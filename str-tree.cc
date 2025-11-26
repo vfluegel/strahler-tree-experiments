@@ -75,7 +75,8 @@ void getLevelPSuccessor (int idx, int p)
     // Calculate number of Non-Empty Strings (NES): count unique values in tmp_d up until there
     size_t nes = std::unordered_set<int>( tmp_d.begin(), tmp_d.begin() + i + 1 ).size();
     std::cout << nes << std::endl;
-    if (nes == k - 1) {
+    // Subtract the string that we currently look at (A, B only refers to strings "above")
+    if (nes - 1 == k - 1) {
         // A: No next sibling on this layer
         std::cout << "Skipping a level\n";
         i = skipUntilNextLevel(tmp_d, i);
@@ -83,36 +84,41 @@ void getLevelPSuccessor (int idx, int p)
 
     while (i >= 0) {
         // check if there was a level change
-        if (tmp_d[i] != tmp_d[i+1]) 
+        if (i == tmp_d.size()-1 or tmp_d[i] != tmp_d[i+1]) 
         {
-            nes --;
             std::cout << "Handling level change\n";
             // Calculate the Non-Leading Bits (NLB): take the complete length and subtract the number of NES (every NES has one leading bit)
             int nlb = (i + 1) - nes;
+            nes --;
             std::cout << "NLB " << nlb << " i " << i << " NES " << nes << std::endl;
             if (nlb < t) 
             {
                 std::cout <<  "Smaller than t\n";
                 int new_index = tmp_d[i];
                 i ++;
-                tmp_b[i] = 1;
-                tmp_d[i] = new_index;
-                int j = 1;
-                while (nlb + j < t) 
+                if ((i + t - nlb + 1)  > tmp_b.size())
                 {
-                    tmp_b [i + j] = 0;
-                    tmp_d [i + j] = new_index;
-                    j ++;
+                    tmp_b.insert(tmp_b.end(), t - nlb, 0);
+                    tmp_b[i] = 1;
+                    tmp_d.insert(tmp_d.end(), t - nlb, new_index);
+                    i += t - nlb;
                 }
-                // remember the last changed position
-                i += j-1;
+                else 
+                {
+                    tmp_b[i] = 1;
+                    tmp_d[i] = new_index;
+                    int j = 1;
+                    while (nlb + j < t) 
+                    {
+                        tmp_b [i + j] = 0;
+                        tmp_d [i + j] = new_index;
+                        j ++;
+                    }
+                    // remember the last changed position
+                    i += j;
+                }
                 break;
             }
-            else
-            {
-                i --;
-            }
-
         }
         // For all following cases we know NLB == t
         else if (i == 0 && tmp_b[i] == 1)
@@ -123,7 +129,9 @@ void getLevelPSuccessor (int idx, int p)
             tmp_d[0] = -1;
             return;
         }
-        else if (tmp_b[i] == 0) 
+        
+        // Have to always check 0s - even when e.g. the first case applies
+        if (tmp_b[i] == 0) 
         {
             if (i == 0 || tmp_d[i - 1] != tmp_d[i])
             {
@@ -159,25 +167,32 @@ void getLevelPSuccessor (int idx, int p)
     std::cout << "Adjusting bit level\n";
     std::cout << "starting at " << i << std::endl; 
     
-    int no_of_needed_nes = k-1 - nes;
-    int set_index = tmp_d[i] + 1;
-    i ++;
-    // Fill up with just the next one as long as we still have bits
-    std::cout << "Needed nes: " << no_of_needed_nes << std::endl;
-    while (tmp_b.size() - i > no_of_needed_nes) 
-    {
-        assert (i >= 0 && i < tmp_d.size());
-        tmp_d[i] = set_index;
-        i ++;
+    int no_of_needed_nes = (k-1) - (nes+1);
+    if (no_of_needed_nes == 0) {
+        // special case: Don't add anything, remove everything after the current position
+        tmp_d.resize(i);
+        tmp_b.resize(i);
     }
-    std::cout << "Filling singles\n";
-    // Now assign the rest of the bits one level a piece
-    while (i < tmp_b.size())
-    {
-        tmp_d[i] = set_index;
-        i ++;
-        set_index ++;
+    else {
+        int set_index = tmp_d[i-1] + 1;
+        // Fill up with just the next one as long as we still have bits
+        std::cout << "Needed nes: " << no_of_needed_nes << std::endl;
+        while (tmp_b.size() - i >= no_of_needed_nes) 
+        {
+            assert (i >= 0 && i < tmp_d.size());
+            tmp_d[i] = set_index;
+            i ++;
+        }
+        std::cout << "Filling singles\n";
+        // Now assign the rest of the bits one level a piece
+        while (i < tmp_b.size())
+        {
+            tmp_d[i] = set_index;
+            i ++;
+            set_index ++;
+        }
     }
+
 }
 
 int main()
@@ -187,14 +202,14 @@ int main()
         getLevelPSuccessor(idx, h-1);
         if (tmp_b == leaves_b[idx+1] && tmp_d == leaves_d[idx+1])
         {
-            std::cout << idx << ": Correct successor!\n";
+            std::cout << idx << ": \033[32mCorrect successor!\n\033[0m";
         }
         else 
         {
-            std::cout << idx << ": Wrong successor!\n";
+            std::cout << idx << ": \033[31mWrong successor!\n\033[0m";
         }
     }
-   /*getLevelPSuccessor(0, h-1);
+   /*getLevelPSuccessor(3, h-1);
    std::cout << "Result: ";
    for (auto &&i : tmp_b)
    {
