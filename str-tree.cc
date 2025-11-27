@@ -1,6 +1,7 @@
 #include <vector>
 #include <unordered_set>
 #include <iostream>
+#include <cassert>
 
 int k = 3, t = 2, h = 2;
 std::vector<std::vector<int>> leaves_b {
