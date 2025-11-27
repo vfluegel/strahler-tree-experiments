@@ -120,16 +120,7 @@ void getLevelPSuccessor (int idx, int p)
                 break;
             }
         }
-        // For all following cases we know NLB == t
-        else if (i == 0 && tmp_b[i] == 1)
-        {
-            std::cout << "We are at top\n";
-            // A base case, we have reached the root and everything is just 1: we are top
-            // Special case of D
-            tmp_d[0] = -1;
-            return;
-        }
-        
+        // For all following cases we know NLB == t        
         // Have to always check 0s - even when e.g. the first case applies
         if (tmp_b[i] == 0) 
         {
@@ -161,6 +152,15 @@ void getLevelPSuccessor (int idx, int p)
             tmp_b[i] = 0;
             i --;
         }
+    }
+
+    // A base case, we have reached the root: we are top
+    // Special case of D
+    if (i == -1) 
+    {
+        std::cout << "We are at top\n";
+        tmp_d[0] = -1;
+        return;
     }
 
     // Change where the bits belong
@@ -200,7 +200,7 @@ int main()
     for (size_t idx = 0; idx < leaves_b.size(); idx++)
     {
         getLevelPSuccessor(idx, h-1);
-        if (tmp_b == leaves_b[idx+1] && tmp_d == leaves_d[idx+1])
+        if (tmp_b == leaves_b[idx+1] && tmp_d == leaves_d[idx+1] or (idx == leaves_b.size() - 1 and tmp_d[0] == -1))
         {
             std::cout << idx << ": \033[32mCorrect successor!\n\033[0m";
         }
