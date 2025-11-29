@@ -16,33 +16,90 @@ typedef struct _node {
   short u;
 } Node;
 
+void push(short u, int k, int t, int h, size_t* lenq, size_t* maxq, Node** stack) {
+  if (*lenq >= *maxq) {
+    (*maxq) = 2 * ((*maxq) + 1);
+    (*stack) = realloc(*stack, (*maxq) * sizeof(Node));
+    assert (*lenq < *maxq);
+  }
+  Node* fresh = *stack + *lenq;
+  fresh->u = (u == 0);
+  fresh->k = k;
+  fresh->t = t;
+  fresh->h = h;
+  (*lenq)++;
+  assert (*lenq <= *maxq);
+}
+
 void strahler_tree(int k, int t, int h) {
   assert(h >= k);
   unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
-  size_t maxq = 10;
-  Node* stack = calloc(maxq, sizeof(Node));
-  if (tree == nullptr || stack == nullptr) {
-    fprintf(stderr, "Memory allocation error\n");
-    exit(EXIT_FAILURE);
-  }
+  const short UTREE = 0;
+  const short VTREE = 1;
+
+  size_t maxq = 0;
+  size_t lenq = 0;
+  Node* stack = nullptr;
 
   // this is the node of interest
-  stack[0].k = k;
-  stack[0].t = t;
-  stack[0].h = h;
-  stack[0].u = true;
-  size_t lenq = 1;
+  push(0, k, t, h, &lenq, &maxq, &stack);
 
   while (lenq > 0) {
     Node* cur = stack + lenq - 1;
-    // check if it's children are nonzero and then pop, otherwise push the
-    // children into the stack
+    if (cur->u && cur->h == 1 && cur->k == 1) {
+      tree[UTREE][cur->k][cur->t][cur->h] = 1;
+      lenq--; // pop
+    } else if (cur->u && cur->h > 1 && cur->k == 1) {
+      unsigned son = tree[UTREE][cur->k][cur->t][cur->h - 1];
+      if (son > 0) {
+        tree[UTREE][cur->k][cur->t][cur->h] = son;
+        lenq--; // pop
+      } else {
+        push(0, cur->k, cur->t, cur->h - 1, &lenq, &maxq, &stack);
+      }
+    } else if (cur->h >= cur->k && cur->k >= 2 && cur->t == 0) {
+      unsigned son = tree[UTREE][cur->k - 1][cur->t][cur->h - 1];
+      if (son > 0) {
+        tree[cur->u ? 0 : 1][cur->k][cur->t][cur->h] = son;
+        lenq--; // pop
+      } else {
+        push(0, cur->k - 1, cur->t, cur->h - 1, &lenq, &maxq, &stack);
+      }
+    } else if (!cur->u && cur->h >= cur->k && cur->k >= 2 && cur->t >= 1) {
+      unsigned child1 = tree[VTREE][cur->k][cur->t - 1][cur->h];
+      unsigned child2 = tree[UTREE][cur->k - 1][cur->t][cur->h - 1];
+      if (child1 > 0 && child2 > 0) {
+        tree[VTREE][cur->k][cur->t][cur->h] = child1 * 2 + child2;
+        lenq--; // pop
+      } else {
+       push(1, cur->k, cur->t - 1, cur->h, &lenq, &maxq, &stack);
+       push(0, cur->k - 1, cur->t, cur->h - 1, &lenq, &maxq, &stack);
+      }
+    } else if (cur->u && cur->h == cur->k && cur->k >= 2) {
+      unsigned son = tree[VTREE][cur->k][cur->t][cur->h];
+      if (son > 0) {
+        tree[UTREE][cur->k][cur->t][cur->h] = son;
+        lenq--; // pop
+      } else {
+        push(1, cur->k, cur->t, cur->h, &lenq, &maxq, &stack);
+      }
+    } else if (cur->u && cur->h > cur->k && cur->k >= 2) {
+      unsigned child1 = tree[VTREE][cur->k][cur->t][cur->h];
+      unsigned child2 = tree[UTREE][cur->k][cur->t][cur->h - 1];
+      if (child1 > 0 && child2 > 0) {
+        tree[UTREE][cur->k][cur->t][cur->h] = child1 * 2 + child2;
+        lenq--; // pop
+      } else {
+       push(1, cur->k, cur->t, cur->h, &lenq, &maxq, &stack);
+       push(0, cur->k, cur->t, cur->h - 1, &lenq, &maxq, &stack);
+      }
+    } else {
+      assert (false);
+    }    
   }
 
-
-
-  // Def 21 items 2: no. of bits in total is at most k + t
-  // TODO: We need a type for subtrees now
+  unsigned total = tree[UTREE][k][t][h];
+  printf("U^%d_{%d,%d} has %d leaves\n", k, t, h, total);
 
   // Epilogue
   free(stack);
