@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 void print_usage(char *argv[]) {
@@ -13,8 +14,11 @@ typedef struct _node {
   int k;
   int t;
   int h;
-  short u;
+  char u;
 } Node;
+
+const char UTREE = 0;
+const char VTREE = 1;
 
 #define PUSH(UVAL, KVAL, TVAL, HVAL, LENQ, MAXQ, STACK)                        \
   do {                                                                         \
@@ -23,7 +27,7 @@ typedef struct _node {
       STACK = realloc(STACK, MAXQ * sizeof(*STACK));                           \
       assert(LENQ < MAXQ);                                                     \
     }                                                                          \
-    STACK[LENQ].u = ((UVAL) == 0);                                             \
+    STACK[LENQ].u = UVAL;                                                      \
     STACK[LENQ].k = KVAL;                                                      \
     STACK[LENQ].t = TVAL;                                                      \
     STACK[LENQ].h = HVAL;                                                      \
@@ -31,67 +35,65 @@ typedef struct _node {
     assert(LENQ <= MAXQ);                                                      \
   } while (0)
 
-unsigned strahler_tree(int k, int t, int h) {
+unsigned count_leaves(int k, int t, int h) {
   assert(h >= k);
   unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
-  const short UTREE = 0;
-  const short VTREE = 1;
 
   size_t maxq = 0;
   size_t lenq = 0;
   Node *stack = nullptr;
 
   // this is the node of interest
-  PUSH(0, k, t, h, lenq, maxq, stack);
+  PUSH(UTREE, k, t, h, lenq, maxq, stack);
 
   while (lenq > 0) {
     Node tos = stack[lenq - 1];
-    if (tos.u && tos.h == 1 && tos.k == 1) {
+    if (tos.u == UTREE && tos.h == 1 && tos.k == 1) {
       tree[UTREE][tos.k][tos.t][tos.h] = 1;
       lenq--; // pop
-    } else if (tos.u && tos.h > 1 && tos.k == 1) {
+    } else if (tos.u == UTREE && tos.h > 1 && tos.k == 1) {
       unsigned son = tree[UTREE][tos.k][tos.t][tos.h - 1];
       if (son > 0) {
         tree[UTREE][tos.k][tos.t][tos.h] = son;
         lenq--; // pop
       } else {
-        PUSH(0, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
+        PUSH(UTREE, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
       }
     } else if (tos.h >= tos.k && tos.k >= 2 && tos.t == 0) {
       unsigned son = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
       if (son > 0) {
-        tree[tos.u ? 0 : 1][tos.k][tos.t][tos.h] = son;
+        tree[tos.u][tos.k][tos.t][tos.h] = son;
         lenq--; // pop
       } else {
-        PUSH(0, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
+        PUSH(UTREE, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
       }
-    } else if (!tos.u && tos.h >= tos.k && tos.k >= 2 && tos.t >= 1) {
+    } else if (tos.u == VTREE && tos.h >= tos.k && tos.k >= 2 && tos.t >= 1) {
       unsigned child1 = tree[VTREE][tos.k][tos.t - 1][tos.h];
       unsigned child2 = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
       if (child1 > 0 && child2 > 0) {
         tree[VTREE][tos.k][tos.t][tos.h] = child1 * 2 + child2;
         lenq--; // pop
       } else {
-        PUSH(1, tos.k, tos.t - 1, tos.h, lenq, maxq, stack);
-        PUSH(0, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
+        PUSH(VTREE, tos.k, tos.t - 1, tos.h, lenq, maxq, stack);
+        PUSH(UTREE, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
       }
-    } else if (tos.u && tos.h == tos.k && tos.k >= 2) {
+    } else if (tos.u == UTREE && tos.h == tos.k && tos.k >= 2) {
       unsigned son = tree[VTREE][tos.k][tos.t][tos.h];
       if (son > 0) {
         tree[UTREE][tos.k][tos.t][tos.h] = son;
         lenq--; // pop
       } else {
-        PUSH(1, tos.k, tos.t, tos.h, lenq, maxq, stack);
+        PUSH(VTREE, tos.k, tos.t, tos.h, lenq, maxq, stack);
       }
-    } else if (tos.u && tos.h > tos.k && tos.k >= 2) {
+    } else if (tos.u == UTREE && tos.h > tos.k && tos.k >= 2) {
       unsigned child1 = tree[VTREE][tos.k][tos.t][tos.h];
       unsigned child2 = tree[UTREE][tos.k][tos.t][tos.h - 1];
       if (child1 > 0 && child2 > 0) {
         tree[UTREE][tos.k][tos.t][tos.h] = child1 * 2 + child2;
         lenq--; // pop
       } else {
-        PUSH(1, tos.k, tos.t, tos.h, lenq, maxq, stack);
-        PUSH(0, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
+        PUSH(VTREE, tos.k, tos.t, tos.h, lenq, maxq, stack);
+        PUSH(UTREE, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
       }
     } else {
       assert(false);
@@ -106,6 +108,221 @@ unsigned strahler_tree(int k, int t, int h) {
   free(tree);
 
   return total;
+}
+
+const char ONE = '1';
+const char ZERO = '0';
+const char EPSILON = 'e';
+const char COMMA = ',';
+const char EOS = '|';
+
+char *prepend(size_t n, const char *pref, const char *str) {
+  // overshooting: if every character is a bitstring, we need to prepend the
+  // prefix to each of them, and add an end-of-string symbol
+  size_t len = 1 + strlen(str) * (n + 1);
+  char *res = malloc(len * sizeof(char));
+  size_t reslen = 0;
+  // Now we copy the prefix, then copy up until the next EOS,
+  // and repeat until end of string marker
+  const char *next = str;
+  assert(next != nullptr);
+  while (*next != '\0') {
+    // we first walk up until the next EOS
+    size_t lenlab = 0;
+    while (next[lenlab] != EOS)
+      lenlab++;
+    lenlab++;
+    // now we copy
+    strncpy(res + reslen, pref, n);
+    strncpy(res + reslen + n, next, lenlab);
+    // finally, we update the pointer to the next label
+    reslen += lenlab + n;
+    assert(reslen < len);
+    next += lenlab;
+  }
+  res[reslen] = '\0';
+  return res;
+}
+
+char *concat3(const char *left, const char *midl, const char *right) {
+  assert(left != nullptr);
+  assert(midl != nullptr);
+  assert(right != nullptr);
+  size_t len = strlen(left) + strlen(midl) + strlen(right) + 1;
+  char *res = malloc(len * sizeof(char));
+  strcpy(res, left);
+  strcat(res, midl);
+  strcat(res, right);
+  return res;
+}
+
+char *labels_leaves(int k, int t, int h) {
+  assert(h >= k);
+  char *(*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
+  const char UTREE = 0;
+  const char VTREE = 1;
+  // NOTE: Technically, the pointers are not required to be null'd at this
+  // point. However, all implementations of C currently take 0-bits as nullptr
+  // and so calloc does null all pointers.
+
+  size_t maxq = 0;
+  size_t lenq = 0;
+  Node *stack = nullptr;
+
+  // this is the node of interest
+  PUSH(UTREE, k, t, h, lenq, maxq, stack);
+
+  while (lenq > 0) {
+    Node tos = stack[lenq - 1];
+    if (tos.u == UTREE && tos.h == 1 && tos.k == 1) {
+      char *lab = calloc(2, sizeof(char));
+      lab[0] = EOS;
+      tree[UTREE][tos.k][tos.t][tos.h] = lab;
+      lenq--; // pop
+    } else if (tos.u == UTREE && tos.h > 1 && tos.k == 1) {
+      char *son = tree[UTREE][tos.k][tos.t][tos.h - 1];
+      if (son != nullptr) {
+        char pref[3] = {EPSILON, COMMA, '\0'};
+        tree[UTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+        lenq--; // pop
+      } else {
+        PUSH(UTREE, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
+      }
+    } else if (tos.h >= tos.k && tos.k >= 2 && tos.t == 0) {
+      char *son = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
+      if (son != nullptr) {
+        if (tos.u == VTREE) {
+          char pref[3] = {EPSILON, COMMA, '\0'};
+          tree[VTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+        } else {
+          char pref[3] = {ZERO, COMMA, '\0'};
+          tree[UTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+        }
+        lenq--; // pop
+      } else {
+        PUSH(UTREE, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
+      }
+    } else if (tos.u == VTREE && tos.h >= tos.k && tos.k >= 2 && tos.t >= 1) {
+      char *child1 = tree[VTREE][tos.k][tos.t - 1][tos.h];
+      char *child2 = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
+      if (child1 != nullptr && child2 != nullptr) {
+        char pref[3] = {EPSILON, COMMA, '\0'};
+        char *midl = prepend(2, pref, child2);
+        pref[0] = ZERO;
+        char *left = prepend(1, pref, child1);
+        pref[0] = ONE;
+        char *right = prepend(1, pref, child1);
+        tree[VTREE][tos.k][tos.t][tos.h] = concat3(left, midl, right);
+        lenq--; // pop
+      } else {
+        PUSH(VTREE, tos.k, tos.t - 1, tos.h, lenq, maxq, stack);
+        PUSH(UTREE, tos.k - 1, tos.t, tos.h - 1, lenq, maxq, stack);
+      }
+    } else if (tos.u == UTREE && tos.h == tos.k && tos.k >= 2) {
+      char *son = tree[VTREE][tos.k][tos.t][tos.h];
+      if (son != nullptr) {
+        char pref[2] = {ZERO, '\0'};
+        tree[UTREE][tos.k][tos.t][tos.h] = prepend(1, pref, son);
+        lenq--; // pop
+      } else {
+        PUSH(VTREE, tos.k, tos.t, tos.h, lenq, maxq, stack);
+      }
+    } else if (tos.u == UTREE && tos.h > tos.k && tos.k >= 2) {
+      char *child1 = tree[VTREE][tos.k][tos.t][tos.h];
+      char *child2 = tree[UTREE][tos.k][tos.t][tos.h - 1];
+      if (child1 != nullptr && child2 != nullptr) {
+        char pref[3] = {EPSILON, COMMA, '\0'};
+        char *midl = prepend(2, pref, child2);
+        pref[0] = ZERO;
+        char *left = prepend(1, pref, child1);
+        pref[0] = ONE;
+        char *right = prepend(1, pref, child1);
+        tree[UTREE][tos.k][tos.t][tos.h] = concat3(left, midl, right);
+        lenq--; // pop
+      } else {
+        PUSH(VTREE, tos.k, tos.t, tos.h, lenq, maxq, stack);
+        PUSH(UTREE, tos.k, tos.t, tos.h - 1, lenq, maxq, stack);
+      }
+    } else {
+      assert(false);
+    }
+  }
+
+  // Epilogue
+  free(stack);
+
+  char* ret = malloc(sizeof(char) * strlen(tree[UTREE][k][t][h]) + 1);
+  strcpy(ret, tree[UTREE][k][t][h]);
+  // NOTE: This could be smarter if we kept track of everything being set not
+  // to nullptr above
+  for (char epu = 0; epu <= 1; epu++)
+    for (unsigned epk = 0; epk <= k; epk++)
+      for (unsigned ept = 0; ept <= t; ept++)
+        for (unsigned eph = 0; eph <= h; eph++)
+          free(tree[epu][epk][ept][eph]);
+  free(tree);
+
+  return ret;
+}
+
+void print_list(const int* nums) {
+  const int* cur = nums;
+  printf("{ ");
+  bool first = true;
+  while (*cur != -1) {
+    if (first) {
+      first = false;
+    } else {
+      printf(", ");
+    }
+    printf("%d", *cur);
+    cur++;
+  }
+  printf(" },\n");
+}
+
+void print_labels(unsigned nleaves, const char* labels) {
+  assert (labels != nullptr);
+  size_t len = strlen(labels) + 2; // overshooting
+  int toms_b[nleaves][len];
+  int toms_d[nleaves][len];
+  size_t leaf = 0;
+  size_t i = 0;
+  size_t b = 0;
+  for (const char* cur = labels; *cur != '\0'; cur++) {
+    switch (*cur) {
+      case ZERO:
+        toms_b[leaf][i] = 0;
+        toms_d[leaf][i++] = b;
+        break;
+      case ONE:
+        toms_b[leaf][i] = 1;
+        toms_d[leaf][i++] = b;
+        break;
+      case EPSILON:
+        break;
+      case COMMA:
+        b++;
+        break;
+      case EOS:
+        toms_b[leaf][i] = -1;
+        toms_d[leaf][i] = -1;
+        leaf++;
+        i = 0;
+        b = 0;
+        break;
+      default:
+        assert (false);
+    }
+  }
+  // Print bits
+  printf("Bits:\n");
+  for (size_t j = 0; j < nleaves; j++)
+    print_list(toms_b[j]);
+  // Print blocks
+  printf("Blocks:\n");
+  for (size_t j = 0; j < nleaves; j++)
+    print_list(toms_d[j]);
 }
 
 int main(int argc, char *argv[]) {
@@ -155,8 +372,11 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // Continuing with the actual computation of the
-  unsigned nleaves = strahler_tree(k, t, h);
+  unsigned nleaves = count_leaves(k, t, h);
+
+  char *labels = labels_leaves(k, t, h);
+  print_labels(nleaves, labels);
+  free(labels);
 
   return EXIT_SUCCESS;
 }
