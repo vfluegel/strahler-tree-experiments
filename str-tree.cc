@@ -116,7 +116,7 @@ std::vector<std::vector<int>> leaves2_d {
 };
 
 std::vector<std::vector<bool>> generated_b {
-    { 0, 0, 0, 0, 0 },
+{ 0, 0, 0, 0, 0 },
 { 0, 0, 0, 0, 0 },
 { 0, 0, 0, 0 },
 { 0, 0, 0, 0, 1 },
@@ -1662,6 +1662,7 @@ void getLevelPSuccessor (int idx, int p, std::vector<std::vector<bool>>& use_b, 
                     tmp_b[i] = 1;
                     tmp_d[i] = new_index;
                     if (i != 0 and tmp_d[i-1] == tmp_d[i]) nlb++;
+                    else nes++;
                     int j = 1;
                     while (nlb + j <= t) 
                     {
@@ -1836,6 +1837,7 @@ int main(int argc, char *argv[])
             else 
             {
                 std::cout << idx << ": \033[31mWrong successor!\n\033[0m";
+                assert (false);
             }
 
             if (idx < use_b.size() - 1)
