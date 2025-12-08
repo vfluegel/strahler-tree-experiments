@@ -329,12 +329,7 @@ void print_labels(unsigned nleaves, const char *labels) {
   printf("Blocks:\n");
   for (size_t j = 0; j < nleaves; j++)
     print_list(toms_d[j]);
-<<<<<<< HEAD
-  // Dump memory
-=======
-
   // cleaning memory
->>>>>>> ee5ff8b5f7fc0b877dc6c29205d884b0dbff0ef5
   free(toms_b);
   free(toms_d);
 }
