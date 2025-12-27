@@ -6,14 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define ONE '1'
-#define ZERO '0'
-#define EPSILON 'e'
-#define COMMA ','
-#define EOS '|'
-
-#define UTREE 0
-#define VTREE 1
+enum : char { ONE = '1', ZERO = '0', EPSILON = 'e', COMMA = ',', EOS = '|' };
+enum { UTREE = 0, VTREE = 1 };
 
 #define PUSH(UVAL, KVAL, TVAL, HVAL, LENQ, MAXQ, STACK)                        \
   do {                                                                         \
