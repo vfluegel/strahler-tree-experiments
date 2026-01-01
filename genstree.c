@@ -24,7 +24,8 @@ enum { UTREE = 0, VTREE = 1 };
     assert(LENQ <= MAXQ);                                                      \
   } while (0)
 
-typedef struct _node {
+typedef struct Node Node;
+typedef struct Node {
   int k;
   int t;
   int h;
@@ -268,23 +269,23 @@ void print_bits(const char *labels) {
   assert(labels != nullptr);
   bool first = true;
 
-  printf("Bits:\n");
+  puts("Bits:");
   for (const char *cur = labels; *cur != '\0'; cur++) {
     switch (*cur) {
     case ZERO:
       if (first) {
-        printf("{0");
+        fputs("{0", stdout);
         first = false;
       } else {
-        printf(", 0");
+        fputs(", 0", stdout);
       }
       break;
     case ONE:
       if (first) {
-        printf("{1");
+        fputs("{1", stdout);
         first = false;
       } else {
-        printf(", 1");
+        fputs(", 1", stdout);
       }
       break;
     case EPSILON:
@@ -292,8 +293,8 @@ void print_bits(const char *labels) {
       break;
     case EOS:
       if (first)
-        printf("{ ");
-      printf("}\n");
+        fputs("{ ", stdout);
+      puts("}");
       first = true;
       break;
     default:
@@ -307,7 +308,7 @@ void print_blocks(const char *labels) {
   unsigned b = 0;
   bool first = true;
 
-  printf("Blocks:\n");
+  puts("Blocks:");
   for (const char *cur = labels; *cur != '\0'; cur++) {
     switch (*cur) {
     case ZERO:
@@ -326,8 +327,8 @@ void print_blocks(const char *labels) {
       break;
     case EOS:
       if (first)
-        printf("{ ");
-      printf("}\n");
+        fputs("{ ", stdout);
+      puts("}");
       b = 0;
       first = true;
       break;
@@ -351,7 +352,7 @@ int main(int argc, char *argv[]) {
     case 'k':
       k = atoi(optarg);
       if (k < 1) {
-        fprintf(stderr, "K must be a positive integer\n");
+        fputs("K must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
       kset = true;
@@ -359,7 +360,7 @@ int main(int argc, char *argv[]) {
     case 't':
       t = atoi(optarg);
       if (t < 0) {
-        fprintf(stderr, "T must be a nonnegative integer\n");
+        fputs("T must be a nonnegative integer\n", stderr);
         return EXIT_FAILURE;
       }
       tset = true;
@@ -367,7 +368,7 @@ int main(int argc, char *argv[]) {
     case 'h':
       h = atoi(optarg);
       if (h < 1) {
-        fprintf(stderr, "H must be a positive integer\n");
+        fputs("H must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
       hset = true;
@@ -379,7 +380,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (!(kset && tset && hset)) {
-    fprintf(stderr, "Expected three arguments\n");
+    fputs("Expected three arguments\n", stderr);
     print_usage(argv);
     return EXIT_FAILURE;
   }
