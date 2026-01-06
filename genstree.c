@@ -346,9 +346,13 @@ int main(int argc, char *argv[argc + 1]) {
   bool kset = false;
   bool tset = false;
   bool hset = false;
+  bool just_count = false;
 
-  while ((opt = getopt(argc, argv, "k:t:h:")) != -1) {
+  while ((opt = getopt(argc, argv, "k:t:h:j")) != -1) {
     switch (opt) {
+    case 'j':
+      just_count = true;
+      break;
     case 'k':
       k = atoi(optarg);
       if (k < 1) {
@@ -386,10 +390,12 @@ int main(int argc, char *argv[argc + 1]) {
   }
 
   count_leaves(k, t, h);
-  char *labels = labels_leaves(k, t, h);
-  print_bits(labels);
-  print_blocks(labels);
-  free(labels);
+  if (!just_count) {
+    char *labels = labels_leaves(k, t, h);
+    print_bits(labels);
+    print_blocks(labels);
+    free(labels);
+  }
 
   return EXIT_SUCCESS;
 }
