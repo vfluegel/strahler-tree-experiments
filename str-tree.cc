@@ -1,7 +1,9 @@
+#include <algorithm>
 #include <vector>
 #include <unordered_set>
 #include <iostream>
 #include <cassert>
+#include <utility>
 
 #include "test.hpp"
 
@@ -2898,7 +2900,7 @@ std::vector<int> tmp_d;
 
 int skipUntilNextLevel (std::vector<int>& curr_d, int i) 
 {
-    while ((i >= 0 && curr_d[i] == curr_d[i+1]) || i == curr_d.size() - 1) 
+    while ((i >= 0 && curr_d[i] == curr_d[i+1]) || std::cmp_equal(i + 1, curr_d.size())) 
     {
         tmp_b[i] = 0;
         i --;
@@ -2928,7 +2930,8 @@ void getLevelPSuccessor (int idx, int p, std::vector<std::vector<bool>>& use_b, 
     size_t nes = std::unordered_set<int>( tmp_d.begin(), tmp_d.begin() + i + 1 ).size();
     std::cout << nes << std::endl;
     // Subtract the string that we currently look at (A, B only refers to strings "above")
-    if (nes - 1 == k - 1) {
+    if (std::cmp_equal(nes, k)) {  // we actually want to check nes - 1 == k - 1, but we can
+                     // +1 on both sides (saves us signedness craziness)
         // A: No next sibling on this layer
         std::cout << "Skipping a level\n";
         i = skipUntilNextLevel(tmp_d, i);
@@ -2936,7 +2939,7 @@ void getLevelPSuccessor (int idx, int p, std::vector<std::vector<bool>>& use_b, 
 
     while (i >= 0) {
         // check if there was a level change
-        if (i == tmp_d.size()-1 or tmp_d[i] != tmp_d[i+1]) 
+        if (std::cmp_equal(i + 1, tmp_d.size()) or tmp_d[i] != tmp_d[i+1]) 
         {
             std::cout << "Handling level change\n";
             // Calculate the Non-Leading Bits (NLB): take the complete length and subtract the number of NES (every NES has one leading bit)
@@ -2946,9 +2949,9 @@ void getLevelPSuccessor (int idx, int p, std::vector<std::vector<bool>>& use_b, 
             if (nlb < t) 
             {
                 std::cout <<  "Smaller than t\n";
-                int new_index = i == tmp_d.size() - 1 ? tmp_d[i] : tmp_d[i+1] - 1;
+                int new_index = std::cmp_equal(i + 1, tmp_d.size()) ? tmp_d[i] : tmp_d[i+1] - 1;
                 i ++;
-                if ((i + t - nlb + 1)  > tmp_b.size())
+                if (std::cmp_greater(i + t - nlb + 1, tmp_b.size()))
                 {
                     tmp_b.insert(tmp_b.end(), t - nlb, 0);
                     tmp_b[i] = 1;
@@ -3057,15 +3060,15 @@ void getLevelPSuccessor (int idx, int p, std::vector<std::vector<bool>>& use_b, 
         int set_index = tmp_d[(skipLevel ? i : i-1)] + 1;
         // Fill up with just the next one as long as we still have bits
         std::cout << "Needed nes: " << no_of_needed_nes << std::endl;
-        while (tmp_b.size() - i >= no_of_needed_nes) 
+        while (std::cmp_greater_equal(tmp_b.size(),i + no_of_needed_nes)) 
         {
-            assert (i >= 0 && i < tmp_d.size());
+            assert (i >= 0 and std::cmp_less(i, tmp_d.size()));
             tmp_d[i] = set_index;
             i ++;
         }
         std::cout << "Filling singles\n";
         // Now assign the rest of the bits one level a piece
-        while (i < tmp_b.size())
+        while (std::cmp_less(i, tmp_b.size()))
         {
             set_index ++;
             tmp_d[i] = set_index;
@@ -3136,7 +3139,7 @@ void prog_tmp(int pindex)
 
     while (i >= 0) {
         // check if there was a level change
-        if (i == tmp_d.size()-1 or tmp_d[i] != tmp_d[i+1]) 
+        if (std::cmp_equal(i+1, tmp_d.size()) or tmp_d[i] != tmp_d[i+1]) 
         {
 #ifndef NDEBUG
             if (trace >= 2) std::cout << "Handling level change\n";
@@ -3152,13 +3155,13 @@ void prog_tmp(int pindex)
 #ifndef NDEBUG
                 if (trace >= 2) std::cout <<  "Smaller than t\n";
 #endif
-                int new_index = i == tmp_d.size() - 1 ? tmp_d[i] : tmp_d[i+1] - 1;
+                int new_index = std::cmp_equal(i+1, tmp_d.size()) ? tmp_d[i] : tmp_d[i+1] - 1;
                 if (new_index >= h-1) {
                     std::cout << "Found error when handling case nlb < t\n";
                 }
                 std::cout << "New index is " << new_index << ", current NLB: " << nlb << std::endl;
                 i ++;
-                if ((i + t - nlb + 1)  > tmp_b.size())
+                if (std::cmp_greater(i + t - nlb + 1, tmp_b.size()))
                 {
                     tmp_b.insert(tmp_b.end(), t - nlb, 0);
                     tmp_b[i] = 1;
@@ -3291,9 +3294,9 @@ void prog_tmp(int pindex)
     #ifndef NDEBUG
         if (trace >= 2) std::cout << "Needed nes: " << no_of_needed_nes << std::endl;
     #endif
-        while (tmp_b.size() - i >= no_of_needed_nes) 
+        while (std::cmp_greater_equal(tmp_b.size(), i + no_of_needed_nes))
         {
-            assert (i >= 0 && i < tmp_d.size());
+            assert (i >= 0 and std::cmp_less(i, tmp_d.size()));
             tmp_d[i] = set_index;
             i ++;
         }
@@ -3301,7 +3304,7 @@ void prog_tmp(int pindex)
         if (trace >= 2) std::cout << "Filling singles\n";
 #endif
         // Now assign the rest of the bits one level a piece
-        while (i < tmp_b.size())
+        while (std::cmp_less(i, tmp_b.size()))
         {
             set_index ++;
             if (set_index >= h-1) {
@@ -3327,12 +3330,12 @@ int compare(size_t idxA, size_t idxB, int pindex, std::vector<std::vector<bool>>
     if (indicesA[0] == -1) return 1;
     if (indicesB[0] == -1) return -1;
     
-    for (int i=0; i < std::max(bitsA.size(), bitsB.size()); i++) {
-        if (i >= bitsB.size())
+    for (int i=0; std::cmp_less(i, std::max(bitsA.size(), bitsB.size())); i++) {
+        if (std::cmp_greater_equal(i, bitsB.size()))
         {
             return bitsA[i] == 0 ? -1: 1;
         }
-        else if (i >= bitsA.size())
+        else if (std::cmp_greater_equal(i, bitsA.size()))
         {
             return bitsB[i] == 0 ? 1 : -1;
         }
@@ -3371,7 +3374,7 @@ int main(int argc, char *argv[])
             tmp_d = use_d[idx];
             prog_tmp(h-2);
             // getLevelPSuccessor(idx, h-1, use_b, use_d);
-            if (tmp_b == use_b[idx+1] && tmp_d == use_d[idx+1] or (idx == use_b.size() - 1 and tmp_d[0] == -1))
+            if ((tmp_b == use_b[idx+1] and tmp_d == use_d[idx+1]) or ((idx == use_b.size() - 1 and tmp_d[0] == -1)))
             {
                 std::cout << idx << ": \033[32mCorrect successor!\n\033[0m";
             }
