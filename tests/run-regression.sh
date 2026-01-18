@@ -67,8 +67,8 @@ for ct in "${CASES[@]}"; do
   actual="tests/actual/$name"
   golden="tests/golden/$name"
 
-  echo "  Running: $BIN --k $k --t $t --h $h"
-  "$BIN" --k "$k" --t "$t" --h "$h" > "$actual"
+  echo "  Running: $BIN -k $k -t $t -h $h"
+  "$BIN" -k "$k" -t "$t" -h "$h" > "$actual"
 
   if [ ! -f "$golden" ]; then
     echo "  MISSING GOLDEN: $golden"
