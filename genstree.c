@@ -29,19 +29,19 @@ enum { UTREE = 0, VTREE = 1 };
     STACK[LENQ - 1].h = HVAL;                                                  \
   } while (0)
 
-typedef struct Node {
-  int k;
-  int t;
-  int h;
-  char u;
-} Node;
-
 void print_usage(char *argv[]) {
   fprintf(stderr, "Usage: %s -k K -t T -h H [-j -d]\n", argv[0]);
   fputs("-j\t Can be used to obtain just the leaf count\n", stderr);
   fputs("-d\t Indicates the tree should be printed in dot format\n", stderr);
   fputs("With no options, the labels of the leaves will be printed\n", stderr);
 }
+
+typedef struct Node {
+  int k;
+  int t;
+  int h;
+  char u;
+} Node;
 
 [[nodiscard]]
 unsigned count_leaves(int k, int t, int h) {
@@ -132,7 +132,7 @@ char *prepend(size_t n, char const *pref, char const *str) {
   // overshooting: if every character is a bitstring, we need to prepend the
   // prefix to each of them, and add an end-of-string symbol
   size_t len = 1 + strlen(str) * (n + 1);
-  char *res = malloc(len * sizeof(char));
+  char *res = malloc(len);
   size_t reslen = 0;
   // Now we copy the prefix, then copy up until the next EOS,
   // and repeat until end of string marker
@@ -162,7 +162,7 @@ char *concat3(char const *left, char const *midl, char const *right) {
   assert(midl != nullptr);
   assert(right != nullptr);
   size_t len = strlen(left) + strlen(midl) + strlen(right) + 1;
-  char *res = malloc(len * sizeof(char));
+  char *res = malloc(len);
   strcpy(res, left);
   strcat(res, midl);
   strcat(res, right);
@@ -188,8 +188,9 @@ char *labels_leaves(int k, int t, int h) {
   while (lenq > 0) {
     Node tos = stack[lenq - 1];
     if (tos.u == UTREE && tos.h == 1 && tos.k == 1) {
-      char *lab = calloc(2, sizeof(char));
+      char *lab = malloc(2);
       lab[0] = EOS;
+      lab[1] = '\0';
       tree[UTREE][tos.k][tos.t][tos.h] = lab;
       lenq--; // pop
     } else if (tos.u == UTREE && tos.h > 1 && tos.k == 1) {
@@ -277,7 +278,8 @@ char *labels_leaves(int k, int t, int h) {
   // Epilogue
   free(stack);
 
-  char *ret = malloc(sizeof(char) * strlen(tree[UTREE][k][t][h]) + 1);
+  // Remember the extra byte for the end-of-string symbol
+  char *ret = malloc(strlen(tree[UTREE][k][t][h]) + 1);
   strcpy(ret, tree[UTREE][k][t][h]);
   // NOTE: This could be smarter if we kept track of everything being set not
   // to nullptr above
@@ -364,39 +366,31 @@ void print_blocks(char const *labels) {
   }
 }
 
-void print_tree(char const *labels) {
+void print_tree(unsigned const nlabs, char const labels[nlabs]) {
   assert(labels != nullptr);
-  unsigned b = 0;
-  bool first = true;
+  unsigned id = 1;
+  char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
 
-  puts("Blocks:");
+  // This will be a DFS-like procedure, we need a stack of arrays of pointers
+  char const ***stack = nullptr;
+  size_t maxq = 0;
+  size_t lenq = 0;
+
+  // And we put in it the array of pointers to all labels to being with
+  lab_ptrs[0] = labels;
+  unsigned cur_label_idx = 1;
   for (char const *cur = labels; *cur != '\0'; cur++) {
-    switch (*cur) {
-    case ZERO:
-    case ONE:
-      if (first) {
-        printf("{%d", b);
-        first = false;
-      } else {
-        printf(", %d", b);
-      }
-      break;
-    case EPSILON:
-      break;
-    case COMMA:
-      b++;
-      break;
-    case EOS:
-      if (first)
-        fputs("{ ", stdout);
-      puts("}");
-      b = 0;
-      first = true;
-      break;
-    default:
-      assert(false);
+    assert(cur_label_idx < nlabs);
+    if (*cur == EOS) {
+      lab_ptrs[cur_label_idx] = cur + 1;
+      cur_label_idx++;
     }
   }
+  PUSH(stack, lenq, maxq);
+  stack[lenq - 1] = lab_ptrs;
+
+  free(stack);
+  free(lab_ptrs);
 }
 
 int main(int argc, char *argv[argc + 1]) {
@@ -454,15 +448,15 @@ int main(int argc, char *argv[argc + 1]) {
     return EXIT_FAILURE;
   }
 
+  unsigned total = count_leaves(k, t, h);
   if (just_count) {
-    unsigned total = count_leaves(k, t, h);
     printf("U^%d_{%d,%d} has %d leaves\n", k, t, h, total);
     return EXIT_SUCCESS;
   }
 
   char *labels = labels_leaves(k, t, h);
   if (print_dot) {
-    print_tree(labels);
+    print_tree(total, labels);
     return EXIT_SUCCESS;
   } else { // Default: print labels of leaves
     print_bits(labels);
