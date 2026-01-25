@@ -1,5 +1,5 @@
 # Strahler Tree Experiments
-Repository to hold some files to play around with Strahler trees.
+Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
 ## Tools
 Run `make` to compile some tools.
@@ -12,8 +12,18 @@ Run `make` to compile some tools.
   "00,0,1,e,1|00,1,1,0,0|" | ./pms2dot | dot -Tpng > tree.png` prints a tree
   with two branches.
 
-## Labels in Code
-Labels refer to conditions in page 19 of [this paper](https://arxiv.org/pdf/2003.08627):  
+
+## Computing P-Level Successors
+The file `str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree. 
+The compiled binary contains a main function that can be used without or with one paramter:
+* No parameter: Check every leaf in the tree against its successor
+* One (integer) parameter: Check that specific leaf and output the result and expected result.  
+
+The tree that is used is defined in the file before compiling. The expected format is two vectors of vectors: One storing the bits and a second storing the level that the corresponding bit in the first vector of vectors belongs to. Multiple examples are currently included and can be switched out by changing `use_b` (bits) and `use_d` (levels) in `main`. When the tree is switched out, `k`, `t`, and `h` need to be set accordingly!
+
+
+## Explanations for Comments in Code
+Some comments in `str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:  
 * _Cases where the siblings does not exist_
     * **A**: the number of non-empty strings among bitstrings h-1 and r+1 is k-1
     * **B**: the number of non-leadings bits in bitstrings h-1 to r+1 is t
@@ -27,8 +37,3 @@ Labels refer to conditions in page 19 of [this paper](https://arxiv.org/pdf/2003
 * _Setting the remaining bits_
     * **G**: Set 00^j for some i>=0 so the total number of bits used is (k-1)+t
     * **H**: Add strings 0 so the number of non-empty bitstrings is k-1
-
-## Command Line Arguments
-The compiled binary can be used without or with one paramter:
-* No parameter: Check every leaf in the tree against its successor
-* One (integer) parameter: Check that specific leaf and output the result and expected result
