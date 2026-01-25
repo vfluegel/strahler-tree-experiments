@@ -283,7 +283,7 @@ typedef struct Node {
   // Remember the extra byte for the end-of-string symbol
   char *ret = malloc(strlen(tree[UTREE][k][t][h]) + 1);
   strcpy(ret, tree[UTREE][k][t][h]);
-  // NOTE: This could be smarter if we kept track of everything being set not
+  // FIXME: This could be smarter if we kept track of everything being set not
   // to nullptr above
   for (char epu = 0; epu <= 1; epu++)
     for (unsigned epk = 0; epk <= k; epk++)

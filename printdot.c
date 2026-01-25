@@ -84,7 +84,7 @@ typedef struct LabdTree {
   return true;
 }
 
-void print_tree(unsigned const nlabs, char const labels[nlabs]) {
+void print_tree(unsigned const nlabs, char const labels[static nlabs]) {
   assert(labels != nullptr);
   char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
 
