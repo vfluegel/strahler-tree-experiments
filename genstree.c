@@ -159,8 +159,9 @@ typedef struct Node {
   return res;
 }
 
-[[nodiscard]] static char *concat3(char const *left, char const *midl,
-                                   char const *right) {
+[[nodiscard]] static inline char *concat3(char const *left,
+                                          char const *midl,
+                                          char const *right) {
   assert(left != nullptr);
   assert(midl != nullptr);
   assert(right != nullptr);

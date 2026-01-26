@@ -31,7 +31,7 @@ typedef struct LabdTree {
   unsigned id;
 } LabdTree;
 
-[[nodiscard]] static char const *after_next_comma(char const *str) {
+[[nodiscard]] static inline char const *after_next_comma(char const *str) {
   assert(str != nullptr);
   char const *cur = str;
   while (*cur != COMMA && *cur != EOS) {
@@ -84,7 +84,7 @@ typedef struct LabdTree {
   return true;
 }
 
-void print_tree(unsigned const nlabs, char const labels[static nlabs]) {
+void print_tree(unsigned const nlabs, char const labels[nlabs]) {
   assert(labels != nullptr);
   char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
 
