@@ -110,7 +110,8 @@ void print_tree_ppart(unsigned const nlabs,
     }
   }
   PUSH(stack, lenq, maxq);
-  SET_TOP_LABDTREE(stack, lenq, nlabs, lab_ptrs, 0, next_id);
+  // Hacky: no edges indexed yet so we give the root a "height" of -1
+  SET_TOP_LABDTREE(stack, lenq, nlabs, lab_ptrs, -1, next_id);
   next_id++;
 
   // Recall we're going to try and handle this DFS-fashion. Each time we
