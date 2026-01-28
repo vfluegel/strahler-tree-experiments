@@ -13,11 +13,12 @@
 
 static void print_usage(char *argv[]) {
   fprintf(stderr,
-          "Usage: %s reads progress measures and prints their prefix tree.\n",
+          "Usage: %s [-h] reads progress measures and prints their prefix tree.\n",
           argv[0]);
-  fputs("The program receives progress measures ending with '|' via stdin.\n",
+  fputs("-h\t Prints this message.\n", stderr);
+  fputs("The program receives progress measures ending with '|' via stdin. Each\n",
         stderr);
-  fputs("Each progress measure is a comma-separated sequence of bits.\n",
+  fputs("progress measure is a comma-separated sequence of bits.\n",
         stderr);
 }
 
