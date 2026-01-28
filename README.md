@@ -7,6 +7,10 @@ Run `make` to compile some tools.
   and `h`; it can also print to `stdout` the labels of the leaves of the tree;
   and it can even print the tree in dot format so you can run, e.g. `./genstree
   -k 4 -t 2 -h 4 -d | dot -Tpng > tree.png`
+* If you want `genstree` to also print the partitioning of leaf labels into
+  p-level groups, you can use the `-p` option; then the sizes of groups of
+  leaves whose p-level successor are the same are printed (their sum
+  adds up to the total number of leaves)
 * `pms2dot` can be used to read from `stdin` and print a dot format tree
   constructed from a progress-measure string, for instance `echo
   "00,0,1,e,1|00,1,1,0,0|" | ./pms2dot | dot -Tpng > tree.png` prints a tree
