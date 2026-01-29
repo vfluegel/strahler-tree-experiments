@@ -1,0 +1,15 @@
+# Binaries
+genstree
+lenstree
+pms2dot
+
+# Objects
+*.o
+
+# Coverage data
+*.gcda
+*.gcno
+*.gcov
+
+# Test artifacts
+tests/actual/

@@ -84,10 +84,11 @@ unsigned tree_size(int k, int t, int h) {
 }
 
 void print_usage(char *argv[]) {
-  fprintf(stderr, "Usage: %s -k K -t T -h H \n", argv[0]);
+  fprintf(stderr, "Usage: %s -k K -t T -h H\n", argv[0]);
 }
 
 int main(int argc, char **argv) {
+  opterr = 0;
   int opt;
   int k;
   int t;

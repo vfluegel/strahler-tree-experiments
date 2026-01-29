@@ -1,0 +1,10 @@
+strict graph {
+	1 -- 2 [label="00"];
+	2 -- 3 [label="0"];
+	1 -- 4 [label="0"];
+	4 -- 5 [label="00"];
+	4 -- 6 [label="0"];
+	4 -- 7 [label="01"];
+	1 -- 8 [label="01"];
+	8 -- 9 [label="0"];
+}

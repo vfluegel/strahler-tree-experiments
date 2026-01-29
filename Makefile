@@ -3,18 +3,30 @@ CXXFLAGS=-O3 -Wall -Wextra -Wpedantic
 
 all: genstree lenstree pms2dot
 
-genstree: genstree.c prtstree.c prtstree.h
-	$(CC) $(CFLAGS) genstree.c prtstree.c -o genstree
+genstree: genstree.o prtstree.o
+	$(CC) $(CFLAGS) $^ -o $@
 
-pms2dot: pms2dot.c prtstree.h prtstree.c
-	$(CC) $(CFLAGS) pms2dot.c prtstree.c -o pms2dot
+pms2dot: pms2dot.o prtstree.o
+	$(CC) $(CFLAGS) $^ -o $@
 
-lenstree: lenstree.cpp
-	$(CXX) $(CXXFLAGS) lenstree.cpp -o lenstree
+lenstree: lenstree.o
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+%.o: %.c prtstree.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm genstree lenstree pms2dot
+	rm -f genstree lenstree pms2dot *.o *.gcda *.gcno *.gcov
+
+GCOV?=gcov
+coverage: CFLAGS += --coverage
+coverage: CXXFLAGS += --coverage
+coverage: clean all regtest
+	$(GCOV) genstree.c pms2dot.c prtstree.c lenstree.cpp
 
 regtest:
-	echo "Running regression tests..." 
+	@echo "Running regression tests..."
 	./tests/run-regression.sh

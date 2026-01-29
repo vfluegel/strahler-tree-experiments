@@ -1,0 +1,6 @@
+Some arguments are missing!
+Usage: genstree -k K -t T -h H [-j -d -p P]
+-j	 Can be used to obtain just the leaf count
+-d	 Indicates the tree should be printed in dot format
+-p	 P can be used to indicate a p-value of interest
+With -p or no options, the labels of the leaves will be printed

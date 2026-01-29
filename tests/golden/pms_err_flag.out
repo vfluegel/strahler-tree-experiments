@@ -1,0 +1,4 @@
+Usage: pms2dot [-h] reads progress measures and prints their prefix tree.
+-h	 Prints this message.
+The program receives progress measures ending with '|' via stdin. Each
+progress measure is a comma-separated sequence of bits.
