@@ -31,6 +31,18 @@ fi
 echo "Using genstree binary: $GENSTREE_BIN"
 echo "Using pms2dot binary: $PMS2DOT_BIN"
 
+LENSTREE_BIN=""
+if [ -x "./lenstree" ]; then
+  LENSTREE_BIN="./lenstree"
+elif command -v lenstree >/dev/null 2>&1; then
+  LENSTREE_BIN="$(command -v lenstree)"
+else
+  echo "Error: lenstree binary not found in project root or PATH."
+  echo "Please build the project so that './lenstree' exists, or adjust this script."
+  exit 2
+fi
+echo "Using lenstree binary: $LENSTREE_BIN"
+
 # genstree test cases: list of "k t h" triples
 GENSTREE_CASES=(
   "2 1 2"
@@ -76,6 +88,13 @@ if [ "$GENERATE" -eq 1 ]; then
     echo "  echo \"$case\" | $PMS2DOT_BIN > tests/golden/$name"
     echo "$case" | "$PMS2DOT_BIN" > "tests/golden/$name"
   done
+  for ct in "${GENSTREE_CASES[@]}"; do
+    set -- $ct
+    k=$1; t=$2; h=$3
+    name="len_k${k}_t${t}_h${h}.out"
+    echo "  $LENSTREE_BIN -k $k -t $t -h $h > tests/golden/$name"
+    "$LENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "tests/golden/$name"
+  done
   echo "Done. Review and commit tests/golden/* if outputs are correct."
   exit 0
 fi
@@ -93,6 +112,32 @@ for ct in "${GENSTREE_CASES[@]}"; do
 
   echo "  Running: $GENSTREE_BIN -k $k -t $t -h $h"
   "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "$actual"
+
+  if [ ! -f "$golden" ]; then
+    echo "  MISSING GOLDEN: $golden"
+    echo "  To create goldens: tests/run-regression.sh --generate-goldens"
+    FAIL=1
+    continue
+  fi
+
+  if ! diff -u "$golden" "$actual"; then
+    echo "  FAIL: output differs for $name"
+    FAIL=1
+  else
+    echo "  OK: $name"
+  fi
+done
+
+echo "Testing lenstree..."
+for ct in "${GENSTREE_CASES[@]}"; do
+  set -- $ct
+  k=$1; t=$2; h=$3
+  name="len_k${k}_t${t}_h${h}.out"
+  actual="tests/actual/$name"
+  golden="tests/golden/$name"
+
+  echo "  Running: $LENSTREE_BIN -k $k -t $t -h $h"
+  "$LENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "$actual"
 
   if [ ! -f "$golden" ]; then
     echo "  MISSING GOLDEN: $golden"
