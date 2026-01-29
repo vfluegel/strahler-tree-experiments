@@ -23,6 +23,7 @@ static void print_usage(char *argv[]) {
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  opterr = 0;
   int opt;
 
   while ((opt = getopt(argc, argv, "h")) != -1) {

@@ -88,6 +88,7 @@ void print_usage(char *argv[]) {
 }
 
 int main(int argc, char **argv) {
+  opterr = 0;
   int opt;
   int k;
   int t;

@@ -410,6 +410,7 @@ static void print_blocks(char const labels[static 1]) [[unsequenced]] {
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  opterr = 0;
   int opt;
   int k;
   int t;
