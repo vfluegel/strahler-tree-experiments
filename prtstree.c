@@ -6,24 +6,15 @@
 
 #include "prtstree.h"
 
-#define PUSH(STACK, LENQ, MAXQ)                                                \
+#define PUSH(STACK, LENS, MAXS, ELEM)                                          \
   do {                                                                         \
-    if (LENQ >= MAXQ) {                                                        \
-      MAXQ = 2 * (MAXQ + 1);                                                   \
-      STACK = realloc(STACK, MAXQ * sizeof(*STACK));                           \
-      assert(LENQ < MAXQ);                                                     \
+    if ((LENS) == (MAXS)) {                                                    \
+      (MAXS) = 2 * ((MAXS) + 1);                                               \
+      (STACK) = realloc((STACK), (MAXS) * sizeof((STACK)[0]));                 \
+      assert((LENS) < (MAXS));                                                 \
     }                                                                          \
-    LENQ++;                                                                    \
-    assert(LENQ <= MAXQ);                                                      \
-  } while (0)
-
-#define SET_TOP_LABDTREE(STACK, LENQ, NLABS, LABPTRS, HEIGHT, FRESHID)         \
-  do {                                                                         \
-    assert(LENQ > 0);                                                          \
-    STACK[LENQ - 1].size = NLABS;                                              \
-    STACK[LENQ - 1].labs = LABPTRS;                                            \
-    STACK[LENQ - 1].height = HEIGHT;                                           \
-    STACK[LENQ - 1].id = FRESHID;                                              \
+    (STACK)[(LENS)] = (ELEM);                                                  \
+    (LENS)++;                                                                  \
   } while (0)
 
 typedef struct LabdTree {
@@ -87,16 +78,15 @@ typedef struct LabdTree {
   return true;
 }
 
-void print_tree_ppart(unsigned const nlabs,
-                      char const labels[nlabs],
+void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
                       int const p) [[unsequenced]] {
   assert(labels != nullptr);
   char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
 
   // This will be a DFS-like procedure, we need a stack of arrays of pointers
   LabdTree *stack = nullptr;
-  size_t maxq = 0;
-  size_t lenq = 0;
+  size_t maxs = 0;
+  size_t lens = 0;
 
   // And we put in it the array of pointers to all labels to being with
   unsigned next_id = 1;
@@ -109,10 +99,10 @@ void print_tree_ppart(unsigned const nlabs,
       cur_label_idx++;
     }
   }
-  PUSH(stack, lenq, maxq);
   // Hacky: no edges indexed yet so we give the root a "height" of -1
-  SET_TOP_LABDTREE(stack, lenq, nlabs, lab_ptrs, -1, next_id);
-  next_id++;
+  LabdTree ltree = {
+      .size = nlabs, .labs = lab_ptrs, .id = next_id++, .height = -1};
+  PUSH(stack, lens, maxs, ltree);
 
   // Recall we're going to try and handle this DFS-fashion. Each time we
   // "treat" a labelled tree we consider its leaf labels so that:
@@ -124,20 +114,20 @@ void print_tree_ppart(unsigned const nlabs,
   // start (so we need to reduce the length) in the new labelled tree.
   //
   // Level p nodes are base cases print their size.
-  while (lenq > 0) {
-    LabdTree const tree = stack[lenq - 1];
-    if (tree.height == p) {  // base cases, print and pop
-      lenq--;
+  while (lens > 0) {
+    LabdTree const tree = stack[lens - 1];
+    if (tree.height == p) { // base cases, print and pop
+      lens--;
       printf("Part %ld\n", tree.size);
       continue;
     }
-    if (tree.size == 0) {  // we're done!
-      lenq--;
-      assert(lenq == 0);
+    if (tree.size == 0) { // we're done!
+      lens--;
+      assert(lens == 0);
       continue;
     }
     if (tree.size == 1 && tree.labs[0][0] == EOS) {
-      lenq--;
+      lens--;
       fprintf(stderr, "Got to a leaf or size %ld, something is going wrong!\n",
               tree.size);
       break;
@@ -164,30 +154,30 @@ void print_tree_ppart(unsigned const nlabs,
       tree.labs[idx] = after_next_comma(tree.labs[idx]);
 
     // 3. Now we need to push a tree into the stack that points at the initial
-    // segment of tree.labs. But first, we update tree.labs to ignore that
-    // initial part
-    char const **latter_labs = tree.labs + bucket_size;
-    size_t new_size = tree.size - bucket_size;
-    unsigned new_height = tree.height + 1;
-    SET_TOP_LABDTREE(stack, lenq, new_size, latter_labs, tree.height, tree.id);
-    PUSH(stack, lenq, maxq);
-    SET_TOP_LABDTREE(stack, lenq, bucket_size, tree.labs, new_height, next_id);
-    next_id++;
+    // segment of tree.labs. But first, we update the top of the stack to
+    // ignore that initial part
+    stack[lens - 1].size = tree.size - bucket_size;
+    stack[lens - 1].labs = tree.labs + bucket_size;
+    ltree.size = bucket_size;
+    ltree.labs = tree.labs;
+    ltree.height = tree.height + 1;
+    ltree.id = next_id++;
+    PUSH(stack, lens, maxs, ltree);
   }
 
   free(stack);
   free(lab_ptrs);
 }
 
-void print_tree_dot(unsigned const nlabs,
-                    char const labels[nlabs]) [[unsequenced]] {
+void print_tree_dot(unsigned const nlabs, char const labels[nlabs])
+    [[unsequenced]] {
   assert(labels != nullptr);
   char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
 
   // This will be a DFS-like procedure, we need a stack of arrays of pointers
   LabdTree *stack = nullptr;
-  size_t maxq = 0;
-  size_t lenq = 0;
+  size_t maxs = 0;
+  size_t lens = 0;
 
   // And we put in it the array of pointers to all labels to being with
   unsigned next_id = 1;
@@ -200,9 +190,8 @@ void print_tree_dot(unsigned const nlabs,
       cur_label_idx++;
     }
   }
-  PUSH(stack, lenq, maxq);
-  SET_TOP_LABDTREE(stack, lenq, nlabs, lab_ptrs, 0, next_id);
-  next_id++;
+  LabdTree ltree = {.size = nlabs, .labs = lab_ptrs, .id = next_id++};
+  PUSH(stack, lens, maxs, ltree);
 
   // start the tree in the output
   puts("strict graph {");
@@ -218,11 +207,11 @@ void print_tree_dot(unsigned const nlabs,
   //
   // Parents are responsible for printing nodes of their newly created
   // children (when pushing a new labelled tree) and edges to them.
-  while (lenq > 0) {
-    LabdTree const tree = stack[lenq - 1];
+  while (lens > 0) {
+    LabdTree const tree = stack[lens - 1];
     if (tree.size == 0 ||
-        (tree.size == 1 && tree.labs[0][0] == EOS)) {  // base cases, just pop
-      lenq--;
+        (tree.size == 1 && tree.labs[0][0] == EOS)) { // base cases, just pop
+      lens--;
       continue;
     }
 
@@ -265,14 +254,14 @@ void print_tree_dot(unsigned const nlabs,
       tree.labs[idx] = after_next_comma(tree.labs[idx]);
 
     // 3. Now we need to push a tree into the stack that points at the initial
-    // segment of tree.labs. But first, we update tree.labs to ignore that
-    // initial part
-    char const **latter_labs = tree.labs + bucket_size;
-    size_t new_size = tree.size - bucket_size;
-    SET_TOP_LABDTREE(stack, lenq, new_size, latter_labs, 0, tree.id);
-    PUSH(stack, lenq, maxq);
-    SET_TOP_LABDTREE(stack, lenq, bucket_size, tree.labs, 0, next_id);
-    next_id++;
+    // segment of tree.labs. But first, we update the top of the stack to
+    // ignore that initial part
+    stack[lens - 1].size = tree.size - bucket_size;
+    stack[lens - 1].labs = tree.labs + bucket_size;
+    ltree.size = bucket_size;
+    ltree.labs = tree.labs;
+    ltree.id = next_id++;
+    PUSH(stack, lens, maxs, ltree);
   }
   puts("}");
 
