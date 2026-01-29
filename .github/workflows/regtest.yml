@@ -19,7 +19,7 @@ jobs:
       - name: Install build essentials
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential g++-14 gcc-14
+          sudo apt-get install -y build-essential g++-14 gcc-14 libboost-dev
 
       - name: Run regression tests
         env:
@@ -27,5 +27,6 @@ jobs:
           GENERATE_GOLDENS: "0"
         run: |
           export CC=gcc-14
-          make genstree
+          export CXX=g++-14
+          make all
           make regtest
