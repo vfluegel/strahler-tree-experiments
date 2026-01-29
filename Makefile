@@ -1,5 +1,4 @@
-# Use -std=c2x because -std=c23 is not supported by GCC versions earlier than 14
-CFLAGS=-O3 -std=c2x -Wall -Wextra -Wpedantic -DNDEBUG
+CFLAGS=-O3 -std=c23 -Wall -Wextra -Wpedantic -DNDEBUG
 CXXFLAGS=-O3 -Wall -Wextra -Wpedantic
 
 all: genstree lenstree pms2dot
