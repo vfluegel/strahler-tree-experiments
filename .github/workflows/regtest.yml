@@ -12,6 +12,8 @@ jobs:
   regtest:
     name: Run make regtest
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -30,3 +32,24 @@ jobs:
           export CXX=g++-14
           make all
           make regtest
+
+      - name: Update coverage badge
+        run: |
+          export CC=gcc-14
+          export CXX=g++-14
+          export GCOV=gcov-14
+          COVERAGE=$(make coverage | grep "Lines executed" | tail -n 1 | awk '{print $2}' | sed 's/%//')
+          echo "Coverage is $COVERAGE%"
+          COLOR="red"
+          if [ $(echo "$COVERAGE > 90" | awk "{print ($COVERAGE >= 90)}") -eq 1 ]; then COLOR="brightgreen";
+          elif [ $(echo "$COVERAGE > 70" | awk "{print ($COVERAGE >= 70)}") -eq 1 ]; then COLOR="green";
+          elif [ $(echo "$COVERAGE > 50" | awk "{print ($COVERAGE >= 50)}") -eq 1 ]; then COLOR="yellow";
+          fi
+          sed -i "s/coverage-[0-9.]*%-[a-z]*/coverage-${COVERAGE}%-${COLOR}/" README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update coverage badge" && git push)

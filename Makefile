@@ -21,10 +21,11 @@ lenstree: lenstree.o
 clean:
 	rm -f genstree lenstree pms2dot *.o *.gcda *.gcno *.gcov
 
+GCOV?=gcov
 coverage: CFLAGS += --coverage
 coverage: CXXFLAGS += --coverage
 coverage: clean all regtest
-	gcov genstree.c pms2dot.c prtstree.c lenstree.cpp
+	$(GCOV) genstree.c pms2dot.c prtstree.c lenstree.cpp
 
 regtest:
 	@echo "Running regression tests..."
