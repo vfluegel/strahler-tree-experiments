@@ -65,6 +65,14 @@ PMS2DOT_CASES=(
 
 mkdir -p tests/actual tests/golden
 
+# Helper to sanitize paths in output files
+sanitize_output() {
+  local file=$1
+  sed -i "s|$GENSTREE_BIN|genstree|g; s|$PMS2DOT_BIN|pms2dot|g; s|$LENSTREE_BIN|lenstree|g" "$file"
+  # Also catch cases where the binary might be called via a different path
+  sed -i "s|.*/genstree|genstree|g; s|.*/pms2dot|pms2dot|g; s|.*/lenstree|lenstree|g" "$file"
+}
+
 # Decide whether to generate goldens
 GENERATE=0
 if [ "${1:-}" = "--generate-goldens" ]; then
@@ -104,7 +112,7 @@ if [ "$GENERATE" -eq 1 ]; then
   # Test pms2dot -h
   echo "  $PMS2DOT_BIN -h 2> tests/golden/pms_h.out"
   "$PMS2DOT_BIN" -h 2> "tests/golden/pms_h.out" || true
-  sed -i "s|$PMS2DOT_BIN|pms2dot|g" "tests/golden/pms_h.out"
+  sanitize_output "tests/golden/pms_h.out"
 
   for ct in "${GENSTREE_CASES[@]}"; do
     set -- $ct
@@ -116,17 +124,14 @@ if [ "$GENERATE" -eq 1 ]; then
 
   echo "Generating error case goldens..."
   "$GENSTREE_BIN" -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k.out || true
-  sed -i "s|$GENSTREE_BIN|genstree|g" tests/golden/gen_err_k.out
   "$GENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k_val.out || true
-  sed -i "s|$GENSTREE_BIN|genstree|g" tests/golden/gen_err_k_val.out
   "$PMS2DOT_BIN" -x > /dev/null 2> tests/golden/pms_err_flag.out || true
-  # Some systems might prefix the error with the binary name, some might not.
-  # We'll just replace the binary name if it appears.
-  sed -i "s|$PMS2DOT_BIN|pms2dot|g" tests/golden/pms_err_flag.out
   "$LENSTREE_BIN" -k 1 > /dev/null 2> tests/golden/len_err_args.out || true
-  sed -i "s|$LENSTREE_BIN|lenstree|g" tests/golden/len_err_args.out
   "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/len_err_k.out || true
-  sed -i "s|$LENSTREE_BIN|lenstree|g" tests/golden/len_err_k.out
+
+  for err in gen_err_k.out gen_err_k_val.out pms_err_flag.out len_err_args.out len_err_k.out; do
+    sanitize_output "tests/golden/$err"
+  done
 
   echo "Done. Review and commit tests/golden/* if outputs are correct."
   exit 0
@@ -173,8 +178,7 @@ name="pms_h.out"
 actual="tests/actual/$name"
 golden="tests/golden/$name"
 "$PMS2DOT_BIN" -h 2> "$actual" || true
-# Sanitize program name in usage message
-sed -i "s|$PMS2DOT_BIN|pms2dot|g" "$actual"
+sanitize_output "$actual"
 if ! diff -u "$golden" "$actual"; then
   echo "  FAIL: output differs for $name"
   FAIL=1
@@ -236,21 +240,17 @@ done
 echo "Testing error cases..."
 # genstree missing k
 "$GENSTREE_BIN" -t 1 -h 2 > /dev/null 2> tests/actual/gen_err_k.out || true
-sed -i "s|$GENSTREE_BIN|genstree|g" tests/actual/gen_err_k.out
 # genstree invalid k
 "$GENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/actual/gen_err_k_val.out || true
-sed -i "s|$GENSTREE_BIN|genstree|g" tests/actual/gen_err_k_val.out
 # pms2dot invalid flag
 "$PMS2DOT_BIN" -x > /dev/null 2> tests/actual/pms_err_flag.out || true
-sed -i "s|$PMS2DOT_BIN|pms2dot|g" tests/actual/pms_err_flag.out
 # lenstree missing args
 "$LENSTREE_BIN" -k 1 > /dev/null 2> tests/actual/len_err_args.out || true
-sed -i "s|$LENSTREE_BIN|lenstree|g" tests/actual/len_err_args.out
 # lenstree invalid k
 "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/actual/len_err_k.out || true
-sed -i "s|$LENSTREE_BIN|lenstree|g" tests/actual/len_err_k.out
 
 for err in gen_err_k.out gen_err_k_val.out pms_err_flag.out len_err_args.out len_err_k.out; do
+  sanitize_output "tests/actual/$err"
   if [ ! -f "tests/golden/$err" ]; then
     if [ "$GENERATE" -eq 1 ]; then
       cp "tests/actual/$err" "tests/golden/$err"

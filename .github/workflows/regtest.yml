@@ -41,7 +41,12 @@ jobs:
           # Run coverage and capture output. We grep for the total summary line.
           COVERAGE_OUTPUT=$(make coverage)
           echo "$COVERAGE_OUTPUT"
-          COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "Lines executed" | tail -n 1 | awk '{print $2}' | sed 's/%//')
+          COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "Lines executed" | tail -n 1 | sed 's/.*executed:\([0-9.]*\)%.*/\1/')
+
+          if [ -z "$COVERAGE" ] || [ "$COVERAGE" = "0" ]; then
+            # Try another format just in case
+            COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "Lines executed" | tail -n 1 | awk '{print $2}' | grep -o '[0-9.]*')
+          fi
 
           if [ -z "$COVERAGE" ]; then
             echo "Failed to extract coverage percentage"
@@ -62,6 +67,7 @@ jobs:
           sed -i "s/coverage-[0-9.]*%-[a-z]*/coverage-${COVERAGE}%-${COLOR}/" README.md
 
       - name: Commit and push changes
+        if: github.event_name == 'push'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
