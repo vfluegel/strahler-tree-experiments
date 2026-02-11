@@ -84,10 +84,11 @@ jobs:
           git add README.md
           if ! git diff --staged --quiet; then
             # Save the modified README.md and switch to the target branch
-            # to avoid rebasing the entire merge commit on PRs
+            # to avoid rebasing the entire merge commit on PRs.
+            # We use checkout -f to discard the local README.md change before switching.
             cp README.md README.md.bak
             git fetch origin $BRANCH
-            git checkout $BRANCH
+            git checkout -f $BRANCH
             mv README.md.bak README.md
 
             git add README.md
