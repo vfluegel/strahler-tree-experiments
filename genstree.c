@@ -9,15 +9,15 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "utrees.h"
 #include "prtstree.h"
+#include "utrees.h"
 
 enum { UTREE = 0, VTREE = 1 };
 
 static void print_usage(char *argv[static 1]) {
-  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -d -p P]\n", argv[0]);  //  -l L  not yet added
+  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", argv[0]);
   fputs("-j\t Can be used to obtain just the leaf count\n", stderr);
-//  fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
+  fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
   fputs("-d\t Indicates the tree should be printed in dot format\n", stderr);
   fputs("-p\t P can be used to indicate a p-value of interest\n", stderr);
   fputs("With -p or no options, the labels of the leaves will be printed\n",
@@ -31,7 +31,6 @@ typedef struct Node {
   char u;
 } Node;
 
-
 /**
  * FIXME: The DFS traversal/generation in this function is used again, almost
  * identically, in a function later on (hence the repeated comments, etc.) If
@@ -41,7 +40,8 @@ typedef struct Node {
  */
 [[nodiscard]]
 static unsigned count_leaves_with_cache(int k, int t, int h,
-                                        unsigned (*tree)[k + 1][t + 1][h + 1]) [[unsequenced]] {
+                                        unsigned (*tree)[k + 1][t + 1][h + 1])
+    [[unsequenced]] {
   size_t maxs = 0;
   size_t lens = 0;
   Node *stack = nullptr;
@@ -488,7 +488,7 @@ int main(int argc, char *argv[argc + 1]) {
 
   if (lth > 0) {
     puts("Print lth leaf");
-    //print_lth_leaf(k, t, h);
+    // print_lth_leaf(k, t, h);
     return EXIT_SUCCESS;
   }
 

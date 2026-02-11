@@ -1,5 +1,5 @@
-CFLAGS=-O3 -std=c23 -Wall -Wextra -Wpedantic -DNDEBUG
-CXXFLAGS=-O3 -Wall -Wextra -Wpedantic
+CFLAGS:=$(CFLAGS) -O3 -std=c23 -Wall -Wextra -Wpedantic -DNDEBUG
+CXXFLAGS:=$(CXXFLAGS) -O3 -Wall -Wextra -Wpedantic
 
 all: genstree lenstree pms2dot
 
