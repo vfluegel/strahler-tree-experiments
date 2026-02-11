@@ -17,7 +17,7 @@ enum { UTREE = 0, VTREE = 1 };
 static void print_usage(char *argv[static 1]) {
   fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", argv[0]);
   fputs("-j\t Can be used to obtain just the leaf count\n", stderr);
-  fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
+//  fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
   fputs("-d\t Indicates the tree should be printed in dot format\n", stderr);
   fputs("-p\t P can be used to indicate a p-value of interest\n", stderr);
   fputs("With -p or no options, the labels of the leaves will be printed\n",
