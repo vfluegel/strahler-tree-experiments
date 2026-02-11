@@ -68,9 +68,13 @@ mkdir -p tests/actual tests/golden
 # Helper to sanitize paths in output files
 sanitize_output() {
   local file=$1
-  sed -i "s|$GENSTREE_BIN|genstree|g; s|$PMS2DOT_BIN|pms2dot|g; s|$LENSTREE_BIN|lenstree|g" "$file"
-  # Also catch cases where the binary might be called via a different path
-  sed -i "s|.*/genstree|genstree|g; s|.*/pms2dot|pms2dot|g; s|.*/lenstree|lenstree|g" "$file"
+  # Use a temporary file and avoid sed -i for portability between GNU and BSD sed.
+  # We use a pattern that matches any non-whitespace characters followed by the binary name,
+  # but only if there is a slash, to replace paths with just the binary name.
+  sed -e "s|[^[:space:]]*/genstree|genstree|g" \
+      -e "s|[^[:space:]]*/pms2dot|pms2dot|g" \
+      -e "s|[^[:space:]]*/lenstree|lenstree|g" \
+      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
 }
 
 # Decide whether to generate goldens
