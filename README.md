@@ -1,6 +1,6 @@
 # Strahler Tree Experiments
 ![regression_tests](https://github.com/gaperez64/strahler-tree-experiments/actions/workflows/regtest.yml/badge.svg)
-![Coverage](https://img.shields.io/badge/coverage-84.24%25-green)
+![Coverage](https://img.shields.io/badge/coverage-83.54%25-green)
 
 Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
@@ -22,12 +22,23 @@ Run `make` to compile some tools.
 
 ## Computing P-Level Successors
 The file `str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree. 
-The compiled binary contains a main function that can be used without or with one paramter:
-* No parameter: Check every leaf in the tree against its successor
+The compiled binary contains a main function that can be used without or with additional paramters:
+* No parameter: Check every leaf in the tree against its (p-level) successor
 * One (integer) parameter: Check that specific leaf and output the result and expected result.  
+* Two (integer) parameters: Compute the p-level successor of the specific leaf, where p is the second parameter.
 
-The tree that is used is defined in the file before compiling. The expected format is two vectors of vectors: One storing the bits and a second storing the level that the corresponding bit in the first vector of vectors belongs to. Multiple examples are currently included and can be switched out by changing `use_b` (bits) and `use_d` (levels) in `main`. When the tree is switched out, `k`, `t`, and `h` need to be set accordingly!
+The tree that is used is defined in the file before compiling. The expected format is two vectors of vectors: One storing the bits (called `tree_b`) and a second storing the level that the corresponding bit in the first vector of vectors belongs to (called `tree_d`). Multiple examples are currently included in the directory `examples` and can be switched out by changing the imported file. When the tree is switched out, `k`, `t`, and `h` (and potentially `p` if using) need to be set accordingly in the file!  
 
+New input files can be generated with a combination of the included tools.
+1. Generate the tree output and pipe it into the desired file: 
+```
+./genstree -k 3 -t 2 - h 5 -p 2 > examples/k3t2h5p2.hpp
+```
+2. Convert the file to C++
+```
+python3 convert_out.py examples/k3t2h5p2.hpp
+```  
+3. Open the file and adjust the variables at the top to match the parameters used during generation
 
 ## Explanations for Comments in Code
 Some comments in `str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:  
