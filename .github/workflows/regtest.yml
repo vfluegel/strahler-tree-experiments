@@ -74,15 +74,25 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BRANCH=${{ github.head_ref }}
+          else
+            BRANCH=${{ github.ref_name }}
+          fi
+
           git add README.md
           if ! git diff --staged --quiet; then
-            git commit -m "Update coverage badge"
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
-              BRANCH=${{ github.head_ref }}
-            else
-              BRANCH=${{ github.ref_name }}
-            fi
+            # Save the modified README.md and switch to the target branch.
+            # We use checkout -f and reset --hard to ensure we are on the latest origin state
+            # before applying our small badge change. This avoids rebase conflicts.
+            cp README.md README.md.bak
             git fetch origin $BRANCH
-            git rebase origin/$BRANCH
+            git checkout -f $BRANCH
+            git reset --hard origin/$BRANCH
+            mv README.md.bak README.md
+
+            git add README.md
+            git commit -m "Update coverage badge"
             git push origin HEAD:$BRANCH
           fi

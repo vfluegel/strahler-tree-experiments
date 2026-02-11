@@ -68,9 +68,40 @@ mkdir -p tests/actual tests/golden
 # Helper to sanitize paths in output files
 sanitize_output() {
   local file=$1
-  sed -i "s|$GENSTREE_BIN|genstree|g; s|$PMS2DOT_BIN|pms2dot|g; s|$LENSTREE_BIN|lenstree|g" "$file"
-  # Also catch cases where the binary might be called via a different path
-  sed -i "s|.*/genstree|genstree|g; s|.*/pms2dot|pms2dot|g; s|.*/lenstree|lenstree|g" "$file"
+  # Use a temporary file and avoid sed -i for portability between GNU and BSD sed.
+  # We use a pattern that matches any non-whitespace characters followed by the binary name,
+  # to replace paths with just the binary name. This handles ./bin, /path/to/bin, etc.
+  sed -e "s|[^[:space:]]*/genstree|genstree|g" \
+      -e "s|[^[:space:]]*/pms2dot|pms2dot|g" \
+      -e "s|[^[:space:]]*/lenstree|lenstree|g" \
+      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+}
+
+# Helper to compare actual and golden files robustly
+compare_files() {
+  local golden=$1
+  local actual=$2
+  local name=$3
+
+  if [ ! -f "$golden" ]; then
+    echo "  MISSING GOLDEN: $golden"
+    echo "  To create goldens: tests/run-regression.sh --generate-goldens"
+    return 1
+  fi
+
+  # Sanitize a copy of the golden file to make comparison robust to path differences
+  # in existing golden files (e.g. if they were generated on Mac)
+  local golden_sanitized="$actual.golden_sanitized"
+  cp "$golden" "$golden_sanitized"
+  sanitize_output "$golden_sanitized"
+
+  if ! diff -u "$golden_sanitized" "$actual"; then
+    echo "  FAIL: output differs for $name"
+    rm "$golden_sanitized"
+    return 1
+  fi
+  rm "$golden_sanitized"
+  return 0
 }
 
 # Decide whether to generate goldens
@@ -164,18 +195,10 @@ for ct in "${GENSTREE_CASES[@]}"; do
     "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" $flags > "$actual" 2>&1
     sanitize_output "$actual"
 
-    if [ ! -f "$golden" ]; then
-      echo "  MISSING GOLDEN: $golden"
-      echo "  To create goldens: tests/run-regression.sh --generate-goldens"
-      FAIL=1
-      continue
-    fi
-
-    if ! diff -u "$golden" "$actual"; then
-      echo "  FAIL: output differs for $name"
-      FAIL=1
-    else
+    if compare_files "$golden" "$actual" "$name"; then
       echo "  OK: $name"
+    else
+      FAIL=1
     fi
   done
 done
@@ -186,11 +209,10 @@ actual="tests/actual/$name"
 golden="tests/golden/$name"
 "$PMS2DOT_BIN" -h 2> "$actual" || true
 sanitize_output "$actual"
-if ! diff -u "$golden" "$actual"; then
-  echo "  FAIL: output differs for $name"
-  FAIL=1
-else
+if compare_files "$golden" "$actual" "$name"; then
   echo "  OK: $name"
+else
+  FAIL=1
 fi
 
 echo "Testing lenstree..."
@@ -205,18 +227,10 @@ for ct in "${GENSTREE_CASES[@]}"; do
   "$LENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "$actual" 2>&1
   sanitize_output "$actual"
 
-  if [ ! -f "$golden" ]; then
-    echo "  MISSING GOLDEN: $golden"
-    echo "  To create goldens: tests/run-regression.sh --generate-goldens"
-    FAIL=1
-    continue
-  fi
-
-  if ! diff -u "$golden" "$actual"; then
-    echo "  FAIL: output differs for $name"
-    FAIL=1
-  else
+  if compare_files "$golden" "$actual" "$name"; then
     echo "  OK: $name"
+  else
+    FAIL=1
   fi
 done
 
@@ -231,18 +245,10 @@ for i in "${!PMS2DOT_CASES[@]}"; do
   echo "$case" | "$PMS2DOT_BIN" > "$actual" 2>&1
   sanitize_output "$actual"
 
-  if [ ! -f "$golden" ]; then
-    echo "  MISSING GOLDEN: $golden"
-    echo "  To create goldens: tests/run-regression.sh --generate-goldens"
-    FAIL=1
-    continue
-  fi
-
-  if ! diff -u "$golden" "$actual"; then
-    echo "  FAIL: output differs for $name"
-    FAIL=1
-  else
+  if compare_files "$golden" "$actual" "$name"; then
     echo "  OK: $name"
+  else
+    FAIL=1
   fi
 done
 
@@ -259,19 +265,21 @@ echo "Testing error cases..."
 "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/actual/len_err_k.out || true
 
 for err in gen_err_k.out gen_err_k_val.out pms_err_flag.out len_err_args.out len_err_k.out; do
-  sanitize_output "tests/actual/$err"
-  if [ ! -f "tests/golden/$err" ]; then
+  actual="tests/actual/$err"
+  golden="tests/golden/$err"
+  sanitize_output "$actual"
+  if [ ! -f "$golden" ]; then
     if [ "$GENERATE" -eq 1 ]; then
-      cp "tests/actual/$err" "tests/golden/$err"
+      cp "$actual" "$golden"
+      echo "  CREATED GOLDEN: $golden"
     else
-      echo "  MISSING GOLDEN: tests/golden/$err"
+      echo "  MISSING GOLDEN: $golden"
       FAIL=1
     fi
-  elif ! diff -u "tests/golden/$err" "tests/actual/$err"; then
-    echo "  FAIL: output differs for $err"
-    FAIL=1
-  else
+  elif compare_files "$golden" "$actual" "$err"; then
     echo "  OK: $err"
+  else
+    FAIL=1
   fi
 done
 
