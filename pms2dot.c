@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "utrees.h"
 #include "prtstree.h"
 
 static void print_usage(char *argv[]) {

@@ -2,6 +2,7 @@
 genstree
 lenstree
 pms2dot
+str-test
 
 # Objects
 *.o
@@ -13,3 +14,7 @@ pms2dot
 
 # Test artifacts
 tests/actual/
+
+.vscode/
+visualizations/
+.DS_Store

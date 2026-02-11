@@ -10,23 +10,14 @@
 #include <unistd.h>
 
 #include "prtstree.h"
+#include "utrees.h"
 
 enum { UTREE = 0, VTREE = 1 };
 
-#define PUSH(STACK, LENS, MAXS, ELEM)                                          \
-  do {                                                                         \
-    if ((LENS) == (MAXS)) {                                                    \
-      (MAXS) = 2 * ((MAXS) + 1);                                               \
-      (STACK) = realloc((STACK), (MAXS) * sizeof((STACK)[0]));                 \
-      assert((LENS) < (MAXS));                                                 \
-    }                                                                          \
-    (STACK)[(LENS)] = (ELEM);                                                  \
-    (LENS)++;                                                                  \
-  } while (0)
-
 static void print_usage(char *argv[static 1]) {
-  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -d -p P]\n", argv[0]);
+  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", argv[0]);
   fputs("-j\t Can be used to obtain just the leaf count\n", stderr);
+  fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
   fputs("-d\t Indicates the tree should be printed in dot format\n", stderr);
   fputs("-p\t P can be used to indicate a p-value of interest\n", stderr);
   fputs("With -p or no options, the labels of the leaves will be printed\n",
@@ -40,12 +31,17 @@ typedef struct Node {
   char u;
 } Node;
 
+/**
+ * FIXME: The DFS traversal/generation in this function is used again, almost
+ * identically, in a function later on (hence the repeated comments, etc.) If
+ * another function comes along that requires the same, it would be best to
+ * factor it out and take a callback function as argument to call on the
+ * leaves.
+ */
 [[nodiscard]]
-static unsigned count_leaves(int k, int t, int h) [[unsequenced]] {
-  assert(h >= k);
-  unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
-  // NOTE: calloc sets all entries to zero
-
+static unsigned count_leaves_with_cache(int k, int t, int h,
+                                        unsigned (*tree)[k + 1][t + 1][h + 1])
+    [[unsequenced]] {
   size_t maxs = 0;
   size_t lens = 0;
   Node *stack = nullptr;
@@ -138,10 +134,19 @@ static unsigned count_leaves(int k, int t, int h) [[unsequenced]] {
 
   unsigned total = tree[UTREE][k][t][h];
 
-  // Epilogue
   free(stack);
-  free(tree);
+  return total;
+}
 
+[[nodiscard]]
+static unsigned count_leaves(int k, int t, int h) [[unsequenced]] {
+  assert(h >= k);
+  unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
+  // NOTE: calloc sets all entries to zero
+
+  unsigned total = count_leaves_with_cache(k, t, h, tree);
+
+  free(tree);
   return total;
 }
 
@@ -416,14 +421,22 @@ int main(int argc, char *argv[argc + 1]) {
   int t;
   int h;
   int p = 0;
+  int lth = 0;
   bool kset = false;
   bool tset = false;
   bool hset = false;
   bool just_count = false;
   bool print_dot = false;
 
-  while ((opt = getopt(argc, argv, "k:t:h:jdp:")) != -1) {
+  while ((opt = getopt(argc, argv, "k:t:h:jdp:l:")) != -1) {
     switch (opt) {
+    case 'l':
+      lth = atoi(optarg);
+      if (lth < 1) {
+        fputs("L must be a positive integer\n", stderr);
+        return EXIT_FAILURE;
+      }
+      break;
     case 'j':
       just_count = true;
       break;
@@ -471,6 +484,12 @@ int main(int argc, char *argv[argc + 1]) {
     fputs("Some arguments are missing!\n", stderr);
     print_usage(argv);
     return EXIT_FAILURE;
+  }
+
+  if (lth > 0) {
+    puts("Print lth leaf");
+    // print_lth_leaf(k, t, h);
+    return EXIT_SUCCESS;
   }
 
   unsigned total = count_leaves(k, t, h);

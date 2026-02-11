@@ -1,5 +1,6 @@
 #include <vector>
 
+int k = 3, t = 2, h = 5;
 
 std::vector<std::vector<bool>> tree_b =
 {

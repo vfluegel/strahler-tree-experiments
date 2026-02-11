@@ -1,5 +1,5 @@
-CFLAGS=-O3 -std=c23 -Wall -Wextra -Wpedantic -DNDEBUG
-CXXFLAGS=-O3 -Wall -Wextra -Wpedantic
+CFLAGS:=$(CFLAGS) -O3 -std=c23 -Wall -Wextra -Wpedantic -DNDEBUG
+CXXFLAGS:=$(CXXFLAGS) -O3 -Wall -Wextra -Wpedantic
 
 all: genstree lenstree pms2dot
 
@@ -12,7 +12,7 @@ pms2dot: pms2dot.o prtstree.o
 lenstree: lenstree.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-%.o: %.c prtstree.h
+%.o: %.c prtstree.h utrees.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
