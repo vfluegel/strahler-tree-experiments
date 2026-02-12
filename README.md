@@ -4,24 +4,25 @@
 Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
 ## Tools
-Run `make` to compile some tools.
-* `genstree` can be used to count leaves of a tree (for given values of `k`, `t`
+Run `meson setup build && meson compile -C build` to compile the tools. Binaries will be located in the `build/` directory.
+
+* `build/genstree` can be used to count leaves of a tree (for given values of `k`, `t`
   and `h`; it can also print to `stdout` the labels of the leaves of the tree;
-  and it can even print the tree in dot format so you can run, e.g. `./genstree
+  and it can even print the tree in dot format so you can run, e.g. `./build/genstree
   -k 4 -t 2 -h 4 -d | dot -Tpng > tree.png`
 * If you want `genstree` to also print the partitioning of leaf labels into
   p-level groups, you can use the `-p` option; then the sizes of groups of
   leaves whose p-level successor are the same are printed (their sum
   adds up to the total number of leaves)
-* `pms2dot` can be used to read from `stdin` and print a dot format tree
+* `build/pms2dot` can be used to read from `stdin` and print a dot format tree
   constructed from a progress-measure string, for instance `echo
-  "00,0,1,e,1|00,1,1,0,0|" | ./pms2dot | dot -Tpng > tree.png` prints a tree
+  "00,0,1,e,1|00,1,1,0,0|" | ./build/pms2dot | dot -Tpng > tree.png` prints a tree
   with two branches.
 
 
 ## Computing P-Level Successors
 The file `str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree. 
-The compiled binary contains a main function that can be used without or with additional paramters:
+The compiled binary `build/str-tree` contains a main function that can be used without or with additional paramters:
 * No parameter: Check every leaf in the tree against its (p-level) successor
 * One (integer) parameter: Check that specific leaf and output the result and expected result.  
 * Two (integer) parameters: Compute the p-level successor of the specific leaf, where p is the second parameter.
@@ -31,7 +32,7 @@ The tree that is used is defined in the file before compiling. The expected form
 New input files can be generated with a combination of the included tools.
 1. Generate the tree output and pipe it into the desired file: 
 ```
-./genstree -k 3 -t 2 - h 5 -p 2 > examples/k3t2h5p2.hpp
+./build/genstree -k 3 -t 2 - h 5 -p 2 > examples/k3t2h5p2.hpp
 ```
 2. Convert the file to C++
 ```
