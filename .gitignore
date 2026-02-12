@@ -3,7 +3,8 @@ genstree
 lenstree
 pms2dot
 unit_tests
-str-test
+str-tree
+build/
 
 # Objects
 *.o

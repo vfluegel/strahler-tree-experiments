@@ -5,7 +5,7 @@
 #include <cassert>
 #include <utility>
 
-#include "examples/k4t3h5.hpp"
+#include "../examples/k4t3h5.hpp"
 
 #ifndef HAS_P
 #include <numeric>
