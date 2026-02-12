@@ -137,6 +137,14 @@ if [ "$GENERATE" -eq 1 ]; then
     echo "  $GENSTREE_BIN -k $k -t $t -h $h -p 1 > tests/golden/p1_$name"
     "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -p 1 > "tests/golden/p1_$name" 2>&1
     sanitize_output "tests/golden/p1_$name"
+
+    # Test -l for 1st and last leaf
+    total=$("$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -j | grep -o '[0-9]\+ leaves' | cut -d' ' -f1)
+    for l in 1 $total; do
+      echo "  $GENSTREE_BIN -k $k -t $t -h $h -l $l > tests/golden/l${l}_$name"
+      "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -l "$l" > "tests/golden/l${l}_$name" 2>&1
+      sanitize_output "tests/golden/l${l}_$name"
+    done
   done
   for i in "${!PMS2DOT_CASES[@]}"; do
     case="${PMS2DOT_CASES[$i]}"
@@ -162,11 +170,12 @@ if [ "$GENERATE" -eq 1 ]; then
   echo "Generating error case goldens..."
   "$GENSTREE_BIN" -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k.out || true
   "$GENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k_val.out || true
+  "$GENSTREE_BIN" -k 2 -t 1 -h 2 -l 0 > /dev/null 2> tests/golden/gen_err_l.out || true
   "$PMS2DOT_BIN" -x > /dev/null 2> tests/golden/pms_err_flag.out || true
   "$LENSTREE_BIN" -k 1 > /dev/null 2> tests/golden/len_err_args.out || true
   "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/len_err_k.out || true
 
-  for err in gen_err_k.out gen_err_k_val.out pms_err_flag.out len_err_args.out len_err_k.out; do
+  for err in gen_err_k.out gen_err_k_val.out gen_err_l.out pms_err_flag.out len_err_args.out len_err_k.out; do
     sanitize_output "tests/golden/$err"
   done
 
@@ -181,11 +190,16 @@ echo "Testing genstree..."
 for ct in "${GENSTREE_CASES[@]}"; do
   set -- $ct
   k=$1; t=$2; h=$3
-  for flags in "" "-j" "-d" "-p 1"; do
+  total=$("$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -j | grep -o '[0-9]\+ leaves' | cut -d' ' -f1)
+  for flags in "" "-j" "-d" "-p 1" "-l 1" "-l $total"; do
     prefix=""
     if [ "$flags" == "-j" ]; then prefix="j_"; fi
     if [ "$flags" == "-d" ]; then prefix="d_"; fi
     if [ "$flags" == "-p 1" ]; then prefix="p1_"; fi
+    if [[ "$flags" == -l* ]]; then
+        l_val=$(echo "$flags" | cut -d' ' -f2)
+        prefix="l${l_val}_"
+    fi
 
     name="${prefix}k${k}_t${t}_h${h}.out"
     actual="tests/actual/$name"
@@ -257,6 +271,8 @@ echo "Testing error cases..."
 "$GENSTREE_BIN" -t 1 -h 2 > /dev/null 2> tests/actual/gen_err_k.out || true
 # genstree invalid k
 "$GENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/actual/gen_err_k_val.out || true
+# genstree invalid l
+"$GENSTREE_BIN" -k 2 -t 1 -h 2 -l 0 > /dev/null 2> tests/actual/gen_err_l.out || true
 # pms2dot invalid flag
 "$PMS2DOT_BIN" -x > /dev/null 2> tests/actual/pms_err_flag.out || true
 # lenstree missing args
@@ -264,7 +280,7 @@ echo "Testing error cases..."
 # lenstree invalid k
 "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/actual/len_err_k.out || true
 
-for err in gen_err_k.out gen_err_k_val.out pms_err_flag.out len_err_args.out len_err_k.out; do
+for err in gen_err_k.out gen_err_k_val.out gen_err_l.out pms_err_flag.out len_err_args.out len_err_k.out; do
   actual="tests/actual/$err"
   golden="tests/golden/$err"
   sanitize_output "$actual"

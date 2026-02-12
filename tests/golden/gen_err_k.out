@@ -1,5 +1,5 @@
 Some arguments are missing!
-Usage: ./genstree -k K -t T -h H [-j -l L -d -p P]
+Usage: genstree -k K -t T -h H [-j -l L -d -p P]
 -j	 Can be used to obtain just the leaf count
 -l	 L can be used to indicate interest in the L-th leaf
 -d	 Indicates the tree should be printed in dot format

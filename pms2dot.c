@@ -13,9 +13,11 @@
 #include "prtstree.h"
 
 static void print_usage(char *argv[]) {
+  char *progname = strrchr(argv[0], '/');
+  progname = progname ? progname + 1 : argv[0];
   fprintf(stderr,
           "Usage: %s [-h] reads progress measures and prints their prefix tree.\n",
-          argv[0]);
+          progname);
   fputs("-h\t Prints this message.\n", stderr);
   fputs("The program receives progress measures ending with '|' via stdin. Each\n",
         stderr);

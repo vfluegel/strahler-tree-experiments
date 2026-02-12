@@ -15,7 +15,9 @@
 typedef enum { UTREE = 0, VTREE = 1 } TType;
 
 static void print_usage(char *argv[static 1]) {
-  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", argv[0]);
+  char *progname = strrchr(argv[0], '/');
+  progname = progname ? progname + 1 : argv[0];
+  fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", progname);
   fputs("-j\t Can be used to obtain just the leaf count\n", stderr);
   fputs("-l\t L can be used to indicate interest in the L-th leaf\n", stderr);
   fputs("-d\t Indicates the tree should be printed in dot format\n", stderr);
@@ -40,8 +42,9 @@ typedef struct Node {
  */
 [[nodiscard]]
 static unsigned count_leaves_with_cache(TType tree_type, int const k,
-                                        int const t, int const h,
-                                        unsigned (*tree)[k + 1][t + 1][h + 1])
+                                        int const t, int const h, int const K,
+                                        int const T, int const H,
+                                        unsigned tree[2][K + 1][T + 1][H + 1])
     [[unsequenced]] {
   // early exit?
   unsigned cached = tree[tree_type][k][t][h];
@@ -152,7 +155,7 @@ static unsigned count_leaves(int const k, int const t, int const h)
   unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
   // NOTE: calloc sets all entries to zero
 
-  unsigned total = count_leaves_with_cache(UTREE, k, t, h, tree);
+  unsigned total = count_leaves_with_cache(UTREE, k, t, h, k, t, h, tree);
 
   free(tree);
   return total;
@@ -253,10 +256,10 @@ static char *label_lth_leaf(int const k, int const t, int const h,
       node.h = node.h - 1;
     } else if (node.u == VTREE && node.h >= node.k && node.k >= 2 &&
                node.t >= 1) {
-      unsigned size_child1 = count_leaves_with_cache(VTREE, node.k, node.t - 1,
-                                                     node.h, count_cache);
-      unsigned size_child2 = count_leaves_with_cache(UTREE, node.k - 1, node.t,
-                                                     node.h - 1, count_cache);
+      unsigned size_child1 = count_leaves_with_cache(
+          VTREE, node.k, node.t - 1, node.h, k, t, h, count_cache);
+      unsigned size_child2 = count_leaves_with_cache(
+          UTREE, node.k - 1, node.t, node.h - 1, k, t, h, count_cache);
       // which subtree to follow?
       if (size_child1 >= nth) {
         cur[0] = ZERO;
@@ -295,9 +298,10 @@ static char *label_lth_leaf(int const k, int const t, int const h,
       node.h = node.h;
     } else if (node.u == UTREE && node.h > node.k && node.k >= 2) {
       unsigned size_child1 =
-          count_leaves_with_cache(VTREE, node.k, node.t, node.h, count_cache);
-      unsigned size_child2 = count_leaves_with_cache(UTREE, node.k, node.t,
-                                                     node.h - 1, count_cache);
+          count_leaves_with_cache(VTREE, node.k, node.t, node.h, k, t, h,
+                                  count_cache);
+      unsigned size_child2 = count_leaves_with_cache(
+          UTREE, node.k, node.t, node.h - 1, k, t, h, count_cache);
       // which subtree to follow?
       if (size_child1 >= nth) {
         cur[0] = ZERO;
@@ -555,12 +559,13 @@ static void print_blocks(char const labels[static 1]) [[unsequenced]] {
   }
 }
 
+#ifndef UNIT_TEST
 int main(int argc, char *argv[argc + 1]) {
   opterr = 0;
   int opt;
-  int k;
-  int t;
-  int h;
+  int k = 0;
+  int t = 0;
+  int h = 0;
   int p = 0;
   int lth = 0;
   bool kset = false;
@@ -655,3 +660,4 @@ int main(int argc, char *argv[argc + 1]) {
 
   return EXIT_SUCCESS;
 }
+#endif
