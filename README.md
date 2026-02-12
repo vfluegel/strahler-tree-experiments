@@ -21,7 +21,7 @@ Run `meson setup build && meson compile -C build` to compile the tools. Binaries
 
 
 ## Computing P-Level Successors
-The file `str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree. 
+The file `src/str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree.
 The compiled binary `build/str-tree` contains a main function that can be used without or with additional paramters:
 * No parameter: Check every leaf in the tree against its (p-level) successor
 * One (integer) parameter: Check that specific leaf and output the result and expected result.  
@@ -36,12 +36,12 @@ New input files can be generated with a combination of the included tools.
 ```
 2. Convert the file to C++
 ```
-python3 convert_out.py examples/k3t2h5p2.hpp
+python3 src/convert_out.py examples/k3t2h5p2.hpp
 ```  
 3. Open the file and adjust the variables at the top to match the parameters used during generation
 
 ## Explanations for Comments in Code
-Some comments in `str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:  
+Some comments in `src/str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:
 * _Cases where the siblings does not exist_
     * **A**: the number of non-empty strings among bitstrings h-1 and r+1 is k-1
     * **B**: the number of non-leadings bits in bitstrings h-1 to r+1 is t
