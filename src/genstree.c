@@ -299,9 +299,8 @@ static char *label_lth_leaf(int const k, int const t, int const h,
       node.t = node.t;
       node.h = node.h;
     } else if (node.u == UTREE && node.h > node.k && node.k >= 2) {
-      unsigned size_child1 =
-          count_leaves_with_cache(VTREE, node.k, node.t, node.h, k, t, h,
-                                  count_cache);
+      unsigned size_child1 = count_leaves_with_cache(
+          VTREE, node.k, node.t, node.h, k, t, h, count_cache);
       unsigned size_child2 = count_leaves_with_cache(
           UTREE, node.k, node.t, node.h - 1, k, t, h, count_cache);
       // which subtree to follow?
