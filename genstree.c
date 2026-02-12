@@ -41,10 +41,13 @@ typedef struct Node {
  * leaves.
  */
 [[nodiscard]]
-static unsigned count_leaves_with_cache(TType tree_type, int const k,
-                                        int const t, int const h, int const K,
-                                        int const T, int const H,
-                                        unsigned tree[2][K + 1][T + 1][H + 1])
+static unsigned
+count_leaves_with_cache(TType tree_type,
+                        // The indices of interest
+                        int const k, int const t, int const h,
+                        // The real dimensions of the cache
+                        int const kdim, int const tdim, int const hdim,
+                        unsigned tree[2][kdim + 1][tdim + 1][hdim + 1])
     [[unsequenced]] {
   // early exit?
   unsigned cached = tree[tree_type][k][t][h];
@@ -297,9 +300,8 @@ static char *label_lth_leaf(int const k, int const t, int const h,
       node.t = node.t;
       node.h = node.h;
     } else if (node.u == UTREE && node.h > node.k && node.k >= 2) {
-      unsigned size_child1 =
-          count_leaves_with_cache(VTREE, node.k, node.t, node.h, k, t, h,
-                                  count_cache);
+      unsigned size_child1 = count_leaves_with_cache(
+          VTREE, node.k, node.t, node.h, k, t, h, count_cache);
       unsigned size_child2 = count_leaves_with_cache(
           UTREE, node.k, node.t, node.h - 1, k, t, h, count_cache);
       // which subtree to follow?
