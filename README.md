@@ -1,6 +1,5 @@
 # Strahler Tree Experiments
-![regression_tests](https://github.com/gaperez64/strahler-tree-experiments/actions/workflows/regtest.yml/badge.svg)
-![Coverage](https://img.shields.io/badge/coverage-84.07%25-green)
+![regression_tests](https://github.com/gaperez64/strahler-tree-experiments/actions/workflows/tests.yml/badge.svg)
 
 Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
