@@ -40,7 +40,8 @@ typedef struct Node {
  * factor it out and take a callback function as argument to call on the
  * leaves.
  */
-[[nodiscard]] unsigned
+[[nodiscard]]
+static unsigned
 count_leaves_with_cache(TType tree_type,
                         // The indices of interest
                         int const k, int const t, int const h,
