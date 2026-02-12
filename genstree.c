@@ -47,7 +47,7 @@ count_leaves_with_cache(TType tree_type,
                         int const k, int const t, int const h,
                         // The real dimensions of the cache
                         int const kdim, int const tdim, int const hdim,
-                        unsigned tree[2][kdim + 1][tdim + 1][hdim + 1])
+                        unsigned tree[restrict 2][kdim + 1][tdim + 1][hdim + 1])
     [[unsequenced]] {
   // early exit?
   unsigned cached = tree[tree_type][k][t][h];
