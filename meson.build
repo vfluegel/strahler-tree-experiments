@@ -16,18 +16,18 @@ boost_dep = dependency('boost', required : false)
 
 # Executables
 genstree = executable('genstree',
-  ['genstree.c', 'prtstree.c'],
+  ['src/genstree.c', 'src/prtstree.c'],
   install : true
 )
 
 pms2dot = executable('pms2dot',
-  ['pms2dot.c', 'prtstree.c'],
+  ['src/pms2dot.c', 'src/prtstree.c'],
   install : true
 )
 
 if boost_dep.found()
   lenstree = executable('lenstree',
-    'lenstree.cpp',
+    'src/lenstree.cpp',
     dependencies : boost_dep,
     install : true
   )
@@ -36,15 +36,15 @@ else
 endif
 
 str_tree = executable('str-tree',
-  'str-tree.cc',
+  'src/str-tree.cc',
   install : true
 )
 
 # Unit Tests
 unit_tests_exe = executable('unit_tests',
-  ['tests/unit_tests.c', 'prtstree.c'],
+  ['tests/unit_tests.c', 'src/prtstree.c'],
   c_args : '-DUNIT_TEST',
-  include_directories : include_directories('.')
+  include_directories : include_directories('src')
 )
 
 test('unit_tests', unit_tests_exe)

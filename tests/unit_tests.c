@@ -1,5 +1,5 @@
 #define UNIT_TEST
-#include "../genstree.c"
+#include "../src/genstree.c"
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
