@@ -10,7 +10,7 @@ on:
 
 jobs:
   regtest:
-    name: Run make regtest
+    name: Run make test
     runs-on: ubuntu-24.04
     permissions:
       contents: write
