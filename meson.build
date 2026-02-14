@@ -20,6 +20,11 @@ genstree = executable('genstree',
   install : true
 )
 
+pgfilt = executable('pgfilt',
+  ['src/pgfilt.c'],
+  install : true
+)
+
 pms2dot = executable('pms2dot',
   ['src/pms2dot.c', 'src/prtstree.c'],
   install : true
