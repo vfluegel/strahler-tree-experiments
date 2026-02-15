@@ -38,10 +38,10 @@ int main(int argc, char *argv[argc + 1]) {
     }
   }
 
-  size_t buf_size = 2048;
-  char *buffer = malloc(buf_size);
-  if (!fgets(buffer, buf_size, stdin)) {
-    free(buffer);
+  size_t buf_size;
+  char *buffer = nullptr;
+  if (getline(&buffer, &buf_size, stdin) == -1) {
+    fprintf(stderr, "Failed to read line!\n");
     return EXIT_FAILURE;
   }
 
