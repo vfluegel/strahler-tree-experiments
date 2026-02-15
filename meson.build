@@ -21,7 +21,7 @@ genstree = executable('genstree',
 )
 
 pgfilt = executable('pgfilt',
-  ['src/pgfilt.c'],
+  ['src/pgfilt.c', 'src/pargame.c'],
   install : true
 )
 

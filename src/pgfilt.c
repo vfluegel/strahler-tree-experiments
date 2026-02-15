@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "utrees.h"
+#include "pargame.h"
 
 static void print_usage(char *argv[static 1]) {
   char *progname = strrchr(argv[0], '/');
@@ -18,21 +19,7 @@ static void print_usage(char *argv[static 1]) {
           "Usage: %s [-h] prints information about pgsolver-format parity games\n",
           progname);
   fputs("-h\t Prints this message.\n", stderr);
-  fputs("The program receives the game via stdin\n",
-        stderr);
-}
-
-[[nodiscard]]
-static unsigned process_header(size_t const n,
-                               char const line[restrict n]) [[unsequenced]] {
-  if (strncmp(line, "parity ", 7) != 0) {
-    fprintf(stderr, "Expected header to start with parity X; but got %s\n", line);
-    return EXIT_FAILURE;
-  }
-
-  unsigned res = atoi(line + 7);
-  printf("Maximal node index: %d\n", res);
-  return res;
+  fputs("The program receives the game via stdin.\n", stderr);
 }
 
 int main(int argc, char *argv[argc + 1]) {
@@ -54,7 +41,7 @@ int main(int argc, char *argv[argc + 1]) {
     fprintf(stderr, "Failed to read line!\n");
     return EXIT_FAILURE;
   }
-  unsigned res = process_header(buf_size, buffer);
+  unsigned res = proc_pgsolver_header(buf_size, buffer);
   free(buffer);
 
   return EXIT_SUCCESS;

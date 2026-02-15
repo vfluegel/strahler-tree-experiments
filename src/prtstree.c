@@ -4,8 +4,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "utrees.h"
 #include "prtstree.h"
+#include "utils.h"
+#include "utrees.h"
 
 typedef struct LabdTree {
   size_t size;

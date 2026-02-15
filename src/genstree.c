@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "prtstree.h"
+#include "utils.h"
 #include "utrees.h"
 
 typedef enum { UTREE = 0, VTREE = 1 } TType;
