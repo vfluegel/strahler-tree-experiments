@@ -9,20 +9,21 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "utrees.h"
 #include "prtstree.h"
+#include "utrees.h"
 
 static void print_usage(char *argv[]) {
   char *progname = strrchr(argv[0], '/');
   progname = progname ? progname + 1 : argv[0];
-  fprintf(stderr,
-          "Usage: %s [-h] reads progress measures and prints their prefix tree.\n",
-          progname);
+  fprintf(
+      stderr,
+      "Usage: %s [-h] reads progress measures and prints their prefix tree.\n",
+      progname);
   fputs("-h\t Prints this message.\n", stderr);
-  fputs("The program receives progress measures ending with '|' via stdin. Each\n",
+  fputs("The program receives progress measures ending with '|' via stdin. "
+        "Each\n",
         stderr);
-  fputs("progress measure is a comma-separated sequence of bits.\n",
-        stderr);
+  fputs("progress measure is a comma-separated sequence of bits.\n", stderr);
 }
 
 int main(int argc, char *argv[argc + 1]) {
@@ -41,7 +42,8 @@ int main(int argc, char *argv[argc + 1]) {
   size_t buf_size;
   char *buffer = nullptr;
   if (getline(&buffer, &buf_size, stdin) == -1) {
-    fprintf(stderr, "Failed to read line!\n");
+    free(buffer);
+    fputs("Failed to read line!\n", stderr);
     return EXIT_FAILURE;
   }
 

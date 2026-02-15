@@ -9,15 +9,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "utrees.h"
 #include "pargame.h"
+#include "utrees.h"
 
 static void print_usage(char *argv[static 1]) {
   char *progname = strrchr(argv[0], '/');
   progname = progname ? progname + 1 : argv[0];
-  fprintf(stderr,
-          "Usage: %s [-h] prints information about pgsolver-format parity games\n",
-          progname);
+  fprintf(
+      stderr,
+      "Usage: %s [-h] prints information about pgsolver-format parity games\n",
+      progname);
   fputs("-h\t Prints this message.\n", stderr);
   fputs("The program receives the game via stdin.\n", stderr);
 }
@@ -38,10 +39,27 @@ int main(int argc, char *argv[argc + 1]) {
   size_t buf_size;
   char *buffer = nullptr;
   if (getline(&buffer, &buf_size, stdin) == -1) {
-    fprintf(stderr, "Failed to read line!\n");
+    free(buffer);
+    fputs("Failed to read line!\n", stderr);
     return EXIT_FAILURE;
   }
-  unsigned res = proc_pgsolver_header(buf_size, buffer);
+  size_t n_nodes = proc_pgsolver_header(buf_size, buffer);
+
+  PGNode *restrict vertices = calloc(n_nodes, sizeof(PGNode));
+  for (unsigned i = 0; i <= n_nodes; i++) {
+    if (getline(&buffer, &buf_size, stdin) == -1) {
+      free(buffer);
+      fprintf(stderr, "Failed to read node spec %d/%ld\n", i + 1, n_nodes + 1);
+      return EXIT_FAILURE;
+    }
+    if (proc_pgsolver_node(vertices + i, buf_size, buffer) == nullptr) {
+      free(buffer);
+      fprintf(stderr, "Failed to parse node spec %s\n", buffer);
+      return EXIT_FAILURE;
+    }
+  }
+
+  free(vertices);
   free(buffer);
 
   return EXIT_SUCCESS;

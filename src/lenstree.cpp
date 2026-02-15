@@ -22,7 +22,8 @@ std::unordered_map<std::tuple<int, int, int>, unsigned,
     treeV;
 
 unsigned tree_size(int k, int t, int h) {
-  std::cout << "Looking into k=" << k <<", t="<<t << ", h="<<h<<std::endl;
+  std::cout << "Looking into k=" << k << ", t=" << t << ", h=" << h
+            << std::endl;
   std::stack<Node> stack;
 
   stack.push({k, t, h, true});

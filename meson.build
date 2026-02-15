@@ -48,7 +48,6 @@ str_tree = executable('str-tree',
 # Unit Tests
 unit_tests_exe = executable('unit_tests',
   ['tests/unit_tests.c', 'src/prtstree.c'],
-  c_args : '-DUNIT_TEST',
   include_directories : include_directories('src')
 )
 
