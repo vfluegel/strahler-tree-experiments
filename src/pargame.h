@@ -8,7 +8,8 @@ size_t proc_pgsolver_header(size_t const n, char const line[restrict n])
     [[unsequenced]];
 
 typedef struct PGNode {
-  unsigned priority;
+  unsigned id;
+  unsigned prio;
   unsigned char owner;
   size_t outdeg;
   unsigned *succ;

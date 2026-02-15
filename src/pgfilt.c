@@ -53,8 +53,8 @@ int main(int argc, char *argv[argc + 1]) {
       return EXIT_FAILURE;
     }
     if (proc_pgsolver_node(vertices + i, buf_size, buffer) == nullptr) {
+      fprintf(stderr, "Failed to parse node spec:\n%s\n", buffer);
       free(buffer);
-      fprintf(stderr, "Failed to parse node spec %s\n", buffer);
       return EXIT_FAILURE;
     }
   }
