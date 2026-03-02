@@ -4,6 +4,7 @@
 #include <stack>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 struct Node {
   int k;
@@ -21,11 +22,18 @@ std::unordered_map<std::tuple<int, int, int>, unsigned,
                    boost::hash<std::tuple<int, int, int>>>
     treeV;
 
-unsigned tree_size(int k, int t, int h) {
+unsigned tree_size(int k, int t, int h, bool isU) {
   std::cout << "Looking into k=" << k <<", t="<<t << ", h="<<h<<std::endl;
+  // Check for cache hit
+  auto& requested_tree = isU ? treeU : treeV;
+  auto cached = requested_tree.find(std::make_tuple(k, t, h));
+  if (cached != treeV.end()) {
+    return cached->second;
+  }
+  
   std::stack<Node> stack;
 
-  stack.push({k, t, h, true});
+  stack.push({k, t, h, isU});
   while (!stack.empty()) {
     Node &tos = stack.top();
     if (tos.isU and tos.h == 1 and tos.k == 1) {
@@ -81,7 +89,98 @@ unsigned tree_size(int k, int t, int h) {
       assert(false); // We should never get here
   }
 
-  return treeU[std::make_tuple(k, t, h)];
+  return isU ? treeU[std::make_tuple(k, t, h)] : treeV[std::make_tuple(k, t, h)];
+}
+
+std::pair<std::vector<bool>, std::vector<int>> label_lth_leaf(int k, int t, int h, int lth)
+{
+  std::pair<std::vector<bool>, std::vector<int>> leaf;
+  Node node { k, t, h, true };
+  int lth_tmp = lth;
+
+  while (true)
+  {
+    if (node.isU and node.k == 1)
+    {
+      assert (lth_tmp == 1);
+      // Just empty string... (We can combine case 1 and 2 from the C)
+      break;
+    }
+    else if (node.h >= node.k and node.k >= 2 and node.t == 0)
+    {
+      if (node.isU)
+      {
+        leaf.first.push_back(0);
+        leaf.second.push_back(h - node.h); // Double check!
+      }
+      node.isU = true;
+      node.k--;
+      node.h--;
+    }
+    else if (!node.isU and node.h >= node.k and node.k >= 2 and node.t >= 1)
+    {
+      unsigned size_child1 = tree_size(node.k, node.t - 1, node.h, false);
+      unsigned size_child2 = tree_size(node.k - 1, node.t, node.h - 1, true);
+      if (size_child1 >= lth_tmp)
+      {
+        leaf.first.push_back(0);
+        leaf.second.push_back(h - node.h); // Double check!
+        node.t--;
+        node.isU = false;
+      }
+      else if (size_child1 + size_child2 >= lth_tmp)
+      {
+        lth_tmp -= size_child1;
+        node.isU = true;
+        node.k--;
+        node.h--;
+      }
+      else
+      {
+        lth_tmp -= size_child1 + size_child2;
+        leaf.first.push_back(1);
+        leaf.second.push_back(h - node.h); // Double check!
+        node.isU = false;
+        node.t--;
+      }
+    }
+    else if (node.isU and node.h == node.k and node.k >= 2)
+    {
+      leaf.first.push_back(0);
+      leaf.second.push_back(h - node.h); // Double check!
+      node.isU = false;
+    }
+    else if (node.isU and node.h > node.k and node.k >= 2)
+    {
+      unsigned size_child1 = tree_size(node.k, node.t, node.h, false);
+      unsigned size_child2 = tree_size(node.k, node.t, node.h-1, true);
+      if (size_child1 >= lth_tmp)
+      {
+        leaf.first.push_back(0);
+        leaf.second.push_back(h - node.h); // Double check!
+        node.isU = false;
+      }
+      else if (size_child1 + size_child2 >= lth_tmp)
+      {
+        lth_tmp -= size_child1;
+        node.isU = true;
+        node.h--;
+      }
+      else 
+      {
+        lth_tmp -= size_child1 + size_child2;
+        leaf.first.push_back(1);
+        leaf.second.push_back(h - node.h); // Double check!
+        node.isU = false;
+      }
+    }
+    else 
+    {
+      assert (false);
+    }
+  }
+
+  return leaf;
 }
 
 void print_usage(char *argv[]) {
@@ -96,11 +195,13 @@ int main(int argc, char **argv) {
   int k;
   int t;
   int h;
+  int l;
   bool kset = false;
   bool tset = false;
   bool hset = false;
+  bool lset= false;
 
-  while ((opt = getopt(argc, argv, "k:t:h:")) != -1) {
+  while ((opt = getopt(argc, argv, "k:t:h:l:")) != -1) {
     switch (opt) {
     case 'k':
       k = atoi(optarg);
@@ -126,6 +227,14 @@ int main(int argc, char **argv) {
       }
       hset = true;
       break;
+    case 'l':
+      l = atoi(optarg);
+      if (l < 1) {
+        fputs("L must be a positive integer\n", stderr);
+        return EXIT_FAILURE;
+      }
+      lset = true;
+      break;
     default: /* '?' */
       print_usage(argv);
       return EXIT_FAILURE;
@@ -138,8 +247,28 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
-  unsigned len = tree_size(k, t, h);
-  std::cout << "It has " << len << " leaves\n";
+  if (lset) 
+  {
+    auto leaf = label_lth_leaf(k, t, h, l);
+    std::cout << "Leaf no " << l << " is ";
+    std::cout << std::noboolalpha;
+    for (bool bit: leaf.first)
+    {
+      std::cout << bit;
+    }
+    std::cout << std::boolalpha << " ";
+    for (int lvl: leaf.second)
+    {
+      std::cout << lvl;
+    }
+    std::cout << std::endl;
+  }
+  else
+  {
+    unsigned len = tree_size(k, t, h, true);
+    std::cout << "It has " << len << " leaves\n";
+  }
+  
 
   return EXIT_SUCCESS;
 }
