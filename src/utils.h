@@ -1,7 +1,5 @@
-#ifndef UTREES_H
-#define UTREES_H 1
-
-enum : char { ONE = '1', ZERO = '0', EPSILON = 'e', COMMA = ',', EOS = '|' };
+#ifndef UTILS_H
+#define UTILS_H 1
 
 // Macro to handle pushing into a stack
 #define PUSH(STACK, LENS, MAXS, ELEM)                                          \

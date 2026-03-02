@@ -9,90 +9,26 @@ on:
       - "**"
 
 jobs:
-  regtest:
-    name: Run make test
+  test:
+    name: Run tests
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install build essentials
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential g++-14 gcc-14 libboost-dev
+          sudo apt-get install -y build-essential g++-14 gcc-14 libboost-dev meson ninja-build gcovr
 
-      - name: Run regression tests
+      - name: Run tests
         env:
-          # Do NOT generate goldens in CI by default.
           GENERATE_GOLDENS: "0"
         run: |
           export CC=gcc-14
           export CXX=g++-14
-          make all
-          make test
-
-      - name: Update coverage badge
-        run: |
-          export CC=gcc-14
-          export CXX=g++-14
           export GCOV=gcov-14
-          # Run coverage and capture output. We grep for the total summary line.
-          COVERAGE_OUTPUT=$(make coverage)
-          echo "$COVERAGE_OUTPUT"
-          # Extract the percentage. Handle potential colon variants.
-          COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "Lines executed" | tail -n 1 | sed 's/.*executed: *\([0-9.]*\)%.*/\1/')
-
-          if [ -z "$COVERAGE" ]; then
-            # Try another format just in case (e.g. awk based)
-            COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "Lines executed" | tail -n 1 | awk '{print $2}' | grep -o '[0-9.]*' | head -n 1)
-          fi
-
-          if [ -z "$COVERAGE" ]; then
-            echo "Failed to extract coverage percentage"
-            exit 1
-          fi
-
-          echo "Coverage is $COVERAGE%"
-
-          # Determine color based on coverage percentage
-          COLOR="red"
-          # Use awk for floating point comparison
-          if [ $(awk "BEGIN {print ($COVERAGE >= 90)}") -eq 1 ]; then COLOR="brightgreen";
-          elif [ $(awk "BEGIN {print ($COVERAGE >= 70)}") -eq 1 ]; then COLOR="green";
-          elif [ $(awk "BEGIN {print ($COVERAGE >= 50)}") -eq 1 ]; then COLOR="yellow";
-          fi
-
-          # Update the badge in README.md. Note the %25 for URL encoding of %.
-          sed -i "s/coverage-[0-9.]*%25-[a-z]*/coverage-${COVERAGE}%25-${COLOR}/" README.md
-
-      - name: Commit and push changes
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            BRANCH=${{ github.head_ref }}
-          else
-            BRANCH=${{ github.ref_name }}
-          fi
-
-          git add README.md
-          if ! git diff --staged --quiet; then
-            # Save the modified README.md and switch to the target branch.
-            # We use checkout -f and reset --hard to ensure we are on the latest origin state
-            # before applying our small badge change. This avoids rebase conflicts.
-            cp README.md README.md.bak
-            git fetch origin $BRANCH
-            git checkout -f $BRANCH
-            git reset --hard origin/$BRANCH
-            mv README.md.bak README.md
-
-            git add README.md
-            git commit -m "Update coverage badge"
-            git push origin HEAD:$BRANCH
-          fi
+          meson setup build
+          meson test -C build -v
+          ninja -C build coverage-text
+          cat build/meson-logs/coverage.txt
