@@ -4,7 +4,7 @@
 #include <chrono>
 #include <cassert>
 
-#include "../examples/k4t3h7p4.hpp"
+#include "../examples/k3t2h3.hpp"
 
 namespace stdx = std::experimental;
 using simd_uint8 = stdx::fixed_size_simd<uint8_t, 8>;
@@ -189,6 +189,62 @@ void parse_to_vec(size_t idx, std::vector<uint8_t>& bits, std::vector<uint8_t>& 
     lengths.resize(8);
 }
 
+int compare(const int pindex, size_t idxA, size_t idxB)
+{
+    // Read vectors from old format
+    std::vector<uint8_t> bits_vec_A, lengths_vec_A;
+    std::vector<int> levels_A;
+    parse_to_vec(idxA, bits_vec_A, lengths_vec_A, levels_A);
+    std::vector<uint8_t> bits_vec_B, lengths_vec_B;
+    std::vector<int> levels_B;
+    parse_to_vec(idxB, bits_vec_B, lengths_vec_B, levels_B);
+
+    // Put vectors into SIMD
+    simd_uint8 bits_A, bits_B, lengths_A, lengths_B;
+    bits_A.copy_from(bits_vec_A.data(), std::experimental::element_aligned);
+    bits_B.copy_from(bits_vec_B.data(), std::experimental::element_aligned);
+    lengths_A.copy_from(lengths_vec_A.data(), std::experimental::element_aligned);
+    lengths_B.copy_from(lengths_vec_B.data(), std::experimental::element_aligned);
+    
+    simd_uint8 bit_xor = bits_A ^ bits_B;
+    simd_uint8_mask a_geq = ((lengths_A & bit_xor) == 0) and (lengths_A <= lengths_B);
+    simd_uint8_mask b_geq = ((lengths_B & bit_xor) == 0) and (lengths_B <= lengths_A);
+
+    for (size_t i = 0; i < std::max(levels_A.size(), levels_B.size()); i++)
+    {
+        // One of the two has more nonempty strings but we were equal up until here
+        if (i >= levels_B.size())
+        {
+            return (bits_vec_A[i] & 1) == 0 ? -1 : 1;
+        }
+        else if (i >= levels_A.size())
+        {
+            return (bits_vec_B[i] & 1) == 0 ? 1 : -1;
+        }
+        // One of the two has a bitstring "earlier"
+        else if (levels_A[i] < levels_B[i])
+        {
+            return (bits_vec_A[i] & 1) == 0 ? -1 : 1;
+        }
+        else if (levels_A[i] > levels_B[i])
+        {
+            return (bits_vec_B[i] & 1) == 0 ? 1 : -1;
+        }
+        // The two levels are equal... We have to compare strings
+        else if (a_geq[i] and !b_geq[i])
+        {
+            return 1;
+        }
+        else if (!a_geq[i] and b_geq[i])
+        {
+            return -1;
+        }
+    }
+    
+    // The birstrings are entirely equal
+    return 0;
+}
+
 int main()
 {
     // Set for initial bitstring: k-1 bitstrings with t NLB in the first one, all 0s
@@ -247,6 +303,17 @@ int main()
             std::cout << i << ": \033[31mWrong successor!\n\033[0m";
             assert(false);
         }
+
+        int fwd_res = compare(p, i, i + 1);
+        std::cout << i << ": " << fwd_res
+                  << (fwd_res == -1
+                          ? " \033[32mCorrect forward comparison!\n\033[0m"
+                          : " \033[31mWrong forward comparison!\n\033[0m");
+
+        int bwd_res = compare(p, i + 1, i);
+        std::cout << i << ": " << bwd_res
+                  << (bwd_res == 1
+                          ? " \033[32mCorrect backward comparison!\n\033[0m"
+                          : " \033[31mWrong backward comparison!\n\033[0m");
     }
-    
 }
