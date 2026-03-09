@@ -2,10 +2,27 @@
 #include <experimental/simd>
 #include <vector>
 #include <chrono>
+#include <cassert>
+
+#include "../examples/k4t3h7p4.hpp"
 
 namespace stdx = std::experimental;
 using simd_uint8 = stdx::fixed_size_simd<uint8_t, 8>;
 using simd_uint8_mask = stdx::fixed_size_simd_mask<uint8_t, 8>;
+
+#ifndef HAS_P
+#include <numeric>
+
+int p = h - 2;
+inline std::vector<int>
+make_indices(const std::vector<std::vector<bool>> &original) {
+  std::vector<int> indices(original.size());
+  std::iota(indices.begin(), indices.end(), 1);
+  return indices;
+}
+
+std::vector<int> p_successors = make_indices(tree_b);
+#endif
 
 void print_simd_bits(auto const& val)
 {
@@ -14,86 +31,97 @@ void print_simd_bits(auto const& val)
     std::cout << '\n';
 }
 
-int main()
+void print_vector(auto const& vec)
 {
-    int t = 4;
-    int k = 5;
-    int h = 5;
-
-    // Set for initial bitstring: k-1 bitstrings with t NLB in the first one, all 0s
-    simd_uint8 lengths ([k](uint8_t i) {return static_cast<uint8_t>(i < k-1); } );
-    lengths[0] = (1 << (t+1)) - 1;
-    std::cout << "Lengths: ";
-    print_simd_bits(lengths);
-    simd_uint8 bits = 0;
-    std::vector<int> levels { 0, 1, 2, 3 };
-
-    // Bad: Runs sequentially
-    simd_uint8_mask multiple_ones ([](uint8_t i) { return std::popcount(i) > 1; });
-
-    // Count total bits
-    auto start = std::chrono::high_resolution_clock::now();
-    size_t cnt = 0;
-    for (size_t n = 0; n < lengths.size(); n++)
+    for (int i : vec)
     {
-        cnt += std::popcount(static_cast<uint8_t>(lengths[n]));
+        std::cout << i << " ";
     }
-    auto stop = std::chrono::high_resolution_clock::now();
-    std::cout << "Total bits: " << cnt << ", time: " << (stop - start) << std::endl;
+    std::cout << std::endl;   
+}
 
-    // Alternative
-    start = std::chrono::high_resolution_clock::now();
-    simd_uint8 nlb_counts { std::popcount(static_cast<uint8_t>(lengths[0])) - 1 };  /*([lengths](int8_t n) { 
+void prog_p_successor(const int pindex, simd_uint8& lengths, simd_uint8& bits, std::vector<int>& levels)
+{
+    simd_uint8_mask has_bits = (lengths > 0);
+    simd_uint8 nlb_counts { std::popcount(static_cast<uint8_t>(lengths[0])) - has_bits[0] };  /*([lengths](int8_t n) { 
         return static_cast<int8_t> (std::popcount(static_cast<uint8_t>(lengths[n])));
     });*/
     for (size_t n = 1; n < lengths.size(); n++)
     {
-        nlb_counts[n] = nlb_counts[n-1] + std::popcount(static_cast<uint8_t>(lengths[n])) - (lengths[n] > 0);
+        // Add the NLB in this to the previous result, subtract the leading bit if there is one
+        nlb_counts[n] = nlb_counts[n-1] + std::popcount(static_cast<uint8_t>(lengths[n])) - has_bits[n];
     }
-    //size_t total = stdx::reduce(bit_counts);
-    stop = std::chrono::high_resolution_clock::now();
-    std::cout << "Total (SIMD): " << static_cast<int>(nlb_counts[7]) << ", time: " << (stop - start) << std::endl;
-    for (std::size_t i{}; i != nlb_counts.size(); ++i)
-        std::cout << static_cast<int>(nlb_counts[i]) << ' ';
-    std::cout << '\n';
-
+    
+    simd_uint8_mask smaller_than_p = simd_uint8 ([](uint8_t i) { return i; }) <= simd_uint8{pindex};
     simd_uint8 clear_first_bit(~simd_uint8{0} & ~1);
     simd_uint8 pattern_zero_and_ones = lengths & clear_first_bit;
-    simd_uint8 strings_after ([levels](uint8_t i) {
-        return i < levels.size() ? static_cast<uint8_t>(levels.size() - i) : 0;
+    simd_uint8 strings_after ([&levels](uint8_t i) {
+        return static_cast<uint8_t>(levels.size() - i);
     });
-    simd_uint8 needed_after ([h, levels](uint8_t i) {
-        return i < levels.size() ? (h - levels[i] - 1) : 1;
+    simd_uint8 needed_after ([&levels](uint8_t i) {
+        return i < levels.size() ? (h - levels[i] - 1) : 0;
     });
-    simd_uint8_mask no_successor = (lengths > 0) and (nlb_counts == t) and (
+    simd_uint8 nlb_before ([&nlb_counts](uint8_t i) { return i == 0 ? 0 : nlb_counts[i-1]; });
+    simd_uint8_mask no_successor = has_bits and ((nlb_before == t) or ((nlb_counts == t) and (
              ((bits == pattern_zero_and_ones) and (strings_after == needed_after)) // Third case
-          or (bits == lengths) // Fourth case
+          or (bits == lengths))) // Fourth case
     );
     
-    simd_uint8_mask has_successor = (lengths > 0) and !no_successor;
+    simd_uint8_mask has_successor = smaller_than_p and has_bits and !no_successor;
     std::cout << "Matches pattern: ";
     print_simd_bits(has_successor);
 
+    // Use the last match to determine the successor
     int match = stdx::find_last_set(has_successor);
-    
-    // TODO: Doesn't take empty strings into account...
-    if (nlb_counts[match] == t)
+    std::cout << "Last match is: " << match << std::endl;
+    if (match == -1)
     {
-        // Case A: No more open bits, we erase everything starting from the 1
-        // Find the index of the last bit that was set to 1 (i.e. first 1 from the left)
-        int last_one = std::countl_zero(static_cast<uint8_t>(bits[match]));
-        if (last_one >= 0) 
+        if (levels[0] == 0)
         {
-            // reset the 1 to a 0
-            bits[match] &= ~(1u << (7 - last_one));
-            // reset all the indexing bits starting from the same bit
-            levels[match] &= (1u << (last_one - 1)) - 1;
+            // We are at top
+            levels.resize(1);
+            levels[0] = -1;
+            return;
+        }
+        else 
+        {
+            bits[0] = 1;
+            match = 0;
+            levels[0] --; 
+        }
+    }
+    else if (nlb_counts[match] == t)
+    {
+        // Case A: No more open bits, we erase the tail 01^j
+        int reset_bits = std::countl_one(static_cast<uint8_t>(bits[match] | ~lengths[match])) + 1;
+        int current_bits = std::popcount(static_cast<uint8_t>(lengths[match]));
+        // reset the 1 to a 0
+        bits[match] &= (1u << (8-reset_bits)) - 1;
+        lengths[match] &= (1u << (8-reset_bits)) - 1;
+        // Determine new number of NLB
+        // Depends on whether we reset the entire string!
+        if (reset_bits < 8)
+        {
+            nlb_counts[match] -= current_bits - std::popcount(static_cast<uint8_t>(lengths[match]));
+            match++;
+        }
+        else 
+        {
+            // The new string is empty...
+            nlb_counts[match] -= (current_bits - 1);
+            if ((std::cmp_equal(match + 1, levels.size()) and levels[match] < h-2) or 
+                (std::cmp_less(match + 1, levels.size()) and levels[match] + 1 < levels[match + 1]) )
+            { 
+                // Empty level!
+                levels[match] = std::cmp_equal(match + 1, levels.size()) ? levels[match] + 1 : levels[match + 1] - 1;
+            }
+            else levels[match] ++;
         }
     }
     else 
     {
         // Case B: There are still open bits! Append to 10^j
-        if ((match == levels.size() - 1 and levels[match] < h-2) or (match < levels.size() - 1 and levels[match] + 1 < levels[match] + 1) )
+        if ((std::cmp_less(match + 1, levels.size()) and levels[match] + 1 < levels[match + 1]))
         {
             // There is an empty level we can use! 
             match ++; // We append to the next string
@@ -102,11 +130,123 @@ int main()
         }
         else 
         {
-            int first_new = std::popcount(static_cast<uint8_t>(levels[match]));
+            int first_new = std::popcount(static_cast<uint8_t>(lengths[match]));
             bits[match] |= (1u << first_new);
         }
+    }
+    if (match < k-1)
+    {
         // Add enough bits to fill t NLB
         int bits_before = match > 0 ? nlb_counts[match - 1] : 0;
-        levels[match] |= (1u << (t - bits_before + 1));
+        lengths[match] |= (1u << (t - bits_before + 1)) - 1;
+
+        // Now append the new strings
+        levels.resize(match+1);
+        int set_to_level = levels[match] + 1;
+        while (std::cmp_less(levels.size(), k-1) and set_to_level <= h-2)
+        {
+            levels.push_back(set_to_level);
+            set_to_level++;
+        }
+        simd_uint8 after_match ([match](uint8_t i) { 
+            return i > match; 
+        });
+        simd_uint8 before_levels ([&levels](uint8_t i) { 
+            return i < levels.size(); 
+        });
+        stdx::where((before_levels > 0 and after_match > 0), lengths) = 1;
+        stdx::where((after_match > 0), bits) = 0;
     }
+    
+}
+
+void parse_to_vec(size_t idx, std::vector<uint8_t>& bits, std::vector<uint8_t>& lengths, std::vector<int>& levels)
+{
+    bits.clear();
+    lengths.clear();
+    levels.clear();
+    auto& entry_b = tree_b[idx];
+    auto& entry_d = tree_d[idx];
+    int under_construction = -1;
+    size_t current_bit;
+    for (size_t i = 0; i < entry_b.size(); i++)
+    {
+        if (under_construction == -1 or entry_d[i] != entry_d[i-1])
+        {
+            // New layer!
+            under_construction++;
+            bits.push_back(0);
+            lengths.push_back(0);
+            levels.push_back(entry_d[i]);
+            current_bit = 0;
+        }
+        lengths[under_construction] |= (1 << current_bit);
+        if (entry_b[i]) bits[under_construction] |= (1 << current_bit);
+        current_bit++;
+    }
+    // Fill so it matches the width of SIMD
+    bits.resize(8);
+    lengths.resize(8);
+}
+
+int main()
+{
+    // Set for initial bitstring: k-1 bitstrings with t NLB in the first one, all 0s
+    simd_uint8 lengths ([](uint8_t i) {return static_cast<uint8_t>(i < k-1); } );
+    lengths[0] = (1 << (t+1)) - 1;
+    simd_uint8 bits = 0;
+
+    std::cout << "Bits: ";
+    print_simd_bits(bits);
+    std::cout << "Lengths: ";
+    print_simd_bits(lengths);
+
+    // Test loop
+    std::vector<uint8_t> bits_vec;
+    std::vector<uint8_t> lengths_vec;
+    std::vector<int> levels;
+    levels.reserve(k-1);
+    parse_to_vec(0, bits_vec, lengths_vec, levels);
+    for (size_t i = 0; i < tree_b.size() - 1; i++)
+    {
+        // read into the SIMD arrays
+        bits.copy_from(bits_vec.data(), std::experimental::element_aligned);
+        lengths.copy_from(lengths_vec.data(), std::experimental::element_aligned);
+        
+        // call the successor function
+        prog_p_successor(p, lengths, bits, levels);
+
+        // parse successor and compare to (converted) result
+        std::vector<uint8_t> succ_bits (8);
+        bits.copy_to(succ_bits.data(), std::experimental::element_aligned);
+        std::vector<uint8_t> succ_lengths (8);
+        lengths.copy_to(succ_lengths.data(), std::experimental::element_aligned);
+        std::vector<int> succ_levels { levels };
+
+        parse_to_vec(i + 1, bits_vec, lengths_vec, levels);
+        std::cout << "Computed bits: ";
+        print_simd_bits(succ_bits);
+        std::cout << "Expected bits: ";
+        print_simd_bits(bits_vec);
+        std::cout << "Computed lengths: ";
+        print_simd_bits(succ_lengths);
+        std::cout << "Expected lengths: ";
+        print_simd_bits(lengths_vec);
+        std::cout << "Computed levels: ";
+        print_vector(succ_levels);
+        std::cout << "Expected levels: ";
+        print_vector(levels);
+        
+        
+        if (levels == succ_levels and bits_vec == succ_bits and lengths_vec == succ_lengths)
+        {
+            std::cout << i << ": \033[32mCorrect successor!\n\033[0m";
+        }
+        else 
+        {
+            std::cout << i << ": \033[31mWrong successor!\n\033[0m";
+            assert(false);
+        }
+    }
+    
 }
