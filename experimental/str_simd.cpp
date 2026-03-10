@@ -207,8 +207,8 @@ int compare(const int pindex, size_t idxA, size_t idxB)
     lengths_B.copy_from(lengths_vec_B.data(), std::experimental::element_aligned);
     
     simd_uint8 bit_xor = bits_A ^ bits_B;
-    simd_uint8_mask a_geq = ((lengths_A & bit_xor) == 0) and (lengths_A <= lengths_B);
-    simd_uint8_mask b_geq = ((lengths_B & bit_xor) == 0) and (lengths_B <= lengths_A);
+    simd_uint8_mask a_less = (lengths_A < lengths_B) and (bit_xor & (lengths_A | (lengths_A + simd_uint8{1}))) == (lengths_A + simd_uint8{1});
+    simd_uint8_mask b_less = (lengths_B < lengths_A) and (bit_xor & (lengths_B | (lengths_B + simd_uint8{1}))) == (lengths_B + simd_uint8{1});
 
     for (size_t i = 0; i < std::max(levels_A.size(), levels_B.size()); i++)
     {
@@ -231,13 +231,13 @@ int compare(const int pindex, size_t idxA, size_t idxB)
             return (bits_vec_B[i] & 1) == 0 ? 1 : -1;
         }
         // The two levels are equal... We have to compare strings
-        else if (a_geq[i] and !b_geq[i])
-        {
-            return 1;
-        }
-        else if (!a_geq[i] and b_geq[i])
+        else if (a_less[i] and !b_less[i])
         {
             return -1;
+        }
+        else if (!a_less[i] and b_less[i])
+        {
+            return 1;
         }
     }
     
