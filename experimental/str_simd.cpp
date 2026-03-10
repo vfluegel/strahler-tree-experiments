@@ -206,9 +206,21 @@ int compare(const int pindex, size_t idxA, size_t idxB)
     lengths_A.copy_from(lengths_vec_A.data(), std::experimental::element_aligned);
     lengths_B.copy_from(lengths_vec_B.data(), std::experimental::element_aligned);
     
+    simd_uint8 shorter_string = lengths_A & lengths_B;
+    simd_uint8 first_length_difference = (lengths_A ^ lengths_B) & ~((lengths_A ^ lengths_B) * 2);
     simd_uint8 bit_xor = bits_A ^ bits_B;
-    simd_uint8_mask a_less = (lengths_A < lengths_B) and (bit_xor & (lengths_A | (lengths_A + simd_uint8{1}))) == (lengths_A + simd_uint8{1});
-    simd_uint8_mask b_less = (lengths_B < lengths_A) and (bit_xor & (lengths_B | (lengths_B + simd_uint8{1}))) == (lengths_B + simd_uint8{1});
+    simd_uint8_mask a_less = ((lengths_A < lengths_B) and (bit_xor & (shorter_string + first_length_difference)) == first_length_difference) or
+                             ((lengths_A > lengths_B) and (bit_xor & (shorter_string + first_length_difference)) == 0);
+    simd_uint8_mask b_less = ((lengths_B < lengths_A) and (bit_xor & (shorter_string + first_length_difference)) == first_length_difference) or
+                             ((lengths_B > lengths_A) and (bit_xor & (shorter_string + first_length_difference)) == 0);
+
+
+    simd_uint8 different_bits = (shorter_string & bit_xor);
+    simd_uint8 first_bit_difference ([&different_bits](uint8_t i){ 
+        return 1u << (std::countr_zero(static_cast<uint8_t>(different_bits[i])));
+    });
+    simd_uint8_mask a_greater = (different_bits > 0) and ((bits_A & first_bit_difference) > 0);
+    simd_uint8_mask b_greater = (different_bits > 0) and ((bits_B & first_bit_difference) > 0);
 
     for (size_t i = 0; i < std::max(levels_A.size(), levels_B.size()); i++)
     {
@@ -231,13 +243,13 @@ int compare(const int pindex, size_t idxA, size_t idxB)
             return (bits_vec_B[i] & 1) == 0 ? 1 : -1;
         }
         // The two levels are equal... We have to compare strings
-        else if (a_less[i] and !b_less[i])
-        {
-            return -1;
-        }
-        else if (!a_less[i] and b_less[i])
+        else if (a_greater[i] or (!a_less[i] and b_less[i]))
         {
             return 1;
+        }
+        else if (b_greater[i] or (a_less[i] and !b_less[i]))
+        {
+            return -1;
         }
     }
     
@@ -322,4 +334,6 @@ int main()
             assert (false);
         }
     }
+
+    std::cout << "Compared: " << compare(p, 3, 1) << std::endl;
 }
