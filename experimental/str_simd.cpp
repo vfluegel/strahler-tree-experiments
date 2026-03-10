@@ -52,7 +52,7 @@ void prog_p_successor(const int pindex, simd_uint8& lengths, simd_uint8& bits, s
         nlb_counts[n] = nlb_counts[n-1] + std::popcount(static_cast<uint8_t>(lengths[n])) - has_bits[n];
     }
     
-    simd_uint8_mask smaller_than_p = simd_uint8 ([](uint8_t i) { return i; }) <= simd_uint8{pindex};
+    simd_uint8_mask smaller_than_p = simd_uint8 ([&levels](uint8_t i) { return i < levels.size() ? levels[i] : 0b11111111; }) <= simd_uint8{pindex};
     simd_uint8 clear_first_bit(~simd_uint8{0} & ~1);
     simd_uint8 pattern_zero_and_ones = lengths & clear_first_bit;
     simd_uint8 strings_after ([&levels](uint8_t i) {
@@ -87,7 +87,7 @@ void prog_p_successor(const int pindex, simd_uint8& lengths, simd_uint8& bits, s
         {
             bits[0] = 1;
             match = 0;
-            levels[0] --; 
+            levels[0] = std::min(levels[0] - 1, p); 
         }
     }
     else if (nlb_counts[match] == t)
@@ -121,12 +121,12 @@ void prog_p_successor(const int pindex, simd_uint8& lengths, simd_uint8& bits, s
     else 
     {
         // Case B: There are still open bits! Append to 10^j
-        if ((std::cmp_less(match + 1, levels.size()) and levels[match] + 1 < levels[match + 1]))
+        if ((std::cmp_less(match + 1, levels.size()) and levels[match] + 1 < levels[match + 1] and levels[match] != p))
         {
             // There is an empty level we can use! 
             match ++; // We append to the next string
             bits[match] = 1; 
-            levels[match] --; // Move the empty string up to the next higher level
+            levels[match] = std::min(p, levels[match] - 1); // Move the empty string up to the next higher level
         }
         else 
         {
@@ -266,6 +266,7 @@ int main()
     for (size_t i = 0; i < tree_b.size() - 1; i++)
     {
         // read into the SIMD arrays
+        parse_to_vec(i, bits_vec, lengths_vec, levels);
         bits.copy_from(bits_vec.data(), std::experimental::element_aligned);
         lengths.copy_from(lengths_vec.data(), std::experimental::element_aligned);
         
@@ -279,7 +280,7 @@ int main()
         lengths.copy_to(succ_lengths.data(), std::experimental::element_aligned);
         std::vector<int> succ_levels { levels };
 
-        parse_to_vec(i + 1, bits_vec, lengths_vec, levels);
+        parse_to_vec(p_successors[i], bits_vec, lengths_vec, levels);
         std::cout << "Computed bits: ";
         print_simd_bits(succ_bits);
         std::cout << "Expected bits: ";
@@ -293,7 +294,6 @@ int main()
         std::cout << "Expected levels: ";
         print_vector(levels);
         
-        
         if (levels == succ_levels and bits_vec == succ_bits and lengths_vec == succ_lengths)
         {
             std::cout << i << ": \033[32mCorrect successor!\n\033[0m";
@@ -305,15 +305,21 @@ int main()
         }
 
         int fwd_res = compare(p, i, i + 1);
-        std::cout << i << ": " << fwd_res
-                  << (fwd_res == -1
-                          ? " \033[32mCorrect forward comparison!\n\033[0m"
-                          : " \033[31mWrong forward comparison!\n\033[0m");
+        std::cout << i << ": " << fwd_res;
+        if (fwd_res == -1) std::cout << " \033[32mCorrect forward comparison!\n\033[0m";
+        else 
+        {
+            std::cout << " \033[31mWrong forward comparison!\n\033[0m";
+            assert (false);
+        }
 
         int bwd_res = compare(p, i + 1, i);
-        std::cout << i << ": " << bwd_res
-                  << (bwd_res == 1
-                          ? " \033[32mCorrect backward comparison!\n\033[0m"
-                          : " \033[31mWrong backward comparison!\n\033[0m");
+        std::cout << i << ": " << bwd_res;
+        if (bwd_res == 1)std::cout << " \033[32mCorrect backward comparison!\n\033[0m";
+        else 
+        {
+            std::cout << " \033[31mWrong backward comparison!\n\033[0m";
+            assert (false);
+        }
     }
 }
