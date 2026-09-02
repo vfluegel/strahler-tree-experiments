@@ -1,17 +1,45 @@
-# Regression tests for genstree
+# Tests
 
-This directory contains a small regression harness for the `genstree` binary.
+Meson builds the C unit tests and runs the command-line regression cases.
 
-- `run-regression.sh` — Run the regression suite or generate golden outputs.
-- `golden/` — Expected outputs (golden files).
-- `actual/` — Test run outputs (ignored by git).
+- `test_stree.c` tests the reusable Strahler-tree generator.
+- `test_ordered_tree.c` tests the owned compact-leaf tree, including stable
+  sibling order, normalization, round trips, invalid input, DOT, and p-level
+  partitions.
+- `run-single-test.sh` runs one command-line golden comparison.
+- `run-regression.sh` regenerates or checks the complete golden suite.
+- `run-with-input.sh` supplies a file on standard input for smoke tests.
+- `games/` contains parser and solver fixtures.
+- `golden/` contains expected command output.
+- `actual/` receives ignored output from the current test run.
 
-Usage:
-- Build the project (top-level): `meson setup build && meson compile -C build`
-- Generate golden files (one-time or when outputs intentionally change):
-  - `tests/run-regression.sh --generate-goldens`
-- Run regression tests (compare actual vs golden):
-  - `meson test -C build`
-  - or: `tests/run-regression.sh`
+## Compact leaf streams
+
+`pms2dot` and the ordered-tree library read an ordered list of root-to-leaf
+paths. `0` and `1` form an edge label, `e` is an explicit empty contribution,
+`,` separates components, and `|` terminates a path. The trivial one-node tree
+is `|`. Empty normalized edge labels serialize as `e`. For compatibility, a
+single trailing comma before `|` is accepted as a level terminator; empty
+components anywhere else are rejected.
+
+Distinct children retain the order in which their normalized labels first
+occur. Duplicate paths and prefix conflicts are rejected, so leaves and
+internal nodes remain distinct.
+
+## Running the suite
+
+Build and run from the repository root:
+
+```sh
+meson setup build
+meson compile -C build
+meson test -C build --print-errorlogs
+```
+
+To regenerate golden files after an intentional output change:
+
+```sh
+tests/run-regression.sh --generate-goldens
+```
 
 If any diffs are reported, the script exits non-zero. To update goldens, run with `GENERATE_GOLDENS=1` (or `--generate-goldens`) and commit the resulting `tests/golden/*` files if the changes are intentional.

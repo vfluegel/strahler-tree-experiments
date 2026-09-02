@@ -1,7 +1,8 @@
 Some arguments are missing!
 Usage: genstree -k K -t T -h H [-j -l L -d -p P]
--j	 Can be used to obtain just the leaf count
--l	 L can be used to indicate interest in the L-th leaf
--d	 Indicates the tree should be printed in dot format
--p	 P can be used to indicate a p-value of interest
-With -p or no options, the labels of the leaves will be printed
+  --help  Print this message
+  -j      Print only the leaf count
+  -l L    Print the L-th leaf
+  -d      Print the tree in DOT format
+  -p P    Print the partition at p-level P
+With -p or no output option, leaf labels are printed.

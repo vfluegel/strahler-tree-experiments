@@ -16,10 +16,35 @@ cpp = meson.get_compiler('cpp')
 
 lenstree_option = get_option('lenstree')
 boost_dep = dependency('boost', required : lenstree_option)
+source_includes = include_directories('src')
+
+stree_lib = static_library('stree', 'src/stree.c')
+stree_dep = declare_dependency(
+  include_directories : source_includes,
+  link_with : stree_lib,
+)
+
+dot_utils_lib = static_library('dot_utils', 'src/dot_utils.c')
+dot_utils_dep = declare_dependency(
+  include_directories : source_includes,
+  link_with : dot_utils_lib,
+)
+
+ordered_tree_lib = static_library(
+  'ordered_tree',
+  'src/ordered_tree.c',
+  dependencies : dot_utils_dep,
+)
+ordered_tree_dep = declare_dependency(
+  dependencies : dot_utils_dep,
+  include_directories : source_includes,
+  link_with : ordered_tree_lib,
+)
 
 # Executables
 genstree = executable('genstree',
-  ['src/genstree.c', 'src/prtstree.c'],
+  'src/genstree.c',
+  dependencies : [stree_dep, ordered_tree_dep],
   install : true
 )
 
@@ -29,7 +54,8 @@ pgfilt = executable('pgfilt',
 )
 
 pms2dot = executable('pms2dot',
-  ['src/pms2dot.c', 'src/prtstree.c'],
+  'src/pms2dot.c',
+  dependencies : ordered_tree_dep,
   install : true
 )
 
@@ -49,16 +75,31 @@ str_tree = executable('str-tree',
 )
 
 # Unit Tests
-unit_tests_exe = executable('unit_tests',
-  ['tests/unit_tests.c', 'src/prtstree.c'],
-  include_directories : include_directories('src')
+test_stree_exe = executable(
+  'test_stree',
+  'tests/test_stree.c',
+  dependencies : stree_dep,
 )
+test('test_stree', test_stree_exe)
 
-test('unit_tests', unit_tests_exe)
+test_ordered_tree_exe = executable(
+  'test_ordered_tree',
+  'tests/test_ordered_tree.c',
+  dependencies : ordered_tree_dep,
+)
+test('test_ordered_tree', test_ordered_tree_exe)
+
+test_dot_utils_exe = executable(
+  'test_dot_utils',
+  'tests/test_dot_utils.c',
+  dependencies : dot_utils_dep,
+)
+test('test_dot_utils', test_dot_utils_exe)
 
 # Exercise every supported command-line entry point. These smoke tests are
 # intentionally output-agnostic; the regression tests cover stable output.
 test('str_tree_all', str_tree)
+test('genstree_help', genstree, args : ['--help'])
 test('str_tree_one_argument', str_tree, args : ['0'])
 test('str_tree_two_arguments', str_tree, args : ['0', '2'])
 test('pgfilt_help', pgfilt, args : ['-h'])
@@ -141,6 +182,9 @@ pms2dot_cases = [
   ['2', '0,e,1|0,1,1|1,e,0|'],
   ['3', '0,0,1,e,1|0,1,1,0,0|'],
   ['4', '0,1|1,0|0,0|'],
+  ['5', '|'],
+  ['6', 'e,e|0,e|'],
+  ['7', '1,0|0,0|1,1|0,1|'],
 ]
 
 foreach ct : pms2dot_cases
@@ -150,6 +194,37 @@ foreach ct : pms2dot_cases
     args: [pms2dot, 'tests/golden/pms_' + id + '.out', 'tests/actual/pms_' + id + '.out', input],
     workdir: meson.project_source_root())
 endforeach
+
+dot_program = find_program('dot', required : false)
+if dot_program.found()
+  foreach ct : pms2dot_cases
+    id = ct[0]
+    test(
+      'pms2dot_' + id + '_dot_syntax',
+      dot_program,
+      args : [
+        '-Tdot',
+        '-o',
+        '/dev/null',
+        files('tests/golden/pms_' + id + '.out'),
+      ],
+    )
+  endforeach
+
+  foreach ct : genstree_cases
+    base_name = 'k' + ct[0] + '_t' + ct[1] + '_h' + ct[2]
+    test(
+      'genstree_' + base_name + '_dot_syntax',
+      dot_program,
+      args : [
+        '-Tdot',
+        '-o',
+        '/dev/null',
+        files('tests/golden/d_' + base_name + '.out'),
+      ],
+    )
+  endforeach
+endif
 
 test('pms2dot_h', run_single_test,
   args: [pms2dot, 'tests/golden/pms_h.out', 'tests/actual/pms_h.out', 'EMPTY', '-h'],

@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 libboost-dev meson ninja-build
+          sudo apt-get install -y clang-18 graphviz libboost-dev meson ninja-build
 
       - name: Configure
         env:
@@ -67,7 +67,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-14 gcc-14 libboost-dev meson ninja-build
+          sudo apt-get install -y g++-14 gcc-14 graphviz libboost-dev meson ninja-build
 
       - name: Configure
         env:
@@ -115,7 +115,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-14 gcc-14 gcovr libboost-dev meson ninja-build
+          sudo apt-get install -y g++-14 gcc-14 gcovr graphviz libboost-dev meson ninja-build
 
       - name: Configure
         env:
@@ -165,7 +165,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-18 libboost-dev meson ninja-build
+          sudo apt-get install -y clang-18 graphviz libboost-dev meson ninja-build
 
       - name: Configure
         env:
