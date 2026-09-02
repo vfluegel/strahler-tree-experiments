@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "cli_version.h"
 #include "ordered_tree.h"
 
 enum { USAGE_ERROR = 2, OPT_CHECK_ORDER = 256, OPT_REORDER };
@@ -18,6 +19,7 @@ static void print_usage(FILE *out, char *argv[]) {
   progname = progname ? progname + 1 : argv[0];
   fprintf(out, "Usage: %s [--check-order|--reorder] [-h]\n", progname);
   fputs("  -h, --help     Print this message.\n", out);
+  fputs("  --version      Print the program version.\n", out);
   fputs("  --check-order  Reject branches outside bitstring-vector order.\n",
         out);
   fputs("  --reorder      Sort branches into bitstring-vector order.\n", out);
@@ -33,6 +35,12 @@ static void print_usage(FILE *out, char *argv[]) {
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   opterr = 0;
   int opt;
   OrderedTreeBranchOrder branch_order = ORDERED_TREE_PRESERVE_INPUT_ORDER;

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cli_version.h"
 #include "pg_game.h"
 
 enum { USAGE_ERROR = 2 };
@@ -17,9 +18,16 @@ static void print_usage(FILE *out, char *argv[static 1]) {
   fputs("Read one PGSolver game from standard input.\n", out);
   fputs("  -h, --help       Print this message\n", out);
   fputs("  -n, --normalize  Write canonical PGSolver format\n", out);
+  fputs("  --version         Print the program version\n", out);
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},
       {"normalize", no_argument, nullptr, 'n'},

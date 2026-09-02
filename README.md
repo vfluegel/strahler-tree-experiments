@@ -1,94 +1,116 @@
 # Strahler Tree Experiments
-Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
-## Tools
-Run `meson setup build && meson compile -C build` to compile the tools. Binaries will be located in the `build/` directory.
+Command-line tools for working with the Strahler trees described in
+[The Strahler Number of a Parity Game](https://arxiv.org/pdf/2003.08627).
 
-* `build/genstree` can be used to count leaves of a tree (for given values of `k`, `t`
-  and `h`; it can also print to `stdout` the labels of the leaves of the tree;
-  and it can even print the tree in dot format so you can run, e.g. `./build/genstree
-  -k 4 -t 2 -h 4 -d | dot -Tpng > tree.png`
-* If you want `genstree` to also print the partitioning of leaf labels into
-  p-level groups, you can use the `-p` option; then the sizes of groups of
-  leaves whose p-level successor are the same are printed (their sum
-  adds up to the total number of leaves)
-* `build/pms2dot` can be used to read from `stdin` and print a dot format tree
-  constructed from a progress-measure string, for instance `echo
-  "00,0,1,e,1|00,1,1,0,0|" | ./build/pms2dot | dot -Tpng > tree.png` prints a tree
-  with two branches. `--check-order` rejects a branch sequence that is not in
-  the paper's bitstring-vector order; `--reorder` sorts it before constructing
-  the DOT tree. The bitstring comparison is the infinite-binary-tree DFS order
-  `0 beta < epsilon < 1 beta`, recursively below equal leading bits, and the
-  vector comparison is its lexicographic lifting.
-* `build/pgfilt` validates a PGSolver parity game from `stdin` and prints a
-  deterministic graph summary. Pass `--normalize` to write canonical PGSolver
-  format instead. Sparse external identifiers are stored densely; an optional
-  `parity MAX_ID;` header gives the maximum allowed identifier, not a vertex
-  count.
-* `build/pg2adot [OPTIONS] [FILE]` solves a PGSolver game with enhanced
-  Zielonka, verifies the resulting attractor decompositions, and writes their
-  associated ordered trees as directed DOT. With no file, or with `-`, it
-  reads standard input. Use `--player=both|even|odd`,
-  `--labels=counts|sets|none`, and `--max-set-items=N` to control output.
-  Verification is enabled by default; `--no-verify` is intended only for
-  diagnosis. The reported Strahler number describes this concrete witness,
-  not a minimum over all possible attractor decompositions.
+## Build
 
-### Examples
+```sh
+meson setup build
+meson compile -C build
+meson test -C build --print-errorlogs
+```
 
-Check that progress-measure branches already follow the paper's order, or
-reorder an unsorted stream while producing DOT:
+The executables are written to `build/`. Every executable accepts `--version`;
+the value comes from the Meson project version, currently `0.1`.
+
+## Commands
+
+### `genstree`
+
+Build a Strahler tree for `k`, `t`, and `h`. By default, `genstree` prints its
+leaf labels. Use `-j` for the leaf count, `-l L` for one leaf, `-d` for DOT, or
+`-p P` for the sizes of the p-level groups.
+
+```sh
+./build/genstree -k 4 -t 2 -h 4 -j
+./build/genstree -k 4 -t 2 -h 4 -d | dot -Tsvg > tree.svg
+```
+
+### `lenstree`
+
+Compute the same leaf data with the Boost-based implementation. This command
+is built when Boost is available.
+
+```sh
+./build/lenstree -k 4 -t 2 -h 4
+./build/lenstree -k 4 -t 2 -h 4 -l 3
+```
+
+### `pms2dot`
+
+Read progress-measure branches from standard input and write their prefix tree
+as DOT. A branch is a comma-separated vector of bitstrings ending in `|`; use
+`e` for an empty bitstring.
+
+`--check-order` rejects branches that are out of order. `--reorder` sorts them
+before building the tree. Bitstrings use the paper's binary-tree order
+`0β < ε < 1β`, applied recursively after equal leading bits. Vectors use the
+lexicographic order induced by that bitstring order.
 
 ```sh
 printf '00,e|0,e|e,e|10,e|1,e|\n' | ./build/pms2dot --check-order > tree.dot
 printf '1,0|e,1|0,1|e,0|\n' | ./build/pms2dot --reorder > sorted-tree.dot
 ```
 
-Normalize a sparse-ID PGSolver game, then render verified Even and Odd
-attractor decompositions with truncated set labels:
+### `pgfilt`
+
+Read and check one PGSolver game from standard input. By default, `pgfilt`
+prints basic statistics such as the number of vertices and edges. Use
+`--normalize` to print the game in a consistent PGSolver format.
 
 ```sh
-./build/pgfilt --normalize < tests/games/sparse.pg
-./build/pg2adot --player=both --labels=sets --max-set-items=8 \
-  tests/games/ordered_two_children.pg | dot -Tsvg > decomposition.svg
+./build/pgfilt < game.pg
+./build/pgfilt --normalize < game.pg > normalized.pg
 ```
 
+### `pg2adot`
 
-## Computing P-Level Successors
-The file `src/str-tree.cc` contains the code to compute a p-level successor of a node in the Strahler tree.
-The compiled binary `build/str-tree` contains a main function that can be used without or with additional parameters:
-* No parameter: Check every leaf in the tree against its (p-level) successor
-* One (integer) parameter: Check that specific leaf and output the result and expected result.  
-* Two (integer) parameters: Compute the p-level successor of the specific leaf, where p is the second parameter.
+Solve a PGSolver game with the enhanced Zielonka algorithm, check the resulting
+attractor decompositions, and write them as DOT. Pass a file name, `-`, or no
+file name; the latter two read from standard input.
 
-The tree that is used is defined in the file before compiling. The expected format is two vectors of vectors: One storing the bits (called `tree_b`) and a second storing the level that the corresponding bit in the first vector of vectors belongs to (called `tree_d`). Multiple examples are currently included in the directory `examples` and can be switched out by changing the imported file. When the tree is switched out, `k`, `t`, and `h` (and potentially `p` if using) need to be set accordingly in the file!  
+- `--player=both|even|odd` selects the trees to print.
+- `--labels=counts|sets|none` selects the node and edge labels.
+- `--max-set-items=N` limits the number of vertices shown in a set label.
+- `--no-verify` skips the decomposition check and is intended for debugging.
 
-New input files can be generated with a combination of the included tools.
-1. Generate the tree output and pipe it into the desired file: 
+The reported Strahler number belongs to the tree that `pg2adot` built. The
+command does not search for the smallest value over every possible
+decomposition.
+
+```sh
+./build/pg2adot game.pg > decomposition.dot
+./build/pg2adot --player=both --labels=sets --max-set-items=8 game.pg \
+  | dot -Tsvg > decomposition.svg
 ```
+
+The repository includes small sample games under `tests/games/`, for example:
+
+```sh
+./build/pg2adot tests/games/ordered_two_children.pg
+```
+
+### `str-tree`
+
+Check p-level successors in the tree compiled into `src/str-tree.cc`.
+
+- With no arguments, check every leaf and its successor.
+- With `INDEX`, check one leaf.
+- With `INDEX P`, compute that leaf's p-level successor.
+
+To compile a different generated tree into this command:
+
+```sh
 ./build/genstree -k 3 -t 2 -h 5 -p 2 > examples/k3t2h5p2.hpp
-```
-2. Convert the file to C++
-```
 python3 src/convert_out.py examples/k3t2h5p2.hpp
-```  
-3. Open the file and adjust the variables at the top to match the parameters used during generation
+```
 
-The program under `experimental/` is not a supported Meson target and is not
-part of the required build, static-analysis, or coverage jobs.
+Then update the included example and the matching `k`, `t`, `h`, and `p`
+values in `src/str-tree.cc`, and rebuild.
 
-## Explanations for Comments in Code
-Some comments in `src/str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:
-* _Cases where the sibling does not exist_
-    * **A**: the number of non-empty strings among bitstrings h-1 and r+1 is k-1
-    * **B**: the number of non-leadings bits in bitstrings h-1 to r+1 is t
-    * **C**: bitstring r is 01^j for some j>=0, the number of non-leading bits used in bitstrings h-1 to r is t and all bitstrings r to 1 are non-empty
-    * **D**: bitstring r is 1^j for some j>=1, and the number of non-leading bits used in bitstrings h-1 to r is t
+## Developer notes
 
-* _Finding the sibling_
-    * **E**: Less than t non-leading bits are used in bitstrings h-1 to r -> append 10^j with j>=0 to original string r, so that exactly t non-leading bits are used
-    * **F**: Exactly t non-leading bits are used in bitstrings h-1 to r and r is in format b01^j for some j>=0 -> use b
-
-* _Setting the remaining bits_
-    * **G**: Set 00^j for some i>=0 so the total number of bits used is (k-1)+t
-    * **H**: Add strings 0 so the number of non-empty bitstrings is k-1
+The program under `experimental/` is not built or tested by Meson. Comments
+labelled A through H in `src/str-tree.cc` refer to the case analysis on page 19
+of the paper.

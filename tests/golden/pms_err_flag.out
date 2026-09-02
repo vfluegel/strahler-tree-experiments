@@ -1,5 +1,6 @@
 Usage: pms2dot [--check-order|--reorder] [-h]
   -h, --help     Print this message.
+  --version      Print the program version.
   --check-order  Reject branches outside bitstring-vector order.
   --reorder      Sort branches into bitstring-vector order.
 The program receives progress measures ending with '|' via stdin. Each

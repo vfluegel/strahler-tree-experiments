@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ad_tree_dot.h"
+#include "cli_version.h"
 #include "zielonka.h"
 
 enum {
@@ -23,6 +24,7 @@ static void usage(FILE *out, char *argv[static 1]) {
   fprintf(out,
           "Usage: %s [OPTIONS] [FILE]\n"
           "  -h, --help\n"
+          "  --version                    print the program version\n"
           "  --player=both|even|odd       default: both\n"
           "  --labels=counts|sets|none    default: counts\n"
           "  --max-set-items=N            default: 32\n"
@@ -52,6 +54,12 @@ static void usage(FILE *out, char *argv[static 1]) {
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   enum { OPTION_PLAYER = 1, OPTION_LABELS, OPTION_MAX_ITEMS, OPTION_NO_VERIFY };
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},

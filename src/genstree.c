@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "cli_version.h"
 #include "ordered_tree.h"
 #include "stree.h"
 #include "utrees.h"
@@ -36,6 +37,7 @@ static void print_usage(FILE *out, char *argv[static 1]) {
   progname = progname ? progname + 1 : argv[0];
   fprintf(out, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", progname);
   fputs("  --help  Print this message\n", out);
+  fputs("  --version Print the program version\n", out);
   fputs("  -j      Print only the leaf count\n", out);
   fputs("  -l L    Print the L-th leaf\n", out);
   fputs("  -d      Print the tree in DOT format\n", out);
@@ -115,6 +117,12 @@ static void print_blocks(char const labels[static 1]) {
 }
 
 int main(int argc, char *argv[argc + 1]) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   static struct option const long_options[] = {
       {"help", no_argument, nullptr, 1},
       {nullptr, 0, nullptr, 0},

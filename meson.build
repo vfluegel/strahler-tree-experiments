@@ -18,6 +18,24 @@ lenstree_option = get_option('lenstree')
 boost_dep = dependency('boost', required : lenstree_option)
 source_includes = include_directories('src')
 
+version_configuration = configuration_data()
+version_configuration.set_quoted(
+  'STRAHLER_TREE_VERSION',
+  meson.project_version(),
+)
+version_header = configure_file(
+  output : 'strahler_tree_version.h',
+  configuration : version_configuration,
+)
+cli_version_lib = static_library(
+  'cli_version',
+  ['src/cli_version.c', version_header],
+)
+cli_version_dep = declare_dependency(
+  include_directories : source_includes,
+  link_with : cli_version_lib,
+)
+
 stree_lib = static_library('stree', 'src/stree.c')
 stree_dep = declare_dependency(
   include_directories : source_includes,
@@ -100,33 +118,33 @@ ad_tree_dot_dep = declare_dependency(
 # Executables
 genstree = executable('genstree',
   'src/genstree.c',
-  dependencies : [stree_dep, ordered_tree_dep],
+  dependencies : [stree_dep, ordered_tree_dep, cli_version_dep],
   install : true
 )
 
 pgfilt = executable('pgfilt',
   'src/pgfilt.c',
-  dependencies : pg_game_dep,
+  dependencies : [pg_game_dep, cli_version_dep],
   install : true
 )
 
 pms2dot = executable('pms2dot',
   'src/pms2dot.c',
-  dependencies : ordered_tree_dep,
+  dependencies : [ordered_tree_dep, cli_version_dep],
   install : true
 )
 
 pg2adot = executable(
   'pg2adot',
   'src/pg2adot.c',
-  dependencies : [zielonka_dep, ad_tree_dot_dep],
+  dependencies : [zielonka_dep, ad_tree_dot_dep, cli_version_dep],
   install : true,
 )
 
 if not lenstree_option.disabled() and boost_dep.found()
   lenstree = executable('lenstree',
     'src/lenstree.cpp',
-    dependencies : boost_dep,
+    dependencies : [boost_dep, cli_version_dep],
     install : true
   )
 else
@@ -135,6 +153,7 @@ endif
 
 str_tree = executable('str-tree',
   'src/str-tree.cc',
+  dependencies : cli_version_dep,
   install : true
 )
 
@@ -204,6 +223,39 @@ test('str_tree_two_arguments', str_tree, args : ['0', '2'])
 test('pgfilt_help', pgfilt, args : ['-h'])
 test('pg2adot_help', pg2adot, args : ['--help'])
 test('pms2dot_help_exit', pms2dot, args : ['-h'])
+check_version = find_program('tests/check-version.sh')
+test(
+  'genstree_version',
+  check_version,
+  args : [genstree, meson.project_version()],
+)
+test(
+  'pgfilt_version',
+  check_version,
+  args : [pgfilt, meson.project_version()],
+)
+test(
+  'pms2dot_version',
+  check_version,
+  args : [pms2dot, meson.project_version()],
+)
+test(
+  'pg2adot_version',
+  check_version,
+  args : [pg2adot, meson.project_version()],
+)
+test(
+  'str_tree_version',
+  check_version,
+  args : [str_tree, meson.project_version()],
+)
+if boost_dep.found()
+  test(
+    'lenstree_version',
+    check_version,
+    args : [lenstree, meson.project_version()],
+  )
+endif
 run_with_input = find_program('tests/run-with-input.sh')
 test(
   'pgfilt_rejects_missing_semicolon',
