@@ -9,10 +9,9 @@ shift 4
 
 sanitize_output() {
   local file=$1
-  sed -e "s|[^[:space:]]*/genstree|genstree|g" \
-      -e "s|[^[:space:]]*/pms2dot|pms2dot|g" \
-      -e "s|[^[:space:]]*/lenstree|lenstree|g" \
-      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+  local program=${BINARY##*/}
+  sed -e "s|[^[:space:]]*/${program}|${program}|g" "$file" > "$file.tmp" &&
+    mv "$file.tmp" "$file"
 }
 
 compare_files() {

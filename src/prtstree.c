@@ -15,8 +15,7 @@ typedef struct LabdTree {
   int height;
 } LabdTree;
 
-[[nodiscard]] static char const *after_next_comma(char const str[static 1])
-    [[unsequenced]] {
+[[nodiscard]] static char const *after_next_comma(char const str[static 1]) {
   assert(str != nullptr);
   char const *cur = str;
   while (*cur != COMMA && *cur != EOS) {
@@ -31,8 +30,7 @@ typedef struct LabdTree {
 }
 
 [[nodiscard]] static bool same_before_comma(char const first[static 1],
-                                            char const second[static 1])
-    [[unsequenced]] {
+                                            char const second[static 1]) {
   char const *cur1 = first;
   char const *cur2 = second;
 
@@ -42,17 +40,15 @@ typedef struct LabdTree {
     if (*cur1 == ONE || *cur1 == ZERO) {
       while (true) {
         assert(*cur2 != '\0');
-        if (*cur2 == COMMA || *cur2 == EOS) {
-          return false;
-        } else if (*cur2 == EPSILON) {
+        if (*cur2 == EPSILON) {
           cur2++; // ignore it
           continue;
-        } else if (*cur2 != *cur1) {
-          return false; // no match? then not equal
-        } else {
-          cur2++; // match!
-          break;
         }
+        if (*cur2 == COMMA || *cur2 == EOS || *cur2 != *cur1) {
+          return false; // no match? then not equal
+        }
+        cur2++; // match!
+        break;
       }
     }
     cur1++;
@@ -77,9 +73,21 @@ typedef struct LabdTree {
  * leaves.
  */
 void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
-                      int const p) [[unsequenced]] {
+                      int const p) {
   assert(labels != nullptr);
-  char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
+  if (nlabs == 0) {
+    fputs("Cannot print an empty tree\n", stderr);
+    return;
+  }
+  char const **lab_ptrs =
+      (char const **)calloc((size_t)nlabs, sizeof(*lab_ptrs));
+  if (lab_ptrs == nullptr) {
+    fputs("Failed to allocate tree traversal\n", stderr);
+    return;
+  }
+  for (size_t idx = 0; idx < nlabs; idx++) {
+    lab_ptrs[idx] = labels;
+  }
 
   // This will be a DFS-like procedure, we need a stack of arrays of pointers
   LabdTree *stack = nullptr;
@@ -100,7 +108,7 @@ void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
   // Hacky: no edges indexed yet so we give the root a "height" of -1
   LabdTree ltree = {
       .size = nlabs, .labs = lab_ptrs, .id = next_id++, .height = -1};
-  PUSH(stack, lens, maxs, ltree);
+  PUSH_OR(stack, lens, maxs, ltree, goto allocation_failure);
 
   // Recall we're going to try and handle this DFS-fashion. Each time we
   // "treat" a labelled tree we consider its leaf labels so that:
@@ -116,7 +124,7 @@ void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
     LabdTree const tree = stack[lens - 1];
     if (tree.height == p) { // base cases, print and pop
       lens--;
-      printf("Part %ld\n", tree.size);
+      printf("Part %zu\n", tree.size);
       continue;
     }
     if (tree.size == 0) {
@@ -127,7 +135,7 @@ void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
     }
     if (tree.size == 1 && tree.labs[0][0] == EOS) {
       lens--;
-      fprintf(stderr, "Got to a leaf or size %ld, something is going wrong!\n",
+      fprintf(stderr, "Got to a leaf or size %zu, something is going wrong!\n",
               tree.size);
       break;
     }
@@ -161,17 +169,34 @@ void print_tree_ppart(unsigned const nlabs, char const labels[nlabs],
     ltree.labs = tree.labs;
     ltree.height = tree.height + 1;
     ltree.id = next_id++;
-    PUSH(stack, lens, maxs, ltree);
+    PUSH_OR(stack, lens, maxs, ltree, goto allocation_failure);
   }
 
   free(stack);
-  free(lab_ptrs);
+  free((void *)lab_ptrs);
+  return;
+
+allocation_failure:
+  fputs("Failed to grow tree traversal stack\n", stderr);
+  free(stack);
+  free((void *)lab_ptrs);
 }
 
-void print_tree_dot(unsigned const nlabs, char const labels[nlabs])
-    [[unsequenced]] {
+void print_tree_dot(unsigned const nlabs, char const labels[nlabs]) {
   assert(labels != nullptr);
-  char const **lab_ptrs = malloc(sizeof(char *[nlabs]));
+  if (nlabs == 0) {
+    fputs("Cannot print an empty tree\n", stderr);
+    return;
+  }
+  char const **lab_ptrs =
+      (char const **)calloc((size_t)nlabs, sizeof(*lab_ptrs));
+  if (lab_ptrs == nullptr) {
+    fputs("Failed to allocate tree traversal\n", stderr);
+    return;
+  }
+  for (size_t idx = 0; idx < nlabs; idx++) {
+    lab_ptrs[idx] = labels;
+  }
 
   // This will be a DFS-like procedure, we need a stack of arrays of pointers
   LabdTree *stack = nullptr;
@@ -190,7 +215,7 @@ void print_tree_dot(unsigned const nlabs, char const labels[nlabs])
     }
   }
   LabdTree ltree = {.size = nlabs, .labs = lab_ptrs, .id = next_id++};
-  PUSH(stack, lens, maxs, ltree);
+  PUSH_OR(stack, lens, maxs, ltree, goto allocation_failure);
 
   // start the tree in the output
   puts("strict graph {");
@@ -260,10 +285,16 @@ void print_tree_dot(unsigned const nlabs, char const labels[nlabs])
     ltree.size = bucket_size;
     ltree.labs = tree.labs;
     ltree.id = next_id++;
-    PUSH(stack, lens, maxs, ltree);
+    PUSH_OR(stack, lens, maxs, ltree, goto allocation_failure);
   }
   puts("}");
 
   free(stack);
-  free(lab_ptrs);
+  free((void *)lab_ptrs);
+  return;
+
+allocation_failure:
+  fputs("Failed to grow tree traversal stack\n", stderr);
+  free(stack);
+  free((void *)lab_ptrs);
 }

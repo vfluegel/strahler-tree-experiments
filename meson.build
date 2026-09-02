@@ -1,18 +1,21 @@
-project('strahler-tree-experiments', 'c', 'cpp',
+project(
+  'strahler-tree-experiments',
+  'c',
+  'cpp',
   version : '0.1',
   default_options : [
     'warning_level=3',
     'c_std=c2x',
     'cpp_std=c++20',
-    'optimization=3',
-    'b_coverage=true'
-  ]
+    'b_coverage=false',
+  ],
 )
 
 cc = meson.get_compiler('c')
 cpp = meson.get_compiler('cpp')
 
-boost_dep = dependency('boost', required : false)
+lenstree_option = get_option('lenstree')
+boost_dep = dependency('boost', required : lenstree_option)
 
 # Executables
 genstree = executable('genstree',
@@ -30,7 +33,7 @@ pms2dot = executable('pms2dot',
   install : true
 )
 
-if boost_dep.found()
+if not lenstree_option.disabled() and boost_dep.found()
   lenstree = executable('lenstree',
     'src/lenstree.cpp',
     dependencies : boost_dep,
@@ -52,6 +55,21 @@ unit_tests_exe = executable('unit_tests',
 )
 
 test('unit_tests', unit_tests_exe)
+
+# Exercise every supported command-line entry point. These smoke tests are
+# intentionally output-agnostic; the regression tests cover stable output.
+test('str_tree_all', str_tree)
+test('str_tree_one_argument', str_tree, args : ['0'])
+test('str_tree_two_arguments', str_tree, args : ['0', '2'])
+test('pgfilt_help', pgfilt, args : ['-h'])
+test('pms2dot_help_exit', pms2dot, args : ['-h'])
+run_with_input = find_program('tests/run-with-input.sh')
+test(
+  'pgfilt_rejects_incomplete_parser_input',
+  run_with_input,
+  args : [files('tests/games/incomplete.pg'), pgfilt],
+  should_fail : true,
+)
 
 # Regression Tests
 run_single_test = find_program('tests/run-single-test.sh')

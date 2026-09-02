@@ -74,38 +74,37 @@ mkdir -p tests/actual tests/golden
 
 sanitize_output() {
   local file=$1
-  sed -e "s|[^[:space:]]*/genstree|genstree|g" \
-      -e "s|[^[:space:]]*/pms2dot|pms2dot|g" \
-      -e "s|[^[:space:]]*/lenstree|lenstree|g" \
-      "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+  local binary=$2
+  local program=${binary##*/}
+  sed -e "s|[^[:space:]]*/${program}|${program}|g" "$file" > "$file.tmp" &&
+    mv "$file.tmp" "$file"
 }
 
 echo "Generating golden files into tests/golden/ ..."
 for ct in "${GENSTREE_CASES[@]}"; do
-  set -- $ct
-  k=$1; t=$2; h=$3
+  read -r k t h <<< "$ct"
   name="k${k}_t${t}_h${h}.out"
   echo "  $GENSTREE_BIN -k $k -t $t -h $h > tests/golden/$name"
   "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "tests/golden/$name" 2>&1
-  sanitize_output "tests/golden/$name"
+  sanitize_output "tests/golden/$name" "$GENSTREE_BIN"
 
   echo "  $GENSTREE_BIN -k $k -t $t -h $h -j > tests/golden/j_$name"
   "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -j > "tests/golden/j_$name" 2>&1
-  sanitize_output "tests/golden/j_$name"
+  sanitize_output "tests/golden/j_$name" "$GENSTREE_BIN"
 
   echo "  $GENSTREE_BIN -k $k -t $t -h $h -d > tests/golden/d_$name"
   "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -d > "tests/golden/d_$name" 2>&1
-  sanitize_output "tests/golden/d_$name"
+  sanitize_output "tests/golden/d_$name" "$GENSTREE_BIN"
 
   echo "  $GENSTREE_BIN -k $k -t $t -h $h -p 1 > tests/golden/p1_$name"
   "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -p 1 > "tests/golden/p1_$name" 2>&1
-  sanitize_output "tests/golden/p1_$name"
+  sanitize_output "tests/golden/p1_$name" "$GENSTREE_BIN"
 
   total=$("$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -j | grep -o '[0-9]\+ leaves' | cut -d' ' -f1)
   for l in 1 $total; do
     echo "  $GENSTREE_BIN -k $k -t $t -h $h -l $l > tests/golden/l${l}_$name"
     "$GENSTREE_BIN" -k "$k" -t "$t" -h "$h" -l "$l" > "tests/golden/l${l}_$name" 2>&1
-    sanitize_output "tests/golden/l${l}_$name"
+    sanitize_output "tests/golden/l${l}_$name" "$GENSTREE_BIN"
   done
 done
 
@@ -114,39 +113,38 @@ for i in "${!PMS2DOT_CASES[@]}"; do
   name="pms_${i}.out"
   echo "  echo \"$case\" | $PMS2DOT_BIN > tests/golden/$name"
   echo "$case" | "$PMS2DOT_BIN" > "tests/golden/$name" 2>&1
-  sanitize_output "tests/golden/$name"
+  sanitize_output "tests/golden/$name" "$PMS2DOT_BIN"
 done
 
 echo "  $PMS2DOT_BIN -h 2> tests/golden/pms_h.out"
 "$PMS2DOT_BIN" -h 2> "tests/golden/pms_h.out" || true
-sanitize_output "tests/golden/pms_h.out"
+sanitize_output "tests/golden/pms_h.out" "$PMS2DOT_BIN"
 
 if [ -n "$LENSTREE_BIN" ]; then
   for ct in "${GENSTREE_CASES[@]}"; do
-    set -- $ct
-    k=$1; t=$2; h=$3
+    read -r k t h <<< "$ct"
     name="len_k${k}_t${t}_h${h}.out"
     echo "  $LENSTREE_BIN -k $k -t $t -h $h > tests/golden/$name"
     "$LENSTREE_BIN" -k "$k" -t "$t" -h "$h" > "tests/golden/$name" 2>&1
-    sanitize_output "tests/golden/$name"
+    sanitize_output "tests/golden/$name" "$LENSTREE_BIN"
   done
 fi
 
 echo "Generating error case goldens..."
 "$GENSTREE_BIN" -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k.out || true
+sanitize_output "tests/golden/gen_err_k.out" "$GENSTREE_BIN"
 "$GENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/gen_err_k_val.out || true
+sanitize_output "tests/golden/gen_err_k_val.out" "$GENSTREE_BIN"
 "$GENSTREE_BIN" -k 2 -t 1 -h 2 -l 0 > /dev/null 2> tests/golden/gen_err_l.out || true
+sanitize_output "tests/golden/gen_err_l.out" "$GENSTREE_BIN"
 "$PMS2DOT_BIN" -x > /dev/null 2> tests/golden/pms_err_flag.out || true
+sanitize_output "tests/golden/pms_err_flag.out" "$PMS2DOT_BIN"
 if [ -n "$LENSTREE_BIN" ]; then
   "$LENSTREE_BIN" -k 1 > /dev/null 2> tests/golden/len_err_args.out || true
+  sanitize_output "tests/golden/len_err_args.out" "$LENSTREE_BIN"
   "$LENSTREE_BIN" -k 0 -t 1 -h 2 > /dev/null 2> tests/golden/len_err_k.out || true
+  sanitize_output "tests/golden/len_err_k.out" "$LENSTREE_BIN"
 fi
-
-for err in gen_err_k.out gen_err_k_val.out gen_err_l.out pms_err_flag.out len_err_args.out len_err_k.out; do
-  if [ -f "tests/golden/$err" ]; then
-    sanitize_output "tests/golden/$err"
-  fi
-done
 
 echo "Done. Review and commit tests/golden/* if outputs are correct."
 exit 0

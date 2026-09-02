@@ -4,8 +4,7 @@
 #include <stddef.h>
 
 [[nodiscard]]
-size_t proc_pgsolver_header(size_t const n, char const line[restrict n])
-    [[unsequenced]];
+size_t proc_pgsolver_header(size_t const n, char const line[restrict n]);
 
 typedef struct PGNode {
   unsigned id;
@@ -18,6 +17,6 @@ typedef struct PGNode {
 
 [[nodiscard]]
 PGNode *proc_pgsolver_node(PGNode *restrict node, size_t const n,
-                           char const line[restrict n]) [[unsequenced]];
+                           char const line[restrict n]);
 
 #endif

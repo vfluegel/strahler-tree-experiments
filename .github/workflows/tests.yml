@@ -8,9 +8,12 @@ on:
     branches:
       - "**"
 
+permissions:
+  contents: read
+
 jobs:
-  test:
-    name: Run tests
+  format:
+    name: Formatting and script checks
     runs-on: ubuntu-24.04
     steps:
       - name: Check out repository
@@ -19,16 +22,162 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential g++-14 gcc-14 libboost-dev meson ninja-build gcovr
+          sudo apt-get install -y clang-format-18 shellcheck
 
-      - name: Run tests
-        env:
-          GENERATE_GOLDENS: "0"
+      - name: Check C and C++ formatting
+        run: ci/check-format.sh --check
+
+      - name: Check shell scripts
+        run: shellcheck ci/*.sh tests/*.sh
+
+      - name: Check Python syntax
+        run: python3 -m py_compile src/convert_out.py
+
+  clang-build-test:
+    name: Clang 18 build and tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
         run: |
-          export CC=gcc-14
-          export CXX=g++-14
-          export GCOV=gcov-14
-          meson setup build
-          meson test -C build -v
-          ninja -C build coverage-text
-          cat build/meson-logs/coverage.txt
+          sudo apt-get update
+          sudo apt-get install -y clang-18 libboost-dev meson ninja-build
+
+      - name: Configure
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: meson setup build-clang --buildtype=debug -Dwerror=true -Dlenstree=enabled
+
+      - name: Build
+        run: meson compile -C build-clang
+
+      - name: Test
+        run: meson test -C build-clang --print-errorlogs
+
+  gcc-build-test:
+    name: GCC 14 build and tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 gcc-14 libboost-dev meson ninja-build
+
+      - name: Configure
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: meson setup build-gcc --buildtype=debug -Dwerror=true -Dlenstree=enabled
+
+      - name: Build
+        run: meson compile -C build-gcc
+
+      - name: Test
+        run: meson test -C build-gcc --print-errorlogs
+
+  clang-tidy:
+    name: Clang-Tidy 18
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 clang-tidy-18 libboost-dev meson ninja-build
+
+      - name: Configure compilation database
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: meson setup build-tidy --buildtype=debug -Dwerror=true -Dlenstree=enabled
+
+      - name: Build before analysis
+        run: meson compile -C build-tidy
+
+      - name: Analyze
+        run: ci/check-tidy.sh build-tidy
+
+  coverage-75:
+    name: GCC 14 coverage (minimum 75%)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 gcc-14 gcovr libboost-dev meson ninja-build
+
+      - name: Configure
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: meson setup build-coverage --buildtype=debug -Db_coverage=true -Dwerror=true -Dlenstree=enabled
+
+      - name: Build and test
+        env:
+          GCOV: gcov-14
+        run: |
+          meson compile -C build-coverage
+          meson test -C build-coverage --print-errorlogs
+
+      - name: Generate reports and enforce threshold
+        run: |
+          gcovr \
+            --root . \
+            --filter '^src/' \
+            --gcov-executable gcov-14 \
+            --gcov-object-directory build-coverage \
+            --txt build-coverage/coverage.txt \
+            --xml-pretty \
+            --xml build-coverage/coverage.xml \
+            --html-details build-coverage/coverage.html \
+            --print-summary \
+            --fail-under-line 75
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            build-coverage/coverage.txt
+            build-coverage/coverage.xml
+            build-coverage/coverage.html
+            build-coverage/coverage.*.html
+
+  sanitizers:
+    name: Address and undefined behavior sanitizers
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 libboost-dev meson ninja-build
+
+      - name: Configure
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: meson setup build-sanitizers --buildtype=debug -Db_sanitize=address,undefined -Db_lundef=false -Dwerror=true -Dlenstree=enabled
+
+      - name: Build
+        run: meson compile -C build-sanitizers
+
+      - name: Test
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: meson test -C build-sanitizers --print-errorlogs
