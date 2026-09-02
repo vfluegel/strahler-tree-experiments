@@ -41,6 +41,12 @@ ordered_tree_dep = declare_dependency(
   link_with : ordered_tree_lib,
 )
 
+pg_game_lib = static_library('pg_game', 'src/pg_game.c')
+pg_game_dep = declare_dependency(
+  include_directories : source_includes,
+  link_with : pg_game_lib,
+)
+
 # Executables
 genstree = executable('genstree',
   'src/genstree.c',
@@ -49,7 +55,8 @@ genstree = executable('genstree',
 )
 
 pgfilt = executable('pgfilt',
-  ['src/pgfilt.c', 'src/pargame.c'],
+  'src/pgfilt.c',
+  dependencies : pg_game_dep,
   install : true
 )
 
@@ -96,6 +103,13 @@ test_dot_utils_exe = executable(
 )
 test('test_dot_utils', test_dot_utils_exe)
 
+test_pg_game_exe = executable(
+  'test_pg_game',
+  'tests/test_pg_game.c',
+  dependencies : pg_game_dep,
+)
+test('test_pg_game', test_pg_game_exe)
+
 # Exercise every supported command-line entry point. These smoke tests are
 # intentionally output-agnostic; the regression tests cover stable output.
 test('str_tree_all', str_tree)
@@ -106,7 +120,7 @@ test('pgfilt_help', pgfilt, args : ['-h'])
 test('pms2dot_help_exit', pms2dot, args : ['-h'])
 run_with_input = find_program('tests/run-with-input.sh')
 test(
-  'pgfilt_rejects_incomplete_parser_input',
+  'pgfilt_rejects_missing_semicolon',
   run_with_input,
   args : [files('tests/games/incomplete.pg'), pgfilt],
   should_fail : true,
@@ -114,6 +128,31 @@ test(
 
 # Regression Tests
 run_single_test = find_program('tests/run-single-test.sh')
+
+test(
+  'pgfilt_sparse_summary',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_summary.out',
+    'tests/actual/pgfilt_summary.out',
+    '@tests/games/sparse.pg',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pgfilt_sparse_normalize',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_normalize.out',
+    'tests/actual/pgfilt_normalize.out',
+    '@tests/games/sparse.pg',
+    '--normalize',
+  ],
+  workdir : meson.project_source_root(),
+)
 
 genstree_cases = [
   ['2', '1', '2'],

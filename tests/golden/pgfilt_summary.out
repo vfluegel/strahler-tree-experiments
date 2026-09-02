@@ -1,0 +1,5 @@
+vertices: 2
+edges: 3
+max-priority: 7
+owners: 1 1
+external-id-range: 10..1000

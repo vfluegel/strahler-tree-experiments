@@ -20,6 +20,11 @@ Run `meson setup build && meson compile -C build` to compile the tools. Binaries
   the DOT tree. The bitstring comparison is the infinite-binary-tree DFS order
   `0 beta < epsilon < 1 beta`, recursively below equal leading bits, and the
   vector comparison is its lexicographic lifting.
+* `build/pgfilt` validates a PGSolver parity game from `stdin` and prints a
+  deterministic graph summary. Pass `--normalize` to write canonical PGSolver
+  format instead. Sparse external identifiers are stored densely; an optional
+  `parity MAX_ID;` header gives the maximum allowed identifier, not a vertex
+  count.
 
 
 ## Computing P-Level Successors

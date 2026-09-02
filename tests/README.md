@@ -6,7 +6,11 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `test_ordered_tree.c` tests the owned compact-leaf tree, including stable
   sibling order, normalization, round trips, invalid input, DOT, and p-level
   partitions.
-- `run-single-test.sh` runs one command-line golden comparison.
+- `test_pg_game.c` tests whole-stream PGSolver parsing, sparse dense-index
+  construction, predecessor and successor CSR, replacement declarations,
+  canonical round trips, and malformed inputs.
+- `run-single-test.sh` runs one command-line golden comparison, accepting
+  literal standard input or an `@file` input source.
 - `run-regression.sh` regenerates or checks the complete golden suite.
 - `run-with-input.sh` supplies a file on standard input for smoke tests.
 - `games/` contains parser and solver fixtures.
@@ -31,6 +35,18 @@ bitstring-vector order from the paper, while `pms2dot --reorder` sorts them
 before constructing the tree. For bitstrings this is the infinite binary
 tree's depth-first (in-order) relation `0 beta < epsilon < 1 beta`, applied
 recursively after common leading bits. Vectors use its lexicographic lifting.
+
+## PGSolver games
+
+The parser accepts an optional `parity MAX_ID;` header followed by one or more
+node declarations. IDs need not be contiguous, every final declaration must
+have a successor, and every successor must name a final declaration. A later
+declaration replaces an earlier declaration with the same ID. Internally,
+vertices are sorted by external ID and stored densely with outgoing and
+predecessor CSR arrays.
+
+`pgfilt` prints graph counts by default and `pgfilt --normalize` emits a
+canonical representation suitable for round-trip tests.
 
 ## Running the suite
 
