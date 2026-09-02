@@ -49,6 +49,18 @@ else
   exit 2
 fi
 
+PGFILT_BIN=""
+if [ -x "./build/pgfilt" ]; then
+  PGFILT_BIN="./build/pgfilt"
+elif [ -x "./pgfilt" ]; then
+  PGFILT_BIN="./pgfilt"
+elif command -v pgfilt >/dev/null 2>&1; then
+  PGFILT_BIN="$(command -v pgfilt)"
+else
+  echo "Error: pgfilt binary not found in build/ or project root or PATH."
+  exit 2
+fi
+
 LENSTREE_BIN=""
 if [ -x "./build/lenstree" ]; then
   LENSTREE_BIN="./build/lenstree"
@@ -60,6 +72,7 @@ fi
 
 echo "Using genstree binary: $GENSTREE_BIN"
 echo "Using pms2dot binary: $PMS2DOT_BIN"
+echo "Using pgfilt binary: $PGFILT_BIN"
 echo "Using lenstree binary: $LENSTREE_BIN"
 
 GENSTREE_CASES=(
@@ -115,6 +128,13 @@ for i in "${!PMS2DOT_CASES[@]}"; do
   echo "$case" | "$PMS2DOT_BIN" > "tests/golden/$name" 2>&1
   sanitize_output "tests/golden/$name" "$PMS2DOT_BIN"
 done
+
+echo "  $PGFILT_BIN < tests/games/sparse.pg > tests/golden/pgfilt_summary.out"
+"$PGFILT_BIN" < tests/games/sparse.pg > tests/golden/pgfilt_summary.out 2>&1
+sanitize_output "tests/golden/pgfilt_summary.out" "$PGFILT_BIN"
+echo "  $PGFILT_BIN --normalize < tests/games/sparse.pg > tests/golden/pgfilt_normalize.out"
+"$PGFILT_BIN" --normalize < tests/games/sparse.pg > tests/golden/pgfilt_normalize.out 2>&1
+sanitize_output "tests/golden/pgfilt_normalize.out" "$PGFILT_BIN"
 
 echo "  $PMS2DOT_BIN -h 2> tests/golden/pms_h.out"
 "$PMS2DOT_BIN" -h 2> "tests/golden/pms_h.out" || true

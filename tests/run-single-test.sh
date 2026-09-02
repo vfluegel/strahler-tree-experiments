@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/run-single-test.sh <binary> <golden_file> <actual_file> <stdin_content_or_EMPTY> <args...>
+# tests/run-single-test.sh <binary> <golden> <actual> <stdin|EMPTY|@file> <args...>
 
 BINARY=$1
 GOLDEN=$2
@@ -37,7 +37,9 @@ compare_files() {
 
 mkdir -p "$(dirname "$ACTUAL")"
 
-if [ "$STDIN_CONTENT" != "EMPTY" ]; then
+if [[ "$STDIN_CONTENT" == @* ]]; then
+    "$BINARY" "$@" < "${STDIN_CONTENT#@}" > "$ACTUAL" 2>&1
+elif [ "$STDIN_CONTENT" != "EMPTY" ]; then
     echo -n "$STDIN_CONTENT" | "$BINARY" "$@" > "$ACTUAL" 2>&1
 else
     "$BINARY" "$@" > "$ACTUAL" 2>&1
