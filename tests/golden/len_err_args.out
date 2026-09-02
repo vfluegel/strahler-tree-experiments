@@ -1,2 +1,3 @@
 Expected three arguments
 Usage: lenstree -k K -t T -h H
+  --version Print the program version

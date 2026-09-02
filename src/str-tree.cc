@@ -8,6 +8,8 @@
 #include <utility>
 #include <vector>
 
+#include "cli_version.h"
+
 #include "../examples/k4t3h5.hpp"
 
 #ifndef HAS_P
@@ -535,6 +537,12 @@ int compare(size_t idxA, size_t idxB, int pindex,
 }
 
 int main(int argc, char *argv[]) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   // Switch out the tree to use here - don't forget to adjust the parameters k,
   // t, h at the top as well
   auto &use_b = tree_b;

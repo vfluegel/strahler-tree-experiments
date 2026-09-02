@@ -1,6 +1,7 @@
 Some arguments are missing!
 Usage: genstree -k K -t T -h H [-j -l L -d -p P]
   --help  Print this message
+  --version Print the program version
   -j      Print only the leaf count
   -l L    Print the L-th leaf
   -d      Print the tree in DOT format

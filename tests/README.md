@@ -9,6 +9,12 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `test_pg_game.c` tests whole-stream PGSolver parsing, sparse dense-index
   construction, predecessor and successor CSR, replacement declarations,
   canonical round trips, and malformed inputs.
+- `test_pg_set.c` tests the owned dense-index bitset and its move semantics.
+- `test_pg_attractor.c` compares the predecessor-queue attractor against an
+  independent fixed-point implementation on fixed and random subgames.
+- `test_zielonka.c` checks exact decomposition witnesses and metrics, verifies
+  literal priority-gap wrappers, and compares fixed-seed random games with an
+  exhaustive positional-strategy solver.
 - `run-single-test.sh` runs one command-line golden comparison, accepting
   literal standard input or an `@file` input source.
 - `run-regression.sh` regenerates or checks the complete golden suite.
@@ -47,6 +53,11 @@ predecessor CSR arrays.
 
 `pgfilt` prints graph counts by default and `pgfilt --normalize` emits a
 canonical representation suitable for round-trip tests.
+
+`pg2adot` keeps proof metadata in an attractor-decomposition witness. Its DOT
+tree contains only recursive child decompositions: top attractors are node
+metadata, while traps and child attractors are edge metadata. Count and set
+goldens are parsed by Graphviz during the Meson suite.
 
 ## Running the suite
 

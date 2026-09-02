@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include "cli_version.h"
+
 struct Node {
   int k;
   int t;
@@ -186,9 +188,16 @@ void print_usage(char *argv[]) {
   char *progname = strrchr(argv[0], '/');
   progname = progname ? progname + 1 : argv[0];
   fprintf(stderr, "Usage: %s -k K -t T -h H\n", progname);
+  fputs("  --version Print the program version\n", stderr);
 }
 
 int main(int argc, char **argv) {
+  int const version_status =
+      cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
+  if (version_status != CLI_VERSION_NOT_REQUESTED) {
+    return version_status;
+  }
+
   opterr = 0;
   int opt;
   int k = 0;
