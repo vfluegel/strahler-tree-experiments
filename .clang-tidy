@@ -1,7 +1,6 @@
 ---
 # Annex K replacements such as fprintf_s and memcpy_s are not portable to the
 # two CI libc/toolchain combinations.
-# The direct .c inclusion is removed by the ordered-tree refactor in change 2.
 # Segmented copies are explicitly sized and terminated, despite the tidy false
 # positive; command-line diagnostics intentionally do not flush every line.
 # str-tree deliberately uses signed vector positions because -1 is its root
@@ -17,7 +16,6 @@ Checks: >
   -bugprone-narrowing-conversions,
   -bugprone-not-null-terminated-result,
   -bugprone-reserved-identifier,
-  -bugprone-suspicious-include,
   cert-err33-c,
   -cert-err33-c,
   cert-err34-c,

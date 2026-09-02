@@ -120,6 +120,11 @@ echo "  $PMS2DOT_BIN -h 2> tests/golden/pms_h.out"
 "$PMS2DOT_BIN" -h 2> "tests/golden/pms_h.out" || true
 sanitize_output "tests/golden/pms_h.out" "$PMS2DOT_BIN"
 
+echo "  unordered progress measures | $PMS2DOT_BIN --check-order > tests/golden/pms_err_order.out"
+echo -n "0,0|1,0|0,1|" | "$PMS2DOT_BIN" --check-order \
+  > tests/golden/pms_err_order.out 2>&1 || true
+sanitize_output "tests/golden/pms_err_order.out" "$PMS2DOT_BIN"
+
 if [ -n "$LENSTREE_BIN" ]; then
   for ct in "${GENSTREE_CASES[@]}"; do
     read -r k t h <<< "$ct"
