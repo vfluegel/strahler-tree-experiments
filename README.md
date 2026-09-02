@@ -75,6 +75,40 @@ file name; the latter two read from standard input.
 - `--max-set-items=N` limits the number of vertices shown in a set label.
 - `--no-verify` skips the decomposition check and is intended for debugging.
 
+#### Reading the tree
+
+Each Even or Odd root is the decomposition of that player's winning region.
+The `result (synthetic)` node only connects the two roots when
+`--player=both` is used. If a player has an empty winning region, its box says
+`W=empty; no decomposition`.
+
+Node labels describe the subtree rooted at that box:
+
+| Label | Meaning |
+| --- | --- |
+| `Even` or `Odd` | The player whose decomposition this is. |
+| `d` | The priority bound at this node. It has the same parity as the player. |
+| `W` | The vertices in this node's subgame. At a root, this is the player's winning region. |
+| `A` | The player's attractor within `W` to vertices with priority `d`. This can be empty if priority `d` does not occur. |
+| `children` | The number of child subgames. |
+| `nodes`, `leaves` | The numbers of nodes and leaves in this subtree. |
+| `height` | The number of nodes on the longest path from this box to a leaf. A leaf has height 1. |
+| `Strahler` | The Strahler number of this subtree. A leaf has value 1; a node adds 1 when its largest child value occurs at least twice. |
+
+An edge labelled `i`, `S_i`, and `A_i` records one decomposition step:
+
+| Label | Meaning |
+| --- | --- |
+| `i` | The step number. Children are shown in the order in which they were removed. |
+| `S_i` | The child subgame, which is a trap for the other player. The child node's `W` is this same set. |
+| `A_i` | The current player's attractor to `S_i` in the vertices remaining at step `i`. It is removed before the next step. |
+
+With `--labels=counts`, vertical bars give set sizes: for example, `|W|=3`
+means that `W` contains three vertices. With `--labels=sets`, `W={...}` also
+lists their PGSolver vertex IDs. A suffix such as `+5 more` means that
+`--max-set-items` hid five IDs. With `--labels=none`, nodes show only the player
+and `d`, and edges have no labels.
+
 The reported Strahler number belongs to the tree that `pg2adot` built. The
 command does not search for the smallest value over every possible
 decomposition.
