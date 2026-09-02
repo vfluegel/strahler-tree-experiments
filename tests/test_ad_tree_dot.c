@@ -47,13 +47,13 @@ int main(void) {
   char *second =
       render(&game, &result, AD_DOT_PLAYER_BOTH, AD_DOT_LABEL_SETS, 32);
   assert(strcmp(first, second) == 0);
-  assert(strstr(first, "W={10}") != nullptr);
-  assert(strstr(first, "W={1000}") != nullptr);
+  assert(strstr(first, "<I>W</I> = {10}") != nullptr);
+  assert(strstr(first, "<I>W</I> = {1000}") != nullptr);
   free(second);
   free(first);
 
   char *none = render(&game, &result, AD_DOT_PLAYER_EVEN, AD_DOT_LABEL_NONE, 0);
-  assert(strstr(none, "even [label=\"Even d=2\"]") != nullptr);
+  assert(strstr(none, "<B>Even</B> <I>d</I> = 2") != nullptr);
   assert(strstr(none, "result (synthetic)") == nullptr);
   free(none);
 

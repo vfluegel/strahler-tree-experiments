@@ -2,12 +2,12 @@ digraph attractor_decompositions {
   graph [rankdir=TB, ordering=out];
   node [shape=box];
   result [label="result (synthetic)"];
-  even_empty [label="Even: W=empty; no decomposition"];
+  even_empty [label=<<B>Even</B>: <I>W</I> = empty; no decomposition>];
   result -> even_empty;
   result -> odd;
-  odd [label="Odd d=3\n|W|=3 |A|=0\nchildren=2\nnodes=3 leaves=2 height=2 Strahler=2\nW={0,..., +2 more}\nA={}"];
-  odd -> odd_0 [label="i=1 |S_i|=1 |A_i|=2\nS_i={1}\nA_i={1,..., +1 more}"];
-  odd_0 [label="Odd d=1\n|W|=1 |A|=1\nchildren=0\nnodes=1 leaves=1 height=1 Strahler=1\nW={1}\nA={1}"];
-  odd -> odd_1 [label="i=2 |S_i|=1 |A_i|=1\nS_i={0}\nA_i={0}"];
-  odd_1 [label="Odd d=1\n|W|=1 |A|=1\nchildren=0\nnodes=1 leaves=1 height=1 Strahler=1\nW={0}\nA={0}"];
+  odd [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Odd</B> <I>d</I> = 3</TD></TR><TR><TD>|<I>W</I>| = 3</TD><TD>|<I>A</I>| = 0</TD></TR><TR><TD>nodes = 3</TD><TD>leaves = 2</TD></TR><TR><TD>height = 2</TD><TD>Strahler = 2</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>W</I> = {0,..., +2 more}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>A</I> = {}</TD></TR></TABLE>>];
+  odd -> odd_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><I>i</I> = 1</TD></TR><TR><TD>|<I>S</I><SUB><I>i</I></SUB>| = 1</TD><TD>|<I>A</I><SUB><I>i</I></SUB>| = 2</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>S</I><SUB><I>i</I></SUB> = {1}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>A</I><SUB><I>i</I></SUB> = {1,..., +1 more}</TD></TR></TABLE>>];
+  odd_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Odd</B> <I>d</I> = 1</TD></TR><TR><TD>|<I>W</I>| = 1</TD><TD>|<I>A</I>| = 1</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>W</I> = {1}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>A</I> = {1}</TD></TR></TABLE>>];
+  odd -> odd_1 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><I>i</I> = 2</TD></TR><TR><TD>|<I>S</I><SUB><I>i</I></SUB>| = 1</TD><TD>|<I>A</I><SUB><I>i</I></SUB>| = 1</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>S</I><SUB><I>i</I></SUB> = {0}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>A</I><SUB><I>i</I></SUB> = {0}</TD></TR></TABLE>>];
+  odd_1 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Odd</B> <I>d</I> = 1</TD></TR><TR><TD>|<I>W</I>| = 1</TD><TD>|<I>A</I>| = 1</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>W</I> = {0}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>A</I> = {0}</TD></TR></TABLE>>];
 }

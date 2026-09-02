@@ -107,10 +107,10 @@ zielonka_dep = declare_dependency(
 ad_tree_dot_lib = static_library(
   'ad_tree_dot',
   'src/ad_tree_dot.c',
-  dependencies : [ad_tree_dep, dot_utils_dep],
+  dependencies : ad_tree_dep,
 )
 ad_tree_dot_dep = declare_dependency(
-  dependencies : [ad_tree_dep, dot_utils_dep],
+  dependencies : ad_tree_dep,
   include_directories : source_includes,
   link_with : ad_tree_dot_lib,
 )

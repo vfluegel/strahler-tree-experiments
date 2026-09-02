@@ -1,25 +1,8 @@
-#define _POSIX_C_SOURCE 200809L
-
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "ad_tree_dot.h"
-#include "dot_utils.h"
-
-[[nodiscard]] static char *finish_label(FILE *stream, char **buffer,
-                                        size_t *length) {
-  bool const flushed = fflush(stream) == 0;
-  bool const closed = fclose(stream) == 0;
-  if (!flushed || !closed) {
-    free(*buffer);
-    *buffer = nullptr;
-    return nullptr;
-  }
-  (void)length;
-  return *buffer;
-}
 
 [[nodiscard]] static bool write_set(FILE *stream, PGGame const *game,
                                     PGSet const *set, size_t const max_items) {
@@ -44,71 +27,81 @@
   return fputc('}', stream) != EOF;
 }
 
-[[nodiscard]] static char *node_label(PGGame const *game, PGSet const *domain,
-                                      ADNode const *node,
-                                      ADDotLabels const labels,
-                                      size_t const max_items) {
-  char *buffer = nullptr;
-  size_t length = 0;
-  FILE *stream = open_memstream(&buffer, &length);
-  if (stream == nullptr) {
-    return nullptr;
-  }
-  char const *name = node->player == PG_EVEN ? "Even" : "Odd";
-  bool succeeded =
-      fprintf(stream, "%s d=%" PRIu64, name, node->priority_bound) >= 0;
-  if (succeeded && labels != AD_DOT_LABEL_NONE) {
-    ADTreeMetrics const metrics = ad_tree_metrics(node);
-    succeeded =
-        fprintf(stream,
-                "\n|W|=%zu |A|=%zu\nchildren=%zu\n"
-                "nodes=%zu leaves=%zu height=%zu Strahler=%zu",
-                pg_set_count(domain), pg_set_count(&node->top_attractor),
-                node->child_count, metrics.nodes, metrics.leaves,
-                metrics.height, metrics.strahler) >= 0;
-  }
-  if (succeeded && labels == AD_DOT_LABEL_SETS) {
-    succeeded = fputs("\nW=", stream) >= 0 &&
-                write_set(stream, game, domain, max_items) &&
-                fputs("\nA=", stream) >= 0 &&
-                write_set(stream, game, &node->top_attractor, max_items);
-  }
-  if (!succeeded) {
-    (void)fclose(stream);
-    free(buffer);
-    return nullptr;
-  }
-  return finish_label(stream, &buffer, &length);
+[[nodiscard]] static bool begin_html_table(FILE *out) {
+  return fputs("<<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"4\" "
+               "CELLPADDING=\"1\">",
+               out) >= 0;
 }
 
-[[nodiscard]] static char *edge_label(PGGame const *game, ADChild const *child,
-                                      size_t const child_index,
-                                      ADDotLabels const labels,
-                                      size_t const max_items) {
-  char *buffer = nullptr;
-  size_t length = 0;
-  FILE *stream = open_memstream(&buffer, &length);
-  if (stream == nullptr) {
-    return nullptr;
-  }
-  bool succeeded = true;
-  if (labels != AD_DOT_LABEL_NONE) {
-    succeeded = fprintf(stream, "i=%zu |S_i|=%zu |A_i|=%zu", child_index + 1,
-                        pg_set_count(&child->trap),
-                        pg_set_count(&child->attractor)) >= 0;
+[[nodiscard]] static bool end_html_table(FILE *out) {
+  return fputs("</TABLE>>", out) >= 0;
+}
+
+[[nodiscard]] static bool
+write_node_label(FILE *out, PGGame const *game, PGSet const *domain,
+                 ADNode const *node, ADDotLabels const labels,
+                 size_t const max_items, bool const show_tree_metrics) {
+  char const *name = node->player == PG_EVEN ? "Even" : "Odd";
+  bool succeeded = begin_html_table(out) &&
+                   fprintf(out,
+                           "<TR><TD COLSPAN=\"2\"><B>%s</B> <I>d</I> = %" PRIu64
+                           "</TD></TR>",
+                           name, node->priority_bound) >= 0;
+  if (succeeded && labels != AD_DOT_LABEL_NONE) {
+    succeeded =
+        fprintf(out,
+                "<TR><TD>|<I>W</I>| = %zu</TD>"
+                "<TD>|<I>A</I>| = %zu</TD></TR>",
+                pg_set_count(domain), pg_set_count(&node->top_attractor)) >= 0;
+    if (succeeded && show_tree_metrics) {
+      ADTreeMetrics const metrics = ad_tree_metrics(node);
+      succeeded =
+          fprintf(out,
+                  "<TR><TD>nodes = %zu</TD><TD>leaves = %zu</TD></TR>"
+                  "<TR><TD>height = %zu</TD><TD>Strahler = %zu</TD></TR>",
+                  metrics.nodes, metrics.leaves, metrics.height,
+                  metrics.strahler) >= 0;
+    }
   }
   if (succeeded && labels == AD_DOT_LABEL_SETS) {
-    succeeded = fputs("\nS_i=", stream) >= 0 &&
-                write_set(stream, game, &child->trap, max_items) &&
-                fputs("\nA_i=", stream) >= 0 &&
-                write_set(stream, game, &child->attractor, max_items);
+    succeeded =
+        fputs("<TR><TD COLSPAN=\"2\" ALIGN=\"LEFT\"><I>W</I> = ", out) >= 0 &&
+        write_set(out, game, domain, max_items) &&
+        fputs("</TD></TR>"
+              "<TR><TD COLSPAN=\"2\" ALIGN=\"LEFT\"><I>A</I> = ",
+              out) >= 0 &&
+        write_set(out, game, &node->top_attractor, max_items) &&
+        fputs("</TD></TR>", out) >= 0;
   }
-  if (!succeeded) {
-    (void)fclose(stream);
-    free(buffer);
-    return nullptr;
+  return succeeded && end_html_table(out);
+}
+
+[[nodiscard]] static bool write_edge_label(FILE *out, PGGame const *game,
+                                           ADChild const *child,
+                                           size_t const child_index,
+                                           ADDotLabels const labels,
+                                           size_t const max_items) {
+  bool succeeded = begin_html_table(out) &&
+                   fprintf(out,
+                           "<TR><TD COLSPAN=\"2\"><I>i</I> = %zu</TD></TR>"
+                           "<TR><TD>|<I>S</I><SUB><I>i</I></SUB>| = %zu</TD>"
+                           "<TD>|<I>A</I><SUB><I>i</I></SUB>| = %zu</TD></TR>",
+                           child_index + 1, pg_set_count(&child->trap),
+                           pg_set_count(&child->attractor)) >= 0;
+  if (succeeded && labels == AD_DOT_LABEL_SETS) {
+    succeeded =
+        fputs("<TR><TD COLSPAN=\"2\" ALIGN=\"LEFT\"><I>S</I><SUB><I>i</I>"
+              "</SUB> = ",
+              out) >= 0 &&
+        write_set(out, game, &child->trap, max_items) &&
+        fputs("</TD></TR>"
+              "<TR><TD COLSPAN=\"2\" ALIGN=\"LEFT\"><I>A</I><SUB><I>i</I>"
+              "</SUB> = ",
+              out) >= 0 &&
+        write_set(out, game, &child->attractor, max_items) &&
+        fputs("</TD></TR>", out) >= 0;
   }
-  return finish_label(stream, &buffer, &length);
+  return succeeded && end_html_table(out);
 }
 
 [[nodiscard]] static char *child_identifier(char const *parent,
@@ -124,37 +117,33 @@
   return identifier;
 }
 
-[[nodiscard]] static bool write_node(FILE *out, PGGame const *game,
-                                     PGSet const *domain, ADNode const *node,
-                                     char const *identifier,
-                                     ADDotLabels const labels,
-                                     size_t const max_items) {
-  char *label = node_label(game, domain, node, labels, max_items);
-  if (label == nullptr || fprintf(out, "  %s [label=", identifier) < 0 ||
-      !dot_write_quoted(out, label) || fputs("];\n", out) < 0) {
-    free(label);
+[[nodiscard]] static bool
+write_node(FILE *out, PGGame const *game, PGSet const *domain,
+           ADNode const *node, char const *identifier, ADDotLabels const labels,
+           size_t const max_items, bool const show_tree_metrics) {
+  if (fprintf(out, "  %s [label=", identifier) < 0 ||
+      !write_node_label(out, game, domain, node, labels, max_items,
+                        show_tree_metrics) ||
+      fputs("];\n", out) < 0) {
     return false;
   }
-  free(label);
 
   for (size_t index = 0; index < node->child_count; index++) {
     ADChild const *child = node->children + index;
     char *child_id = child_identifier(identifier, index);
-    char *label_text = edge_label(game, child, index, labels, max_items);
-    if (child_id == nullptr || label_text == nullptr ||
+    if (child_id == nullptr ||
         fprintf(out, "  %s -> %s", identifier, child_id) < 0 ||
         (labels != AD_DOT_LABEL_NONE &&
-         (fputs(" [label=", out) < 0 || !dot_write_quoted(out, label_text) ||
+         (fputs(" [label=", out) < 0 ||
+          !write_edge_label(out, game, child, index, labels, max_items) ||
           fputc(']', out) == EOF)) ||
         fputs(";\n", out) < 0 ||
         !write_node(out, game, &child->trap, child->subtree, child_id, labels,
-                    max_items)) {
+                    max_items, false)) {
       free(child_id);
-      free(label_text);
       return false;
     }
     free(child_id);
-    free(label_text);
   }
   return true;
 }
@@ -163,7 +152,9 @@
                                       bool const attach) {
   char const *name = player == PG_EVEN ? "Even" : "Odd";
   char const *identifier = player == PG_EVEN ? "even_empty" : "odd_empty";
-  if (fprintf(out, "  %s [label=\"%s: W=empty; no decomposition\"];\n",
+  if (fprintf(out,
+              "  %s [label=<<B>%s</B>: <I>W</I> = empty; no "
+              "decomposition>];\n",
               identifier, name) < 0) {
     return false;
   }
@@ -193,7 +184,7 @@ bool ad_tree_write_dot(FILE *out, PGGame const *game,
         succeeded = fprintf(out, "  result -> %s;\n", identifier) >= 0 &&
                     write_node(out, game, &result->winning[candidate],
                                result->decomposition[candidate], identifier,
-                               labels, max_set_items);
+                               labels, max_set_items, true);
       }
     }
   } else {
@@ -203,7 +194,7 @@ bool ad_tree_write_dot(FILE *out, PGGame const *game,
                     ? write_empty(out, selected, false)
                     : write_node(out, game, &result->winning[selected],
                                  result->decomposition[selected], identifier,
-                                 labels, max_set_items);
+                                 labels, max_set_items, true);
   }
   return succeeded && fputs("}\n", out) >= 0;
 }
