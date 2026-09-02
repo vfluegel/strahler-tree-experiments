@@ -4,6 +4,8 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <assert.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +17,24 @@
 
 typedef enum { UTREE = 0, VTREE = 1 } TType;
 
-static void print_usage(char *argv[static 1]) {
+[[nodiscard, maybe_unused]] static bool parse_int(char const *text, int minimum,
+                                                  int *result) {
+  assert(text != nullptr);
+  assert(result != nullptr);
+
+  errno = 0;
+  char *end = nullptr;
+  long const value = strtol(text, &end, 10);
+  if (errno == ERANGE || end == text || *end != '\0' || value < minimum ||
+      value > INT_MAX) {
+    return false;
+  }
+
+  *result = (int)value;
+  return true;
+}
+
+[[maybe_unused]] static void print_usage(char *argv[static 1]) {
   char *progname = strrchr(argv[0], '/');
   progname = progname ? progname + 1 : argv[0];
   fprintf(stderr, "Usage: %s -k K -t T -h H [-j -l L -d -p P]\n", progname);
@@ -42,14 +61,13 @@ typedef struct Node {
  * leaves.
  */
 [[nodiscard]]
-static unsigned
-count_leaves_with_cache(TType tree_type,
-                        // The indices of interest
-                        int const k, int const t, int const h,
-                        // The real dimensions of the cache
-                        int const kdim, int const tdim, int const hdim,
-                        unsigned tree[restrict 2][kdim + 1][tdim + 1][hdim + 1])
-    [[unsequenced]] {
+static unsigned count_leaves_with_cache(
+    TType tree_type,
+    // The indices of interest
+    int const k, int const t, int const h,
+    // The real dimensions of the cache
+    int const kdim, int const tdim, int const hdim,
+    unsigned tree[restrict 2][kdim + 1][tdim + 1][hdim + 1]) {
   // early exit?
   unsigned cached = tree[tree_type][k][t][h];
   if (cached > 0)
@@ -61,7 +79,7 @@ count_leaves_with_cache(TType tree_type,
 
   // this is the node of interest
   Node node = {.u = tree_type, .k = k, .t = t, .h = h};
-  PUSH(stack, lens, maxs, node);
+  PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
 
   while (lens > 0) {
     Node const tos = stack[lens - 1];
@@ -78,7 +96,7 @@ count_leaves_with_cache(TType tree_type,
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.h >= tos.k && tos.k >= 2 && tos.t == 0) {
       unsigned son = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
@@ -90,7 +108,7 @@ count_leaves_with_cache(TType tree_type,
         node.k = tos.k - 1;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == VTREE && tos.h >= tos.k && tos.k >= 2 && tos.t >= 1) {
       unsigned child1 = tree[VTREE][tos.k][tos.t - 1][tos.h];
@@ -103,12 +121,12 @@ count_leaves_with_cache(TType tree_type,
         node.k = tos.k;
         node.t = tos.t - 1;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
         node.u = UTREE;
         node.k = tos.k - 1;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == UTREE && tos.h == tos.k && tos.k >= 2) {
       unsigned son = tree[VTREE][tos.k][tos.t][tos.h];
@@ -120,7 +138,7 @@ count_leaves_with_cache(TType tree_type,
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == UTREE && tos.h > tos.k && tos.k >= 2) {
       unsigned child1 = tree[VTREE][tos.k][tos.t][tos.h];
@@ -133,12 +151,12 @@ count_leaves_with_cache(TType tree_type,
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
         node.u = UTREE;
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else {
       assert(false);
@@ -150,13 +168,19 @@ count_leaves_with_cache(TType tree_type,
 
   free(stack);
   return total;
+
+allocation_failure:
+  free(stack);
+  return 0;
 }
 
 [[nodiscard]]
-static unsigned count_leaves(int const k, int const t, int const h)
-    [[unsequenced]] {
+static unsigned count_leaves(int const k, int const t, int const h) {
   assert(h >= k);
-  unsigned (*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
+  unsigned(*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
+  if (tree == nullptr) {
+    return 0;
+  }
   // NOTE: calloc sets all entries to zero
 
   unsigned total = count_leaves_with_cache(UTREE, k, t, h, k, t, h, tree);
@@ -167,17 +191,27 @@ static unsigned count_leaves(int const k, int const t, int const h)
 
 [[nodiscard]]
 static char *prepend(size_t const n, char const pref[restrict static n],
-                     char const *restrict str) [[unsequenced]] {
+                     char const *restrict str) {
   // overshooting: if every character is a bitstring, we need to prepend the
   // prefix to each of them, and add an end-of-string symbol, i.e.
   // len(str) + len(str) * n + 1 = 1 + len(str) * (n + 1)
-  size_t len = 1 + strlen(str) * (n + 1);
+  assert(str != nullptr);
+  if (n == SIZE_MAX) {
+    return nullptr;
+  }
+  size_t const str_length = strlen(str);
+  if (str_length > (SIZE_MAX - 1) / (n + 1)) {
+    return nullptr;
+  }
+  size_t len = 1 + str_length * (n + 1);
   char *res = malloc(len);
+  if (res == nullptr) {
+    return nullptr;
+  }
   size_t reslen = 0;
   // Now we copy the prefix, then copy up until the next EOS,
   // and repeat until end of string marker
   char const *next = str;
-  assert(next != nullptr);
   while (*next != '\0') {
     // we first walk up until the next EOS
     size_t lenlab = 0;
@@ -185,8 +219,8 @@ static char *prepend(size_t const n, char const pref[restrict static n],
       lenlab++;
     lenlab++;
     // now we copy
-    strncpy(res + reslen, pref, n);
-    strncpy(res + reslen + n, next, lenlab);
+    memcpy(res + reslen, pref, n);
+    memcpy(res + reslen + n, next, lenlab);
     // finally, we update the pointer to the next label
     reslen += lenlab + n;
     assert(reslen < len);
@@ -199,28 +233,45 @@ static char *prepend(size_t const n, char const pref[restrict static n],
 [[nodiscard]]
 static char *concat3(char const left[restrict static 1],
                      char const midl[restrict static 1],
-                     char const right[restrict static 1]) [[unsequenced]] {
+                     char const right[restrict static 1]) {
   assert(left != nullptr);
   assert(midl != nullptr);
   assert(right != nullptr);
-  size_t len = strlen(left) + strlen(midl) + strlen(right) + 1;
+  size_t const left_length = strlen(left);
+  size_t const middle_length = strlen(midl);
+  size_t const right_length = strlen(right);
+  if (left_length > SIZE_MAX - middle_length ||
+      left_length + middle_length > SIZE_MAX - right_length ||
+      left_length + middle_length + right_length == SIZE_MAX) {
+    return nullptr;
+  }
+  size_t len = left_length + middle_length + right_length + 1;
   char *res = malloc(len);
-  strcpy(res, left);
-  strcat(res, midl);
-  strcat(res, right);
+  if (res == nullptr) {
+    return nullptr;
+  }
+  memcpy(res, left, left_length);
+  memcpy(res + left_length, midl, middle_length);
+  memcpy(res + left_length + middle_length, right, right_length + 1);
   return res;
 }
 
 static char *label_lth_leaf(int const k, int const t, int const h,
-                            int const lth) [[unsequenced]] {
+                            int const lth) {
   assert(h >= k);
-  unsigned (*count_cache)[k + 1][t + 1][h + 1] =
-      calloc(2, sizeof(*count_cache));
+  unsigned(*count_cache)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*count_cache));
+  if (count_cache == nullptr) {
+    return nullptr;
+  }
   // From Def. 21 in "The Strahler Number of a Parity Game"
   // plus the fact that we need the end-of-string character and we explicitly
   // keep EPSILON as a character; then times 2 because we keep explicit commas
-  unsigned slack = 2 * ((k - 1 + t) + h + 1);
+  size_t slack = 2U * ((size_t)(k - 1 + t) + (size_t)h + 1U);
   char *lab = malloc(slack);
+  if (lab == nullptr) {
+    free(count_cache);
+    return nullptr;
+  }
   char *cur = lab;
   unsigned nth = lth;
 
@@ -264,6 +315,11 @@ static char *label_lth_leaf(int const k, int const t, int const h,
           VTREE, node.k, node.t - 1, node.h, k, t, h, count_cache);
       unsigned size_child2 = count_leaves_with_cache(
           UTREE, node.k - 1, node.t, node.h - 1, k, t, h, count_cache);
+      if (size_child1 == 0 || size_child2 == 0) {
+        free(count_cache);
+        free(lab);
+        return nullptr;
+      }
       // which subtree to follow?
       if (size_child1 >= nth) {
         cur[0] = ZERO;
@@ -305,6 +361,11 @@ static char *label_lth_leaf(int const k, int const t, int const h,
           VTREE, node.k, node.t, node.h, k, t, h, count_cache);
       unsigned size_child2 = count_leaves_with_cache(
           UTREE, node.k, node.t, node.h - 1, k, t, h, count_cache);
+      if (size_child1 == 0 || size_child2 == 0) {
+        free(count_cache);
+        free(lab);
+        return nullptr;
+      }
       // which subtree to follow?
       if (size_child1 >= nth) {
         cur[0] = ZERO;
@@ -343,11 +404,13 @@ static char *label_lth_leaf(int const k, int const t, int const h,
   return lab;
 }
 
-[[nodiscard]]
-static char *labels_leaves(int const k, int const t, int const h)
-    [[unsequenced]] {
+[[nodiscard, maybe_unused]]
+static char *labels_leaves(int const k, int const t, int const h) {
   assert(h >= k);
   char *(*tree)[k + 1][t + 1][h + 1] = calloc(2, sizeof(*tree));
+  if (tree == nullptr) {
+    return nullptr;
+  }
   // NOTE: Technically, the pointers are not required to be null'd at this
   // point. However, all implementations of C currently take 0-bits as nullptr
   // and so calloc does null all pointers.
@@ -358,12 +421,19 @@ static char *labels_leaves(int const k, int const t, int const h)
 
   // this is the node of interest
   Node node = {.u = UTREE, .k = k, .t = t, .h = h};
-  PUSH(stack, lens, maxs, node);
+  PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
 
   while (lens > 0) {
     Node const tos = stack[lens - 1];
+    if (tree[(int)tos.u][tos.k][tos.t][tos.h] != nullptr) {
+      lens--; // A sibling traversal already populated this shared cache entry.
+      continue;
+    }
     if (tos.u == UTREE && tos.h == 1 && tos.k == 1) {
       char *lab = malloc(2);
+      if (lab == nullptr) {
+        goto allocation_failure;
+      }
       lab[0] = EOS;
       lab[1] = '\0';
       tree[UTREE][tos.k][tos.t][tos.h] = lab;
@@ -373,13 +443,16 @@ static char *labels_leaves(int const k, int const t, int const h)
       if (son != nullptr) {
         char pref[3] = {EPSILON, COMMA, '\0'};
         tree[UTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+        if (tree[UTREE][tos.k][tos.t][tos.h] == nullptr) {
+          goto allocation_failure;
+        }
         lens--; // pop
       } else {
         node.u = UTREE;
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.h >= tos.k && tos.k >= 2 && tos.t == 0) {
       char *son = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
@@ -387,9 +460,15 @@ static char *labels_leaves(int const k, int const t, int const h)
         if (tos.u == VTREE) {
           char pref[3] = {EPSILON, COMMA, '\0'};
           tree[VTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+          if (tree[VTREE][tos.k][tos.t][tos.h] == nullptr) {
+            goto allocation_failure;
+          }
         } else {
           char pref[3] = {ZERO, COMMA, '\0'};
           tree[UTREE][tos.k][tos.t][tos.h] = prepend(2, pref, son);
+          if (tree[UTREE][tos.k][tos.t][tos.h] == nullptr) {
+            goto allocation_failure;
+          }
         }
         lens--; // pop
       } else {
@@ -397,7 +476,7 @@ static char *labels_leaves(int const k, int const t, int const h)
         node.k = tos.k - 1;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == VTREE && tos.h >= tos.k && tos.k >= 2 && tos.t >= 1) {
       char *child1 = tree[VTREE][tos.k][tos.t - 1][tos.h];
@@ -405,39 +484,58 @@ static char *labels_leaves(int const k, int const t, int const h)
       if (child1 != nullptr && child2 != nullptr) {
         char pref[3] = {EPSILON, COMMA, '\0'};
         char *midl = prepend(2, pref, child2);
+        if (midl == nullptr) {
+          goto allocation_failure;
+        }
         pref[0] = ZERO;
         char *left = prepend(1, pref, child1);
+        if (left == nullptr) {
+          free(midl);
+          goto allocation_failure;
+        }
         pref[0] = ONE;
         char *right = prepend(1, pref, child1);
-        tree[VTREE][tos.k][tos.t][tos.h] = concat3(left, midl, right);
+        if (right == nullptr) {
+          free(left);
+          free(midl);
+          goto allocation_failure;
+        }
+        char *combined = concat3(left, midl, right);
         free(left);
         free(midl);
         free(right);
+        if (combined == nullptr) {
+          goto allocation_failure;
+        }
+        tree[VTREE][tos.k][tos.t][tos.h] = combined;
         lens--; // pop
       } else {
         node.u = VTREE;
         node.k = tos.k;
         node.t = tos.t - 1;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
         node.u = UTREE;
         node.k = tos.k - 1;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == UTREE && tos.h == tos.k && tos.k >= 2) {
       char *son = tree[VTREE][tos.k][tos.t][tos.h];
       if (son != nullptr) {
         char pref[2] = {ZERO, '\0'};
         tree[UTREE][tos.k][tos.t][tos.h] = prepend(1, pref, son);
+        if (tree[UTREE][tos.k][tos.t][tos.h] == nullptr) {
+          goto allocation_failure;
+        }
         lens--; // pop
       } else {
         node.u = VTREE;
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else if (tos.u == UTREE && tos.h > tos.k && tos.k >= 2) {
       char *child1 = tree[VTREE][tos.k][tos.t][tos.h];
@@ -445,38 +543,56 @@ static char *labels_leaves(int const k, int const t, int const h)
       if (child1 != nullptr && child2 != nullptr) {
         char pref[3] = {EPSILON, COMMA, '\0'};
         char *midl = prepend(2, pref, child2);
+        if (midl == nullptr) {
+          goto allocation_failure;
+        }
         pref[0] = ZERO;
         char *left = prepend(1, pref, child1);
+        if (left == nullptr) {
+          free(midl);
+          goto allocation_failure;
+        }
         pref[0] = ONE;
         char *right = prepend(1, pref, child1);
-        tree[UTREE][tos.k][tos.t][tos.h] = concat3(left, midl, right);
+        if (right == nullptr) {
+          free(left);
+          free(midl);
+          goto allocation_failure;
+        }
+        char *combined = concat3(left, midl, right);
         free(left);
         free(midl);
         free(right);
+        if (combined == nullptr) {
+          goto allocation_failure;
+        }
+        tree[UTREE][tos.k][tos.t][tos.h] = combined;
         lens--; // pop
       } else {
         node.u = VTREE;
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
         node.u = UTREE;
         node.k = tos.k;
         node.t = tos.t;
         node.h = tos.h - 1;
-        PUSH(stack, lens, maxs, node);
+        PUSH_OR(stack, lens, maxs, node, goto allocation_failure);
       }
     } else {
       assert(false);
     }
   }
 
-  // Epilogue
-  free(stack);
-
   // Remember the extra byte for the end-of-string symbol
-  char *ret = malloc(strlen(tree[UTREE][k][t][h]) + 1);
-  strcpy(ret, tree[UTREE][k][t][h]);
+  size_t const root_length = strlen(tree[UTREE][k][t][h]);
+  char *ret = malloc(root_length + 1);
+  if (ret != nullptr) {
+    memcpy(ret, tree[UTREE][k][t][h], root_length + 1);
+  }
+
+  free(stack);
   // FIXME: This could be smarter if we kept track of everything being set not
   // to nullptr above
   for (char epu = 0; epu <= 1; epu++)
@@ -487,9 +603,19 @@ static char *labels_leaves(int const k, int const t, int const h)
   free(tree);
 
   return ret;
+
+allocation_failure:
+  free(stack);
+  for (char epu = 0; epu <= 1; epu++)
+    for (int epk = 0; epk <= k; epk++)
+      for (int ept = 0; ept <= t; ept++)
+        for (int eph = 0; eph <= h; eph++)
+          free(tree[(int)epu][epk][ept][eph]);
+  free(tree);
+  return nullptr;
 }
 
-static void print_bits(char const labels[static 1]) [[unsequenced]] {
+[[maybe_unused]] static void print_bits(char const labels[static 1]) {
   assert(labels != nullptr);
   bool first = true;
 
@@ -527,7 +653,7 @@ static void print_bits(char const labels[static 1]) [[unsequenced]] {
   }
 }
 
-static void print_blocks(char const labels[static 1]) [[unsequenced]] {
+[[maybe_unused]] static void print_blocks(char const labels[static 1]) {
   assert(labels != nullptr);
   unsigned b = 0;
   bool first = true;
@@ -580,8 +706,7 @@ int main(int argc, char *argv[argc + 1]) {
   while ((opt = getopt(argc, argv, "k:t:h:jdp:l:")) != -1) {
     switch (opt) {
     case 'l':
-      lth = atoi(optarg);
-      if (lth < 1) {
+      if (!parse_int(optarg, 1, &lth)) {
         fputs("L must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
@@ -593,31 +718,27 @@ int main(int argc, char *argv[argc + 1]) {
       print_dot = true;
       break;
     case 'p':
-      p = atoi(optarg);
-      if (p < 1) {
+      if (!parse_int(optarg, 1, &p)) {
         fputs("P must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
       break;
     case 'k':
-      k = atoi(optarg);
-      if (k < 1) {
+      if (!parse_int(optarg, 1, &k)) {
         fputs("K must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
       kset = true;
       break;
     case 't':
-      t = atoi(optarg);
-      if (t < 0) {
+      if (!parse_int(optarg, 0, &t)) {
         fputs("T must be a nonnegative integer\n", stderr);
         return EXIT_FAILURE;
       }
       tset = true;
       break;
     case 'h':
-      h = atoi(optarg);
-      if (h < 1) {
+      if (!parse_int(optarg, 1, &h)) {
         fputs("H must be a positive integer\n", stderr);
         return EXIT_FAILURE;
       }
@@ -637,6 +758,10 @@ int main(int argc, char *argv[argc + 1]) {
 
   if (lth > 0) {
     char *label = label_lth_leaf(k, t, h, lth);
+    if (label == nullptr) {
+      fputs("Failed to allocate leaf label\n", stderr);
+      return EXIT_FAILURE;
+    }
     print_bits(label);
     print_blocks(label);
     free(label);
@@ -644,12 +769,20 @@ int main(int argc, char *argv[argc + 1]) {
   }
 
   unsigned total = count_leaves(k, t, h);
+  if (total == 0) {
+    fputs("Failed to allocate leaf-count cache\n", stderr);
+    return EXIT_FAILURE;
+  }
   if (just_count) {
     printf("U^%d_{%d,%d} has %d leaves\n", k, t, h, total);
     return EXIT_SUCCESS;
   }
 
   char *labels = labels_leaves(k, t, h);
+  if (labels == nullptr) {
+    fputs("Failed to allocate leaf labels\n", stderr);
+    return EXIT_FAILURE;
+  }
   if (print_dot) {
     print_tree_dot(total, labels);
   } else { // Default: print labels of leaves

@@ -1,6 +1,9 @@
 #include <algorithm>
 #include <cassert>
+#include <charconv>
 #include <iostream>
+#include <string_view>
+#include <system_error>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -23,6 +26,19 @@ std::vector<int> p_successors = make_indices(tree_b);
 
 std::vector<bool> tmp_b;
 std::vector<int> tmp_d;
+
+bool parse_int(char const *text, int minimum, int &result) {
+  std::string_view const input{text};
+  int parsed = 0;
+  auto const conversion =
+      std::from_chars(input.data(), input.data() + input.size(), parsed);
+  if (conversion.ec != std::errc{} ||
+      conversion.ptr != input.data() + input.size() || parsed < minimum) {
+    return false;
+  }
+  result = parsed;
+  return true;
+}
 
 int skipUntilNextLevel(std::vector<int> &curr_d, int i) {
   while ((i >= 0 && curr_d[i] == curr_d[i + 1]) ||
@@ -283,12 +299,11 @@ void prog_tmp(int pindex) {
 
         // Either we add the one at the end of the existing string, which means
         // we add one NLB, or we add a NES!
-        bool isNewString = false;
-        if (i != 0 and (i == tmp_d.size() or tmp_d[i - 1] == new_index))
+        if (i != 0 and
+            (std::cmp_equal(i, tmp_d.size()) or tmp_d[i - 1] == new_index))
           nlb++;
         else {
           nes++;
-          isNewString = true;
 #ifndef NDEBUG
           if (trace >= 2)
             std::cout << "Appending to an empty string...\n";
@@ -479,8 +494,9 @@ void prog_tmp(int pindex) {
     }
   }
   // Assert that the number of NLB is at most t
-  assert((tmp_d.size() -
-          std::unordered_set<int>(tmp_d.begin(), tmp_d.end()).size()) <= t);
+  assert(std::cmp_less_equal(
+      tmp_d.size() - std::unordered_set<int>(tmp_d.begin(), tmp_d.end()).size(),
+      t));
 }
 
 int compare(size_t idxA, size_t idxB, int pindex,
@@ -507,18 +523,12 @@ int compare(size_t idxA, size_t idxB, int pindex,
     } else if (indicesA[i] > pindex and indicesB[i] > pindex) {
       // equal until pindex, return 0
       return 0;
-    } else if (indicesA[i] < indicesB[i]) {
-      // equal until best has [eps]
+    } else if (indicesA[i] != indicesB[i]) {
+      // The side with the earlier level is compared against an epsilon.
+      return indicesA[i] < indicesB[i] ? (bitsA[i] == 0 ? -1 : 1)
+                                       : (bitsB[i] == 0 ? 1 : -1);
+    } else if (bitsA[i] != bitsB[i]) {
       return bitsA[i] == 0 ? -1 : 1;
-    } else if (indicesA[i] > indicesB[i]) {
-      // equal until tmp has [eps]
-      return bitsB[i] == 0 ? 1 : -1;
-    } else if (bitsA[i] < bitsB[i]) {
-      // equal until tmp<best
-      return -1;
-    } else if (bitsA[i] > bitsB[i]) {
-      // equal until tmp>best
-      return 1;
     }
   }
   return 0;
@@ -563,7 +573,13 @@ int main(int argc, char *argv[]) {
   }
   // Pass one parameter = only check that one and print result
   else if (argc == 2 or argc == 3) {
-    int idx = atoi(argv[1]);
+    int parsed_idx = 0;
+    if (!parse_int(argv[1], 0, parsed_idx) ||
+        !std::cmp_less(parsed_idx, use_b.size())) {
+      std::cerr << "Tree index is out of range" << std::endl;
+      return 1;
+    }
+    size_t const idx = static_cast<size_t>(parsed_idx);
     std::cout << "Searching successor for: ";
     for (auto &&i : use_b[idx]) {
       std::cout << i;
@@ -578,8 +594,9 @@ int main(int argc, char *argv[]) {
     tmp_d = use_d[idx];
 
     int p = h - 2;
-    if (argc == 3) {
-      p = atoi(argv[2]);
+    if (argc == 3 && (!parse_int(argv[2], 0, p) || !std::cmp_less(p, h))) {
+      std::cerr << "P-level is out of range" << std::endl;
+      return 1;
     }
 
     prog_tmp(p);
@@ -608,4 +625,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Too many params" << std::endl;
     return 1;
   }
+
+  return 0;
 }

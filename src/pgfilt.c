@@ -4,6 +4,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,13 +31,15 @@ int main(int argc, char *argv[argc + 1]) {
   while ((opt = getopt(argc, argv, "h")) != -1) {
     switch (opt) {
     case 'h':
+      print_usage(argv);
+      return EXIT_SUCCESS;
     default: /* '?' */
       print_usage(argv);
       return EXIT_FAILURE;
     }
   }
 
-  size_t buf_size;
+  size_t buf_size = 0;
   char *buffer = nullptr;
   if (getline(&buffer, &buf_size, stdin) == -1) {
     free(buffer);
@@ -44,17 +47,29 @@ int main(int argc, char *argv[argc + 1]) {
     return EXIT_FAILURE;
   }
   size_t n_nodes = proc_pgsolver_header(buf_size, buffer);
+  if (n_nodes == SIZE_MAX) {
+    free(buffer);
+    fputs("Node index is too large\n", stderr);
+    return EXIT_FAILURE;
+  }
 
-  PGNode *restrict vertices = calloc(n_nodes, sizeof(PGNode));
-  for (unsigned i = 0; i <= n_nodes; i++) {
+  PGNode *restrict vertices = calloc(n_nodes + 1, sizeof(*vertices));
+  if (vertices == nullptr) {
+    free(buffer);
+    fputs("Failed to allocate vertices\n", stderr);
+    return EXIT_FAILURE;
+  }
+  for (size_t i = 0; i <= n_nodes; i++) {
     if (getline(&buffer, &buf_size, stdin) == -1) {
       free(buffer);
-      fprintf(stderr, "Failed to read node spec %d/%ld\n", i + 1, n_nodes + 1);
+      free(vertices);
+      fprintf(stderr, "Failed to read node spec %zu/%zu\n", i + 1, n_nodes + 1);
       return EXIT_FAILURE;
     }
     if (proc_pgsolver_node(vertices + i, buf_size, buffer) == nullptr) {
       fprintf(stderr, "Failed to parse node spec:\n%s\n", buffer);
       free(buffer);
+      free(vertices);
       return EXIT_FAILURE;
     }
   }

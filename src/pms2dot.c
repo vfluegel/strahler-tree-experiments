@@ -33,13 +33,15 @@ int main(int argc, char *argv[argc + 1]) {
   while ((opt = getopt(argc, argv, "h")) != -1) {
     switch (opt) {
     case 'h':
+      print_usage(argv);
+      return EXIT_SUCCESS;
     default: /* '?' */
       print_usage(argv);
       return EXIT_FAILURE;
     }
   }
 
-  size_t buf_size;
+  size_t buf_size = 0;
   char *buffer = nullptr;
   if (getline(&buffer, &buf_size, stdin) == -1) {
     free(buffer);
@@ -48,7 +50,7 @@ int main(int argc, char *argv[argc + 1]) {
   }
 
   unsigned total = 0;
-  for (unsigned i = 0; buffer[i] != '\0'; i++)
+  for (size_t i = 0; buffer[i] != '\0'; i++)
     if (buffer[i] == EOS)
       total++;
   print_tree_dot(total, buffer);

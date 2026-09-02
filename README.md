@@ -1,6 +1,4 @@
 # Strahler Tree Experiments
-![Tests](https://github.com/gaperez64/strahler-tree-experiments/actions/workflows/tests.yml/badge.svg)
-
 Repository to hold some algorithms and tools for Strahler trees. Based on the theory described in [this paper](https://arxiv.org/pdf/2003.08627).
 
 ## Tools
@@ -32,13 +30,16 @@ The tree that is used is defined in the file before compiling. The expected form
 New input files can be generated with a combination of the included tools.
 1. Generate the tree output and pipe it into the desired file: 
 ```
-./build/genstree -k 3 -t 2 - h 5 -p 2 > examples/k3t2h5p2.hpp
+./build/genstree -k 3 -t 2 -h 5 -p 2 > examples/k3t2h5p2.hpp
 ```
 2. Convert the file to C++
 ```
 python3 src/convert_out.py examples/k3t2h5p2.hpp
 ```  
 3. Open the file and adjust the variables at the top to match the parameters used during generation
+
+The program under `experimental/` is not a supported Meson target and is not
+part of the required build, static-analysis, or coverage jobs.
 
 ## Explanations for Comments in Code
 Some comments in `src/str-tree.cc` start with capital letters. These labels refer to conditions in page 19 of the theory paper:

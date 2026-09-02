@@ -1,0 +1,6 @@
+option(
+  'lenstree',
+  type : 'feature',
+  value : 'auto',
+  description : 'Build the Boost-based lenstree utility',
+)
