@@ -28,6 +28,15 @@ static void reject(char const *input) {
   assert(error.message[0] != '\0');
 }
 
+static void reject_order(char const *input) {
+  OrderedTreeNode *tree = nullptr;
+  OrderedTreeError error = {0};
+  assert(!ordered_tree_parse_leaf_stream_ordered(
+      input, ORDERED_TREE_CHECK_VECTOR_ORDER, &tree, &error));
+  assert(tree == nullptr);
+  assert(strstr(error.message, "bitstring-vector order") != nullptr);
+}
+
 [[nodiscard]] static char *capture(bool (*writer)(FILE *,
                                                   OrderedTreeNode const *),
                                    OrderedTreeNode const *tree) {
@@ -87,6 +96,38 @@ static void test_epsilon_normalization(void) {
   ordered_tree_destroy(tree);
 }
 
+static void test_paper_vector_order(void) {
+  // At one component the DFS/in-order relation is
+  // 00 < 0 < 01 < epsilon < 10 < 1 < 11.
+  char const *ordered =
+      "00,e|0,1|01,0|e,00|e,0|e,01|e,e|e,10|e,1|e,11|10,0|1,e|11,1|";
+  OrderedTreeNode *tree = nullptr;
+  OrderedTreeError error = {0};
+  assert(ordered_tree_parse_leaf_stream_ordered(
+      ordered, ORDERED_TREE_CHECK_VECTOR_ORDER, &tree, &error));
+  ordered_tree_destroy(tree);
+
+  // Checking the input sequence catches interleaving, not just locally
+  // ordered sibling arrays in the generated tree.
+  reject_order("0,0|1,0|0,1|");
+  reject_order("e,1|e,0|");
+
+  assert(ordered_tree_parse_leaf_stream_ordered(
+      "1,0|e,1|0,1|e,0|", ORDERED_TREE_REORDER_VECTOR_ORDER, &tree, &error));
+  char *stream = capture(ordered_tree_write_leaf_stream, tree);
+  assert(strcmp(stream, "0,1|e,0|e,1|1,0|") == 0);
+  free(stream);
+  ordered_tree_destroy(tree);
+
+  // A string is not ordered by length or strcmp: 00 precedes its parent 0.
+  assert(ordered_tree_parse_leaf_stream_ordered(
+      "0,e|00,e|", ORDERED_TREE_REORDER_VECTOR_ORDER, &tree, &error));
+  stream = capture(ordered_tree_write_leaf_stream, tree);
+  assert(strcmp(stream, "00,e|0,e|") == 0);
+  free(stream);
+  ordered_tree_destroy(tree);
+}
+
 static void test_partitions(void) {
   OrderedTreeNode *tree = parse("0,0|0,1|1,0|1,1|");
 
@@ -119,6 +160,7 @@ int main(void) {
   test_trivial_tree();
   test_stable_order_and_round_trip();
   test_epsilon_normalization();
+  test_paper_vector_order();
   test_partitions();
   test_rejections();
   return 0;

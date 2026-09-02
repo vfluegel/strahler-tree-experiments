@@ -26,6 +26,12 @@ Distinct children retain the order in which their normalized labels first
 occur. Duplicate paths and prefix conflicts are rejected, so leaves and
 internal nodes remain distinct.
 
+`pms2dot --check-order` requires the input branches to increase in the
+bitstring-vector order from the paper, while `pms2dot --reorder` sorts them
+before constructing the tree. For bitstrings this is the infinite binary
+tree's depth-first (in-order) relation `0 beta < epsilon < 1 beta`, applied
+recursively after common leading bits. Vectors use its lexicographic lifting.
+
 ## Running the suite
 
 Build and run from the repository root:

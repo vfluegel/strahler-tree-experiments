@@ -15,7 +15,11 @@ Run `meson setup build && meson compile -C build` to compile the tools. Binaries
 * `build/pms2dot` can be used to read from `stdin` and print a dot format tree
   constructed from a progress-measure string, for instance `echo
   "00,0,1,e,1|00,1,1,0,0|" | ./build/pms2dot | dot -Tpng > tree.png` prints a tree
-  with two branches.
+  with two branches. `--check-order` rejects a branch sequence that is not in
+  the paper's bitstring-vector order; `--reorder` sorts it before constructing
+  the DOT tree. The bitstring comparison is the infinite-binary-tree DFS order
+  `0 beta < epsilon < 1 beta`, recursively below equal leading bits, and the
+  vector comparison is its lexicographic lifting.
 
 
 ## Computing P-Level Successors

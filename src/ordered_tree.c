@@ -75,6 +75,184 @@ void ordered_tree_destroy(OrderedTreeNode *root) {
   return true;
 }
 
+typedef struct {
+  char **components;
+  size_t component_count;
+  size_t component_capacity;
+  size_t input_offset;
+} LeafPath;
+
+typedef struct {
+  LeafPath *paths;
+  size_t path_count;
+  size_t path_capacity;
+} LeafPathList;
+
+static void leaf_path_destroy(LeafPath *path) {
+  for (size_t index = 0; index < path->component_count; index++) {
+    free(path->components[index]);
+  }
+  free((void *)path->components);
+  *path = (LeafPath){0};
+}
+
+static void leaf_path_list_destroy(LeafPathList *list) {
+  for (size_t index = 0; index < list->path_count; index++) {
+    leaf_path_destroy(&list->paths[index]);
+  }
+  free(list->paths);
+  *list = (LeafPathList){0};
+}
+
+[[nodiscard]] static bool append_component(LeafPath *path, char *component,
+                                           char const *input, size_t offset,
+                                           OrderedTreeError *error) {
+  if (path->component_count == path->component_capacity) {
+    ArrayGrowth const growth =
+        grow_array((void *)path->components, path->component_capacity,
+                   sizeof(path->components[0]));
+    if (!growth.succeeded) {
+      set_error(error, input, offset, "failed to grow a leaf path");
+      return false;
+    }
+    path->components = (char **)growth.data;
+    path->component_capacity = growth.capacity;
+  }
+  path->components[path->component_count++] = component;
+  return true;
+}
+
+[[nodiscard]] static bool append_path(LeafPathList *list, LeafPath *path,
+                                      char const *input, size_t offset,
+                                      OrderedTreeError *error) {
+  if (list->path_count == list->path_capacity) {
+    ArrayGrowth const growth =
+        grow_array(list->paths, list->path_capacity, sizeof(list->paths[0]));
+    if (!growth.succeeded) {
+      set_error(error, input, offset, "failed to grow the leaf-path list");
+      return false;
+    }
+    list->paths = growth.data;
+    list->path_capacity = growth.capacity;
+  }
+  list->paths[list->path_count++] = *path;
+  *path = (LeafPath){0};
+  return true;
+}
+
+[[nodiscard]] static bool parse_paths(char const *input, LeafPathList *list,
+                                      OrderedTreeError *error) {
+  size_t offset = 0;
+  while (input[offset] != '\0') {
+    LeafPath path = {.input_offset = offset};
+    if (input[offset] == '|') {
+      offset++;
+    } else {
+      while (true) {
+        size_t const component_begin = offset;
+        while (input[offset] != '\0' && input[offset] != ',' &&
+               input[offset] != '|') {
+          offset++;
+        }
+        if (offset == component_begin) {
+          set_error(error, input, offset,
+                    "an empty component is ambiguous; use e");
+          goto path_failure;
+        }
+        if (input[offset] == '\0') {
+          set_error(error, input, offset, "missing final '|'");
+          goto path_failure;
+        }
+
+        char *label = nullptr;
+        if (!normalized_label(input, component_begin, offset, &label, error)) {
+          goto path_failure;
+        }
+        if (!append_component(&path, label, input, component_begin, error)) {
+          free(label);
+          goto path_failure;
+        }
+
+        if (input[offset] == '|') {
+          offset++;
+          break;
+        }
+        offset++;
+        if (input[offset] == '|') {
+          // Generator streams historically end every path with a comma. It
+          // terminates the final level and does not denote another edge.
+          offset++;
+          break;
+        }
+      }
+    }
+
+    if (!append_path(list, &path, input, path.input_offset, error)) {
+      goto path_failure;
+    }
+    if (input[offset] == '\0') {
+      break;
+    }
+    if (isspace((unsigned char)input[offset])) {
+      while (isspace((unsigned char)input[offset])) {
+        offset++;
+      }
+      if (input[offset] != '\0') {
+        set_error(error, input, offset,
+                  "unexpected text after trailing whitespace");
+        return false;
+      }
+      break;
+    }
+    continue;
+
+  path_failure:
+    leaf_path_destroy(&path);
+    return false;
+  }
+  return list->path_count != 0;
+}
+
+// This is the in-order traversal of the infinite binary tree from the paper:
+// 0 beta < epsilon < 1 beta, recursively below equal leading bits.
+[[nodiscard]] static int compare_bitstrings(char const *left,
+                                            char const *right) {
+  size_t index = 0;
+  while (left[index] == right[index] && left[index] != '\0') {
+    index++;
+  }
+  if (left[index] == right[index]) {
+    return 0;
+  }
+
+  int const left_rank = left[index] == '0' ? 0 : left[index] == '\0' ? 1 : 2;
+  int const right_rank = right[index] == '0' ? 0 : right[index] == '\0' ? 1 : 2;
+  return left_rank < right_rank ? -1 : 1;
+}
+
+[[nodiscard]] static int compare_paths(LeafPath const *left,
+                                       LeafPath const *right) {
+  size_t const common_length = left->component_count < right->component_count
+                                   ? left->component_count
+                                   : right->component_count;
+  for (size_t index = 0; index < common_length; index++) {
+    int const comparison =
+        compare_bitstrings(left->components[index], right->components[index]);
+    if (comparison != 0) {
+      return comparison;
+    }
+  }
+  if (left->component_count == right->component_count) {
+    return 0;
+  }
+  return left->component_count < right->component_count ? -1 : 1;
+}
+
+[[nodiscard]] static int compare_paths_for_qsort(void const *left,
+                                                 void const *right) {
+  return compare_paths(left, right);
+}
+
 [[nodiscard]] static OrderedTreeNode *
 find_or_append_child(OrderedTreeNode *parent, char *label, char const *input,
                      size_t offset, OrderedTreeError *error) {
@@ -134,8 +312,10 @@ find_or_append_child(OrderedTreeNode *parent, char *label, char const *input,
   return true;
 }
 
-bool ordered_tree_parse_leaf_stream(char const *input, OrderedTreeNode **root,
-                                    OrderedTreeError *error) {
+bool ordered_tree_parse_leaf_stream_ordered(char const *input,
+                                            OrderedTreeBranchOrder order,
+                                            OrderedTreeNode **root,
+                                            OrderedTreeError *error) {
   if (root == nullptr) {
     return false;
   }
@@ -151,105 +331,95 @@ bool ordered_tree_parse_leaf_stream(char const *input, OrderedTreeNode **root,
     set_error(error, input, 0, "the leaf stream is empty");
     return false;
   }
+  if (order != ORDERED_TREE_PRESERVE_INPUT_ORDER &&
+      order != ORDERED_TREE_CHECK_VECTOR_ORDER &&
+      order != ORDERED_TREE_REORDER_VECTOR_ORDER) {
+    set_error(error, input, 0, "invalid branch-order mode");
+    return false;
+  }
+
+  LeafPathList paths = {0};
+  if (!parse_paths(input, &paths, error)) {
+    leaf_path_list_destroy(&paths);
+    return false;
+  }
+  if (order == ORDERED_TREE_REORDER_VECTOR_ORDER) {
+    qsort(paths.paths, paths.path_count, sizeof(paths.paths[0]),
+          compare_paths_for_qsort);
+  }
 
   OrderedTreeNode *result = new_node();
   if (result == nullptr) {
     set_error(error, input, 0, "failed to allocate the tree root");
+    leaf_path_list_destroy(&paths);
     return false;
   }
 
-  size_t offset = 0;
-  size_t path_count = 0;
-  while (input[offset] != '\0') {
+  for (size_t path_index = 0; path_index < paths.path_count; path_index++) {
+    LeafPath const *path = &paths.paths[path_index];
     OrderedTreeNode *node = result;
-
-    if (input[offset] == '|') {
-      offset++;
-    } else {
-      while (true) {
-        size_t const component_begin = offset;
-        while (input[offset] != '\0' && input[offset] != ',' &&
-               input[offset] != '|') {
-          offset++;
-        }
-        if (offset == component_begin) {
-          set_error(error, input, offset,
-                    "an empty component is ambiguous; use e");
-          goto failure;
-        }
-        if (input[offset] == '\0') {
-          set_error(error, input, offset, "missing final '|'");
-          goto failure;
-        }
-        if (node->is_leaf) {
-          set_error(error, input, component_begin,
-                    "an existing path is a prefix of this path");
-          goto failure;
-        }
-
-        char *label = nullptr;
-        if (!normalized_label(input, component_begin, offset, &label, error)) {
-          goto failure;
-        }
-        node = find_or_append_child(node, label, input, component_begin, error);
-        if (node == nullptr) {
-          goto failure;
-        }
-
-        if (input[offset] == '|') {
-          offset++;
-          break;
-        }
-        offset++;
-        if (input[offset] == '|') {
-          // Generator streams historically end every path with a comma. It
-          // terminates the final level and does not denote another edge.
-          offset++;
-          break;
-        }
+    for (size_t component_index = 0; component_index < path->component_count;
+         component_index++) {
+      if (node->is_leaf) {
+        set_error(error, input, path->input_offset,
+                  "an existing path is a prefix of this path");
+        goto failure;
+      }
+      size_t const label_length = strlen(path->components[component_index]);
+      char *label = malloc(label_length + 1);
+      if (label == nullptr) {
+        set_error(error, input, path->input_offset,
+                  "failed to allocate a component label");
+        goto failure;
+      }
+      memcpy(label, path->components[component_index], label_length + 1);
+      node =
+          find_or_append_child(node, label, input, path->input_offset, error);
+      if (node == nullptr) {
+        goto failure;
       }
     }
 
     if (node->is_leaf) {
-      set_error(error, input, offset == 0 ? 0 : offset - 1,
-                "duplicate normalized path");
+      set_error(error, input, path->input_offset, "duplicate normalized path");
       goto failure;
     }
     if (node->child_count != 0) {
-      set_error(error, input, offset == 0 ? 0 : offset - 1,
+      set_error(error, input, path->input_offset,
                 "this path is a prefix of an existing path");
       goto failure;
     }
     node->is_leaf = true;
-    path_count++;
-
-    if (input[offset] == '\0') {
-      break;
-    }
-    if (isspace((unsigned char)input[offset])) {
-      while (isspace((unsigned char)input[offset])) {
-        offset++;
-      }
-      if (input[offset] != '\0') {
-        set_error(error, input, offset,
-                  "unexpected text after trailing whitespace");
-        goto failure;
-      }
-      break;
-    }
   }
 
-  if (path_count == 0 || !cache_leaf_counts(result)) {
-    set_error(error, input, offset, "invalid or excessively large tree");
+  if (!cache_leaf_counts(result)) {
+    set_error(error, input, 0, "invalid or excessively large tree");
     goto failure;
   }
+  if (order == ORDERED_TREE_CHECK_VECTOR_ORDER) {
+    for (size_t index = 1; index < paths.path_count; index++) {
+      if (compare_paths(&paths.paths[index - 1], &paths.paths[index]) >= 0) {
+        set_error(error, input, paths.paths[index].input_offset,
+                  "branches are not in bitstring-vector order");
+        goto failure;
+      }
+    }
+  }
 
+  leaf_path_list_destroy(&paths);
   *root = result;
   return true;
 
 failure:
+  leaf_path_list_destroy(&paths);
   ordered_tree_destroy(result);
   return false;
+}
+
+bool ordered_tree_parse_leaf_stream(char const *input, OrderedTreeNode **root,
+                                    OrderedTreeError *error) {
+  return ordered_tree_parse_leaf_stream_ordered(
+      input, ORDERED_TREE_PRESERVE_INPUT_ORDER, root, error);
 }
 
 size_t ordered_tree_height(OrderedTreeNode const *root) {

@@ -195,6 +195,45 @@ foreach ct : pms2dot_cases
     workdir: meson.project_source_root())
 endforeach
 
+test(
+  'pms2dot_check_order',
+  run_single_test,
+  args : [
+    pms2dot,
+    'tests/golden/pms_0.out',
+    'tests/actual/pms_check_order.out',
+    '0|1|',
+    '--check-order',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pms2dot_reorder',
+  run_single_test,
+  args : [
+    pms2dot,
+    'tests/golden/pms_1.out',
+    'tests/actual/pms_reorder.out',
+    '1,1|0,1|1,0|0,0|',
+    '--reorder',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pms2dot_check_order_rejects_interleaving',
+  run_single_test,
+  args : [
+    pms2dot,
+    'tests/golden/pms_err_order.out',
+    'tests/actual/pms_err_order.out',
+    '0,0|1,0|0,1|',
+    '--check-order',
+  ],
+  workdir : meson.project_source_root(),
+)
+
 dot_program = find_program('dot', required : false)
 if dot_program.found()
   foreach ct : pms2dot_cases

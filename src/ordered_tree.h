@@ -25,9 +25,21 @@ typedef struct {
   char message[256];
 } OrderedTreeError;
 
+typedef enum {
+  ORDERED_TREE_PRESERVE_INPUT_ORDER,
+  ORDERED_TREE_CHECK_VECTOR_ORDER,
+  ORDERED_TREE_REORDER_VECTOR_ORDER,
+} OrderedTreeBranchOrder;
+
 [[nodiscard]]
 bool ordered_tree_parse_leaf_stream(char const *input, OrderedTreeNode **root,
                                     OrderedTreeError *error);
+
+[[nodiscard]]
+bool ordered_tree_parse_leaf_stream_ordered(char const *input,
+                                            OrderedTreeBranchOrder order,
+                                            OrderedTreeNode **root,
+                                            OrderedTreeError *error);
 
 void ordered_tree_destroy(OrderedTreeNode *root);
 
