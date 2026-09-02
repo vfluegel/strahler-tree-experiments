@@ -111,6 +111,5 @@ values in `src/str-tree.cc`, and rebuild.
 
 ## Developer notes
 
-The program under `experimental/` is not built or tested by Meson. Comments
-labelled A through H in `src/str-tree.cc` refer to the case analysis on page 19
+Comments labelled A through H in `src/str-tree.cc` refer to the case analysis on page 19
 of the paper.
