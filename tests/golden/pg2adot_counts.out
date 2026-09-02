@@ -1,0 +1,13 @@
+digraph attractor_decompositions {
+  graph [rankdir=TB, ordering=out];
+  node [shape=box];
+  result [label="result (synthetic)"];
+  even_empty [label="Even: W=empty; no decomposition"];
+  result -> even_empty;
+  result -> odd;
+  odd [label="Odd d=3\n|W|=3 |A|=0\nchildren=2\nnodes=3 leaves=2 height=2 Strahler=2"];
+  odd -> odd_0 [label="i=1 |S_i|=1 |A_i|=2"];
+  odd_0 [label="Odd d=1\n|W|=1 |A|=1\nchildren=0\nnodes=1 leaves=1 height=1 Strahler=1"];
+  odd -> odd_1 [label="i=2 |S_i|=1 |A_i|=1"];
+  odd_1 [label="Odd d=1\n|W|=1 |A|=1\nchildren=0\nnodes=1 leaves=1 height=1 Strahler=1"];
+}

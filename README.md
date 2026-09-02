@@ -25,6 +25,33 @@ Run `meson setup build && meson compile -C build` to compile the tools. Binaries
   format instead. Sparse external identifiers are stored densely; an optional
   `parity MAX_ID;` header gives the maximum allowed identifier, not a vertex
   count.
+* `build/pg2adot [OPTIONS] [FILE]` solves a PGSolver game with enhanced
+  Zielonka, verifies the resulting attractor decompositions, and writes their
+  associated ordered trees as directed DOT. With no file, or with `-`, it
+  reads standard input. Use `--player=both|even|odd`,
+  `--labels=counts|sets|none`, and `--max-set-items=N` to control output.
+  Verification is enabled by default; `--no-verify` is intended only for
+  diagnosis. The reported Strahler number describes this concrete witness,
+  not a minimum over all possible attractor decompositions.
+
+### Examples
+
+Check that progress-measure branches already follow the paper's order, or
+reorder an unsorted stream while producing DOT:
+
+```sh
+printf '00,e|0,e|e,e|10,e|1,e|\n' | ./build/pms2dot --check-order > tree.dot
+printf '1,0|e,1|0,1|e,0|\n' | ./build/pms2dot --reorder > sorted-tree.dot
+```
+
+Normalize a sparse-ID PGSolver game, then render verified Even and Odd
+attractor decompositions with truncated set labels:
+
+```sh
+./build/pgfilt --normalize < tests/games/sparse.pg
+./build/pg2adot --player=both --labels=sets --max-set-items=8 \
+  tests/games/ordered_two_children.pg | dot -Tsvg > decomposition.svg
+```
 
 
 ## Computing P-Level Successors

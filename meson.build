@@ -47,6 +47,56 @@ pg_game_dep = declare_dependency(
   link_with : pg_game_lib,
 )
 
+pg_set_lib = static_library('pg_set', 'src/pg_set.c')
+pg_set_dep = declare_dependency(
+  include_directories : source_includes,
+  link_with : pg_set_lib,
+)
+
+pg_attractor_lib = static_library(
+  'pg_attractor',
+  'src/pg_attractor.c',
+  dependencies : [pg_game_dep, pg_set_dep],
+)
+pg_attractor_dep = declare_dependency(
+  dependencies : [pg_game_dep, pg_set_dep],
+  include_directories : source_includes,
+  link_with : pg_attractor_lib,
+)
+
+ad_tree_lib = static_library(
+  'ad_tree',
+  'src/ad_tree.c',
+  dependencies : pg_attractor_dep,
+)
+ad_tree_dep = declare_dependency(
+  dependencies : pg_attractor_dep,
+  include_directories : source_includes,
+  link_with : ad_tree_lib,
+)
+
+zielonka_lib = static_library(
+  'zielonka',
+  'src/zielonka.c',
+  dependencies : ad_tree_dep,
+)
+zielonka_dep = declare_dependency(
+  dependencies : ad_tree_dep,
+  include_directories : source_includes,
+  link_with : zielonka_lib,
+)
+
+ad_tree_dot_lib = static_library(
+  'ad_tree_dot',
+  'src/ad_tree_dot.c',
+  dependencies : [ad_tree_dep, dot_utils_dep],
+)
+ad_tree_dot_dep = declare_dependency(
+  dependencies : [ad_tree_dep, dot_utils_dep],
+  include_directories : source_includes,
+  link_with : ad_tree_dot_lib,
+)
+
 # Executables
 genstree = executable('genstree',
   'src/genstree.c',
@@ -64,6 +114,13 @@ pms2dot = executable('pms2dot',
   'src/pms2dot.c',
   dependencies : ordered_tree_dep,
   install : true
+)
+
+pg2adot = executable(
+  'pg2adot',
+  'src/pg2adot.c',
+  dependencies : [zielonka_dep, ad_tree_dot_dep],
+  install : true,
 )
 
 if not lenstree_option.disabled() and boost_dep.found()
@@ -110,6 +167,34 @@ test_pg_game_exe = executable(
 )
 test('test_pg_game', test_pg_game_exe)
 
+test_pg_set_exe = executable(
+  'test_pg_set',
+  'tests/test_pg_set.c',
+  dependencies : pg_set_dep,
+)
+test('test_pg_set', test_pg_set_exe)
+
+test_pg_attractor_exe = executable(
+  'test_pg_attractor',
+  ['tests/test_pg_attractor.c', 'tests/reference_attractor.c'],
+  dependencies : pg_attractor_dep,
+)
+test('test_pg_attractor', test_pg_attractor_exe)
+
+test_zielonka_exe = executable(
+  'test_zielonka',
+  ['tests/test_zielonka.c', 'tests/reference_solver.c'],
+  dependencies : zielonka_dep,
+)
+test('test_zielonka', test_zielonka_exe)
+
+test_ad_tree_dot_exe = executable(
+  'test_ad_tree_dot',
+  'tests/test_ad_tree_dot.c',
+  dependencies : [zielonka_dep, ad_tree_dot_dep],
+)
+test('test_ad_tree_dot', test_ad_tree_dot_exe)
+
 # Exercise every supported command-line entry point. These smoke tests are
 # intentionally output-agnostic; the regression tests cover stable output.
 test('str_tree_all', str_tree)
@@ -117,6 +202,7 @@ test('genstree_help', genstree, args : ['--help'])
 test('str_tree_one_argument', str_tree, args : ['0'])
 test('str_tree_two_arguments', str_tree, args : ['0', '2'])
 test('pgfilt_help', pgfilt, args : ['-h'])
+test('pg2adot_help', pg2adot, args : ['--help'])
 test('pms2dot_help_exit', pms2dot, args : ['-h'])
 run_with_input = find_program('tests/run-with-input.sh')
 test(
@@ -150,6 +236,34 @@ test(
     'tests/actual/pgfilt_normalize.out',
     '@tests/games/sparse.pg',
     '--normalize',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_counts',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_counts.out',
+    'tests/actual/pg2adot_counts.out',
+    '@tests/games/ordered_two_children.pg',
+    '-',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_sets_truncated',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_sets.out',
+    'tests/actual/pg2adot_sets.out',
+    'EMPTY',
+    '--labels=sets',
+    '--max-set-items=1',
+    files('tests/games/ordered_two_children.pg'),
   ],
   workdir : meson.project_source_root(),
 )
@@ -275,6 +389,26 @@ test(
 
 dot_program = find_program('dot', required : false)
 if dot_program.found()
+  test(
+    'pg2adot_counts_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_counts.out'),
+    ],
+  )
+  test(
+    'pg2adot_sets_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_sets.out'),
+    ],
+  )
   foreach ct : pms2dot_cases
     id = ct[0]
     test(

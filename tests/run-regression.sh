@@ -61,6 +61,18 @@ else
   exit 2
 fi
 
+PG2ADOT_BIN=""
+if [ -x "./build/pg2adot" ]; then
+  PG2ADOT_BIN="./build/pg2adot"
+elif [ -x "./pg2adot" ]; then
+  PG2ADOT_BIN="./pg2adot"
+elif command -v pg2adot >/dev/null 2>&1; then
+  PG2ADOT_BIN="$(command -v pg2adot)"
+else
+  echo "Error: pg2adot binary not found in build/ or project root or PATH."
+  exit 2
+fi
+
 LENSTREE_BIN=""
 if [ -x "./build/lenstree" ]; then
   LENSTREE_BIN="./build/lenstree"
@@ -73,6 +85,7 @@ fi
 echo "Using genstree binary: $GENSTREE_BIN"
 echo "Using pms2dot binary: $PMS2DOT_BIN"
 echo "Using pgfilt binary: $PGFILT_BIN"
+echo "Using pg2adot binary: $PG2ADOT_BIN"
 echo "Using lenstree binary: $LENSTREE_BIN"
 
 GENSTREE_CASES=(
@@ -80,7 +93,7 @@ GENSTREE_CASES=(
 )
 
 PMS2DOT_CASES=(
-  "0|1|" "0,0|0,1|1,0|1,1|" "0,e,1|0,1,1|1,e,0|" "0,0,1,e,1|0,1,1,0,0|" "0,1|1,0|0,0|"
+  "0|1|" "0,0|0,1|1,0|1,1|" "0,e,1|0,1,1|1,e,0|" "0,0,1,e,1|0,1,1,0,0|" "0,1|1,0|0,0|" "|" "e,e|0,e|" "1,0|0,0|1,1|0,1|"
 )
 
 mkdir -p tests/actual tests/golden
@@ -136,8 +149,15 @@ echo "  $PGFILT_BIN --normalize < tests/games/sparse.pg > tests/golden/pgfilt_no
 "$PGFILT_BIN" --normalize < tests/games/sparse.pg > tests/golden/pgfilt_normalize.out 2>&1
 sanitize_output "tests/golden/pgfilt_normalize.out" "$PGFILT_BIN"
 
-echo "  $PMS2DOT_BIN -h 2> tests/golden/pms_h.out"
-"$PMS2DOT_BIN" -h 2> "tests/golden/pms_h.out" || true
+echo "  $PG2ADOT_BIN tests/games/ordered_two_children.pg > tests/golden/pg2adot_counts.out"
+"$PG2ADOT_BIN" tests/games/ordered_two_children.pg > tests/golden/pg2adot_counts.out 2>&1
+sanitize_output "tests/golden/pg2adot_counts.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out"
+"$PG2ADOT_BIN" --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out 2>&1
+sanitize_output "tests/golden/pg2adot_sets.out" "$PG2ADOT_BIN"
+
+echo "  $PMS2DOT_BIN -h > tests/golden/pms_h.out"
+"$PMS2DOT_BIN" -h > "tests/golden/pms_h.out" 2>&1 || true
 sanitize_output "tests/golden/pms_h.out" "$PMS2DOT_BIN"
 
 echo "  unordered progress measures | $PMS2DOT_BIN --check-order > tests/golden/pms_err_order.out"
