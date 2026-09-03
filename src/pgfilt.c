@@ -11,13 +11,25 @@
 
 enum { USAGE_ERROR = 2 };
 
+typedef enum {
+  PRIORITY_MODE_ORIGINAL,
+  PRIORITY_MODE_COMPACT,
+} PriorityMode;
+
 static void print_usage(FILE *out, char *argv[static 1]) {
   char *program = strrchr(argv[0], '/');
   program = program == nullptr ? argv[0] : program + 1;
-  fprintf(out, "Usage: %s [--normalize]\n", program);
+  fprintf(out,
+          "Usage: %s [--normalize] "
+          "[--priority-mode=original|compact]\n",
+          program);
   fputs("Read one PGSolver game from standard input.\n", out);
   fputs("  -h, --help       Print this message\n", out);
   fputs("  -n, --normalize  Write canonical PGSolver format\n", out);
+  fputs("  --priority-mode=original|compact\n"
+        "                   Choose priority values in the output (default: "
+        "original)\n",
+        out);
   fputs("  --version         Print the program version\n", out);
 }
 
@@ -31,10 +43,12 @@ int main(int argc, char *argv[argc + 1]) {
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},
       {"normalize", no_argument, nullptr, 'n'},
+      {"priority-mode", required_argument, nullptr, 1},
       {nullptr, 0, nullptr, 0},
   };
 
   bool normalize = false;
+  PriorityMode priority_mode = PRIORITY_MODE_ORIGINAL;
   opterr = 0;
   int option = 0;
   while ((option = getopt_long(argc, argv, "hn", options, nullptr)) != -1) {
@@ -44,6 +58,16 @@ int main(int argc, char *argv[argc + 1]) {
       return EXIT_SUCCESS;
     case 'n':
       normalize = true;
+      break;
+    case 1:
+      if (strcmp(optarg, "original") == 0) {
+        priority_mode = PRIORITY_MODE_ORIGINAL;
+      } else if (strcmp(optarg, "compact") == 0) {
+        priority_mode = PRIORITY_MODE_COMPACT;
+      } else {
+        fputs("Invalid --priority-mode value\n", stderr);
+        return USAGE_ERROR;
+      }
       break;
     default:
       print_usage(stderr, argv);
@@ -60,6 +84,19 @@ int main(int argc, char *argv[argc + 1]) {
   if (!pg_game_read(stdin, &game, &error)) {
     fprintf(stderr, "%zu:%zu: %s\n", error.line, error.column, error.message);
     return EXIT_FAILURE;
+  }
+
+  PGPriorityMap priority_map = {0};
+  bool compacted = false;
+  if (priority_mode == PRIORITY_MODE_COMPACT) {
+    if (!pg_priority_map_build(&game, &priority_map) ||
+        !pg_priority_map_apply(&priority_map, &game)) {
+      pg_priority_map_destroy(&priority_map);
+      pg_game_destroy(&game);
+      fputs("Failed to compact the game priorities\n", stderr);
+      return EXIT_FAILURE;
+    }
+    compacted = true;
   }
 
   bool succeeded = true;
@@ -81,9 +118,16 @@ int main(int argc, char *argv[argc + 1]) {
         printf("external-id-range: %" PRIu64 "..%" PRIu64 "\n", minimum_id,
                maximum_id) >= 0;
   }
+  bool const restored =
+      !compacted || pg_priority_map_restore(&priority_map, &game);
+  pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
   if (!succeeded) {
     fputs("Failed to write output\n", stderr);
+    return EXIT_FAILURE;
+  }
+  if (!restored) {
+    fputs("Failed to restore the source priorities\n", stderr);
     return EXIT_FAILURE;
   }
   return EXIT_SUCCESS;

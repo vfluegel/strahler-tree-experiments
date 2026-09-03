@@ -13,6 +13,7 @@ typedef enum {
   TOKEN_EOF,
   TOKEN_NATURAL,
   TOKEN_KW_PARITY,
+  TOKEN_KW_START,
   TOKEN_COMMA,
   TOKEN_SEMICOLON,
   TOKEN_QUOTED_NAME,
@@ -182,6 +183,13 @@ static void lexer_advance_byte(Lexer *lexer) {
     size_t const length = lexer->offset - begin;
     if (length == 6 && memcmp(lexer->text + begin, "parity", length) == 0) {
       return (Token){.kind = TOKEN_KW_PARITY,
+                     .begin = begin,
+                     .length = length,
+                     .line = line,
+                     .column = column};
+    }
+    if (length == 5 && memcmp(lexer->text + begin, "start", length) == 0) {
+      return (Token){.kind = TOKEN_KW_START,
                      .begin = begin,
                      .length = length,
                      .line = line,
@@ -411,6 +419,20 @@ failure:
     parser_advance(parser);
     if (!expect(parser, TOKEN_SEMICOLON,
                 "expected ';' after the parity header")) {
+      return false;
+    }
+    parser_advance(parser);
+  }
+
+  if (parser->token.kind == TOKEN_KW_START) {
+    parser_advance(parser);
+    if (!expect(parser, TOKEN_NATURAL,
+                "expected a vertex identifier after 'start'")) {
+      return false;
+    }
+    parser_advance(parser);
+    if (!expect(parser, TOKEN_SEMICOLON,
+                "expected ';' after the start directive")) {
       return false;
     }
     parser_advance(parser);
@@ -695,5 +717,188 @@ bool pg_game_write_pgsolver(FILE *out, PGGame const *game,
       return false;
     }
   }
+  return true;
+}
+
+[[nodiscard]] static int compare_priorities(void const *left,
+                                            void const *right) {
+  uint64_t const first = *(uint64_t const *)left;
+  uint64_t const second = *(uint64_t const *)right;
+  return first < second ? -1 : first > second ? 1 : 0;
+}
+
+[[nodiscard]] static size_t find_original_priority(PGPriorityMap const *map,
+                                                   uint64_t const priority) {
+  size_t begin = 0;
+  size_t end = map->count;
+  while (begin < end) {
+    size_t const middle = begin + (end - begin) / 2;
+    if (map->entries[middle].original < priority) {
+      begin = middle + 1;
+    } else {
+      end = middle;
+    }
+  }
+  return begin < map->count && map->entries[begin].original == priority
+             ? begin
+             : SIZE_MAX;
+}
+
+[[nodiscard]] static size_t find_compact_priority(PGPriorityMap const *map,
+                                                  uint64_t const priority) {
+  size_t begin = 0;
+  size_t end = map->count;
+  while (begin < end) {
+    size_t const middle = begin + (end - begin) / 2;
+    if (map->entries[middle].compact < priority) {
+      begin = middle + 1;
+    } else {
+      end = middle;
+    }
+  }
+  return begin < map->count && map->entries[begin].compact == priority
+             ? begin
+             : SIZE_MAX;
+}
+
+bool pg_priority_map_build(PGGame const *game, PGPriorityMap *map) {
+  if (map == nullptr) {
+    return false;
+  }
+  *map = (PGPriorityMap){0};
+  if (game == nullptr || game->vertex_count == 0 || game->vertices == nullptr ||
+      game->vertex_count > SIZE_MAX / sizeof(uint64_t)) {
+    return false;
+  }
+
+  uint64_t *priorities = malloc(game->vertex_count * sizeof(priorities[0]));
+  if (priorities == nullptr) {
+    return false;
+  }
+  for (size_t vertex = 0; vertex < game->vertex_count; vertex++) {
+    priorities[vertex] = game->vertices[vertex].priority;
+  }
+  qsort(priorities, game->vertex_count, sizeof(priorities[0]),
+        compare_priorities);
+
+  size_t distinct = 1;
+  for (size_t index = 1; index < game->vertex_count; index++) {
+    if (priorities[index] != priorities[index - 1]) {
+      priorities[distinct++] = priorities[index];
+    }
+  }
+  if (distinct > SIZE_MAX / sizeof(map->entries[0])) {
+    free(priorities);
+    return false;
+  }
+  map->entries = malloc(distinct * sizeof(map->entries[0]));
+  if (map->entries == nullptr) {
+    free(priorities);
+    return false;
+  }
+  map->count = distinct;
+  map->entries[0] = (PGPriorityMapEntry){.original = priorities[0],
+                                         .compact = priorities[0] % 2};
+  for (size_t index = 1; index < distinct; index++) {
+    uint64_t compact = map->entries[index - 1].compact;
+    uint64_t const parity = priorities[index] % 2;
+    if (compact == UINT64_MAX) {
+      goto failure;
+    }
+    compact++;
+    if (compact % 2 != parity) {
+      if (compact == UINT64_MAX) {
+        goto failure;
+      }
+      compact++;
+    }
+    map->entries[index] =
+        (PGPriorityMapEntry){.original = priorities[index], .compact = compact};
+  }
+  free(priorities);
+  return true;
+
+failure:
+  free(priorities);
+  pg_priority_map_destroy(map);
+  return false;
+}
+
+void pg_priority_map_destroy(PGPriorityMap *map) {
+  if (map == nullptr) {
+    return;
+  }
+  free(map->entries);
+  *map = (PGPriorityMap){0};
+}
+
+bool pg_priority_map_apply(PGPriorityMap const *map, PGGame *game) {
+  if (map == nullptr || map->entries == nullptr || map->count == 0 ||
+      game == nullptr || game->vertices == nullptr || game->vertex_count == 0) {
+    return false;
+  }
+  for (size_t vertex = 0; vertex < game->vertex_count; vertex++) {
+    if (find_original_priority(map, game->vertices[vertex].priority) ==
+        SIZE_MAX) {
+      return false;
+    }
+  }
+  for (size_t vertex = 0; vertex < game->vertex_count; vertex++) {
+    size_t const entry =
+        find_original_priority(map, game->vertices[vertex].priority);
+    game->vertices[vertex].priority = map->entries[entry].compact;
+  }
+  game->max_priority = map->entries[map->count - 1].compact;
+  return true;
+}
+
+bool pg_priority_map_restore(PGPriorityMap const *map, PGGame *game) {
+  if (map == nullptr || map->entries == nullptr || map->count == 0 ||
+      game == nullptr || game->vertices == nullptr || game->vertex_count == 0) {
+    return false;
+  }
+  for (size_t vertex = 0; vertex < game->vertex_count; vertex++) {
+    if (find_compact_priority(map, game->vertices[vertex].priority) ==
+        SIZE_MAX) {
+      return false;
+    }
+  }
+  for (size_t vertex = 0; vertex < game->vertex_count; vertex++) {
+    size_t const entry =
+        find_compact_priority(map, game->vertices[vertex].priority);
+    game->vertices[vertex].priority = map->entries[entry].original;
+  }
+  game->max_priority = map->entries[map->count - 1].original;
+  return true;
+}
+
+bool pg_priority_map_original_bound(PGPriorityMap const *map,
+                                    uint64_t const compact_bound,
+                                    uint64_t *original_bound) {
+  if (map == nullptr || map->entries == nullptr || map->count == 0 ||
+      original_bound == nullptr) {
+    return false;
+  }
+  if (compact_bound < map->entries[0].compact) {
+    *original_bound = compact_bound;
+    return true;
+  }
+
+  size_t begin = 0;
+  size_t end = map->count;
+  while (begin < end) {
+    size_t const middle = begin + (end - begin) / 2;
+    if (map->entries[middle].compact <= compact_bound) {
+      begin = middle + 1;
+    } else {
+      end = middle;
+    }
+  }
+  PGPriorityMapEntry const entry = map->entries[begin - 1];
+  uint64_t const difference = compact_bound - entry.compact;
+  if (entry.original > UINT64_MAX - difference) {
+    return false;
+  }
+  *original_bound = entry.original + difference;
   return true;
 }

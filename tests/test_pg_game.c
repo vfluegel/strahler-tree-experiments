@@ -127,6 +127,64 @@ static void test_canonical_round_trip(void) {
   pg_game_destroy(&game);
 }
 
+static void test_start_directive(void) {
+  PGGame game = parse("parity 0;\n"
+                      "start 18446744073709551615;\n"
+                      "0 0 0 0;\n");
+  assert(game.vertex_count == 1);
+  assert(game.vertices[0].external_id == 0);
+  char *written = write_game(&game, true);
+  assert(strcmp(written, "parity 0;\n0 0 0 0;\n") == 0);
+  free(written);
+  pg_game_destroy(&game);
+
+  PGGame headerless = parse("start 999;\n7 1 1 7;\n");
+  assert(headerless.vertex_count == 1);
+  assert(headerless.vertices[0].external_id == 7);
+  pg_game_destroy(&headerless);
+}
+
+static void test_priority_map(void) {
+  PGGame game = parse("parity 3;\n"
+                      "0 0 0 0;\n"
+                      "1 3 1 1;\n"
+                      "2 4 0 2;\n"
+                      "3 100 1 3;\n");
+  PGPriorityMap map = {0};
+  assert(pg_priority_map_build(&game, &map));
+  assert(map.count == 4);
+  uint64_t const original[] = {0, 3, 4, 100};
+  uint64_t const compact[] = {0, 1, 2, 4};
+  for (size_t index = 0; index < map.count; index++) {
+    assert(map.entries[index].original == original[index]);
+    assert(map.entries[index].compact == compact[index]);
+  }
+
+  uint64_t bound = UINT64_MAX;
+  assert(pg_priority_map_original_bound(&map, 0, &bound) && bound == 0);
+  assert(pg_priority_map_original_bound(&map, 1, &bound) && bound == 3);
+  assert(pg_priority_map_original_bound(&map, 2, &bound) && bound == 4);
+  assert(pg_priority_map_original_bound(&map, 3, &bound) && bound == 5);
+  assert(pg_priority_map_original_bound(&map, 4, &bound) && bound == 100);
+  assert(pg_priority_map_original_bound(&map, 5, &bound) && bound == 101);
+  assert(!pg_priority_map_original_bound(&map, UINT64_MAX, &bound));
+
+  assert(pg_priority_map_apply(&map, &game));
+  assert(game.max_priority == 4);
+  for (size_t vertex = 0; vertex < game.vertex_count; vertex++) {
+    assert(game.vertices[vertex].priority == compact[vertex]);
+  }
+  assert(pg_priority_map_restore(&map, &game));
+  assert(game.max_priority == 100);
+  for (size_t vertex = 0; vertex < game.vertex_count; vertex++) {
+    assert(game.vertices[vertex].priority == original[vertex]);
+  }
+
+  pg_priority_map_destroy(&map);
+  assert(map.entries == nullptr && map.count == 0);
+  pg_game_destroy(&game);
+}
+
 static void test_invalid_games(void) {
   reject("");
   reject("   \n\t");
@@ -147,6 +205,10 @@ static void test_invalid_games(void) {
   reject("0 0 0 0 \"caf\303\251\";");
   reject("0 0 0 0; trailing");
   reject("parity 0; 1 0 0 1; 1 0 0 1;");
+  reject("start; 0 0 0 0;");
+  reject("start 0 0 0 0;");
+  reject("start 0; start 0; 0 0 0 0;");
+  reject("0 0 0 0; start 0;");
 }
 
 static void test_api_guards(void) {
@@ -159,6 +221,14 @@ static void test_api_guards(void) {
   assert(fclose(stream) == 0);
   assert(!pg_game_write_pgsolver(nullptr, &game, true));
   assert(!pg_game_write_pgsolver(stdout, &game, true));
+  PGPriorityMap map = {0};
+  uint64_t bound = 0;
+  assert(!pg_priority_map_build(nullptr, &map));
+  assert(!pg_priority_map_apply(&map, &game));
+  assert(!pg_priority_map_restore(&map, &game));
+  assert(!pg_priority_map_original_bound(&map, 0, &bound));
+  pg_priority_map_destroy(nullptr);
+  pg_priority_map_destroy(&map);
   pg_game_destroy(nullptr);
   pg_game_destroy(&game);
 }
@@ -167,6 +237,8 @@ int main(void) {
   test_sparse_dense_graph();
   test_last_declaration_wins();
   test_canonical_round_trip();
+  test_start_directive();
+  test_priority_map();
   test_invalid_games();
   test_api_guards();
   return 0;

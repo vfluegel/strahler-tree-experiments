@@ -40,13 +40,20 @@
 [[nodiscard]] static bool
 write_node_label(FILE *out, PGGame const *game, PGSet const *domain,
                  ADNode const *node, ADDotLabels const labels,
-                 size_t const max_items, bool const show_tree_metrics) {
+                 size_t const max_items, bool const show_tree_metrics,
+                 PGPriorityMap const *priority_map) {
   char const *name = node->player == PG_EVEN ? "Even" : "Odd";
+  uint64_t displayed_bound = node->priority_bound;
+  if (priority_map != nullptr &&
+      !pg_priority_map_original_bound(priority_map, node->priority_bound,
+                                      &displayed_bound)) {
+    return false;
+  }
   bool succeeded = begin_html_table(out) &&
                    fprintf(out,
                            "<TR><TD COLSPAN=\"2\"><B>%s</B> <I>d</I> = %" PRIu64
                            "</TD></TR>",
-                           name, node->priority_bound) >= 0;
+                           name, displayed_bound) >= 0;
   if (succeeded && labels != AD_DOT_LABEL_NONE) {
     succeeded =
         fprintf(out,
@@ -120,10 +127,11 @@ write_node_label(FILE *out, PGGame const *game, PGSet const *domain,
 [[nodiscard]] static bool
 write_node(FILE *out, PGGame const *game, PGSet const *domain,
            ADNode const *node, char const *identifier, ADDotLabels const labels,
-           size_t const max_items, bool const show_tree_metrics) {
+           size_t const max_items, bool const show_tree_metrics,
+           PGPriorityMap const *priority_map) {
   if (fprintf(out, "  %s [label=", identifier) < 0 ||
       !write_node_label(out, game, domain, node, labels, max_items,
-                        show_tree_metrics) ||
+                        show_tree_metrics, priority_map) ||
       fputs("];\n", out) < 0) {
     return false;
   }
@@ -139,7 +147,7 @@ write_node(FILE *out, PGGame const *game, PGSet const *domain,
           fputc(']', out) == EOF)) ||
         fputs(";\n", out) < 0 ||
         !write_node(out, game, &child->trap, child->subtree, child_id, labels,
-                    max_items, false)) {
+                    max_items, false, priority_map)) {
       free(child_id);
       return false;
     }
@@ -163,7 +171,8 @@ write_node(FILE *out, PGGame const *game, PGSet const *domain,
 
 bool ad_tree_write_dot(FILE *out, PGGame const *game,
                        ZielonkaResult const *result, ADDotPlayer const player,
-                       ADDotLabels const labels, size_t const max_set_items) {
+                       ADDotLabels const labels, size_t const max_set_items,
+                       PGPriorityMap const *priority_map) {
   if (out == nullptr || game == nullptr || result == nullptr ||
       player > AD_DOT_PLAYER_ODD || labels > AD_DOT_LABEL_NONE ||
       fputs("digraph attractor_decompositions {\n"
@@ -184,7 +193,7 @@ bool ad_tree_write_dot(FILE *out, PGGame const *game,
         succeeded = fprintf(out, "  result -> %s;\n", identifier) >= 0 &&
                     write_node(out, game, &result->winning[candidate],
                                result->decomposition[candidate], identifier,
-                               labels, max_set_items, true);
+                               labels, max_set_items, true, priority_map);
       }
     }
   } else {
@@ -194,7 +203,7 @@ bool ad_tree_write_dot(FILE *out, PGGame const *game,
                     ? write_empty(out, selected, false)
                     : write_node(out, game, &result->winning[selected],
                                  result->decomposition[selected], identifier,
-                                 labels, max_set_items, true);
+                                 labels, max_set_items, true, priority_map);
   }
   return succeeded && fputs("}\n", out) >= 0;
 }

@@ -35,8 +35,7 @@ static void solver_error(ZielonkaError *error, char const *message) {
                                 uint64_t const bound, size_t const depth,
                                 ZielonkaResult *result, ZielonkaError *error) {
   if (depth > MAX_RECURSION_DEPTH) {
-    solver_error(error,
-                 "literal priority span exceeds the safe recursion depth");
+    solver_error(error, "priority depth exceeds the safe recursion depth");
     return false;
   }
   if (!initialize_result(result, game->vertex_count)) {
@@ -218,8 +217,7 @@ bool zielonka_decompose(PGGame const *game, PGSet const *domain,
     return false;
   }
   if (bound > MAX_RECURSION_DEPTH) {
-    solver_error(error,
-                 "literal priority span exceeds the safe recursion depth");
+    solver_error(error, "priority depth exceeds the safe recursion depth");
     return false;
   }
   *result = (ZielonkaResult){0};

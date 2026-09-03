@@ -57,11 +57,18 @@ printf '1,0|e,1|0,1|e,0|\n' | ./build/pms2dot --reorder > sorted-tree.dot
 
 Read and check one PGSolver game from standard input. By default, `pgfilt`
 prints basic statistics such as the number of vertices and edges. Use
-`--normalize` to print the game in a consistent PGSolver format.
+`--normalize` to print the game in a consistent PGSolver format. An optional
+`start ID;` line is accepted and ignored.
+
+Priorities are left unchanged by default. Use `--priority-mode=compact` to
+remove unnecessary gaps while keeping their order and parity. Distinct
+priorities remain distinct.
 
 ```sh
 ./build/pgfilt < game.pg
 ./build/pgfilt --normalize < game.pg > normalized.pg
+./build/pgfilt --priority-mode=compact --normalize \
+  < game.pg > compact.pg
 ```
 
 ### `pg2adot`
@@ -73,7 +80,14 @@ file name; the latter two read from standard input.
 - `--player=both|even|odd` selects the trees to print.
 - `--labels=counts|sets|none` selects the node and edge labels.
 - `--max-set-items=N` limits the number of vertices shown in a set label.
+- `--priority-mode=original|compact` selects the priority bounds shown in the
+  tree. The default is `original`.
 - `--no-verify` skips the decomposition check and is intended for debugging.
+
+`pg2adot` removes priority gaps internally before solving, so large numeric
+gaps do not add empty levels or exhaust the recursion limit. It still shows
+bounds on the original priority scale by default. Use
+`--priority-mode=compact` to show the internal bounds instead.
 
 #### Reading the tree
 
@@ -87,7 +101,7 @@ Node labels describe the subtree rooted at that box:
 | Label | Meaning |
 | --- | --- |
 | `Even` or `Odd` | The player whose decomposition this is. |
-| `d` | The priority bound at this node. It has the same parity as the player. |
+| `d` | The priority bound at this node. It has the same parity as the player. By default it uses the game's original priority scale. |
 | `W` | The vertices in this node's subgame. At a root, this is the player's winning region. |
 | `A` | The player's attractor within `W` to vertices with priority `d`. This can be empty if priority `d` does not occur. |
 | `nodes`, `leaves` | The numbers of nodes and leaves in the complete Even or Odd tree. These totals are shown only at the root. |
@@ -108,6 +122,12 @@ lists their PGSolver vertex IDs. A suffix such as `+5 more` means that
 `--max-set-items` hid five IDs. With `--labels=none`, nodes show only the player
 and `d`, and edges have no labels.
 
+If the input priorities contain gaps, consecutive tree nodes can have `d`
+values that differ by more than two. The missing values would only create
+empty levels, so they are not included. The reported node count, height, and
+Strahler number describe this gap-free tree. With
+`--priority-mode=compact`, child bounds decrease by two as usual.
+
 The generated DOT uses Graphviz's HTML-like labels to typeset variables and
 subscripts. Ordinary `dot` renders them directly; no LaTeX or dot2tex step is
 needed.
@@ -118,6 +138,7 @@ decomposition.
 
 ```sh
 ./build/pg2adot game.pg > decomposition.dot
+./build/pg2adot --priority-mode=compact game.pg > compact.dot
 ./build/pg2adot --player=both --labels=sets --max-set-items=8 game.pg \
   | dot -Tsvg > decomposition.svg
 ```

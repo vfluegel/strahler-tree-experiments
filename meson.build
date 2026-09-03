@@ -222,6 +222,18 @@ test('str_tree_one_argument', str_tree, args : ['0'])
 test('str_tree_two_arguments', str_tree, args : ['0', '2'])
 test('pgfilt_help', pgfilt, args : ['-h'])
 test('pg2adot_help', pg2adot, args : ['--help'])
+test(
+  'pgfilt_rejects_bad_priority_mode',
+  pgfilt,
+  args : ['--priority-mode=bad'],
+  should_fail : true,
+)
+test(
+  'pg2adot_rejects_bad_priority_mode',
+  pg2adot,
+  args : ['--priority-mode=bad'],
+  should_fail : true,
+)
 test('pms2dot_help_exit', pms2dot, args : ['-h'])
 check_version = find_program('tests/check-version.sh')
 test(
@@ -293,6 +305,58 @@ test(
 )
 
 test(
+  'pgfilt_gap_summary',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_gap_summary.out',
+    'tests/actual/pgfilt_gap_summary.out',
+    '@tests/games/priority_gap_start.pg',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pgfilt_gap_normalize',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_gap_normalize.out',
+    'tests/actual/pgfilt_gap_normalize.out',
+    '@tests/games/priority_gap_start.pg',
+    '--normalize',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pgfilt_gap_compact_summary',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_gap_compact_summary.out',
+    'tests/actual/pgfilt_gap_compact_summary.out',
+    '@tests/games/priority_gap_start.pg',
+    '--priority-mode=compact',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pgfilt_gap_compact_normalize',
+  run_single_test,
+  args : [
+    pgfilt,
+    'tests/golden/pgfilt_gap_compact_normalize.out',
+    'tests/actual/pgfilt_gap_compact_normalize.out',
+    '@tests/games/priority_gap_start.pg',
+    '--priority-mode=compact',
+    '--normalize',
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
   'pg2adot_counts',
   run_single_test,
   args : [
@@ -316,6 +380,33 @@ test(
     '--labels=sets',
     '--max-set-items=1',
     files('tests/games/ordered_two_children.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_gap_original_priorities',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_gap_original.out',
+    'tests/actual/pg2adot_gap_original.out',
+    'EMPTY',
+    files('tests/games/priority_gap_start.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_gap_compact_priorities',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_gap_compact.out',
+    'tests/actual/pg2adot_gap_compact.out',
+    'EMPTY',
+    '--priority-mode=compact',
+    files('tests/games/priority_gap_start.pg'),
   ],
   workdir : meson.project_source_root(),
 )
@@ -459,6 +550,26 @@ if dot_program.found()
       '-o',
       '/dev/null',
       files('tests/golden/pg2adot_sets.out'),
+    ],
+  )
+  test(
+    'pg2adot_gap_original_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_gap_original.out'),
+    ],
+  )
+  test(
+    'pg2adot_gap_compact_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_gap_compact.out'),
     ],
   )
   foreach ct : pms2dot_cases

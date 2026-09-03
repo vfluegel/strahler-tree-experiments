@@ -18,6 +18,11 @@ enum {
   EXIT_IO = 5,
 };
 
+typedef enum {
+  PRIORITY_MODE_ORIGINAL,
+  PRIORITY_MODE_COMPACT,
+} PriorityMode;
+
 static void usage(FILE *out, char *argv[static 1]) {
   char *program = strrchr(argv[0], '/');
   program = program == nullptr ? argv[0] : program + 1;
@@ -28,6 +33,8 @@ static void usage(FILE *out, char *argv[static 1]) {
           "  --player=both|even|odd       default: both\n"
           "  --labels=counts|sets|none    default: counts\n"
           "  --max-set-items=N            default: 32\n"
+          "  --priority-mode=original|compact\n"
+          "                               default: original\n"
           "  --no-verify\n",
           program);
 }
@@ -46,13 +53,6 @@ static void usage(FILE *out, char *argv[static 1]) {
   return true;
 }
 
-[[nodiscard]] static int compare_priorities(void const *left,
-                                            void const *right) {
-  uint64_t const first = *(uint64_t const *)left;
-  uint64_t const second = *(uint64_t const *)right;
-  return first < second ? -1 : first > second ? 1 : 0;
-}
-
 int main(int argc, char *argv[argc + 1]) {
   int const version_status =
       cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
@@ -60,12 +60,19 @@ int main(int argc, char *argv[argc + 1]) {
     return version_status;
   }
 
-  enum { OPTION_PLAYER = 1, OPTION_LABELS, OPTION_MAX_ITEMS, OPTION_NO_VERIFY };
+  enum {
+    OPTION_PLAYER = 1,
+    OPTION_LABELS,
+    OPTION_MAX_ITEMS,
+    OPTION_PRIORITY_MODE,
+    OPTION_NO_VERIFY,
+  };
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},
       {"player", required_argument, nullptr, OPTION_PLAYER},
       {"labels", required_argument, nullptr, OPTION_LABELS},
       {"max-set-items", required_argument, nullptr, OPTION_MAX_ITEMS},
+      {"priority-mode", required_argument, nullptr, OPTION_PRIORITY_MODE},
       {"no-verify", no_argument, nullptr, OPTION_NO_VERIFY},
       {nullptr, 0, nullptr, 0},
   };
@@ -73,6 +80,7 @@ int main(int argc, char *argv[argc + 1]) {
   ADDotPlayer player = AD_DOT_PLAYER_BOTH;
   ADDotLabels labels = AD_DOT_LABEL_COUNTS;
   size_t max_set_items = 32;
+  PriorityMode priority_mode = PRIORITY_MODE_ORIGINAL;
   bool verify = true;
   opterr = 0;
   int option = 0;
@@ -108,6 +116,16 @@ int main(int argc, char *argv[argc + 1]) {
     case OPTION_MAX_ITEMS:
       if (!parse_size(optarg, &max_set_items)) {
         fputs("Invalid --max-set-items value\n", stderr);
+        return EXIT_USAGE;
+      }
+      break;
+    case OPTION_PRIORITY_MODE:
+      if (strcmp(optarg, "original") == 0) {
+        priority_mode = PRIORITY_MODE_ORIGINAL;
+      } else if (strcmp(optarg, "compact") == 0) {
+        priority_mode = PRIORITY_MODE_COMPACT;
+      } else {
+        fputs("Invalid --priority-mode value\n", stderr);
         return EXIT_USAGE;
       }
       break;
@@ -151,35 +169,29 @@ int main(int argc, char *argv[argc + 1]) {
     return EXIT_IO;
   }
 
-  uint64_t *priorities = malloc(game.vertex_count * sizeof(priorities[0]));
-  if (priorities == nullptr) {
+  if (game.max_priority == UINT64_MAX) {
     pg_game_destroy(&game);
-    fputs("Failed to inspect the priority span\n", stderr);
+    fputs("Solver failed: the source maximum priority cannot be followed by "
+          "an opposite-parity bound\n",
+          stderr);
     return EXIT_SOLVER;
   }
-  for (size_t vertex = 0; vertex < game.vertex_count; vertex++) {
-    priorities[vertex] = game.vertices[vertex].priority;
-  }
-  qsort(priorities, game.vertex_count, sizeof(priorities[0]),
-        compare_priorities);
-  size_t distinct_priorities = 1;
-  for (size_t index = 1; index < game.vertex_count; index++) {
-    if (priorities[index] != priorities[index - 1]) {
-      distinct_priorities++;
-    }
-  }
-  free(priorities);
-  if (game.max_priority > 64 && game.max_priority / 8 > distinct_priorities) {
-    fprintf(stderr,
-            "warning: literal priority span 0..%" PRIu64
-            " is large relative to %zu distinct priorities\n",
-            game.max_priority, distinct_priorities);
+
+  PGPriorityMap priority_map = {0};
+  if (!pg_priority_map_build(&game, &priority_map) ||
+      !pg_priority_map_apply(&priority_map, &game)) {
+    pg_priority_map_destroy(&priority_map);
+    pg_game_destroy(&game);
+    fputs("Failed to compact the game priorities\n", stderr);
+    return EXIT_SOLVER;
   }
 
   PGSet domain = {0};
   ZielonkaResult result = {0};
   ZielonkaError solver_error = {0};
   if (!pg_set_init(&domain, game.vertex_count)) {
+    (void)pg_priority_map_restore(&priority_map, &game);
+    pg_priority_map_destroy(&priority_map);
     pg_game_destroy(&game);
     fputs("Failed to allocate the game domain\n", stderr);
     return EXIT_SOLVER;
@@ -189,6 +201,8 @@ int main(int argc, char *argv[argc + 1]) {
                           &solver_error)) {
     fprintf(stderr, "Solver failed: %s\n", solver_error.message);
     pg_set_destroy(&domain);
+    (void)pg_priority_map_restore(&priority_map, &game);
+    pg_priority_map_destroy(&priority_map);
     pg_game_destroy(&game);
     return EXIT_SOLVER;
   }
@@ -199,15 +213,28 @@ int main(int argc, char *argv[argc + 1]) {
       fprintf(stderr, "Verification failed: %s\n", verify_error.message);
       zielonka_result_destroy(&result);
       pg_set_destroy(&domain);
+      (void)pg_priority_map_restore(&priority_map, &game);
+      pg_priority_map_destroy(&priority_map);
       pg_game_destroy(&game);
       return EXIT_SOLVER;
     }
   }
 
-  bool const wrote =
-      ad_tree_write_dot(stdout, &game, &result, player, labels, max_set_items);
+  if (!pg_priority_map_restore(&priority_map, &game)) {
+    fputs("Failed to restore the source priorities\n", stderr);
+    zielonka_result_destroy(&result);
+    pg_set_destroy(&domain);
+    pg_priority_map_destroy(&priority_map);
+    pg_game_destroy(&game);
+    return EXIT_SOLVER;
+  }
+  PGPriorityMap const *display_map =
+      priority_mode == PRIORITY_MODE_ORIGINAL ? &priority_map : nullptr;
+  bool const wrote = ad_tree_write_dot(stdout, &game, &result, player, labels,
+                                       max_set_items, display_map);
   zielonka_result_destroy(&result);
   pg_set_destroy(&domain);
+  pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
   if (!wrote) {
     fputs("Failed to write DOT output\n", stderr);

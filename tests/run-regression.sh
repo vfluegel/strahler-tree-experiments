@@ -148,6 +148,18 @@ sanitize_output "tests/golden/pgfilt_summary.out" "$PGFILT_BIN"
 echo "  $PGFILT_BIN --normalize < tests/games/sparse.pg > tests/golden/pgfilt_normalize.out"
 "$PGFILT_BIN" --normalize < tests/games/sparse.pg > tests/golden/pgfilt_normalize.out 2>&1
 sanitize_output "tests/golden/pgfilt_normalize.out" "$PGFILT_BIN"
+echo "  $PGFILT_BIN < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_summary.out"
+"$PGFILT_BIN" < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_summary.out 2>&1
+sanitize_output "tests/golden/pgfilt_gap_summary.out" "$PGFILT_BIN"
+echo "  $PGFILT_BIN --normalize < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_normalize.out"
+"$PGFILT_BIN" --normalize < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_normalize.out 2>&1
+sanitize_output "tests/golden/pgfilt_gap_normalize.out" "$PGFILT_BIN"
+echo "  $PGFILT_BIN --priority-mode=compact < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_compact_summary.out"
+"$PGFILT_BIN" --priority-mode=compact < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_compact_summary.out 2>&1
+sanitize_output "tests/golden/pgfilt_gap_compact_summary.out" "$PGFILT_BIN"
+echo "  $PGFILT_BIN --priority-mode=compact --normalize < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_compact_normalize.out"
+"$PGFILT_BIN" --priority-mode=compact --normalize < tests/games/priority_gap_start.pg > tests/golden/pgfilt_gap_compact_normalize.out 2>&1
+sanitize_output "tests/golden/pgfilt_gap_compact_normalize.out" "$PGFILT_BIN"
 
 echo "  $PG2ADOT_BIN tests/games/ordered_two_children.pg > tests/golden/pg2adot_counts.out"
 "$PG2ADOT_BIN" tests/games/ordered_two_children.pg > tests/golden/pg2adot_counts.out 2>&1
@@ -155,6 +167,12 @@ sanitize_output "tests/golden/pg2adot_counts.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out"
 "$PG2ADOT_BIN" --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out 2>&1
 sanitize_output "tests/golden/pg2adot_sets.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_original.out"
+"$PG2ADOT_BIN" tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_original.out 2>&1
+sanitize_output "tests/golden/pg2adot_gap_original.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --priority-mode=compact tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_compact.out"
+"$PG2ADOT_BIN" --priority-mode=compact tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_compact.out 2>&1
+sanitize_output "tests/golden/pg2adot_gap_compact.out" "$PG2ADOT_BIN"
 
 echo "  $PMS2DOT_BIN -h > tests/golden/pms_h.out"
 "$PMS2DOT_BIN" -h > "tests/golden/pms_h.out" 2>&1 || true

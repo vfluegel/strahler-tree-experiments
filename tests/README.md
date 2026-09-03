@@ -44,20 +44,24 @@ recursively after common leading bits. Vectors use its lexicographic lifting.
 
 ## PGSolver games
 
-The parser accepts an optional `parity MAX_ID;` header followed by one or more
-node declarations. IDs need not be contiguous, every final declaration must
-have a successor, and every successor must name a final declaration. A later
-declaration replaces an earlier declaration with the same ID. Internally,
-vertices are sorted by external ID and stored densely with outgoing and
-predecessor CSR arrays.
+The parser accepts an optional `parity MAX_ID;` header, an optional `start ID;`
+directive, and one or more node declarations. The start ID is ignored. IDs
+need not be contiguous, every final declaration must have a successor, and
+every successor must name a final declaration. A later declaration replaces
+an earlier declaration with the same ID. Internally, vertices are sorted by
+external ID and stored densely with outgoing and predecessor CSR arrays.
 
 `pgfilt` prints graph counts by default and `pgfilt --normalize` emits a
-canonical representation suitable for round-trip tests.
+canonical representation suitable for round-trip tests. Priority compaction
+is opt-in and preserves the order, parity, and identity of every distinct
+priority.
 
 `pg2adot` keeps proof metadata in an attractor-decomposition witness. Its DOT
 tree contains only recursive child decompositions: top attractors are node
 metadata, while traps and child attractors are edge metadata. Count and set
-goldens are parsed by Graphviz during the Meson suite.
+goldens are parsed by Graphviz during the Meson suite. The solver and verifier
+use compact priorities; the DOT writer can translate bounds back to the input
+priority scale without changing the verified witness.
 
 ## Running the suite
 
