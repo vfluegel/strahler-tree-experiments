@@ -31,6 +31,15 @@
     fprintf(stderr, "verification failed: %s\n", verify_error.message);
     assert(false);
   }
+  for (size_t player = 0; player < 2; player++) {
+    if (result.decomposition[player] != nullptr &&
+        !ad_tree_relative_verify(game, &result.winning[player],
+                                 result.decomposition[player], &verify_error)) {
+      fprintf(stderr, "tree-relative verification failed: %s\n",
+              verify_error.message);
+      assert(false);
+    }
+  }
   return result;
 }
 
@@ -83,6 +92,25 @@ static void test_ordered_two_children(void) {
   assert(pg_set_count(&odd->children[1].trap) == 1);
   assert(pg_set_contains(&odd->children[1].trap, 0));
   assert(pg_set_equal(&odd->children[1].trap, &odd->children[1].attractor));
+
+  ADTreeRelativeParts root_parts = {0};
+  assert(ad_tree_relative_parts(&game, &result.winning[PG_ODD],
+                                &result.winning[PG_ODD], odd, &root_parts));
+  assert(pg_set_empty(&root_parts.highest));
+  assert(pg_set_empty(&root_parts.top));
+  assert(pg_set_empty(&root_parts.side));
+  ad_tree_relative_parts_destroy(&root_parts);
+
+  ADTreeRelativeParts child_parts = {0};
+  assert(ad_tree_relative_parts(&game, &odd->children[0].attractor,
+                                &odd->children[0].trap,
+                                odd->children[0].subtree, &child_parts));
+  assert(pg_set_count(&child_parts.highest) == 1);
+  assert(pg_set_contains(&child_parts.highest, 1));
+  assert(pg_set_empty(&child_parts.top));
+  assert(pg_set_count(&child_parts.side) == 1);
+  assert(pg_set_contains(&child_parts.side, 2));
+  ad_tree_relative_parts_destroy(&child_parts);
   ADTreeMetrics const metrics = ad_tree_metrics(odd);
   assert(metrics.nodes == 3);
   assert(metrics.leaves == 2);
@@ -92,6 +120,8 @@ static void test_ordered_two_children(void) {
   pg_set_add(&odd->children[0].subtree->top_attractor, 0);
   ADVerifyError verify_error = {0};
   assert(!zielonka_result_verify(&game, &domain, &result, &verify_error));
+  assert(!ad_tree_relative_verify(&game, &result.winning[PG_ODD], odd,
+                                  &verify_error));
   pg_set_remove(&odd->children[0].subtree->top_attractor, 0);
 
   zielonka_result_destroy(&result);
@@ -114,6 +144,30 @@ static void test_literal_priority_gap(void) {
   ZielonkaError error = {0};
   assert(!zielonka_decompose(&game, &domain, 1025, &rejected, &error));
   assert(error.message[0] != '\0');
+
+  zielonka_result_destroy(&result);
+  pg_set_destroy(&domain);
+  pg_game_destroy(&game);
+}
+
+static void test_tree_relative_top_partition(void) {
+  PGGame game = parse("parity 1;\n"
+                      "0 2 0 0 \"high\";\n"
+                      "1 0 0 0 \"top attractor\";\n");
+  PGSet domain = {0};
+  ZielonkaResult result = solve(&game, &domain);
+  ADNode const *even = result.decomposition[PG_EVEN];
+  assert(even != nullptr);
+
+  ADTreeRelativeParts parts = {0};
+  assert(ad_tree_relative_parts(&game, &result.winning[PG_EVEN],
+                                &result.winning[PG_EVEN], even, &parts));
+  assert(pg_set_count(&parts.highest) == 1);
+  assert(pg_set_contains(&parts.highest, 0));
+  assert(pg_set_count(&parts.top) == 1);
+  assert(pg_set_contains(&parts.top, 1));
+  assert(pg_set_empty(&parts.side));
+  ad_tree_relative_parts_destroy(&parts);
 
   zielonka_result_destroy(&result);
   pg_set_destroy(&domain);
@@ -168,6 +222,7 @@ int main(void) {
   test_basic_games();
   test_ordered_two_children();
   test_literal_priority_gap();
+  test_tree_relative_top_partition();
   test_random_reference_agreement();
   return 0;
 }

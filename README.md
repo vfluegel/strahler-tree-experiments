@@ -78,6 +78,8 @@ attractor decompositions, and write them as DOT. Pass a file name, `-`, or no
 file name; the latter two read from standard input.
 
 - `--player=both|even|odd` selects the trees to print.
+- `--view=classic|tree-relative` selects the notation used for the
+  decomposition. The default is `classic`.
 - `--labels=counts|sets|none` selects the node and edge labels.
 - `--max-set-items=N` limits the number of vertices shown in a set label.
 - `--priority-mode=original|compact` selects the priority bounds shown in the
@@ -89,7 +91,7 @@ gaps do not add empty levels or exhaust the recursion limit. It still shows
 bounds on the original priority scale by default. Use
 `--priority-mode=compact` to show the internal bounds instead.
 
-#### Reading the tree
+#### Reading the classic view
 
 Each Even or Odd root is the decomposition of that player's winning region.
 The `result (synthetic)` node only connects the two roots when
@@ -136,11 +138,40 @@ The reported Strahler number belongs to the tree that `pg2adot` built. The
 command does not search for the smallest value over every possible
 decomposition.
 
+#### Reading the tree-relative view
+
+`--view=tree-relative` shows the same tree and priority bounds using the
+notation from Section 6.1 of
+[Thejaswini Raghavan's thesis](https://thejaswiniraghavan.github.io/PhD_Thesis.pdf).
+It changes the labels, not the decomposition or its size.
+
+At each node, the displayed sets form the disjoint partition
+`V = H + T + R_1 + ... + R_k + S`:
+
+| Label | Meaning |
+| --- | --- |
+| `V` | The region represented by this node. At a root it is the player's winning region. At a child it is the `R_i` set on the incoming edge. |
+| `H` | Vertices in the node's core whose priority is `d`. |
+| `T` | The other vertices in the player's attractor to `H`, computed inside the core. |
+| `R_i` | The region passed to child `i`. It is a trap for the other player in the region remaining at that step. |
+| `S` | The part of `V` outside the core. |
+
+The core itself is `H + T + R_1 + ... + R_k`. The verifier checks this
+partition, the attractors, the traps, and every recursive child. Here, “trap”
+means a trap for the other player. This matches the construction in Algorithm
+5 and its correspondence with classic attractor decompositions; the player
+name in the prose definition in Section 6.1 points in the opposite direction.
+
+For example, the first child in `ordered_two_children.pg` is shown as
+`R_1={1,2}`. Its node has `V={1,2}`, `H={1}`, `T={}`, and `S={2}`.
+
 ```sh
 ./build/pg2adot game.pg > decomposition.dot
 ./build/pg2adot --priority-mode=compact game.pg > compact.dot
 ./build/pg2adot --player=both --labels=sets --max-set-items=8 game.pg \
   | dot -Tsvg > decomposition.svg
+./build/pg2adot --view=tree-relative --labels=sets game.pg \
+  | dot -Tsvg > tree-relative.svg
 ```
 
 The repository includes small sample games under `tests/games/`, for example:

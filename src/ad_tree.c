@@ -250,6 +250,151 @@ bool ad_tree_verify(PGGame const *game, PGSet const *domain, ADNode const *root,
   return verify_node(game, domain, root, error);
 }
 
+void ad_tree_relative_parts_destroy(ADTreeRelativeParts *parts) {
+  if (parts == nullptr) {
+    return;
+  }
+  pg_set_destroy(&parts->highest);
+  pg_set_destroy(&parts->top);
+  pg_set_destroy(&parts->side);
+  *parts = (ADTreeRelativeParts){0};
+}
+
+bool ad_tree_relative_parts(PGGame const *game, PGSet const *outer,
+                            PGSet const *core, ADNode const *node,
+                            ADTreeRelativeParts *parts) {
+  if (parts != nullptr) {
+    *parts = (ADTreeRelativeParts){0};
+  }
+  if (game == nullptr || outer == nullptr || core == nullptr ||
+      node == nullptr || parts == nullptr ||
+      outer->bit_count != game->vertex_count ||
+      core->bit_count != game->vertex_count ||
+      node->top_attractor.bit_count != game->vertex_count ||
+      !pg_set_subset(core, outer) ||
+      !pg_set_init(&parts->highest, game->vertex_count) ||
+      !pg_set_clone(&parts->top, &node->top_attractor) ||
+      !pg_set_clone(&parts->side, outer)) {
+    ad_tree_relative_parts_destroy(parts);
+    return false;
+  }
+
+  for (size_t vertex = pg_set_next(core, 0); vertex != SIZE_MAX;
+       vertex = pg_set_next(core, vertex + 1)) {
+    if (game->vertices[vertex].priority == node->priority_bound) {
+      pg_set_add(&parts->highest, vertex);
+    }
+  }
+  pg_set_subtract_into(&parts->top, &parts->highest);
+  pg_set_subtract_into(&parts->side, core);
+  return true;
+}
+
+[[nodiscard]] static bool verify_tree_relative_node(PGGame const *game,
+                                                    PGSet const *outer,
+                                                    PGSet const *core,
+                                                    ADNode const *root,
+                                                    ADVerifyError *error) {
+  if (root == nullptr || root->player > PG_ODD ||
+      root->priority_bound % 2 != (uint64_t)root->player ||
+      root->top_attractor.bit_count != game->vertex_count ||
+      outer->bit_count != game->vertex_count ||
+      core->bit_count != game->vertex_count || pg_set_empty(core) ||
+      !pg_set_subset(core, outer) || !pg_subgame_is_total(game, outer) ||
+      !trap_conditions(game, outer, core, root->player)) {
+    verify_error(error, "invalid tree-relative node domain");
+    return false;
+  }
+  if (!priorities_at_most(game, core, root->priority_bound)) {
+    verify_error(error, "a tree-relative core priority exceeds the node bound");
+    return false;
+  }
+
+  ADTreeRelativeParts parts = {0};
+  PGSet expected = {0};
+  PGSet residual = {0};
+  if (!ad_tree_relative_parts(game, outer, core, root, &parts) ||
+      !pg_attractor(game, core, &parts.highest, root->player, &expected) ||
+      !pg_set_equal(&expected, &root->top_attractor)) {
+    verify_error(error, "the tree-relative top attractor is incorrect");
+    goto failure;
+  }
+  pg_set_destroy(&expected);
+
+  if (!pg_attractor(game, outer, core, root->player, &expected) ||
+      !pg_set_equal(&expected, outer)) {
+    verify_error(error,
+                 "the tree-relative core does not attract its outer domain");
+    goto failure;
+  }
+  pg_set_destroy(&expected);
+
+  if (!pg_set_clone(&residual, outer)) {
+    verify_error(error, "failed to allocate tree-relative verifier sets");
+    goto failure;
+  }
+  pg_set_subtract_into(&residual, &parts.highest);
+  pg_set_subtract_into(&residual, &parts.top);
+
+  if (root->priority_bound < 2 && root->child_count != 0) {
+    verify_error(error, "a tree-relative bound below two cannot have children");
+    goto failure;
+  }
+  for (size_t index = 0; index < root->child_count; index++) {
+    ADChild const *child = root->children + index;
+    uint64_t const child_bound = root->priority_bound - 2;
+    if (pg_set_empty(&child->attractor) ||
+        !pg_set_subset(&child->attractor, &residual) ||
+        !trap_conditions(game, &residual, &child->attractor, root->player)) {
+      verify_error(error,
+                   "a tree-relative child region is not an opponent trap");
+      goto failure;
+    }
+    if (pg_set_empty(&child->trap) ||
+        !pg_set_subset(&child->trap, &child->attractor) ||
+        child->subtree == nullptr || child->subtree->player != root->player ||
+        child->subtree->priority_bound != child_bound ||
+        !verify_tree_relative_node(game, &child->attractor, &child->trap,
+                                   child->subtree, error)) {
+      if (error == nullptr || error->message[0] == '\0') {
+        verify_error(error, "invalid recursive tree-relative child");
+      }
+      goto failure;
+    }
+    pg_set_subtract_into(&residual, &child->attractor);
+  }
+  if (!pg_set_equal(&residual, &parts.side)) {
+    verify_error(error,
+                 "tree-relative regions do not partition the outer domain");
+    goto failure;
+  }
+
+  ad_tree_relative_parts_destroy(&parts);
+  pg_set_destroy(&expected);
+  pg_set_destroy(&residual);
+  return true;
+
+failure:
+  ad_tree_relative_parts_destroy(&parts);
+  pg_set_destroy(&expected);
+  pg_set_destroy(&residual);
+  return false;
+}
+
+bool ad_tree_relative_verify(PGGame const *game, PGSet const *domain,
+                             ADNode const *root, ADVerifyError *error) {
+  if (error != nullptr) {
+    *error = (ADVerifyError){0};
+  }
+  if (game == nullptr || domain == nullptr || root == nullptr ||
+      domain->bit_count != game->vertex_count || pg_set_empty(domain) ||
+      !pg_subgame_is_total(game, domain)) {
+    verify_error(error, "invalid tree-relative verifier input domain");
+    return false;
+  }
+  return verify_tree_relative_node(game, domain, domain, root, error);
+}
+
 bool zielonka_result_verify(PGGame const *game, PGSet const *domain,
                             ZielonkaResult const *result,
                             ADVerifyError *error) {

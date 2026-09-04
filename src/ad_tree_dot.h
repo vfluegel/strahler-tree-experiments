@@ -18,12 +18,17 @@ typedef enum {
   AD_DOT_LABEL_NONE,
 } ADDotLabels;
 
+typedef enum {
+  AD_DOT_VIEW_CLASSIC,
+  AD_DOT_VIEW_TREE_RELATIVE,
+} ADDotView;
+
 /* A non-null priority map translates stored compact bounds back to the input
  * priority scale without modifying the decomposition. */
 [[nodiscard]]
 bool ad_tree_write_dot(FILE *out, PGGame const *game,
                        ZielonkaResult const *result, ADDotPlayer player,
-                       ADDotLabels labels, size_t max_set_items,
+                       ADDotView view, ADDotLabels labels, size_t max_set_items,
                        PGPriorityMap const *priority_map);
 
 #endif

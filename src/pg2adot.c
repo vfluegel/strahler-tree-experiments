@@ -31,6 +31,7 @@ static void usage(FILE *out, char *argv[static 1]) {
           "  -h, --help\n"
           "  --version                    print the program version\n"
           "  --player=both|even|odd       default: both\n"
+          "  --view=classic|tree-relative default: classic\n"
           "  --labels=counts|sets|none    default: counts\n"
           "  --max-set-items=N            default: 32\n"
           "  --priority-mode=original|compact\n"
@@ -62,6 +63,7 @@ int main(int argc, char *argv[argc + 1]) {
 
   enum {
     OPTION_PLAYER = 1,
+    OPTION_VIEW,
     OPTION_LABELS,
     OPTION_MAX_ITEMS,
     OPTION_PRIORITY_MODE,
@@ -70,6 +72,7 @@ int main(int argc, char *argv[argc + 1]) {
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},
       {"player", required_argument, nullptr, OPTION_PLAYER},
+      {"view", required_argument, nullptr, OPTION_VIEW},
       {"labels", required_argument, nullptr, OPTION_LABELS},
       {"max-set-items", required_argument, nullptr, OPTION_MAX_ITEMS},
       {"priority-mode", required_argument, nullptr, OPTION_PRIORITY_MODE},
@@ -78,6 +81,7 @@ int main(int argc, char *argv[argc + 1]) {
   };
 
   ADDotPlayer player = AD_DOT_PLAYER_BOTH;
+  ADDotView view = AD_DOT_VIEW_CLASSIC;
   ADDotLabels labels = AD_DOT_LABEL_COUNTS;
   size_t max_set_items = 32;
   PriorityMode priority_mode = PRIORITY_MODE_ORIGINAL;
@@ -98,6 +102,16 @@ int main(int argc, char *argv[argc + 1]) {
         player = AD_DOT_PLAYER_ODD;
       } else {
         fputs("Invalid --player value\n", stderr);
+        return EXIT_USAGE;
+      }
+      break;
+    case OPTION_VIEW:
+      if (strcmp(optarg, "classic") == 0) {
+        view = AD_DOT_VIEW_CLASSIC;
+      } else if (strcmp(optarg, "tree-relative") == 0) {
+        view = AD_DOT_VIEW_TREE_RELATIVE;
+      } else {
+        fputs("Invalid --view value\n", stderr);
         return EXIT_USAGE;
       }
       break;
@@ -218,24 +232,38 @@ int main(int argc, char *argv[argc + 1]) {
       pg_game_destroy(&game);
       return EXIT_SOLVER;
     }
+    if (view == AD_DOT_VIEW_TREE_RELATIVE) {
+      for (size_t candidate = 0; candidate < 2; candidate++) {
+        if (result.decomposition[candidate] != nullptr &&
+            !ad_tree_relative_verify(&game, &result.winning[candidate],
+                                     result.decomposition[candidate],
+                                     &verify_error)) {
+          fprintf(stderr, "Tree-relative verification failed: %s\n",
+                  verify_error.message);
+          zielonka_result_destroy(&result);
+          pg_set_destroy(&domain);
+          (void)pg_priority_map_restore(&priority_map, &game);
+          pg_priority_map_destroy(&priority_map);
+          pg_game_destroy(&game);
+          return EXIT_SOLVER;
+        }
+      }
+    }
   }
 
-  if (!pg_priority_map_restore(&priority_map, &game)) {
-    fputs("Failed to restore the source priorities\n", stderr);
-    zielonka_result_destroy(&result);
-    pg_set_destroy(&domain);
-    pg_priority_map_destroy(&priority_map);
-    pg_game_destroy(&game);
-    return EXIT_SOLVER;
-  }
   PGPriorityMap const *display_map =
       priority_mode == PRIORITY_MODE_ORIGINAL ? &priority_map : nullptr;
-  bool const wrote = ad_tree_write_dot(stdout, &game, &result, player, labels,
-                                       max_set_items, display_map);
+  bool const wrote = ad_tree_write_dot(stdout, &game, &result, player, view,
+                                       labels, max_set_items, display_map);
+  bool const restored = pg_priority_map_restore(&priority_map, &game);
   zielonka_result_destroy(&result);
   pg_set_destroy(&domain);
   pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
+  if (!restored) {
+    fputs("Failed to restore the source priorities\n", stderr);
+    return EXIT_SOLVER;
+  }
   if (!wrote) {
     fputs("Failed to write DOT output\n", stderr);
     return EXIT_IO;

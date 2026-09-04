@@ -234,6 +234,12 @@ test(
   args : ['--priority-mode=bad'],
   should_fail : true,
 )
+test(
+  'pg2adot_rejects_bad_view',
+  pg2adot,
+  args : ['--view=bad'],
+  should_fail : true,
+)
 test('pms2dot_help_exit', pms2dot, args : ['-h'])
 check_version = find_program('tests/check-version.sh')
 test(
@@ -377,6 +383,36 @@ test(
     'tests/golden/pg2adot_sets.out',
     'tests/actual/pg2adot_sets.out',
     'EMPTY',
+    '--labels=sets',
+    '--max-set-items=1',
+    files('tests/games/ordered_two_children.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_tree_relative_counts',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_tree_relative_counts.out',
+    'tests/actual/pg2adot_tree_relative_counts.out',
+    'EMPTY',
+    '--view=tree-relative',
+    files('tests/games/ordered_two_children.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_tree_relative_sets_truncated',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_tree_relative_sets.out',
+    'tests/actual/pg2adot_tree_relative_sets.out',
+    'EMPTY',
+    '--view=tree-relative',
     '--labels=sets',
     '--max-set-items=1',
     files('tests/games/ordered_two_children.pg'),
@@ -550,6 +586,26 @@ if dot_program.found()
       '-o',
       '/dev/null',
       files('tests/golden/pg2adot_sets.out'),
+    ],
+  )
+  test(
+    'pg2adot_tree_relative_counts_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_tree_relative_counts.out'),
+    ],
+  )
+  test(
+    'pg2adot_tree_relative_sets_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_tree_relative_sets.out'),
     ],
   )
   test(

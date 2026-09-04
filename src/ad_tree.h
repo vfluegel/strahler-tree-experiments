@@ -40,6 +40,12 @@ typedef struct {
   char message[256];
 } ADVerifyError;
 
+typedef struct {
+  PGSet highest;
+  PGSet top;
+  PGSet side;
+} ADTreeRelativeParts;
+
 [[nodiscard]] ADNode *ad_node_create(PGPlayer player, uint64_t priority_bound,
                                      size_t vertex_count);
 void ad_node_destroy(ADNode *node);
@@ -53,6 +59,21 @@ void zielonka_result_destroy(ZielonkaResult *result);
 
 [[nodiscard]] bool ad_tree_verify(PGGame const *game, PGSet const *domain,
                                   ADNode const *root, ADVerifyError *error);
+
+/* Derive the tree-relative parts for a classic node: H is the priority-bound
+ * target in core, T is the rest of the stored top attractor, and S is
+ * outer \ core. The caller owns the returned sets and must destroy them with
+ * ad_tree_relative_parts_destroy. */
+[[nodiscard]] bool ad_tree_relative_parts(PGGame const *game,
+                                          PGSet const *outer, PGSet const *core,
+                                          ADNode const *node,
+                                          ADTreeRelativeParts *parts);
+void ad_tree_relative_parts_destroy(ADTreeRelativeParts *parts);
+
+[[nodiscard]] bool ad_tree_relative_verify(PGGame const *game,
+                                           PGSet const *domain,
+                                           ADNode const *root,
+                                           ADVerifyError *error);
 
 [[nodiscard]] bool zielonka_result_verify(PGGame const *game,
                                           PGSet const *domain,

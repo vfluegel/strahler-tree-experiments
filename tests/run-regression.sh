@@ -167,6 +167,12 @@ sanitize_output "tests/golden/pg2adot_counts.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out"
 "$PG2ADOT_BIN" --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_sets.out 2>&1
 sanitize_output "tests/golden/pg2adot_sets.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --view=tree-relative tests/games/ordered_two_children.pg > tests/golden/pg2adot_tree_relative_counts.out"
+"$PG2ADOT_BIN" --view=tree-relative tests/games/ordered_two_children.pg > tests/golden/pg2adot_tree_relative_counts.out 2>&1
+sanitize_output "tests/golden/pg2adot_tree_relative_counts.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --view=tree-relative --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_tree_relative_sets.out"
+"$PG2ADOT_BIN" --view=tree-relative --labels=sets --max-set-items=1 tests/games/ordered_two_children.pg > tests/golden/pg2adot_tree_relative_sets.out 2>&1
+sanitize_output "tests/golden/pg2adot_tree_relative_sets.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_original.out"
 "$PG2ADOT_BIN" tests/games/priority_gap_start.pg > tests/golden/pg2adot_gap_original.out 2>&1
 sanitize_output "tests/golden/pg2adot_gap_original.out" "$PG2ADOT_BIN"
