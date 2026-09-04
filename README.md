@@ -91,7 +91,10 @@ gaps do not add empty levels or exhaust the recursion limit. It still shows
 bounds on the original priority scale by default. Use
 `--priority-mode=compact` to show the internal bounds instead.
 
-#### Reading the classic view
+<details>
+<summary>How to read the trees</summary>
+
+#### Classic view
 
 Each Even or Odd root is the decomposition of that player's winning region.
 The `result (synthetic)` node only connects the two roots when
@@ -138,7 +141,7 @@ The reported Strahler number belongs to the tree that `pg2adot` built. The
 command does not search for the smallest value over every possible
 decomposition.
 
-#### Reading the tree-relative view
+#### Tree-relative view
 
 `--view=tree-relative` shows the same tree and priority bounds using the
 notation from Section 6.1 of
@@ -164,6 +167,8 @@ name in the prose definition in Section 6.1 points in the opposite direction.
 
 For example, the first child in `ordered_two_children.pg` is shown as
 `R_1={1,2}`. Its node has `V={1,2}`, `H={1}`, `T={}`, and `S={2}`.
+
+</details>
 
 ```sh
 ./build/pg2adot game.pg > decomposition.dot
