@@ -1,0 +1,23 @@
+digraph attractor_decompositions {
+  graph [rankdir=TB, ordering=out, newrank=true];
+  node [shape=box];
+  result [label="result (synthetic)"];
+  even_empty [label=<<B>Even</B>: <I>W</I> = empty; no decomposition>];
+  result -> even_empty;
+  result -> odd;
+  odd [label=<<B>Odd</B><BR/><I>H</I> = {}<BR/><FONT POINT-SIZE="10">base tree: 3 nodes; 2 leaves; height 2; Strahler 2</FONT>>];
+  odd -> odd_0 [label=<1>, minlen=2];
+  odd -> odd_0_plus [label=<1<SUP>+</SUP>>];
+  odd_0_plus [shape=ellipse, label=<<I>S</I><SUB>1</SUB> = {2}>];
+  odd -> odd_1 [label=<2>, minlen=2];
+  odd_0 [label=<<I>H</I> = {1}>];
+  odd_1 [label=<<I>H</I> = {0}>];
+  jurdzinski_level_3 [shape=plaintext, label=<<I>level</I> = 3>];
+  { rank=same; jurdzinski_level_3; odd; }
+  jurdzinski_level_2 [shape=plaintext, label=<<I>level</I> = 2>];
+  { rank=same; jurdzinski_level_2; odd_0_plus; }
+  jurdzinski_level_1 [shape=plaintext, label=<<I>level</I> = 1>];
+  { rank=same; jurdzinski_level_1; odd_0; odd_1; }
+  jurdzinski_level_3 -> jurdzinski_level_2 [style=invis, weight=100];
+  jurdzinski_level_2 -> jurdzinski_level_1 [style=invis, weight=100];
+}

@@ -31,7 +31,8 @@ static void usage(FILE *out, char *argv[static 1]) {
           "  -h, --help\n"
           "  --version                    print the program version\n"
           "  --player=both|even|odd       default: both\n"
-          "  --view=classic|tree-relative default: classic\n"
+          "  --view=classic|tree-relative|jurdzinski\n"
+          "                               default: classic\n"
           "  --labels=counts|sets|none    default: counts\n"
           "  --max-set-items=N            default: 32\n"
           "  --priority-mode=original|compact\n"
@@ -110,6 +111,8 @@ int main(int argc, char *argv[argc + 1]) {
         view = AD_DOT_VIEW_CLASSIC;
       } else if (strcmp(optarg, "tree-relative") == 0) {
         view = AD_DOT_VIEW_TREE_RELATIVE;
+      } else if (strcmp(optarg, "jurdzinski") == 0) {
+        view = AD_DOT_VIEW_JURDZINSKI;
       } else {
         fputs("Invalid --view value\n", stderr);
         return EXIT_USAGE;
@@ -232,7 +235,7 @@ int main(int argc, char *argv[argc + 1]) {
       pg_game_destroy(&game);
       return EXIT_SOLVER;
     }
-    if (view == AD_DOT_VIEW_TREE_RELATIVE) {
+    if (view == AD_DOT_VIEW_TREE_RELATIVE || view == AD_DOT_VIEW_JURDZINSKI) {
       for (size_t candidate = 0; candidate < 2; candidate++) {
         if (result.decomposition[candidate] != nullptr &&
             !ad_tree_relative_verify(&game, &result.winning[candidate],

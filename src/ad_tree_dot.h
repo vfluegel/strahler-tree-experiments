@@ -21,6 +21,7 @@ typedef enum {
 typedef enum {
   AD_DOT_VIEW_CLASSIC,
   AD_DOT_VIEW_TREE_RELATIVE,
+  AD_DOT_VIEW_JURDZINSKI,
 } ADDotView;
 
 /* A non-null priority map translates stored compact bounds back to the input

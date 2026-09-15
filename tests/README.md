@@ -15,8 +15,9 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `test_zielonka.c` checks exact classic and tree-relative decomposition
   witnesses and metrics, verifies literal priority-gap wrappers, and compares
   fixed-seed random games with an exhaustive positional-strategy solver.
-- `test_ad_tree_dot.c` checks deterministic classic and tree-relative DOT,
-  priority-bound display, label modes, and invalid writer input.
+- `test_ad_tree_dot.c` checks deterministic classic, tree-relative, and
+  Jurdziński DOT, priority-level display, label modes, and invalid writer
+  input.
 - `run-single-test.sh` runs one command-line golden comparison, accepting
   literal standard input or an `@file` input source.
 - `run-regression.sh` regenerates or checks the complete golden suite.
@@ -61,12 +62,14 @@ priority.
 `pg2adot` keeps proof metadata in an attractor-decomposition witness. Its DOT
 tree contains only recursive child decompositions: top attractors are node
 metadata, while traps and child attractors are edge metadata. Count and set
-goldens cover both the classic and tree-relative views and are parsed by
-Graphviz during the Meson suite. In the tree-relative view, each node is
+goldens cover the classic, tree-relative, and Jurdziński views and are parsed
+by Graphviz during the Meson suite. In the tree-relative view, each node is
 checked as the partition `V = H + T + R_1 + ... + R_k + S`, with every `R_i`
-a trap for the other player in the current residual game. The solver and
-verifier use compact priorities; the DOT writer can translate bounds back to
-the input priority scale without changing the verified witness.
+a trap for the other player in the current residual game. The Jurdziński view
+uses the same checked partition to expand the witness into `leafy(T)`, with
+visible level ranks and empty added leaves omitted. The solver and verifier
+use compact priorities; the DOT writer can show the corresponding source
+bounds without changing the verified witness.
 
 ## Running the suite
 

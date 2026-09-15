@@ -78,8 +78,8 @@ attractor decompositions, and write them as DOT. Pass a file name, `-`, or no
 file name; the latter two read from standard input.
 
 - `--player=both|even|odd` selects the trees to print.
-- `--view=classic|tree-relative` selects the notation used for the
-  decomposition. The default is `classic`.
+- `--view=classic|tree-relative|jurdzinski` selects how the decomposition is
+  drawn. The default is `classic`.
 - `--labels=counts|sets|none` selects the node and edge labels.
 - `--max-set-items=N` limits the number of vertices shown in a set label.
 - `--priority-mode=original|compact` selects the priority bounds shown in the
@@ -168,6 +168,37 @@ name in the prose definition in Section 6.1 points in the opposite direction.
 For example, the first child in `ordered_two_children.pg` is shown as
 `R_1={1,2}`. Its node has `V={1,2}`, `H={1}`, `T={}`, and `S={2}`.
 
+#### Jurdziński view
+
+`--view=jurdzinski` expands the decomposition into the `leafy(T)` shape from
+the attractor-decomposition lifting description. It uses simple labels rather
+than tables and places the nodes on labelled priority levels.
+
+For an Even decomposition:
+
+- A box at even level `d` contains `H`, the vertices whose priority is exactly
+  `d`.
+- The `−∞` ellipse one level below contains `T`, the rest of the attractor to
+  `H`.
+- A numbered box is a recursive child two levels below its parent.
+- The `i+` ellipse immediately after child `i` contains `S_i`, the part of the
+  child's attractor outside its recursive subgame.
+
+Thus boxes contain vertices of their exact level, while ellipses may contain
+vertices of that level or lower. Odd decompositions use the same construction
+with the parities reversed. Empty added leaves are omitted from the drawing.
+A box with no numbered children has no `S_i` ellipses, but it may still have a
+nonempty `T` ellipse one level below it.
+The root summary reports the size and Strahler number of the base tree `T`,
+before these leaves are added.
+
+The row labels use the compact levels that define the tree, so adjacent rows
+differ by one. With the default `--priority-mode=original`, a row also shows
+its source priority bound when that number differs from its compact level.
+
+This view displays the decomposition produced by the Zielonka solver; it does
+not run the lifting algorithm.
+
 </details>
 
 ```sh
@@ -177,6 +208,8 @@ For example, the first child in `ordered_two_children.pg` is shown as
   | dot -Tsvg > decomposition.svg
 ./build/pg2adot --view=tree-relative --labels=sets game.pg \
   | dot -Tsvg > tree-relative.svg
+./build/pg2adot --view=jurdzinski --labels=sets game.pg \
+  | dot -Tsvg > jurdzinski.svg
 ```
 
 The repository includes small sample games under `tests/games/`, for example:

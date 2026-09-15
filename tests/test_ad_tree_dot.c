@@ -84,6 +84,38 @@ int main(void) {
   free(relative_again);
   free(relative);
 
+  char *jurdzinski =
+      render(&game, &result, AD_DOT_PLAYER_BOTH, AD_DOT_VIEW_JURDZINSKI,
+             AD_DOT_LABEL_SETS, 1, &priority_map);
+  char *jurdzinski_again =
+      render(&game, &result, AD_DOT_PLAYER_BOTH, AD_DOT_VIEW_JURDZINSKI,
+             AD_DOT_LABEL_SETS, 1, &priority_map);
+  assert(strcmp(jurdzinski, jurdzinski_again) == 0);
+  assert(strstr(jurdzinski, "<TABLE") == nullptr);
+  assert(strstr(jurdzinski, "<I>H</I> = {10}") != nullptr);
+  assert(strstr(jurdzinski, "<I>H</I> = {1000}") != nullptr);
+  assert(strstr(jurdzinski,
+                "jurdzinski_level_3 [shape=plaintext, "
+                "label=<<I>level</I> = 3<BR/><FONT POINT-SIZE=\"9\">"
+                "source bound = 101</FONT>>") != nullptr);
+  assert(strstr(jurdzinski,
+                "jurdzinski_level_2 [shape=plaintext, "
+                "label=<<I>level</I> = 2<BR/><FONT POINT-SIZE=\"9\">"
+                "source bound = 100</FONT>>") != nullptr);
+  assert(strstr(jurdzinski, "minlen=2") != nullptr);
+  assert(strstr(jurdzinski, "_mininf") == nullptr);
+  assert(strstr(jurdzinski, "_plus") == nullptr);
+  free(jurdzinski_again);
+  free(jurdzinski);
+
+  char *jurdzinski_none =
+      render(&game, &result, AD_DOT_PLAYER_ODD, AD_DOT_VIEW_JURDZINSKI,
+             AD_DOT_LABEL_NONE, 0, nullptr);
+  assert(strstr(jurdzinski_none, "<I>H</I>") != nullptr);
+  assert(strstr(jurdzinski_none, "label=<&minus;&infin;>") == nullptr);
+  assert(strstr(jurdzinski_none, "label=<1>") == nullptr);
+  free(jurdzinski_none);
+
   char *none = render(&game, &result, AD_DOT_PLAYER_EVEN,
                       AD_DOT_VIEW_TREE_RELATIVE, AD_DOT_LABEL_NONE, 0, nullptr);
   assert(strstr(none, "<B>Even</B> <I>d</I> = 2") != nullptr);
@@ -94,6 +126,46 @@ int main(void) {
   assert(!ad_tree_write_dot(nullptr, &game, &result, AD_DOT_PLAYER_BOTH,
                             AD_DOT_VIEW_CLASSIC, AD_DOT_LABEL_COUNTS, 1,
                             nullptr));
+  assert(pg_priority_map_restore(&priority_map, &game));
+  zielonka_result_destroy(&result);
+  pg_set_destroy(&domain);
+  pg_priority_map_destroy(&priority_map);
+  pg_game_destroy(&game);
+
+  stream = tmpfile();
+  assert(stream != nullptr);
+  source = "parity 1;\n"
+           "0 2 0 0 \"highest\";\n"
+           "1 0 0 0 \"top attractor\";\n";
+  assert(fwrite(source, 1, strlen(source), stream) == strlen(source));
+  assert(fseek(stream, 0, SEEK_SET) == 0);
+  game = (PGGame){0};
+  assert(pg_game_read(stream, &game, &parse_error));
+  assert(fclose(stream) == 0);
+  assert(pg_priority_map_build(&game, &priority_map));
+  assert(pg_priority_map_apply(&priority_map, &game));
+  domain = (PGSet){0};
+  assert(pg_set_init(&domain, game.vertex_count));
+  pg_set_fill(&domain);
+  result = (ZielonkaResult){0};
+  assert(
+      zielonka_decompose(&game, &domain, game.max_priority, &result, &error));
+  assert(zielonka_result_verify(&game, &domain, &result, &verify_error));
+  assert(ad_tree_relative_verify(&game, &result.winning[PG_EVEN],
+                                 result.decomposition[PG_EVEN], &verify_error));
+
+  jurdzinski =
+      render(&game, &result, AD_DOT_PLAYER_EVEN, AD_DOT_VIEW_JURDZINSKI,
+             AD_DOT_LABEL_SETS, 32, &priority_map);
+  assert(strstr(jurdzinski, "even [label=<<B>Even</B><BR/><I>H</I> = {0}") !=
+         nullptr);
+  assert(strstr(jurdzinski,
+                "even_mininf [shape=ellipse, label=<<I>T</I> = {1}>") !=
+         nullptr);
+  assert(strstr(jurdzinski,
+                "{ rank=same; jurdzinski_level_1; even_mininf; }") != nullptr);
+  free(jurdzinski);
+
   assert(pg_priority_map_restore(&priority_map, &game));
   zielonka_result_destroy(&result);
   pg_set_destroy(&domain);

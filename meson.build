@@ -421,6 +421,36 @@ test(
 )
 
 test(
+  'pg2adot_jurdzinski_counts',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_jurdzinski_counts.out',
+    'tests/actual/pg2adot_jurdzinski_counts.out',
+    'EMPTY',
+    '--view=jurdzinski',
+    files('tests/games/ordered_two_children.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_jurdzinski_sets',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_jurdzinski_sets.out',
+    'tests/actual/pg2adot_jurdzinski_sets.out',
+    'EMPTY',
+    '--view=jurdzinski',
+    '--labels=sets',
+    '--max-set-items=1',
+    files('tests/games/ordered_two_children.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
   'pg2adot_gap_original_priorities',
   run_single_test,
   args : [
@@ -606,6 +636,26 @@ if dot_program.found()
       '-o',
       '/dev/null',
       files('tests/golden/pg2adot_tree_relative_sets.out'),
+    ],
+  )
+  test(
+    'pg2adot_jurdzinski_counts_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_jurdzinski_counts.out'),
+    ],
+  )
+  test(
+    'pg2adot_jurdzinski_sets_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_jurdzinski_sets.out'),
     ],
   )
   test(
