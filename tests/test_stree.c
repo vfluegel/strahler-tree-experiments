@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,6 +12,9 @@ static void test_count_leaves(void) {
   assert(stree_count_leaves(0, 1, 2) == 0);
   assert(stree_count_leaves(2, -1, 2) == 0);
   assert(stree_count_leaves(3, 1, 2) == 0);
+  /* Large trees saturate instead of wrapping around. */
+  assert(stree_count_leaves(6, 20, 12) == UINT_MAX);
+  assert(stree_leaf_label(6, 20, 12, 1) == nullptr);
 }
 
 static void test_leaf_label(void) {

@@ -5,13 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ad_lift_solve.h"
 #include "ad_tree_dot.h"
 #include "zielonka.h"
 
 [[nodiscard]] static char *
-render(PGGame const *game, ZielonkaResult const *result,
-       ADDotPlayer const player, ADDotView const view, ADDotLabels const labels,
-       size_t const max_items, PGPriorityMap const *priority_map) {
+render(PGGame const *game, ADResult const *result, ADDotPlayer const player,
+       ADDotView const view, ADDotLabels const labels, size_t const max_items,
+       PGPriorityMap const *priority_map) {
   char *buffer = nullptr;
   size_t length = 0;
   FILE *stream = open_memstream(&buffer, &length);
@@ -21,6 +22,77 @@ render(PGGame const *game, ZielonkaResult const *result,
   assert(fclose(stream) == 0);
   assert(buffer != nullptr && length == strlen(buffer));
   return buffer;
+}
+
+/* A restricted host certifies only part of Even's winning region. Partial
+ * roots are dominions D, never winning regions W, and the rest is shown as
+ * unresolved rather than given to the opponent. */
+static void test_partial_rendering(void) {
+  FILE *stream = tmpfile();
+  assert(stream != nullptr);
+  char const *source = "0 2 0 3;\n1 2 1 2;\n2 0 1 1,4;\n3 0 0 3;\n4 3 1 3;\n";
+  assert(fwrite(source, 1, strlen(source), stream) == strlen(source));
+  assert(fseek(stream, 0, SEEK_SET) == 0);
+  PGGame game = {0};
+  PGParseError parse_error = {0};
+  assert(pg_game_read(stream, &game, &parse_error));
+  assert(fclose(stream) == 0);
+  PGSet domain = {0};
+  assert(pg_set_init(&domain, game.vertex_count));
+  pg_set_fill(&domain);
+  ADLiftOptions const options = {
+      .mode = AD_LIFT_HOST_STRAHLER,
+      .k = 1,
+      .max_host_leaves = 1000,
+      .verify = true,
+  };
+  ADResult result = {0};
+  ADLiftError error = {0};
+  assert(ad_lift_solve(&game, &domain, &options, &result, nullptr, &error));
+  assert(result.kind == AD_RESULT_PARTIAL);
+
+  char *classic = render(&game, &result, AD_DOT_PLAYER_BOTH,
+                         AD_DOT_VIEW_CLASSIC, AD_DOT_LABEL_SETS, 32, nullptr);
+  assert(strstr(classic, "result (synthetic; partial)") != nullptr);
+  assert(strstr(classic, "<I>D</I> = {0,3,4}") != nullptr);
+  assert(strstr(classic, "|<I>D</I>| = 3") != nullptr);
+  assert(strstr(classic, "<I>W</I> = {0,3,4}") == nullptr);
+  assert(strstr(classic, "<I>W</I> = {0,3}") != nullptr);
+  assert(strstr(classic, "<I>D</I> = empty; no certified dominion") != nullptr);
+  assert(strstr(classic, "<B>Unresolved</B>: <I>U</I> = {1,2}") != nullptr);
+  assert(strstr(classic, "result -> unresolved [style=dashed]") != nullptr);
+  free(classic);
+
+  char *relative =
+      render(&game, &result, AD_DOT_PLAYER_BOTH, AD_DOT_VIEW_TREE_RELATIVE,
+             AD_DOT_LABEL_COUNTS, 32, nullptr);
+  assert(strstr(relative, "|<I>D</I>| = 3") != nullptr);
+  assert(strstr(relative, "|<I>V</I>| = 3") != nullptr);
+  assert(strstr(relative, "<B>Unresolved</B>: |<I>U</I>| = 2") != nullptr);
+  free(relative);
+
+  char *jurdzinski =
+      render(&game, &result, AD_DOT_PLAYER_BOTH, AD_DOT_VIEW_JURDZINSKI,
+             AD_DOT_LABEL_NONE, 32, nullptr);
+  assert(strstr(jurdzinski, "<B>Even dominion</B>") != nullptr);
+  assert(strstr(jurdzinski, "unresolved [style=dashed, label=<<B>Unresolved"
+                            "</B>>]") != nullptr);
+  free(jurdzinski);
+
+  /* A single player never shows the unresolved summary. */
+  char *even = render(&game, &result, AD_DOT_PLAYER_EVEN, AD_DOT_VIEW_CLASSIC,
+                      AD_DOT_LABEL_COUNTS, 32, nullptr);
+  assert(strstr(even, "unresolved") == nullptr);
+  assert(strstr(even, "|<I>D</I>| = 3") != nullptr);
+  free(even);
+  char *odd = render(&game, &result, AD_DOT_PLAYER_ODD, AD_DOT_VIEW_JURDZINSKI,
+                     AD_DOT_LABEL_COUNTS, 32, nullptr);
+  assert(strstr(odd, "<I>D</I> = empty; no certified dominion") != nullptr);
+  free(odd);
+
+  ad_result_destroy(&result);
+  pg_set_destroy(&domain);
+  pg_game_destroy(&game);
 }
 
 int main(void) {
@@ -41,15 +113,15 @@ int main(void) {
   PGSet domain = {0};
   assert(pg_set_init(&domain, game.vertex_count));
   pg_set_fill(&domain);
-  ZielonkaResult result = {0};
+  ADResult result = {0};
   ZielonkaError error = {0};
   assert(
       zielonka_decompose(&game, &domain, game.max_priority, &result, &error));
   ADVerifyError verify_error = {0};
-  assert(zielonka_result_verify(&game, &domain, &result, &verify_error));
+  assert(ad_result_verify_complete(&game, &domain, &result, &verify_error));
   for (size_t player = 0; player < 2; player++) {
     if (result.decomposition[player] != nullptr) {
-      assert(ad_tree_relative_verify(&game, &result.winning[player],
+      assert(ad_tree_relative_verify(&game, &result.region[player],
                                      result.decomposition[player],
                                      &verify_error));
     }
@@ -127,7 +199,7 @@ int main(void) {
                             AD_DOT_VIEW_CLASSIC, AD_DOT_LABEL_COUNTS, 1,
                             nullptr));
   assert(pg_priority_map_restore(&priority_map, &game));
-  zielonka_result_destroy(&result);
+  ad_result_destroy(&result);
   pg_set_destroy(&domain);
   pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
@@ -147,11 +219,11 @@ int main(void) {
   domain = (PGSet){0};
   assert(pg_set_init(&domain, game.vertex_count));
   pg_set_fill(&domain);
-  result = (ZielonkaResult){0};
+  result = (ADResult){0};
   assert(
       zielonka_decompose(&game, &domain, game.max_priority, &result, &error));
-  assert(zielonka_result_verify(&game, &domain, &result, &verify_error));
-  assert(ad_tree_relative_verify(&game, &result.winning[PG_EVEN],
+  assert(ad_result_verify_complete(&game, &domain, &result, &verify_error));
+  assert(ad_tree_relative_verify(&game, &result.region[PG_EVEN],
                                  result.decomposition[PG_EVEN], &verify_error));
 
   jurdzinski =
@@ -167,9 +239,11 @@ int main(void) {
   free(jurdzinski);
 
   assert(pg_priority_map_restore(&priority_map, &game));
-  zielonka_result_destroy(&result);
+  ad_result_destroy(&result);
   pg_set_destroy(&domain);
   pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
+
+  test_partial_rendering();
   return 0;
 }

@@ -11,18 +11,31 @@ Meson builds the C unit tests and runs the command-line regression cases.
   canonical round trips, and malformed inputs.
 - `test_pg_set.c` tests the owned dense-index bitset and its move semantics.
 - `test_pg_attractor.c` compares the predecessor-queue attractor against an
-  independent fixed-point implementation on fixed and random subgames.
+  independent fixed-point implementation on fixed and random subgames, and
+  does the same for the reach-through-safe attractor with non-total safe sets,
+  including unsafe player and opponent exits.
+- `test_ad_lift_tree.c` checks the flattened `leafy_∞(T)` host: position order,
+  levels, subtree blocks, `after`, `−∞`, `c+`, top, priority compatibility,
+  and the skipping next-compatible search against a linear scan on Strahler
+  hosts.
+- `test_ad_lift.c` checks the lifting solver on the sample games, compares
+  full-host regions with the exhaustive solver and with Zielonka on random
+  games, checks that restricted Strahler hosts give subsets of the winning
+  regions, compares the round and single-vertex schedules, exercises the direct
+  labelling verifier and materialization failures, and covers adaptive, tree,
+  and host-limit modes.
 - `test_zielonka.c` checks exact classic and tree-relative decomposition
   witnesses and metrics, verifies literal priority-gap wrappers, and compares
   fixed-seed random games with an exhaustive positional-strategy solver.
 - `test_ad_tree_dot.c` checks deterministic classic, tree-relative, and
-  Jurdziński DOT, priority-level display, label modes, and invalid writer
-  input.
+  Jurdziński DOT, priority-level display, label modes, partial results with
+  dominions and unresolved vertices, and invalid writer input.
 - `run-single-test.sh` runs one command-line golden comparison, accepting
   literal standard input or an `@file` input source.
 - `run-regression.sh` regenerates or checks the complete golden suite.
 - `run-with-input.sh` supplies a file on standard input for smoke tests.
 - `games/` contains parser and solver fixtures.
+- `trees/` contains leaf-stream host trees for `pg2adot --tree-file`.
 - `golden/` contains expected command output.
 - `actual/` receives ignored output from the current test run.
 
@@ -70,6 +83,13 @@ uses the same checked partition to expand the witness into `leafy(T)`, with
 visible level ranks and empty added leaves omitted. The solver and verifier
 use compact priorities; the DOT writer can show the corresponding source
 bounds without changing the verified witness.
+
+The goldens come from the lifting solver unless they name Zielonka. On
+`ordered_two_children.pg` and the priority-gap games, lifting and Zielonka
+produce identical DOT, so `pg2adot_counts.out` also serves as the legacy
+Zielonka regression. `lifted_shape.pg` shows a game where the least lifted
+decomposition differs from the Zielonka one. `strahler_two.pg` needs a
+Strahler-2 decomposition for Even, so `--tree-k=1` gives a partial result.
 
 ## Running the suite
 

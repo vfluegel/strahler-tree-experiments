@@ -25,11 +25,12 @@ typedef enum {
 } ADDotView;
 
 /* A non-null priority map translates stored compact bounds back to the input
- * priority scale without modifying the decomposition. */
+ * priority scale without modifying the decomposition. A partial result labels
+ * its roots as dominions D rather than winning regions W and, when both
+ * players are shown, summarizes the unresolved vertices separately. */
 [[nodiscard]]
-bool ad_tree_write_dot(FILE *out, PGGame const *game,
-                       ZielonkaResult const *result, ADDotPlayer player,
-                       ADDotView view, ADDotLabels labels, size_t max_set_items,
-                       PGPriorityMap const *priority_map);
+bool ad_tree_write_dot(FILE *out, PGGame const *game, ADResult const *result,
+                       ADDotPlayer player, ADDotView view, ADDotLabels labels,
+                       size_t max_set_items, PGPriorityMap const *priority_map);
 
 #endif

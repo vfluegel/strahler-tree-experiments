@@ -1,0 +1,16 @@
+Adaptive K: complete at K=2 (Even complete at K=2, Odd complete at K=1)
+lifting: vertices=5 t=2 result=complete
+lifting: first_complete_k=2 even_first_full_k=2 odd_first_full_k=1 budget_exhausted=no
+lifting even: root_level=4 H=3 k_full=3 K=2 host_nodes=37 host_leaves=21 positions=111 rounds=6 lifts=12 top=0 dominion=5 tree_nodes=4 tree_leaves=2 tree_height=3 strahler=2
+lifting odd: root_level=3 H=2 k_full=2 K=2 host_nodes=8 host_leaves=7 positions=24 rounds=31 lifts=47 top=5 dominion=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
+digraph attractor_decompositions {
+  graph [rankdir=TB, ordering=out];
+  node [shape=box];
+  even [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 4</TD></TR></TABLE>>];
+  even -> even_0;
+  even_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 2</TD></TR></TABLE>>];
+  even_0 -> even_0_0;
+  even_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 0</TD></TR></TABLE>>];
+  even -> even_1;
+  even_1 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 2</TD></TR></TABLE>>];
+}

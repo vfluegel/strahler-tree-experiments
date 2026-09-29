@@ -1,0 +1,15 @@
+digraph attractor_decompositions {
+  graph [rankdir=TB, ordering=out];
+  node [shape=box];
+  result [label="result (synthetic; partial)"];
+  result -> even;
+  even [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 4</TD></TR><TR><TD>|<I>D</I>| = 3</TD><TD>|<I>H</I>| = 0</TD></TR><TR><TD>|<I>T</I>| = 0</TD><TD>|<I>S</I>| = 0</TD></TR><TR><TD>nodes = 3</TD><TD>leaves = 1</TD></TR><TR><TD>height = 3</TD><TD>Strahler = 1</TD></TR></TABLE>>];
+  even -> even_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD><I>i</I> = 1</TD></TR><TR><TD>|<I>R</I><SUB><I>i</I></SUB>| = 3</TD></TR></TABLE>>];
+  even_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 2</TD></TR><TR><TD>|<I>V</I>| = 3</TD><TD>|<I>H</I>| = 1</TD></TR><TR><TD>|<I>T</I>| = 0</TD><TD>|<I>S</I>| = 1</TD></TR></TABLE>>];
+  even_0 -> even_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD><I>i</I> = 1</TD></TR><TR><TD>|<I>R</I><SUB><I>i</I></SUB>| = 1</TD></TR></TABLE>>];
+  even_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 0</TD></TR><TR><TD>|<I>V</I>| = 1</TD><TD>|<I>H</I>| = 1</TD></TR><TR><TD>|<I>T</I>| = 0</TD><TD>|<I>S</I>| = 0</TD></TR></TABLE>>];
+  odd_empty [label=<<B>Odd</B>: <I>D</I> = empty; no certified dominion>];
+  result -> odd_empty;
+  unresolved [style=dashed, label=<<B>Unresolved</B>: |<I>U</I>| = 2>];
+  result -> unresolved [style=dashed];
+}

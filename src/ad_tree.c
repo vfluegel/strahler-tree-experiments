@@ -58,15 +58,16 @@ bool ad_node_append_child(ADNode *parent, ADChild *child) {
   return true;
 }
 
-void zielonka_result_destroy(ZielonkaResult *result) {
+void ad_result_destroy(ADResult *result) {
   if (result == nullptr) {
     return;
   }
   for (size_t player = 0; player < 2; player++) {
-    pg_set_destroy(&result->winning[player]);
+    pg_set_destroy(&result->region[player]);
     ad_node_destroy(result->decomposition[player]);
   }
-  *result = (ZielonkaResult){0};
+  pg_set_destroy(&result->unresolved);
+  *result = (ADResult){0};
 }
 
 ADTreeMetrics ad_tree_metrics(ADNode const *root) {
@@ -395,50 +396,78 @@ bool ad_tree_relative_verify(PGGame const *game, PGSet const *domain,
   return verify_tree_relative_node(game, domain, domain, root, error);
 }
 
-bool zielonka_result_verify(PGGame const *game, PGSet const *domain,
-                            ZielonkaResult const *result,
-                            ADVerifyError *error) {
+bool ad_result_verify_partial(PGGame const *game, PGSet const *domain,
+                              ADResult const *result, ADVerifyError *error) {
   if (error != nullptr) {
     *error = (ADVerifyError){0};
   }
   if (game == nullptr || domain == nullptr || result == nullptr ||
+      result->kind > AD_RESULT_PARTIAL ||
       domain->bit_count != game->vertex_count ||
-      result->winning[0].bit_count != game->vertex_count ||
-      result->winning[1].bit_count != game->vertex_count) {
+      result->region[0].bit_count != game->vertex_count ||
+      result->region[1].bit_count != game->vertex_count ||
+      result->unresolved.bit_count != game->vertex_count) {
     verify_error(error, "invalid result verifier input");
     return false;
   }
   PGSet intersection = {0};
-  PGSet combined = {0};
-  if (!pg_set_clone(&intersection, &result->winning[0]) ||
-      !pg_set_clone(&combined, &result->winning[0])) {
+  PGSet rest = {0};
+  if (!pg_set_clone(&intersection, &result->region[0]) ||
+      !pg_set_clone(&rest, domain)) {
     verify_error(error, "failed to allocate result verifier sets");
     goto failure;
   }
-  pg_set_intersect_into(&intersection, &result->winning[1]);
-  pg_set_union_into(&combined, &result->winning[1]);
-  if (!pg_set_empty(&intersection) || !pg_set_equal(&combined, domain)) {
-    verify_error(error, "winning regions do not partition the input domain");
+  pg_set_intersect_into(&intersection, &result->region[1]);
+  pg_set_subtract_into(&rest, &result->region[0]);
+  pg_set_subtract_into(&rest, &result->region[1]);
+  if (!pg_set_empty(&intersection) ||
+      !pg_set_subset(&result->region[0], domain) ||
+      !pg_set_subset(&result->region[1], domain) ||
+      !pg_set_equal(&rest, &result->unresolved)) {
+    verify_error(error, "regions and unresolved vertices do not partition the "
+                        "input domain");
     goto failure;
   }
   for (size_t player = 0; player < 2; player++) {
-    bool const empty = pg_set_empty(&result->winning[player]);
-    if ((result->decomposition[player] == nullptr) != empty ||
-        (!empty && (result->decomposition[player]->player != player ||
-                    !ad_tree_verify(game, &result->winning[player],
-                                    result->decomposition[player], error)))) {
-      if (error == nullptr || error->message[0] == '\0') {
-        verify_error(error, "winning region/decomposition mismatch");
-      }
+    PGSet const *region = &result->region[player];
+    bool const empty = pg_set_empty(region);
+    if ((result->decomposition[player] == nullptr) != empty) {
+      verify_error(error, "region/decomposition mismatch");
+      goto failure;
+    }
+    if (empty) {
+      continue;
+    }
+    /* A decomposition of the induced subgame certifies a dominion only if the
+     * opponent cannot leave the region. */
+    if (result->decomposition[player]->player != player ||
+        !trap_conditions(game, domain, region, (PGPlayer)player)) {
+      verify_error(error, "a region is not an opponent trap");
+      goto failure;
+    }
+    if (!ad_tree_verify(game, region, result->decomposition[player], error)) {
       goto failure;
     }
   }
   pg_set_destroy(&intersection);
-  pg_set_destroy(&combined);
+  pg_set_destroy(&rest);
   return true;
 
 failure:
   pg_set_destroy(&intersection);
-  pg_set_destroy(&combined);
+  pg_set_destroy(&rest);
   return false;
+}
+
+bool ad_result_verify_complete(PGGame const *game, PGSet const *domain,
+                               ADResult const *result, ADVerifyError *error) {
+  if (!ad_result_verify_partial(game, domain, result, error)) {
+    return false;
+  }
+  if (result->kind != AD_RESULT_COMPLETE ||
+      !pg_set_empty(&result->unresolved)) {
+    verify_error(error, "winning regions do not partition the input domain");
+    return false;
+  }
+  return true;
 }

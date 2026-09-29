@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,6 +15,15 @@ typedef struct Node {
   int h;
   char u;
 } Node;
+
+// Leaf counts saturate at UINT_MAX instead of wrapping around.
+[[nodiscard]] static unsigned saturating_leaf_sum(unsigned const repeated,
+                                                  unsigned const middle) {
+  if (repeated > (UINT_MAX - middle) / 2) {
+    return UINT_MAX;
+  }
+  return repeated * 2 + middle;
+}
 
 /**
  * FIXME: The DFS traversal/generation in this function is used again, almost
@@ -76,7 +86,7 @@ static unsigned count_leaves_with_cache(
       unsigned child1 = tree[VTREE][tos.k][tos.t - 1][tos.h];
       unsigned child2 = tree[UTREE][tos.k - 1][tos.t][tos.h - 1];
       if (child1 > 0 && child2 > 0) {
-        tree[VTREE][tos.k][tos.t][tos.h] = child1 * 2 + child2;
+        tree[VTREE][tos.k][tos.t][tos.h] = saturating_leaf_sum(child1, child2);
         lens--; // pop
       } else {
         node.u = VTREE;
@@ -106,7 +116,7 @@ static unsigned count_leaves_with_cache(
       unsigned child1 = tree[VTREE][tos.k][tos.t][tos.h];
       unsigned child2 = tree[UTREE][tos.k][tos.t][tos.h - 1];
       if (child1 > 0 && child2 > 0) {
-        tree[UTREE][tos.k][tos.t][tos.h] = child1 * 2 + child2;
+        tree[UTREE][tos.k][tos.t][tos.h] = saturating_leaf_sum(child1, child2);
         lens--; // pop
       } else {
         node.u = VTREE;
@@ -230,7 +240,7 @@ char *stree_leaf_label(int const k, int const t, int const h, int const lth) {
   }
   unsigned const total =
       count_leaves_with_cache(UTREE, k, t, h, k, t, h, count_cache);
-  if (total == 0 || (unsigned)lth > total) {
+  if (total == 0 || total == UINT_MAX || (unsigned)lth > total) {
     free(count_cache);
     return nullptr;
   }

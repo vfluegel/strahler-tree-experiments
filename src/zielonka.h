@@ -12,6 +12,6 @@ typedef struct {
 
 [[nodiscard]]
 bool zielonka_decompose(PGGame const *game, PGSet const *domain, uint64_t bound,
-                        ZielonkaResult *result, ZielonkaError *error);
+                        ADResult *result, ZielonkaError *error);
 
 #endif

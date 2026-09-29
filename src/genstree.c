@@ -218,6 +218,10 @@ int main(int argc, char *argv[argc + 1]) {
       fputs("L exceeds the number of leaves\n", stderr);
       return USAGE_ERROR;
     }
+    if (total == UINT_MAX) {
+      fputs("The tree has too many leaves to index\n", stderr);
+      return EXIT_FAILURE;
+    }
     char *label = stree_leaf_label(k, t, h, leaf_number);
     if (label == nullptr) {
       fputs("Failed to allocate leaf label\n", stderr);
@@ -230,7 +234,8 @@ int main(int argc, char *argv[argc + 1]) {
   }
 
   if (just_count) {
-    printf("U^%d_{%d,%d} has %u leaves\n", k, t, h, total);
+    printf("U^%d_{%d,%d} has %s%u leaves\n", k, t, h,
+           total == UINT_MAX ? "at least " : "", total);
     return EXIT_SUCCESS;
   }
 

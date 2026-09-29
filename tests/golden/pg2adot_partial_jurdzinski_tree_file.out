@@ -1,0 +1,23 @@
+digraph attractor_decompositions {
+  graph [rankdir=TB, ordering=out, newrank=true];
+  node [shape=box];
+  result [label="result (synthetic; partial)"];
+  even_empty [label=<<B>Even</B>: <I>D</I> = empty; no certified dominion>];
+  result -> even_empty;
+  result -> odd;
+  odd [label=<<B>Odd dominion</B><BR/><I>H</I> = {}<BR/><FONT POINT-SIZE="10">base tree: 2 nodes; 1 leaf; height 2; Strahler 1</FONT>>];
+  odd -> odd_0 [label=<1>, minlen=2];
+  odd -> odd_0_plus [label=<1<SUP>+</SUP>>];
+  odd_0_plus [shape=ellipse, label=<<I>S</I><SUB>1</SUB> = {2}>];
+  odd_0 [label=<<I>H</I> = {1}>];
+  unresolved [style=dashed, label=<<B>Unresolved</B>: <I>U</I> = {0}>];
+  result -> unresolved [style=dashed];
+  jurdzinski_level_3 [shape=plaintext, label=<<I>level</I> = 3>];
+  { rank=same; jurdzinski_level_3; odd; }
+  jurdzinski_level_2 [shape=plaintext, label=<<I>level</I> = 2>];
+  { rank=same; jurdzinski_level_2; odd_0_plus; }
+  jurdzinski_level_1 [shape=plaintext, label=<<I>level</I> = 1>];
+  { rank=same; jurdzinski_level_1; odd_0; }
+  jurdzinski_level_3 -> jurdzinski_level_2 [style=invis, weight=100];
+  jurdzinski_level_2 -> jurdzinski_level_1 [style=invis, weight=100];
+}

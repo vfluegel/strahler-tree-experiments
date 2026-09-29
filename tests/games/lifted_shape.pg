@@ -1,0 +1,6 @@
+parity 4;
+0 1 0 2 "bridge";
+1 0 0 2 "feeder";
+2 0 0 2 "loop";
+3 3 0 4 "odd high";
+4 0 1 0,4 "choice";

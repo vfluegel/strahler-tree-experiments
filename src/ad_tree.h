@@ -24,10 +24,22 @@ struct ADNode {
   ADChild *children;
 };
 
+typedef enum {
+  /* The two regions partition the domain, so they are the winning regions. */
+  AD_RESULT_COMPLETE,
+  /* The regions are disjoint certified dominions, and unresolved is the rest
+   * of the domain. Nothing is claimed about who wins there. */
+  AD_RESULT_PARTIAL,
+} ADResultKind;
+
+/* region[p] is decomposed by decomposition[p], which is nullptr exactly when
+ * the region is empty. */
 typedef struct {
-  PGSet winning[2];
+  PGSet region[2];
+  PGSet unresolved;
   ADNode *decomposition[2];
-} ZielonkaResult;
+  ADResultKind kind;
+} ADResult;
 
 typedef struct {
   size_t nodes;
@@ -53,7 +65,7 @@ void ad_node_destroy(ADNode *node);
 /* On success, ownership of all fields in child moves into parent. */
 [[nodiscard]] bool ad_node_append_child(ADNode *parent, ADChild *child);
 
-void zielonka_result_destroy(ZielonkaResult *result);
+void ad_result_destroy(ADResult *result);
 
 [[nodiscard]] ADTreeMetrics ad_tree_metrics(ADNode const *root);
 
@@ -75,9 +87,19 @@ void ad_tree_relative_parts_destroy(ADTreeRelativeParts *parts);
                                            ADNode const *root,
                                            ADVerifyError *error);
 
-[[nodiscard]] bool zielonka_result_verify(PGGame const *game,
-                                          PGSet const *domain,
-                                          ZielonkaResult const *result,
-                                          ADVerifyError *error);
+/* Each nonempty region must be an opponent trap in domain with a verified
+ * classic decomposition, the regions must be disjoint, and unresolved must be
+ * the rest of domain. Complete results pass as well. */
+[[nodiscard]] bool ad_result_verify_partial(PGGame const *game,
+                                            PGSet const *domain,
+                                            ADResult const *result,
+                                            ADVerifyError *error);
+
+/* The partial conditions, plus a complete kind and regions that partition
+ * domain. */
+[[nodiscard]] bool ad_result_verify_complete(PGGame const *game,
+                                             PGSet const *domain,
+                                             ADResult const *result,
+                                             ADVerifyError *error);
 
 #endif

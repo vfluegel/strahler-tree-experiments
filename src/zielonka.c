@@ -12,11 +12,11 @@ static void solver_error(ZielonkaError *error, char const *message) {
   }
 }
 
-[[nodiscard]] static bool initialize_result(ZielonkaResult *result,
+[[nodiscard]] static bool initialize_result(ADResult *result,
                                             size_t const vertex_count) {
-  *result = (ZielonkaResult){0};
-  return pg_set_init(&result->winning[PG_EVEN], vertex_count) &&
-         pg_set_init(&result->winning[PG_ODD], vertex_count);
+  *result = (ADResult){0};
+  return pg_set_init(&result->region[PG_EVEN], vertex_count) &&
+         pg_set_init(&result->region[PG_ODD], vertex_count);
 }
 
 [[nodiscard]] static bool domain_within_bound(PGGame const *game,
@@ -33,14 +33,14 @@ static void solver_error(ZielonkaError *error, char const *message) {
 
 [[nodiscard]] static bool solve(PGGame const *game, PGSet const *domain,
                                 uint64_t const bound, size_t const depth,
-                                ZielonkaResult *result, ZielonkaError *error) {
+                                ADResult *result, ZielonkaError *error) {
   if (depth > MAX_RECURSION_DEPTH) {
     solver_error(error, "priority depth exceeds the safe recursion depth");
     return false;
   }
   if (!initialize_result(result, game->vertex_count)) {
     solver_error(error, "failed to allocate winning-region sets");
-    zielonka_result_destroy(result);
+    ad_result_destroy(result);
     return false;
   }
   if (pg_set_empty(domain)) {
@@ -55,7 +55,7 @@ static void solver_error(ZielonkaError *error, char const *message) {
   if (bound == 0) {
     ADNode *node = ad_node_create(PG_EVEN, 0, game->vertex_count);
     if (node == nullptr || !pg_set_clone(&node->top_attractor, domain) ||
-        !pg_set_clone(&result->winning[PG_EVEN], domain)) {
+        !pg_set_clone(&result->region[PG_EVEN], domain)) {
       ad_node_destroy(node);
       solver_error(error, "failed to construct the bound-zero witness");
       goto failure;
@@ -83,7 +83,7 @@ static void solver_error(ZielonkaError *error, char const *message) {
     PGSet target = {0};
     PGSet alpha_attractor = {0};
     PGSet lower = {0};
-    ZielonkaResult recursive = {0};
+    ADResult recursive = {0};
     if (!pg_set_init(&target, game->vertex_count) ||
         !pg_set_clone(&lower, &residual)) {
       solver_error(error, "failed to allocate an iteration set");
@@ -104,7 +104,7 @@ static void solver_error(ZielonkaError *error, char const *message) {
       goto iteration_failure;
     }
 
-    if (pg_set_empty(&recursive.winning[beta])) {
+    if (pg_set_empty(&recursive.region[beta])) {
       ADNode *alpha_witness = recursive.decomposition[alpha];
       recursive.decomposition[alpha] = nullptr;
       if (alpha_witness == nullptr) {
@@ -125,8 +125,8 @@ static void solver_error(ZielonkaError *error, char const *message) {
         goto iteration_failure;
       }
       pg_set_subtract_into(&beta_region, &residual);
-      pg_set_move(&result->winning[alpha], &residual);
-      pg_set_move(&result->winning[beta], &beta_region);
+      pg_set_move(&result->region[alpha], &residual);
+      pg_set_move(&result->region[beta], &beta_region);
       result->decomposition[alpha] = alpha_witness;
       if (beta_accumulator->child_count == 0) {
         ad_node_destroy(beta_accumulator);
@@ -136,16 +136,16 @@ static void solver_error(ZielonkaError *error, char const *message) {
       pg_set_destroy(&target);
       pg_set_destroy(&alpha_attractor);
       pg_set_destroy(&lower);
-      zielonka_result_destroy(&recursive);
+      ad_result_destroy(&recursive);
       return true;
     }
 
     PGSet beta_attractor = {0};
     if (recursive.decomposition[beta] == nullptr ||
-        !pg_attractor(game, &residual, &recursive.winning[beta], beta,
+        !pg_attractor(game, &residual, &recursive.region[beta], beta,
                       &beta_attractor) ||
         pg_set_empty(&beta_attractor) ||
-        !pg_set_subset(&recursive.winning[beta], &beta_attractor) ||
+        !pg_set_subset(&recursive.region[beta], &beta_attractor) ||
         !pg_set_subset(&beta_attractor, &residual)) {
       solver_error(error, "invalid nonterminal opponent dominion");
       pg_set_destroy(&beta_attractor);
@@ -153,7 +153,7 @@ static void solver_error(ZielonkaError *error, char const *message) {
     }
     ADChild child = {.subtree = recursive.decomposition[beta]};
     recursive.decomposition[beta] = nullptr;
-    pg_set_move(&child.trap, &recursive.winning[beta]);
+    pg_set_move(&child.trap, &recursive.region[beta]);
     pg_set_move(&child.attractor, &beta_attractor);
     if (child.subtree->player != beta ||
         child.subtree->priority_bound != bound - 1 ||
@@ -177,20 +177,20 @@ static void solver_error(ZielonkaError *error, char const *message) {
     pg_set_destroy(&target);
     pg_set_destroy(&alpha_attractor);
     pg_set_destroy(&lower);
-    zielonka_result_destroy(&recursive);
+    ad_result_destroy(&recursive);
     continue;
 
   iteration_failure:
     pg_set_destroy(&target);
     pg_set_destroy(&alpha_attractor);
     pg_set_destroy(&lower);
-    zielonka_result_destroy(&recursive);
+    ad_result_destroy(&recursive);
     ad_node_destroy(beta_accumulator);
     pg_set_destroy(&residual);
     goto failure;
   }
 
-  if (!pg_set_clone(&result->winning[beta], domain)) {
+  if (!pg_set_clone(&result->region[beta], domain)) {
     solver_error(error, "failed to store the final opponent winning region");
     ad_node_destroy(beta_accumulator);
     pg_set_destroy(&residual);
@@ -201,12 +201,12 @@ static void solver_error(ZielonkaError *error, char const *message) {
   return true;
 
 failure:
-  zielonka_result_destroy(result);
+  ad_result_destroy(result);
   return false;
 }
 
 bool zielonka_decompose(PGGame const *game, PGSet const *domain,
-                        uint64_t const bound, ZielonkaResult *result,
+                        uint64_t const bound, ADResult *result,
                         ZielonkaError *error) {
   if (error != nullptr) {
     *error = (ZielonkaError){0};
@@ -220,6 +220,14 @@ bool zielonka_decompose(PGGame const *game, PGSet const *domain,
     solver_error(error, "priority depth exceeds the safe recursion depth");
     return false;
   }
-  *result = (ZielonkaResult){0};
-  return solve(game, domain, bound, 0, result, error);
+  *result = (ADResult){0};
+  if (!solve(game, domain, bound, 0, result, error)) {
+    return false;
+  }
+  if (!pg_set_init(&result->unresolved, game->vertex_count)) {
+    solver_error(error, "failed to allocate the unresolved set");
+    ad_result_destroy(result);
+    return false;
+  }
+  return true;
 }

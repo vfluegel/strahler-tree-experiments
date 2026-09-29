@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ad_lift_solve.h"
 #include "ad_tree_dot.h"
 #include "cli_version.h"
 #include "zielonka.h"
@@ -18,27 +19,44 @@ enum {
   EXIT_IO = 5,
 };
 
+enum { DEFAULT_MAX_HOST_LEAVES = 1000000 };
+
 typedef enum {
   PRIORITY_MODE_ORIGINAL,
   PRIORITY_MODE_COMPACT,
 } PriorityMode;
 
+typedef enum {
+  ALGORITHM_LIFTING,
+  ALGORITHM_ZIELONKA,
+} Algorithm;
+
 static void usage(FILE *out, char *argv[static 1]) {
   char *program = strrchr(argv[0], '/');
   program = program == nullptr ? argv[0] : program + 1;
-  fprintf(out,
-          "Usage: %s [OPTIONS] [FILE]\n"
-          "  -h, --help\n"
-          "  --version                    print the program version\n"
-          "  --player=both|even|odd       default: both\n"
-          "  --view=classic|tree-relative|jurdzinski\n"
-          "                               default: classic\n"
-          "  --labels=counts|sets|none    default: counts\n"
-          "  --max-set-items=N            default: 32\n"
-          "  --priority-mode=original|compact\n"
-          "                               default: original\n"
-          "  --no-verify\n",
-          program);
+  fprintf(
+      out,
+      "Usage: %s [OPTIONS] [FILE]\n"
+      "  -h, --help\n"
+      "  --version                    print the program version\n"
+      "  --player=both|even|odd       default: both\n"
+      "  --view=classic|tree-relative|jurdzinski\n"
+      "                               default: classic\n"
+      "  --labels=counts|sets|none    default: counts\n"
+      "  --max-set-items=N            default: 32\n"
+      "  --priority-mode=original|compact\n"
+      "                               default: original\n"
+      "  --algorithm=lifting|zielonka default: lifting\n"
+      "  --tree-k=K                   lift in U^K_{t,H}; may be partial\n"
+      "  --adaptive-k                 raise K until the result is "
+      "complete\n"
+      "  --start-k=K                  first K for --adaptive-k; default: 1\n"
+      "  --tree-file=FILE             lift in a leaf-stream host tree; may "
+      "be partial\n"
+      "  --max-host-leaves=N          default: %d\n"
+      "  --stats                      print lifting statistics to stderr\n"
+      "  --no-verify\n",
+      program, DEFAULT_MAX_HOST_LEAVES);
 }
 
 [[nodiscard]] static bool parse_size(char const *text, size_t *value) {
@@ -55,6 +73,79 @@ static void usage(FILE *out, char *argv[static 1]) {
   return true;
 }
 
+/* Read a whole file into a null-terminated string. */
+[[nodiscard]] static char *read_file(char const *path) {
+  FILE *stream = fopen(path, "rb");
+  if (stream == nullptr) {
+    return nullptr;
+  }
+  char *text = nullptr;
+  size_t length = 0;
+  size_t capacity = 0;
+  while (true) {
+    if (capacity - length < 2) {
+      size_t const grown = capacity == 0 ? 4096 : capacity * 2;
+      char *resized = grown < capacity ? nullptr : realloc(text, grown);
+      if (resized == nullptr) {
+        free(text);
+        (void)fclose(stream);
+        return nullptr;
+      }
+      text = resized;
+      capacity = grown;
+    }
+    size_t const read = fread(text + length, 1, capacity - length - 1, stream);
+    length += read;
+    if (read == 0) {
+      break;
+    }
+  }
+  bool const failed = ferror(stream) != 0;
+  if (fclose(stream) != 0 || failed) {
+    free(text);
+    return nullptr;
+  }
+  text[length] = '\0';
+  return text;
+}
+
+static void write_stats(ADLiftSolveStats const *stats,
+                        ADLiftOptions const *options, ADResult const *result) {
+  fprintf(stderr, "lifting: vertices=%zu t=%zu result=%s\n", stats->vertices,
+          stats->t,
+          result->kind == AD_RESULT_COMPLETE ? "complete" : "partial");
+  if (options->mode == AD_LIFT_HOST_ADAPTIVE) {
+    fprintf(stderr,
+            "lifting: first_complete_k=%zu even_first_full_k=%zu "
+            "odd_first_full_k=%zu budget_exhausted=%s\n",
+            stats->first_complete_k, stats->player[PG_EVEN].first_full_k,
+            stats->player[PG_ODD].first_full_k,
+            stats->budget_exhausted ? "yes" : "no");
+  }
+  if (stats->vertices == 0) {
+    return;
+  }
+  for (size_t player = 0; player < 2; player++) {
+    ADLiftPlayerStats const *current = stats->player + player;
+    fprintf(stderr, "lifting %s: root_level=%" PRIu64 " H=%zu k_full=%zu K=",
+            player == PG_EVEN ? "even" : "odd", current->root_level,
+            current->height, current->k_full);
+    if (options->mode == AD_LIFT_HOST_TREE) {
+      fputs("file", stderr);
+    } else {
+      fprintf(stderr, "%zu", current->k);
+    }
+    fprintf(stderr,
+            " host_nodes=%zu host_leaves=%zu positions=%zu rounds=%zu "
+            "lifts=%zu top=%zu dominion=%zu tree_nodes=%zu tree_leaves=%zu "
+            "tree_height=%zu strahler=%zu\n",
+            current->host_nodes, current->host_leaves, current->host_positions,
+            current->lift.rounds, current->lift.lifts, current->lift.top_count,
+            pg_set_count(&result->region[player]), current->tree.nodes,
+            current->tree.leaves, current->tree.height, current->tree.strahler);
+  }
+}
+
 int main(int argc, char *argv[argc + 1]) {
   int const version_status =
       cli_handle_version_argument(argc, argv[0], argc > 1 ? argv[1] : nullptr);
@@ -69,6 +160,13 @@ int main(int argc, char *argv[argc + 1]) {
     OPTION_MAX_ITEMS,
     OPTION_PRIORITY_MODE,
     OPTION_NO_VERIFY,
+    OPTION_ALGORITHM,
+    OPTION_TREE_K,
+    OPTION_ADAPTIVE_K,
+    OPTION_START_K,
+    OPTION_TREE_FILE,
+    OPTION_MAX_HOST_LEAVES,
+    OPTION_STATS,
   };
   static struct option const options[] = {
       {"help", no_argument, nullptr, 'h'},
@@ -78,6 +176,13 @@ int main(int argc, char *argv[argc + 1]) {
       {"max-set-items", required_argument, nullptr, OPTION_MAX_ITEMS},
       {"priority-mode", required_argument, nullptr, OPTION_PRIORITY_MODE},
       {"no-verify", no_argument, nullptr, OPTION_NO_VERIFY},
+      {"algorithm", required_argument, nullptr, OPTION_ALGORITHM},
+      {"tree-k", required_argument, nullptr, OPTION_TREE_K},
+      {"adaptive-k", no_argument, nullptr, OPTION_ADAPTIVE_K},
+      {"start-k", required_argument, nullptr, OPTION_START_K},
+      {"tree-file", required_argument, nullptr, OPTION_TREE_FILE},
+      {"max-host-leaves", required_argument, nullptr, OPTION_MAX_HOST_LEAVES},
+      {"stats", no_argument, nullptr, OPTION_STATS},
       {nullptr, 0, nullptr, 0},
   };
 
@@ -86,6 +191,19 @@ int main(int argc, char *argv[argc + 1]) {
   ADDotLabels labels = AD_DOT_LABEL_COUNTS;
   size_t max_set_items = 32;
   PriorityMode priority_mode = PRIORITY_MODE_ORIGINAL;
+  Algorithm algorithm = ALGORITHM_LIFTING;
+  ADLiftOptions lift_options = {
+      .mode = AD_LIFT_HOST_FULL,
+      .max_host_leaves = DEFAULT_MAX_HOST_LEAVES,
+      .schedule = AD_LIFT_SCHEDULE_ROUNDS,
+      .verify = true,
+  };
+  size_t host_options = 0;
+  bool lifting_options = false;
+  bool start_k_given = false;
+  size_t start_k = 1;
+  char const *tree_path = nullptr;
+  bool print_stats = false;
   bool verify = true;
   opterr = 0;
   int option = 0;
@@ -149,6 +267,55 @@ int main(int argc, char *argv[argc + 1]) {
     case OPTION_NO_VERIFY:
       verify = false;
       break;
+    case OPTION_ALGORITHM:
+      if (strcmp(optarg, "lifting") == 0) {
+        algorithm = ALGORITHM_LIFTING;
+      } else if (strcmp(optarg, "zielonka") == 0) {
+        algorithm = ALGORITHM_ZIELONKA;
+      } else {
+        fputs("Invalid --algorithm value\n", stderr);
+        return EXIT_USAGE;
+      }
+      break;
+    case OPTION_TREE_K:
+      if (!parse_size(optarg, &lift_options.k) || lift_options.k == 0) {
+        fputs("Invalid --tree-k value\n", stderr);
+        return EXIT_USAGE;
+      }
+      lift_options.mode = AD_LIFT_HOST_STRAHLER;
+      host_options++;
+      lifting_options = true;
+      break;
+    case OPTION_ADAPTIVE_K:
+      lift_options.mode = AD_LIFT_HOST_ADAPTIVE;
+      host_options++;
+      lifting_options = true;
+      break;
+    case OPTION_START_K:
+      if (!parse_size(optarg, &start_k) || start_k == 0) {
+        fputs("Invalid --start-k value\n", stderr);
+        return EXIT_USAGE;
+      }
+      start_k_given = true;
+      lifting_options = true;
+      break;
+    case OPTION_TREE_FILE:
+      tree_path = optarg;
+      lift_options.mode = AD_LIFT_HOST_TREE;
+      host_options++;
+      lifting_options = true;
+      break;
+    case OPTION_MAX_HOST_LEAVES:
+      if (!parse_size(optarg, &lift_options.max_host_leaves)) {
+        fputs("Invalid --max-host-leaves value\n", stderr);
+        return EXIT_USAGE;
+      }
+      lifting_options = true;
+      break;
+    case OPTION_STATS:
+      print_stats = true;
+      lifting_options = true;
+      break;
     default:
       usage(stderr, argv);
       return EXIT_USAGE;
@@ -158,13 +325,51 @@ int main(int argc, char *argv[argc + 1]) {
     usage(stderr, argv);
     return EXIT_USAGE;
   }
+  if (host_options > 1) {
+    fputs("Use at most one of --tree-k, --adaptive-k, and --tree-file\n",
+          stderr);
+    return EXIT_USAGE;
+  }
+  if (start_k_given && lift_options.mode != AD_LIFT_HOST_ADAPTIVE) {
+    fputs("--start-k requires --adaptive-k\n", stderr);
+    return EXIT_USAGE;
+  }
+  if (algorithm == ALGORITHM_ZIELONKA && lifting_options) {
+    fputs("Lifting options cannot be used with --algorithm=zielonka\n", stderr);
+    return EXIT_USAGE;
+  }
+  if (lift_options.mode == AD_LIFT_HOST_ADAPTIVE) {
+    lift_options.k = start_k;
+  }
+  lift_options.verify = verify;
 
+  OrderedTreeNode *host_tree = nullptr;
+  if (tree_path != nullptr) {
+    char *text = read_file(tree_path);
+    if (text == nullptr) {
+      fprintf(stderr, "Cannot read %s\n", tree_path);
+      return EXIT_IO;
+    }
+    OrderedTreeError tree_error = {0};
+    bool const parsed =
+        ordered_tree_parse_leaf_stream(text, &host_tree, &tree_error);
+    free(text);
+    if (!parsed) {
+      fprintf(stderr, "%s:%zu:%zu: %s\n", tree_path, tree_error.line,
+              tree_error.column, tree_error.message);
+      return EXIT_USAGE;
+    }
+    lift_options.tree = host_tree;
+  }
+
+  int status = EXIT_SUCCESS;
   FILE *input = stdin;
   bool close_input = false;
   if (optind < argc && strcmp(argv[optind], "-") != 0) {
     input = fopen(argv[optind], "rb");
     if (input == nullptr) {
       fprintf(stderr, "Cannot open %s: %s\n", argv[optind], strerror(errno));
+      ordered_tree_destroy(host_tree);
       return EXIT_IO;
     }
     close_input = true;
@@ -178,16 +383,19 @@ int main(int argc, char *argv[argc + 1]) {
     if (close_input) {
       (void)fclose(input);
     }
+    ordered_tree_destroy(host_tree);
     return EXIT_GAME;
   }
   if (close_input && fclose(input) != 0) {
     pg_game_destroy(&game);
+    ordered_tree_destroy(host_tree);
     fputs("Failed to close input file\n", stderr);
     return EXIT_IO;
   }
 
   if (game.max_priority == UINT64_MAX) {
     pg_game_destroy(&game);
+    ordered_tree_destroy(host_tree);
     fputs("Solver failed: the source maximum priority cannot be followed by "
           "an opposite-parity bound\n",
           stderr);
@@ -195,60 +403,80 @@ int main(int argc, char *argv[argc + 1]) {
   }
 
   PGPriorityMap priority_map = {0};
+  PGSet domain = {0};
+  ADResult result = {0};
   if (!pg_priority_map_build(&game, &priority_map) ||
       !pg_priority_map_apply(&priority_map, &game)) {
-    pg_priority_map_destroy(&priority_map);
-    pg_game_destroy(&game);
     fputs("Failed to compact the game priorities\n", stderr);
-    return EXIT_SOLVER;
+    status = EXIT_SOLVER;
+    goto cleanup;
   }
-
-  PGSet domain = {0};
-  ZielonkaResult result = {0};
-  ZielonkaError solver_error = {0};
   if (!pg_set_init(&domain, game.vertex_count)) {
-    (void)pg_priority_map_restore(&priority_map, &game);
-    pg_priority_map_destroy(&priority_map);
-    pg_game_destroy(&game);
     fputs("Failed to allocate the game domain\n", stderr);
-    return EXIT_SOLVER;
+    status = EXIT_SOLVER;
+    goto cleanup;
   }
   pg_set_fill(&domain);
-  if (!zielonka_decompose(&game, &domain, game.max_priority, &result,
-                          &solver_error)) {
-    fprintf(stderr, "Solver failed: %s\n", solver_error.message);
-    pg_set_destroy(&domain);
-    (void)pg_priority_map_restore(&priority_map, &game);
-    pg_priority_map_destroy(&priority_map);
-    pg_game_destroy(&game);
-    return EXIT_SOLVER;
+
+  if (algorithm == ALGORITHM_ZIELONKA) {
+    ZielonkaError solver_error = {0};
+    if (!zielonka_decompose(&game, &domain, game.max_priority, &result,
+                            &solver_error)) {
+      fprintf(stderr, "Solver failed: %s\n", solver_error.message);
+      status = EXIT_SOLVER;
+      goto cleanup;
+    }
+  } else {
+    ADLiftSolveStats stats = {0};
+    ADLiftError lift_error = {0};
+    if (!ad_lift_solve(&game, &domain, &lift_options, &result, &stats,
+                       &lift_error)) {
+      fprintf(stderr, "Solver failed: %s\n", lift_error.message);
+      if (stats.budget_exhausted) {
+        fputs("Use --adaptive-k, --tree-k, a larger --max-host-leaves, or "
+              "--algorithm=zielonka\n",
+              stderr);
+      }
+      status = EXIT_SOLVER;
+      goto cleanup;
+    }
+    if (stats.budget_exhausted) {
+      fprintf(stderr, "Warning: %s; the result is partial\n",
+              lift_error.message);
+    } else if (lift_options.mode == AD_LIFT_HOST_ADAPTIVE &&
+               stats.first_complete_k != 0) {
+      fprintf(stderr,
+              "Adaptive K: complete at K=%zu (Even complete at K=%zu, Odd "
+              "complete at K=%zu)\n",
+              stats.first_complete_k, stats.player[PG_EVEN].first_full_k,
+              stats.player[PG_ODD].first_full_k);
+    }
+    if (print_stats) {
+      write_stats(&stats, &lift_options, &result);
+    }
   }
 
   if (verify) {
     ADVerifyError verify_error = {0};
-    if (!zielonka_result_verify(&game, &domain, &result, &verify_error)) {
+    bool const verified =
+        result.kind == AD_RESULT_COMPLETE
+            ? ad_result_verify_complete(&game, &domain, &result, &verify_error)
+            : ad_result_verify_partial(&game, &domain, &result, &verify_error);
+    if (!verified) {
       fprintf(stderr, "Verification failed: %s\n", verify_error.message);
-      zielonka_result_destroy(&result);
-      pg_set_destroy(&domain);
-      (void)pg_priority_map_restore(&priority_map, &game);
-      pg_priority_map_destroy(&priority_map);
-      pg_game_destroy(&game);
-      return EXIT_SOLVER;
+      status = EXIT_SOLVER;
+      goto cleanup;
     }
     if (view == AD_DOT_VIEW_TREE_RELATIVE || view == AD_DOT_VIEW_JURDZINSKI) {
       for (size_t candidate = 0; candidate < 2; candidate++) {
         if (result.decomposition[candidate] != nullptr &&
-            !ad_tree_relative_verify(&game, &result.winning[candidate],
+            !ad_tree_relative_verify(&game, &result.region[candidate],
                                      result.decomposition[candidate],
                                      &verify_error)) {
           fprintf(stderr, "Tree-relative verification failed: %s\n",
                   verify_error.message);
-          zielonka_result_destroy(&result);
-          pg_set_destroy(&domain);
-          (void)pg_priority_map_restore(&priority_map, &game);
-          pg_priority_map_destroy(&priority_map);
-          pg_game_destroy(&game);
-          return EXIT_SOLVER;
+          status = EXIT_SOLVER;
+          goto cleanup;
         }
       }
     }
@@ -256,20 +484,23 @@ int main(int argc, char *argv[argc + 1]) {
 
   PGPriorityMap const *display_map =
       priority_mode == PRIORITY_MODE_ORIGINAL ? &priority_map : nullptr;
-  bool const wrote = ad_tree_write_dot(stdout, &game, &result, player, view,
-                                       labels, max_set_items, display_map);
-  bool const restored = pg_priority_map_restore(&priority_map, &game);
-  zielonka_result_destroy(&result);
+  if (!ad_tree_write_dot(stdout, &game, &result, player, view, labels,
+                         max_set_items, display_map)) {
+    fputs("Failed to write DOT output\n", stderr);
+    status = EXIT_IO;
+  }
+
+cleanup:
+  if (priority_map.entries != nullptr &&
+      !pg_priority_map_restore(&priority_map, &game) &&
+      status == EXIT_SUCCESS) {
+    fputs("Failed to restore the source priorities\n", stderr);
+    status = EXIT_SOLVER;
+  }
+  ad_result_destroy(&result);
   pg_set_destroy(&domain);
   pg_priority_map_destroy(&priority_map);
   pg_game_destroy(&game);
-  if (!restored) {
-    fputs("Failed to restore the source priorities\n", stderr);
-    return EXIT_SOLVER;
-  }
-  if (!wrote) {
-    fputs("Failed to write DOT output\n", stderr);
-    return EXIT_IO;
-  }
-  return EXIT_SUCCESS;
+  ordered_tree_destroy(host_tree);
+  return status;
 }
