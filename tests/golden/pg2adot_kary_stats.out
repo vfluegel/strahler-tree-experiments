@@ -1,8 +1,6 @@
-Adaptive t: complete at t=1 (Even complete at t=1, Odd complete at t=0)
 lifting: vertices=5 t_full=2 result=complete
-lifting: first_complete_t=1 even_first_full_t=1 odd_first_full_t=0 budget_exhausted=no
-lifting even: root_level=4 H=3 k_full=3 host=strahler K=2 t=1 host_nodes=17 host_leaves=9 positions=51 rounds=6 lifts=12 top=0 region=5 tree_nodes=4 tree_leaves=2 tree_height=3 strahler=2
-lifting odd: root_level=3 H=2 k_full=2 host=strahler K=2 t=1 host_nodes=4 host_leaves=3 positions=12 rounds=15 lifts=23 top=5 region=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
+lifting even: root_level=4 H=3 k_full=3 host=kary arity=2 host_nodes=7 host_leaves=4 positions=21 rounds=8 lifts=14 top=0 region=5 tree_nodes=4 tree_leaves=2 tree_height=3 strahler=2
+lifting odd: root_level=3 H=2 k_full=2 host=kary arity=2 host_nodes=3 host_leaves=2 positions=9 rounds=11 lifts=17 top=5 region=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
 digraph attractor_decompositions {
   graph [rankdir=TB, ordering=out];
   node [shape=box];

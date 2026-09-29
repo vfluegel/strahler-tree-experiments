@@ -254,6 +254,15 @@ static void test_random_reference_agreement(void) {
     assert(result.kind == AD_RESULT_COMPLETE);
     assert(pg_set_equal(&result.region[PG_EVEN], &expected_even));
     assert(pg_set_equal(&result.region[PG_ODD], &expected_odd));
+    ad_result_destroy(&result);
+
+    /* The full n-ary host of the same height is universal too. */
+    ADLiftOptions kary = options_for(AD_LIFT_HOST_KARY, 0);
+    kary.arity = game.vertex_count;
+    result = solve(&game, &domain, &kary, nullptr);
+    assert(result.kind == AD_RESULT_COMPLETE);
+    assert(pg_set_equal(&result.region[PG_EVEN], &expected_even));
+    assert(pg_set_equal(&result.region[PG_ODD], &expected_odd));
     pg_set_destroy(&expected_even);
     pg_set_destroy(&expected_odd);
     ad_result_destroy(&result);
@@ -489,26 +498,39 @@ static void test_partial_and_adaptive(void) {
   assert(ad_result_verify_partial(&game, &domain, &result, &verify_error));
   ad_result_destroy(&result);
 
-  options = options_for(AD_LIFT_HOST_ADAPTIVE, 1);
+  /* Adaptive t uses U^{min(H,t+1)}_{t,H}: at t = 1, Even's U^2_{1,3}
+   * already suffices, while Odd's empty region is found at t = 0. */
+  options = options_for(AD_LIFT_HOST_ADAPTIVE, 0);
   ADLiftSolveStats stats = {0};
   result = solve(&game, &domain, &options, &stats);
   expect_regions(&result, 5, 0);
-  assert(stats.first_complete_k == 2);
-  assert(stats.player[PG_EVEN].first_full_k == 2);
-  assert(stats.player[PG_ODD].first_full_k == 1);
+  assert(stats.t_full == 2);
+  assert(stats.adaptive_complete && stats.first_complete_t == 1);
+  assert(stats.player[PG_EVEN].first_full_t == 1);
+  assert(stats.player[PG_ODD].first_full_t == 0);
+  assert(stats.player[PG_EVEN].k == 2 && stats.player[PG_EVEN].t == 1);
   assert(!stats.budget_exhausted);
   ad_result_destroy(&result);
 
-  /* A start above k_full is clamped to the universal hosts. */
-  options.k = 9;
+  /* A start above t_full is clamped to the universal hosts. */
+  options.t = 9;
   result = solve(&game, &domain, &options, &stats);
-  assert(stats.first_complete_k == 3);
+  assert(stats.first_complete_t == 2);
   assert(stats.player[PG_EVEN].k == stats.player[PG_EVEN].k_full);
+  assert(stats.player[PG_EVEN].t == stats.t_full);
   ad_result_destroy(&result);
 
-  /* The leaf limit stops the adaptive loop after K = 1 with a sound partial
-   * result, but it is an error for the universal host. */
+  /* Capping K at 1 never reaches Even's Strahler-2 decomposition, so the
+   * search ends partial without claiming universality. */
   options = options_for(AD_LIFT_HOST_ADAPTIVE, 1);
+  result = solve(&game, &domain, &options, &stats);
+  assert(result.kind == AD_RESULT_PARTIAL && !stats.adaptive_complete);
+  assert(stats.player[PG_EVEN].k == 1 && stats.player[PG_EVEN].t == 2);
+  ad_result_destroy(&result);
+
+  /* The leaf limit stops the adaptive loop after t = 0 with a sound partial
+   * result, but it is an error for the universal host. */
+  options = options_for(AD_LIFT_HOST_ADAPTIVE, 0);
   options.max_host_leaves = 1;
   ADLiftError error = {0};
   assert(ad_lift_solve(&game, &domain, &options, &result, &stats, &error));
@@ -529,6 +551,45 @@ static void test_partial_and_adaptive(void) {
   result = solve(&game, &domain, &options, nullptr);
   assert(pg_set_count(&result.region[PG_EVEN]) == 3);
   ad_result_destroy(&result);
+  pg_set_destroy(&domain);
+  pg_game_destroy(&game);
+}
+
+static void test_kary_hosts(void) {
+  PGGame game = parse(partial_game);
+  PGSet domain = full_domain(&game);
+  ADLiftOptions options = options_for(AD_LIFT_HOST_KARY, 0);
+  ADLiftSolveStats stats = {0};
+  ADResult result = {0};
+  ADLiftError error = {0};
+  assert(!ad_lift_solve(&game, &domain, &options, &result, &stats, &error));
+
+  /* The 1-ary host is a chain and certifies only {0, 3, 4}. */
+  options.arity = 1;
+  result = solve(&game, &domain, &options, &stats);
+  assert(result.kind == AD_RESULT_PARTIAL);
+  assert(pg_set_count(&result.region[PG_EVEN]) == 3);
+  assert(stats.player[PG_EVEN].arity == 1 && stats.player[PG_EVEN].k == 0);
+  assert(stats.player[PG_EVEN].host_nodes == 3);
+  ad_result_destroy(&result);
+
+  options.arity = 2;
+  result = solve(&game, &domain, &options, &stats);
+  expect_regions(&result, 5, 0);
+  assert(stats.player[PG_EVEN].host_nodes == 7);
+  assert(stats.player[PG_EVEN].host_leaves == 4);
+  assert(stats.player[PG_ODD].host_nodes == 3);
+  ad_result_destroy(&result);
+
+  /* Arity n is universal. */
+  options.arity = 5;
+  result = solve(&game, &domain, &options, &stats);
+  expect_regions(&result, 5, 0);
+  ad_result_destroy(&result);
+
+  options.max_host_leaves = 24;
+  assert(!ad_lift_solve(&game, &domain, &options, &result, &stats, &error));
+  assert(stats.budget_exhausted && strstr(error.message, "5-ary") != nullptr);
   pg_set_destroy(&domain);
   pg_game_destroy(&game);
 }
@@ -606,6 +667,7 @@ int main(void) {
   test_verifier_rejections();
   test_materialize_rejects_empty_core();
   test_partial_and_adaptive();
+  test_kary_hosts();
   test_tree_hosts();
   test_solver_inputs();
   return 0;

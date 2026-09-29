@@ -1,16 +1,10 @@
-Warning: the Even host U^2_{1,3} has 9 leaves, more than the limit of 1; the result is partial
+Adaptive t: incomplete at t=2 with K capped at 1; the result is partial
 digraph attractor_decompositions {
   graph [rankdir=TB, ordering=out];
   node [shape=box];
-  result [label="result (synthetic; partial)"];
-  result -> even;
   even [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 4</TD></TR></TABLE>>];
   even -> even_0;
   even_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 2</TD></TR></TABLE>>];
   even_0 -> even_0_0;
   even_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 0</TD></TR></TABLE>>];
-  odd_empty [label=<<B>Odd</B>: <I>D</I> = empty; no certified dominion>];
-  result -> odd_empty;
-  unresolved [style=dashed, label=<<B>Unresolved</B>>];
-  result -> unresolved [style=dashed];
 }

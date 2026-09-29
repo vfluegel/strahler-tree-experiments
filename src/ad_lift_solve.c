@@ -45,8 +45,7 @@ typedef struct {
 } Solver;
 
 /* Lift, check, and materialize one player's run, replacing its outcome. */
-[[nodiscard]] static bool run_on_host(Solver *solver, ADLiftTree const *host,
-                                      size_t const k) {
+[[nodiscard]] static bool run_on_host(Solver *solver, ADLiftTree const *host) {
   PGPlayer const player = host->player;
   ADLiftPlayerStats *stats = solver->stats->player + player;
   ADLiftLabelling labelling = {0};
@@ -82,7 +81,6 @@ typedef struct {
     goto failure;
   }
 
-  stats->k = k;
   stats->host_nodes = host->node_count;
   stats->host_leaves = host->leaf_count;
   stats->host_positions = host->position_count;
@@ -107,10 +105,17 @@ typedef enum {
   HOST_FAILED,
 } HostStatus;
 
-[[nodiscard]] static HostStatus
-run_strahler(Solver *solver, PGPlayer const player, size_t const k) {
-  ADLiftPlayerStats const *shape = solver->stats->player + player;
-  size_t const t = solver->stats->t;
+[[nodiscard]] static HostStatus over_budget(Solver *solver,
+                                            char const *message) {
+  solver->stats->budget_exhausted = true;
+  solve_error(solver->error, "%s", message);
+  return HOST_OVER_BUDGET;
+}
+
+[[nodiscard]] static HostStatus run_strahler(Solver *solver,
+                                             PGPlayer const player,
+                                             size_t const k, size_t const t) {
+  ADLiftPlayerStats *shape = solver->stats->player + player;
   size_t const height = shape->height;
   /* The priority bound keeps height small, and t < 64. */
   unsigned const leaves = stree_count_leaves((int)k, (int)t, (int)height);
@@ -120,14 +125,14 @@ run_strahler(Solver *solver, PGPlayer const player, size_t const k) {
     return HOST_FAILED;
   }
   if (leaves == UINT_MAX || leaves > solver->options->max_host_leaves) {
-    solver->stats->budget_exhausted = true;
-    solve_error(solver->error,
-                "the %s host U^%zu_{%zu,%zu} has %s%u leaves, more than the "
-                "limit of %zu",
-                player_name(player), k, t, height,
-                leaves == UINT_MAX ? "at least " : "", leaves,
-                solver->options->max_host_leaves);
-    return HOST_OVER_BUDGET;
+    char message[sizeof(solver->error->message)];
+    (void)snprintf(message, sizeof(message),
+                   "the %s host U^%zu_{%zu,%zu} has %s%u leaves, more than the "
+                   "limit of %zu",
+                   player_name(player), k, t, height,
+                   leaves == UINT_MAX ? "at least " : "", leaves,
+                   solver->options->max_host_leaves);
+    return over_budget(solver, message);
   }
 
   char *stream = stree_leaf_stream((int)k, (int)t, (int)height);
@@ -148,9 +153,48 @@ run_strahler(Solver *solver, PGPlayer const player, size_t const k) {
         build_error.message[0] == '\0' ? "" : ": ", build_error.message);
     return HOST_FAILED;
   }
-  bool const ran = run_on_host(solver, &host, k);
+  bool const ran = run_on_host(solver, &host);
   ad_lift_tree_destroy(&host);
-  return ran ? HOST_BUILT : HOST_FAILED;
+  if (!ran) {
+    return HOST_FAILED;
+  }
+  shape->k = k;
+  shape->t = t;
+  return HOST_BUILT;
+}
+
+[[nodiscard]] static HostStatus run_kary(Solver *solver,
+                                         PGPlayer const player) {
+  ADLiftPlayerStats *shape = solver->stats->player + player;
+  size_t const arity = solver->options->arity;
+  size_t nodes = 0;
+  size_t leaves = 0;
+  bool const counted =
+      ad_lift_full_tree_size(arity, shape->height, &nodes, &leaves);
+  if (!counted || leaves > solver->options->max_host_leaves) {
+    char message[sizeof(solver->error->message)];
+    (void)snprintf(message, sizeof(message),
+                   "the %s host, the full %zu-ary tree with %zu levels, has "
+                   "more than %zu leaves",
+                   player_name(player), arity, shape->height,
+                   solver->options->max_host_leaves);
+    return over_budget(solver, message);
+  }
+  ADLiftTree host = {0};
+  ADLiftError build_error = {0};
+  if (!ad_lift_tree_build_full(arity, shape->height, player, shape->root_level,
+                               &host, &build_error)) {
+    solve_error(solver->error, "failed to build the %s full %zu-ary host: %s",
+                player_name(player), arity, build_error.message);
+    return HOST_FAILED;
+  }
+  bool const ran = run_on_host(solver, &host);
+  ad_lift_tree_destroy(&host);
+  if (!ran) {
+    return HOST_FAILED;
+  }
+  shape->arity = arity;
+  return HOST_BUILT;
 }
 
 [[nodiscard]] static bool run_tree(Solver *solver, PGPlayer const player) {
@@ -171,7 +215,7 @@ run_strahler(Solver *solver, PGPlayer const player, size_t const k) {
                 build_error.message);
     return false;
   }
-  bool const ran = run_on_host(solver, &host, 0);
+  bool const ran = run_on_host(solver, &host);
   ad_lift_tree_destroy(&host);
   return ran;
 }
@@ -191,59 +235,82 @@ run_strahler(Solver *solver, PGPlayer const player, size_t const k) {
   return result;
 }
 
-/* Raise K until the dominions cover the domain. Once K reaches a player's
- * k_full its host stops changing, so its run is not repeated. If a host
- * exceeds the leaf limit after every player has run once, keep the dominions
- * found so far; they remain sound.
+[[nodiscard]] static size_t smaller(size_t const left, size_t const right) {
+  return left < right ? left : right;
+}
+
+/* Raise t until the dominions cover the domain, using the largest useful K
+ * for each t, at most the optional cap. Beyond t_full the hosts only grow, so
+ * t stops there; a player whose host does not change is not lifted again. If
+ * a host exceeds the leaf limit after every player has run once, keep the
+ * dominions found so far; they remain sound.
  *
- * Dominions need not grow monotonically with K, but each is contained in the
+ * Dominions need not grow monotonically with t, but each is contained in the
  * player's winning region, which the final dominion equals when the result is
- * complete. So the first K reaching the largest dominion seen is the least K
+ * complete. So the first t reaching the largest dominion seen is the least t
  * that already found the whole winning region. */
 [[nodiscard]] static bool run_adaptive(Solver *solver) {
   ADLiftSolveStats *stats = solver->stats;
-  size_t const last =
-      stats->player[PG_EVEN].k_full > stats->player[PG_ODD].k_full
-          ? stats->player[PG_EVEN].k_full
-          : stats->player[PG_ODD].k_full;
-  size_t used[2] = {0, 0};
+  size_t const cap = solver->options->k;
+  bool ran[2] = {false, false};
   size_t best_count[2] = {0, 0};
-  size_t best_k[2] = {0, 0};
-  for (size_t k = solver->options->k;; k++) {
+  size_t best_t[2] = {0, 0};
+  for (size_t t = smaller(solver->options->t, stats->t_full);; t++) {
     for (size_t player = 0; player < 2; player++) {
-      size_t const effective =
-          k < stats->player[player].k_full ? k : stats->player[player].k_full;
-      if (effective == used[player]) {
+      ADLiftPlayerStats const *shape = stats->player + player;
+      size_t k = smaller(shape->height, t + 1);
+      if (cap != 0) {
+        k = smaller(k, cap);
+      }
+      if (ran[player] && shape->k == k && shape->t == t) {
         continue;
       }
-      HostStatus const status =
-          run_strahler(solver, (PGPlayer)player, effective);
+      HostStatus const status = run_strahler(solver, (PGPlayer)player, k, t);
       if (status == HOST_FAILED ||
-          (status == HOST_OVER_BUDGET && (used[0] == 0 || used[1] == 0))) {
+          (status == HOST_OVER_BUDGET && (!ran[0] || !ran[1]))) {
         return false;
       }
       if (status == HOST_OVER_BUDGET) {
         /* The limit message stays in error for the caller to report. */
         return true;
       }
-      used[player] = effective;
       size_t const count = pg_set_count(&solver->outcome[player].dominion);
-      if (best_k[player] == 0 || count > best_count[player]) {
+      if (!ran[player] || count > best_count[player]) {
         best_count[player] = count;
-        best_k[player] = effective;
+        best_t[player] = t;
       }
+      ran[player] = true;
     }
     if (covered(solver)) {
-      /* K beyond both players' k_full is clamped, so report the K in use. */
-      stats->first_complete_k = used[0] > used[1] ? used[0] : used[1];
-      stats->player[PG_EVEN].first_full_k = best_k[PG_EVEN];
-      stats->player[PG_ODD].first_full_k = best_k[PG_ODD];
+      stats->adaptive_complete = true;
+      stats->first_complete_t = t;
+      stats->player[PG_EVEN].first_full_t = best_t[PG_EVEN];
+      stats->player[PG_ODD].first_full_t = best_t[PG_ODD];
       return true;
     }
-    if (k >= last) {
+    if (t >= stats->t_full) {
       return true;
     }
   }
+}
+
+/* Whether the hosts used are proven universal, so that the dominions must be
+ * the winning regions. A decomposition of a region with at most n vertices has
+ * at most n leaves, so no node has more than n children. */
+[[nodiscard]] static bool universal_hosts(ADLiftSolveStats const *stats,
+                                          ADLiftHostMode const mode) {
+  for (size_t player = 0; player < 2; player++) {
+    ADLiftPlayerStats const *shape = stats->player + player;
+    bool const full = mode == AD_LIFT_HOST_KARY
+                          ? shape->arity >= stats->vertices
+                          : mode != AD_LIFT_HOST_TREE &&
+                                shape->k == shape->k_full &&
+                                shape->t == stats->t_full;
+    if (!full) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool ad_lift_solve(PGGame const *game, PGSet const *domain,
@@ -264,9 +331,8 @@ bool ad_lift_solve(PGGame const *game, PGSet const *domain,
       result == nullptr || domain->bit_count != game->vertex_count ||
       options->mode > AD_LIFT_HOST_TREE ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||
-      ((options->mode == AD_LIFT_HOST_STRAHLER ||
-        options->mode == AD_LIFT_HOST_ADAPTIVE) &&
-       options->k == 0) ||
+      (options->mode == AD_LIFT_HOST_STRAHLER && options->k == 0) ||
+      (options->mode == AD_LIFT_HOST_KARY && options->arity == 0) ||
       (options->mode == AD_LIFT_HOST_TREE && options->tree == nullptr) ||
       !pg_subgame_is_total(game, domain)) {
     solve_error(error, "invalid lifting solver input");
@@ -298,13 +364,13 @@ bool ad_lift_solve(PGGame const *game, PGSet const *domain,
     return false;
   }
   for (size_t rest = vertices; rest > 1; rest >>= 1) {
-    stats->t++;
+    stats->t_full++;
   }
   for (size_t player = 0; player < 2; player++) {
     ADLiftPlayerStats *shape = stats->player + player;
     shape->root_level = maximum % 2 == player ? maximum : maximum + 1;
     shape->height = (size_t)((shape->root_level - player) / 2) + 1;
-    shape->k_full = shape->height < stats->t + 1 ? shape->height : stats->t + 1;
+    shape->k_full = smaller(shape->height, stats->t_full + 1);
   }
 
   Solver solver = {
@@ -320,14 +386,20 @@ bool ad_lift_solve(PGGame const *game, PGSet const *domain,
   case AD_LIFT_HOST_STRAHLER:
     for (size_t player = 0; succeeded && player < 2; player++) {
       size_t const k_full = stats->player[player].k_full;
-      size_t const k = options->mode == AD_LIFT_HOST_FULL || options->k > k_full
+      size_t const k = options->mode == AD_LIFT_HOST_FULL
                            ? k_full
-                           : options->k;
-      succeeded = run_strahler(&solver, (PGPlayer)player, k) == HOST_BUILT;
+                           : smaller(options->k, k_full);
+      succeeded = run_strahler(&solver, (PGPlayer)player, k, stats->t_full) ==
+                  HOST_BUILT;
     }
     break;
   case AD_LIFT_HOST_ADAPTIVE:
     succeeded = run_adaptive(&solver);
+    break;
+  case AD_LIFT_HOST_KARY:
+    for (size_t player = 0; succeeded && player < 2; player++) {
+      succeeded = run_kary(&solver, (PGPlayer)player) == HOST_BUILT;
+    }
     break;
   case AD_LIFT_HOST_TREE:
     for (size_t player = 0; succeeded && player < 2; player++) {
@@ -355,10 +427,8 @@ bool ad_lift_solve(PGGame const *game, PGSet const *domain,
       if (!pg_set_empty(&overlap)) {
         solve_error(error, "the Even and Odd dominions overlap");
         succeeded = false;
-      } else if (options->mode != AD_LIFT_HOST_TREE &&
-                 stats->player[PG_EVEN].k == stats->player[PG_EVEN].k_full &&
-                 stats->player[PG_ODD].k == stats->player[PG_ODD].k_full &&
-                 result->kind != AD_RESULT_COMPLETE) {
+      } else if (result->kind != AD_RESULT_COMPLETE &&
+                 universal_hosts(stats, options->mode)) {
         solve_error(error, "the universal hosts left vertices unresolved");
         succeeded = false;
       }

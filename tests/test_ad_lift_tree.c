@@ -192,6 +192,41 @@ static void check_invariants(ADLiftTree const *tree, uint64_t const root) {
   }
 }
 
+static void test_full_hosts(void) {
+  ADLiftTree tree = {0};
+  ADLiftError error = {0};
+  assert(ad_lift_tree_build_full(2, 3, PG_EVEN, 4, &tree, &error));
+  assert(tree.node_count == 7 && tree.leaf_count == 4 && tree.height == 2);
+  for (size_t index = 0; index < tree.node_count; index++) {
+    assert(tree.nodes[index].child_count ==
+           (tree.nodes[index].level == 0 ? 0 : 2));
+  }
+  check_invariants(&tree, 4);
+  ad_lift_tree_destroy(&tree);
+
+  /* Arity one is a chain; the Odd host may be shorter than its root allows. */
+  assert(ad_lift_tree_build_full(1, 2, PG_ODD, 5, &tree, &error));
+  assert(tree.node_count == 2 && tree.leaf_count == 1 && tree.height == 1);
+  check_invariants(&tree, 5);
+  ad_lift_tree_destroy(&tree);
+
+  size_t nodes = 0;
+  size_t leaves = 0;
+  assert(ad_lift_full_tree_size(3, 4, &nodes, &leaves));
+  assert(nodes == 40 && leaves == 27);
+  assert(ad_lift_full_tree_size(7, 1, &nodes, &leaves));
+  assert(nodes == 1 && leaves == 1);
+  assert(!ad_lift_full_tree_size(SIZE_MAX, 3, &nodes, &leaves));
+  assert(!ad_lift_full_tree_size(0, 3, &nodes, &leaves));
+  assert(!ad_lift_full_tree_size(2, 0, &nodes, &leaves));
+
+  assert(!ad_lift_tree_build_full(0, 3, PG_EVEN, 4, &tree, &error));
+  assert(!ad_lift_tree_build_full(2, 4, PG_EVEN, 4, &tree, &error));
+  assert(!ad_lift_tree_build_full(2, 3, PG_ODD, 4, &tree, &error));
+  assert(!ad_lift_tree_build_full(SIZE_MAX, 40, PG_EVEN, 80, &tree, &error));
+  assert(tree.positions == nullptr && tree.nodes == nullptr);
+}
+
 static void test_strahler_hosts(void) {
   int const cases[][3] = {{1, 2, 3}, {2, 1, 2}, {2, 2, 3}, {3, 2, 4}};
   for (size_t index = 0; index < sizeof(cases) / sizeof(cases[0]); index++) {
@@ -216,6 +251,7 @@ int main(void) {
   test_two_children();
   test_plus_skips_parent_block();
   test_rejections();
+  test_full_hosts();
   test_strahler_hosts();
   return 0;
 }

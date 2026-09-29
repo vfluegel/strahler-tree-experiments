@@ -87,30 +87,35 @@ name; the latter two read from standard input.
   tree. The default is `original`.
 - `--algorithm=lifting|zielonka` selects how the decompositions are built. The
   default is `lifting`; `zielonka` runs the enhanced Zielonka algorithm for
-  comparison and cannot be combined with the options below.
+  comparison. Only `--stats` of the options below applies to it.
 - `--tree-k=K` lifts in the smaller Strahler host `U^K_{t,H}`. The result may
   be partial.
-- `--adaptive-k` lifts with `K = 1, 2, ...` until the result is complete and
-  reports the smallest such `K` on standard error, together with the smallest
-  `K` at which each player's whole winning region was found. `--start-k=K`
-  starts the search at `K` instead of 1.
+- `--adaptive-t` lifts in `U^K_{t,H}` with `t = 0, 1, ...` and the largest
+  useful `K = min(H, t + 1)` until the result is complete. It reports the
+  smallest such `t` on standard error, together with the smallest `t` at which
+  each player's whole winning region was found. `--start-t=T` starts the
+  search at `T`, and `--tree-k=K` caps `K`; a capped search can end partial.
+- `--kary=A` lifts in the full `A`-ary tree with each player's full height
+  `H`, which is not bounded by a Strahler number. The result may be partial;
+  it is complete when `A` is at least the number of vertices.
 - `--tree-file=FILE` lifts in the ordered tree stored in `FILE` in the
   leaf-stream format that `pms2dot` reads, such as `0|1|`. The result may be
   partial.
-- `--max-host-leaves=N` refuses to build Strahler hosts with more than `N`
-  leaves. The default is 1000000. With `--adaptive-k`, reaching the limit
-  stops the search and prints a warning; the result found so far is kept and
-  labelled as partial.
-- `--stats` prints lifting statistics to standard error: host sizes, `K`,
-  rounds, vertex lifts, vertices left at the top, and the size and Strahler
-  number of each decomposition.
+- `--max-host-leaves=N` refuses to build Strahler or `A`-ary hosts with more
+  than `N` leaves. The default is 1000000. With `--adaptive-t`, reaching the
+  limit stops the search and prints a warning; the result found so far is kept
+  and labelled as partial.
+- `--stats` prints statistics to standard error. For lifting, these are the
+  host of each player and its size, rounds, vertex lifts, vertices left at the
+  top, and the size and Strahler number of each decomposition. For Zielonka,
+  they are the region sizes and the decomposition metrics.
 - `--no-verify` skips the decomposition checks and is intended for debugging.
 
 By default, `pg2adot` lifts in a Strahler tree that is guaranteed to contain a
 decomposition of each winning region, so the result is complete. That host
 grows quickly: for thousands of vertices and more than a few priorities it
-exceeds the leaf limit, and `pg2adot` stops with an error. Use `--adaptive-k`,
-`--tree-k`, or `--algorithm=zielonka` for such games.
+exceeds the leaf limit, and `pg2adot` stops with an error. Use `--adaptive-t`,
+`--tree-k`, `--kary`, or `--algorithm=zielonka` for such games.
 
 `pg2adot` removes priority gaps internally before solving, so large numeric
 gaps do not add empty levels or exhaust the recursion limit. It still shows
@@ -124,7 +129,8 @@ bounds on the original priority scale by default. Use
 
 The default host and `--algorithm=zielonka` always give a complete result: the
 Even and Odd roots decompose the two winning regions. A restricted host from
-`--tree-k`, `--tree-file`, or an interrupted `--adaptive-k` search still
+`--tree-k`, `--kary`, `--tree-file`, or a capped or interrupted
+`--adaptive-t` search still
 certifies that each root region is won by its player, but it may leave some
 vertices unresolved. The result is complete exactly when the two regions cover
 the game, even with a restricted host.
@@ -247,7 +253,7 @@ In a partial result the root reads `Even dominion` or `Odd dominion`.
 
 ```sh
 ./build/pg2adot game.pg > decomposition.dot
-./build/pg2adot --adaptive-k --stats game.pg > decomposition.dot
+./build/pg2adot --adaptive-t --stats game.pg > decomposition.dot
 ./build/pg2adot --tree-k=1 --labels=sets game.pg > dominions.dot
 ./build/pg2adot --priority-mode=compact game.pg > compact.dot
 ./build/pg2adot --player=both --labels=sets --max-set-items=8 game.pg \
@@ -332,11 +338,15 @@ the least valid labelling. `AD_LIFT_SCHEDULE_SINGLE` lifts one vertex at a
 time and reaches the same labelling; the tests compare the two.
 
 **Dominions.** For any host, the vertices below `∞` form a dominion `D_P(T)` of
-`P`. With `n` vertices, `t = ⌊log₂ n⌋`, and `H` regular levels, the Strahler
-tree `U^K_{t,H}` contains every ordered tree with at most `n` leaves, height
-`H`, and Strahler number at most `K`. With `K = k_full = min(H, t + 1)`, it
-therefore contains a decomposition of `P`'s winning region, and `D_P` is that
-whole region. Smaller `K` gives a possibly smaller dominion. Player `P`'s root
+`P`. With `H` regular levels, the Strahler tree `U^K_{t,H}` contains every
+ordered tree with fewer than `2^(t+1)` leaves, height `H`, and Strahler number
+at most `K`. A decomposition of a region with `n` vertices has at most `n`
+leaves, so with `t_full = ⌊log₂ n⌋` and `K = k_full = min(H, t_full + 1)` the
+host contains a decomposition of `P`'s winning region, and `D_P` is that whole
+region. `--adaptive-t` asks for the smallest `t` for which
+`U^{min(H,t+1)}_{t,H}` already suffices. The full `n`-ary tree of height `H`
+is universal for the same reason: no node of such a decomposition has more
+than `n` children. Smaller hosts give possibly smaller dominions. Player `P`'s root
 level is the least level of `P`'s parity that bounds all priorities, as in the
 Zielonka solver.
 

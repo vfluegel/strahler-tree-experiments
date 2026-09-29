@@ -200,11 +200,11 @@ sanitize_output "tests/golden/pg2adot_partial_tree_relative.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN --tree-file=tests/trees/one_child.tree --view=jurdzinski --labels=sets tests/games/ordered_two_children.pg > tests/golden/pg2adot_partial_jurdzinski_tree_file.out"
 "$PG2ADOT_BIN" --tree-file=tests/trees/one_child.tree --view=jurdzinski --labels=sets tests/games/ordered_two_children.pg > tests/golden/pg2adot_partial_jurdzinski_tree_file.out 2>&1
 sanitize_output "tests/golden/pg2adot_partial_jurdzinski_tree_file.out" "$PG2ADOT_BIN"
-echo "  $PG2ADOT_BIN --adaptive-k --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_stats.out"
-"$PG2ADOT_BIN" --adaptive-k --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_stats.out 2>&1
+echo "  $PG2ADOT_BIN --adaptive-t --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_stats.out"
+"$PG2ADOT_BIN" --adaptive-t --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_stats.out 2>&1
 sanitize_output "tests/golden/pg2adot_adaptive_stats.out" "$PG2ADOT_BIN"
-echo "  $PG2ADOT_BIN --adaptive-k --max-host-leaves=1 --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_limit.out"
-"$PG2ADOT_BIN" --adaptive-k --max-host-leaves=1 --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_limit.out 2>&1
+echo "  $PG2ADOT_BIN --adaptive-t --max-host-leaves=1 --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_limit.out"
+"$PG2ADOT_BIN" --adaptive-t --max-host-leaves=1 --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_limit.out 2>&1
 sanitize_output "tests/golden/pg2adot_adaptive_limit.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN --max-host-leaves=5 tests/games/strahler_two.pg > tests/golden/pg2adot_host_limit.out"
 "$PG2ADOT_BIN" --max-host-leaves=5 tests/games/strahler_two.pg > tests/golden/pg2adot_host_limit.out 2>&1
@@ -212,6 +212,18 @@ sanitize_output "tests/golden/pg2adot_host_limit.out" "$PG2ADOT_BIN"
 echo "  $PG2ADOT_BIN --tree-file=tests/trees/invalid.tree tests/games/strahler_two.pg > tests/golden/pg2adot_invalid_tree.out"
 "$PG2ADOT_BIN" --tree-file=tests/trees/invalid.tree tests/games/strahler_two.pg > tests/golden/pg2adot_invalid_tree.out 2>&1
 sanitize_output "tests/golden/pg2adot_invalid_tree.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --adaptive-t --tree-k=1 --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_capped.out"
+"$PG2ADOT_BIN" --adaptive-t --tree-k=1 --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_adaptive_capped.out 2>&1
+sanitize_output "tests/golden/pg2adot_adaptive_capped.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --kary=1 --labels=sets tests/games/strahler_two.pg > tests/golden/pg2adot_kary_partial_sets.out"
+"$PG2ADOT_BIN" --kary=1 --labels=sets tests/games/strahler_two.pg > tests/golden/pg2adot_kary_partial_sets.out 2>&1
+sanitize_output "tests/golden/pg2adot_kary_partial_sets.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --kary=2 --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_kary_stats.out"
+"$PG2ADOT_BIN" --kary=2 --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_kary_stats.out 2>&1
+sanitize_output "tests/golden/pg2adot_kary_stats.out" "$PG2ADOT_BIN"
+echo "  $PG2ADOT_BIN --algorithm=zielonka --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_zielonka_stats.out"
+"$PG2ADOT_BIN" --algorithm=zielonka --stats --player=even --labels=none tests/games/strahler_two.pg > tests/golden/pg2adot_zielonka_stats.out 2>&1
+sanitize_output "tests/golden/pg2adot_zielonka_stats.out" "$PG2ADOT_BIN"
 
 echo "  $PMS2DOT_BIN -h > tests/golden/pms_h.out"
 "$PMS2DOT_BIN" -h > "tests/golden/pms_h.out" 2>&1 || true

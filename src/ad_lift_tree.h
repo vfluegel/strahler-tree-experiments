@@ -74,6 +74,18 @@ bool ad_lift_tree_build(OrderedTreeNode const *base, PGPlayer player,
                         uint64_t root_level, ADLiftTree *tree,
                         ADLiftError *error);
 
+/* The full tree with levels regular levels, where every node above the
+ * bottom level has arity children, flattened as above. */
+[[nodiscard]]
+bool ad_lift_tree_build_full(size_t arity, size_t levels, PGPlayer player,
+                             uint64_t root_level, ADLiftTree *tree,
+                             ADLiftError *error);
+
+/* Node and leaf counts of that full tree; false if they overflow. */
+[[nodiscard]]
+bool ad_lift_full_tree_size(size_t arity, size_t levels, size_t *nodes,
+                            size_t *leaves);
+
 void ad_lift_tree_destroy(ADLiftTree *tree);
 
 /* Regular positions accept exactly their level, MINUS_INF and PLUS positions

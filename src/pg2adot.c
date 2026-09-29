@@ -48,13 +48,16 @@ static void usage(FILE *out, char *argv[static 1]) {
       "                               default: original\n"
       "  --algorithm=lifting|zielonka default: lifting\n"
       "  --tree-k=K                   lift in U^K_{t,H}; may be partial\n"
-      "  --adaptive-k                 raise K until the result is "
-      "complete\n"
-      "  --start-k=K                  first K for --adaptive-k; default: 1\n"
+      "  --adaptive-t                 raise t until the result is complete;\n"
+      "                               --tree-k=K caps K\n"
+      "  --start-t=T                  first t for --adaptive-t; default: 0\n"
+      "  --kary=A                     lift in the full A-ary tree of height "
+      "H;\n"
+      "                               may be partial\n"
       "  --tree-file=FILE             lift in a leaf-stream host tree; may "
       "be partial\n"
       "  --max-host-leaves=N          default: %d\n"
-      "  --stats                      print lifting statistics to stderr\n"
+      "  --stats                      print statistics to stderr\n"
       "  --no-verify\n",
       program, DEFAULT_MAX_HOST_LEAVES);
 }
@@ -109,17 +112,46 @@ static void usage(FILE *out, char *argv[static 1]) {
   return text;
 }
 
-static void write_stats(ADLiftSolveStats const *stats,
-                        ADLiftOptions const *options, ADResult const *result) {
-  fprintf(stderr, "lifting: vertices=%zu t=%zu result=%s\n", stats->vertices,
-          stats->t,
-          result->kind == AD_RESULT_COMPLETE ? "complete" : "partial");
+[[nodiscard]] static char const *result_kind(ADResult const *result) {
+  return result->kind == AD_RESULT_COMPLETE ? "complete" : "partial";
+}
+
+static void write_tree_stats(ADResult const *result, size_t const player,
+                             ADTreeMetrics const metrics) {
+  fprintf(stderr,
+          "%s=%zu tree_nodes=%zu tree_leaves=%zu tree_height=%zu "
+          "strahler=%zu\n",
+          result->kind == AD_RESULT_COMPLETE ? "region" : "dominion",
+          pg_set_count(&result->region[player]), metrics.nodes, metrics.leaves,
+          metrics.height, metrics.strahler);
+}
+
+static void write_zielonka_stats(ADResult const *result,
+                                 size_t const vertices) {
+  fprintf(stderr, "zielonka: vertices=%zu result=%s\n", vertices,
+          result_kind(result));
+  for (size_t player = 0; player < 2; player++) {
+    fprintf(stderr, "zielonka %s: ", player == PG_EVEN ? "even" : "odd");
+    write_tree_stats(result, player,
+                     ad_tree_metrics(result->decomposition[player]));
+  }
+}
+
+static void write_lifting_stats(ADLiftSolveStats const *stats,
+                                ADLiftOptions const *options,
+                                ADResult const *result) {
+  fprintf(stderr, "lifting: vertices=%zu t_full=%zu result=%s\n",
+          stats->vertices, stats->t_full, result_kind(result));
   if (options->mode == AD_LIFT_HOST_ADAPTIVE) {
-    fprintf(stderr,
-            "lifting: first_complete_k=%zu even_first_full_k=%zu "
-            "odd_first_full_k=%zu budget_exhausted=%s\n",
-            stats->first_complete_k, stats->player[PG_EVEN].first_full_k,
-            stats->player[PG_ODD].first_full_k,
+    fputs("lifting: first_complete_t=", stderr);
+    if (stats->adaptive_complete) {
+      fprintf(stderr, "%zu even_first_full_t=%zu odd_first_full_t=%zu",
+              stats->first_complete_t, stats->player[PG_EVEN].first_full_t,
+              stats->player[PG_ODD].first_full_t);
+    } else {
+      fputs("none", stderr);
+    }
+    fprintf(stderr, " budget_exhausted=%s\n",
             stats->budget_exhausted ? "yes" : "no");
   }
   if (stats->vertices == 0) {
@@ -127,22 +159,22 @@ static void write_stats(ADLiftSolveStats const *stats,
   }
   for (size_t player = 0; player < 2; player++) {
     ADLiftPlayerStats const *current = stats->player + player;
-    fprintf(stderr, "lifting %s: root_level=%" PRIu64 " H=%zu k_full=%zu K=",
+    fprintf(stderr, "lifting %s: root_level=%" PRIu64 " H=%zu k_full=%zu ",
             player == PG_EVEN ? "even" : "odd", current->root_level,
             current->height, current->k_full);
     if (options->mode == AD_LIFT_HOST_TREE) {
-      fputs("file", stderr);
+      fputs("host=file", stderr);
+    } else if (options->mode == AD_LIFT_HOST_KARY) {
+      fprintf(stderr, "host=kary arity=%zu", current->arity);
     } else {
-      fprintf(stderr, "%zu", current->k);
+      fprintf(stderr, "host=strahler K=%zu t=%zu", current->k, current->t);
     }
     fprintf(stderr,
             " host_nodes=%zu host_leaves=%zu positions=%zu rounds=%zu "
-            "lifts=%zu top=%zu dominion=%zu tree_nodes=%zu tree_leaves=%zu "
-            "tree_height=%zu strahler=%zu\n",
+            "lifts=%zu top=%zu ",
             current->host_nodes, current->host_leaves, current->host_positions,
-            current->lift.rounds, current->lift.lifts, current->lift.top_count,
-            pg_set_count(&result->region[player]), current->tree.nodes,
-            current->tree.leaves, current->tree.height, current->tree.strahler);
+            current->lift.rounds, current->lift.lifts, current->lift.top_count);
+    write_tree_stats(result, player, current->tree);
   }
 }
 
@@ -162,8 +194,9 @@ int main(int argc, char *argv[argc + 1]) {
     OPTION_NO_VERIFY,
     OPTION_ALGORITHM,
     OPTION_TREE_K,
-    OPTION_ADAPTIVE_K,
-    OPTION_START_K,
+    OPTION_ADAPTIVE_T,
+    OPTION_START_T,
+    OPTION_KARY,
     OPTION_TREE_FILE,
     OPTION_MAX_HOST_LEAVES,
     OPTION_STATS,
@@ -178,8 +211,9 @@ int main(int argc, char *argv[argc + 1]) {
       {"no-verify", no_argument, nullptr, OPTION_NO_VERIFY},
       {"algorithm", required_argument, nullptr, OPTION_ALGORITHM},
       {"tree-k", required_argument, nullptr, OPTION_TREE_K},
-      {"adaptive-k", no_argument, nullptr, OPTION_ADAPTIVE_K},
-      {"start-k", required_argument, nullptr, OPTION_START_K},
+      {"adaptive-t", no_argument, nullptr, OPTION_ADAPTIVE_T},
+      {"start-t", required_argument, nullptr, OPTION_START_T},
+      {"kary", required_argument, nullptr, OPTION_KARY},
       {"tree-file", required_argument, nullptr, OPTION_TREE_FILE},
       {"max-host-leaves", required_argument, nullptr, OPTION_MAX_HOST_LEAVES},
       {"stats", no_argument, nullptr, OPTION_STATS},
@@ -198,11 +232,13 @@ int main(int argc, char *argv[argc + 1]) {
       .schedule = AD_LIFT_SCHEDULE_ROUNDS,
       .verify = true,
   };
-  size_t host_options = 0;
-  bool lifting_options = false;
-  bool start_k_given = false;
-  size_t start_k = 1;
+  size_t tree_k = 0;
+  bool adaptive_t = false;
+  bool start_t_given = false;
+  size_t start_t = 0;
+  size_t arity = 0;
   char const *tree_path = nullptr;
+  bool host_limit_given = false;
   bool print_stats = false;
   bool verify = true;
   opterr = 0;
@@ -278,43 +314,39 @@ int main(int argc, char *argv[argc + 1]) {
       }
       break;
     case OPTION_TREE_K:
-      if (!parse_size(optarg, &lift_options.k) || lift_options.k == 0) {
+      if (!parse_size(optarg, &tree_k) || tree_k == 0) {
         fputs("Invalid --tree-k value\n", stderr);
         return EXIT_USAGE;
       }
-      lift_options.mode = AD_LIFT_HOST_STRAHLER;
-      host_options++;
-      lifting_options = true;
       break;
-    case OPTION_ADAPTIVE_K:
-      lift_options.mode = AD_LIFT_HOST_ADAPTIVE;
-      host_options++;
-      lifting_options = true;
+    case OPTION_ADAPTIVE_T:
+      adaptive_t = true;
       break;
-    case OPTION_START_K:
-      if (!parse_size(optarg, &start_k) || start_k == 0) {
-        fputs("Invalid --start-k value\n", stderr);
+    case OPTION_START_T:
+      if (!parse_size(optarg, &start_t)) {
+        fputs("Invalid --start-t value\n", stderr);
         return EXIT_USAGE;
       }
-      start_k_given = true;
-      lifting_options = true;
+      start_t_given = true;
+      break;
+    case OPTION_KARY:
+      if (!parse_size(optarg, &arity) || arity == 0) {
+        fputs("Invalid --kary value\n", stderr);
+        return EXIT_USAGE;
+      }
       break;
     case OPTION_TREE_FILE:
       tree_path = optarg;
-      lift_options.mode = AD_LIFT_HOST_TREE;
-      host_options++;
-      lifting_options = true;
       break;
     case OPTION_MAX_HOST_LEAVES:
       if (!parse_size(optarg, &lift_options.max_host_leaves)) {
         fputs("Invalid --max-host-leaves value\n", stderr);
         return EXIT_USAGE;
       }
-      lifting_options = true;
+      host_limit_given = true;
       break;
     case OPTION_STATS:
       print_stats = true;
-      lifting_options = true;
       break;
     default:
       usage(stderr, argv);
@@ -325,21 +357,37 @@ int main(int argc, char *argv[argc + 1]) {
     usage(stderr, argv);
     return EXIT_USAGE;
   }
-  if (host_options > 1) {
-    fputs("Use at most one of --tree-k, --adaptive-k, and --tree-file\n",
+  bool const strahler_host = tree_k != 0 || adaptive_t;
+  if ((strahler_host ? 1 : 0) + (arity != 0 ? 1 : 0) +
+          (tree_path != nullptr ? 1 : 0) >
+      1) {
+    fputs("Use at most one of --tree-k or --adaptive-t, --kary, and "
+          "--tree-file\n",
           stderr);
     return EXIT_USAGE;
   }
-  if (start_k_given && lift_options.mode != AD_LIFT_HOST_ADAPTIVE) {
-    fputs("--start-k requires --adaptive-k\n", stderr);
+  if (start_t_given && !adaptive_t) {
+    fputs("--start-t requires --adaptive-t\n", stderr);
     return EXIT_USAGE;
   }
-  if (algorithm == ALGORITHM_ZIELONKA && lifting_options) {
+  if (algorithm == ALGORITHM_ZIELONKA &&
+      (strahler_host || start_t_given || arity != 0 || tree_path != nullptr ||
+       host_limit_given)) {
     fputs("Lifting options cannot be used with --algorithm=zielonka\n", stderr);
     return EXIT_USAGE;
   }
-  if (lift_options.mode == AD_LIFT_HOST_ADAPTIVE) {
-    lift_options.k = start_k;
+  if (adaptive_t) {
+    lift_options.mode = AD_LIFT_HOST_ADAPTIVE;
+    lift_options.t = start_t;
+    lift_options.k = tree_k;
+  } else if (tree_k != 0) {
+    lift_options.mode = AD_LIFT_HOST_STRAHLER;
+    lift_options.k = tree_k;
+  } else if (arity != 0) {
+    lift_options.mode = AD_LIFT_HOST_KARY;
+    lift_options.arity = arity;
+  } else if (tree_path != nullptr) {
+    lift_options.mode = AD_LIFT_HOST_TREE;
   }
   lift_options.verify = verify;
 
@@ -426,6 +474,9 @@ int main(int argc, char *argv[argc + 1]) {
       status = EXIT_SOLVER;
       goto cleanup;
     }
+    if (print_stats) {
+      write_zielonka_stats(&result, game.vertex_count);
+    }
   } else {
     ADLiftSolveStats stats = {0};
     ADLiftError lift_error = {0};
@@ -433,8 +484,8 @@ int main(int argc, char *argv[argc + 1]) {
                        &lift_error)) {
       fprintf(stderr, "Solver failed: %s\n", lift_error.message);
       if (stats.budget_exhausted) {
-        fputs("Use --adaptive-k, --tree-k, a larger --max-host-leaves, or "
-              "--algorithm=zielonka\n",
+        fputs("Use --adaptive-t, --tree-k, --kary, a larger "
+              "--max-host-leaves, or --algorithm=zielonka\n",
               stderr);
       }
       status = EXIT_SOLVER;
@@ -444,15 +495,20 @@ int main(int argc, char *argv[argc + 1]) {
       fprintf(stderr, "Warning: %s; the result is partial\n",
               lift_error.message);
     } else if (lift_options.mode == AD_LIFT_HOST_ADAPTIVE &&
-               stats.first_complete_k != 0) {
+               stats.adaptive_complete) {
       fprintf(stderr,
-              "Adaptive K: complete at K=%zu (Even complete at K=%zu, Odd "
-              "complete at K=%zu)\n",
-              stats.first_complete_k, stats.player[PG_EVEN].first_full_k,
-              stats.player[PG_ODD].first_full_k);
+              "Adaptive t: complete at t=%zu (Even complete at t=%zu, Odd "
+              "complete at t=%zu)\n",
+              stats.first_complete_t, stats.player[PG_EVEN].first_full_t,
+              stats.player[PG_ODD].first_full_t);
+    } else if (lift_options.mode == AD_LIFT_HOST_ADAPTIVE) {
+      fprintf(stderr,
+              "Adaptive t: incomplete at t=%zu with K capped at %zu; the "
+              "result is partial\n",
+              stats.t_full, lift_options.k);
     }
     if (print_stats) {
-      write_stats(&stats, &lift_options, &result);
+      write_lifting_stats(&stats, &lift_options, &result);
     }
   }
 

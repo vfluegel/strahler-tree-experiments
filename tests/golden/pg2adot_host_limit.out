@@ -1,2 +1,2 @@
 Solver failed: the Even host U^3_{2,3} has 17 leaves, more than the limit of 5
-Use --adaptive-k, --tree-k, a larger --max-host-leaves, or --algorithm=zielonka
+Use --adaptive-t, --tree-k, --kary, a larger --max-host-leaves, or --algorithm=zielonka

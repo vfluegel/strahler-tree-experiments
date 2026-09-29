@@ -289,9 +289,15 @@ test(
   should_fail : true,
 )
 test(
-  'pg2adot_rejects_zero_start_k',
+  'pg2adot_rejects_bad_start_t',
   pg2adot,
-  args : ['--adaptive-k', '--start-k=0'],
+  args : ['--adaptive-t', '--start-t=x'],
+  should_fail : true,
+)
+test(
+  'pg2adot_rejects_zero_kary',
+  pg2adot,
+  args : ['--kary=0'],
   should_fail : true,
 )
 test(
@@ -303,19 +309,19 @@ test(
 test(
   'pg2adot_rejects_two_hosts',
   pg2adot,
-  args : ['--tree-k=1', '--adaptive-k'],
+  args : ['--tree-k=1', '--kary=2'],
   should_fail : true,
 )
 test(
-  'pg2adot_rejects_start_k_without_adaptive',
+  'pg2adot_rejects_start_t_without_adaptive',
   pg2adot,
-  args : ['--start-k=2'],
+  args : ['--start-t=2'],
   should_fail : true,
 )
 test(
   'pg2adot_rejects_zielonka_lifting_options',
   pg2adot,
-  args : ['--algorithm=zielonka', '--stats'],
+  args : ['--algorithm=zielonka', '--kary=2'],
   should_fail : true,
 )
 test(
@@ -672,7 +678,7 @@ test(
     'tests/golden/pg2adot_adaptive_stats.out',
     'tests/actual/pg2adot_adaptive_stats.out',
     'EMPTY',
-    '--adaptive-k',
+    '--adaptive-t',
     '--stats',
     '--player=even',
     '--labels=none',
@@ -689,7 +695,7 @@ test(
     'tests/golden/pg2adot_adaptive_limit.out',
     'tests/actual/pg2adot_adaptive_limit.out',
     'EMPTY',
-    '--adaptive-k',
+    '--adaptive-t',
     '--max-host-leaves=1',
     '--labels=none',
     files('tests/games/strahler_two.pg'),
@@ -720,6 +726,72 @@ test(
     'tests/actual/pg2adot_invalid_tree.out',
     'EMPTY',
     '--tree-file=tests/trees/invalid.tree',
+    files('tests/games/strahler_two.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_adaptive_capped',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_adaptive_capped.out',
+    'tests/actual/pg2adot_adaptive_capped.out',
+    'EMPTY',
+    '--adaptive-t',
+    '--tree-k=1',
+    '--player=even',
+    '--labels=none',
+    files('tests/games/strahler_two.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_kary_partial_sets',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_kary_partial_sets.out',
+    'tests/actual/pg2adot_kary_partial_sets.out',
+    'EMPTY',
+    '--kary=1',
+    '--labels=sets',
+    files('tests/games/strahler_two.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_kary_stats',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_kary_stats.out',
+    'tests/actual/pg2adot_kary_stats.out',
+    'EMPTY',
+    '--kary=2',
+    '--stats',
+    '--player=even',
+    '--labels=none',
+    files('tests/games/strahler_two.pg'),
+  ],
+  workdir : meson.project_source_root(),
+)
+
+test(
+  'pg2adot_zielonka_stats',
+  run_single_test,
+  args : [
+    pg2adot,
+    'tests/golden/pg2adot_zielonka_stats.out',
+    'tests/actual/pg2adot_zielonka_stats.out',
+    'EMPTY',
+    '--algorithm=zielonka',
+    '--stats',
+    '--player=even',
+    '--labels=none',
     files('tests/games/strahler_two.pg'),
   ],
   workdir : meson.project_source_root(),
@@ -964,6 +1036,16 @@ if dot_program.found()
       '-o',
       '/dev/null',
       files('tests/golden/pg2adot_partial_jurdzinski_tree_file.out'),
+    ],
+  )
+  test(
+    'pg2adot_kary_partial_sets_dot_syntax',
+    dot_program,
+    args : [
+      '-Tdot',
+      '-o',
+      '/dev/null',
+      files('tests/golden/pg2adot_kary_partial_sets.out'),
     ],
   )
   test(

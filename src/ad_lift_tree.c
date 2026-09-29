@@ -23,6 +23,30 @@ static void tree_error(ADLiftError *error, char const *message) {
   return true;
 }
 
+/* A base tree is either an ordered tree or a full tree in which every node
+ * above the bottom level has arity children. */
+typedef struct {
+  OrderedTreeNode const *node;
+  size_t arity;
+  /* Full trees only: the number of levels below this node. */
+  size_t below;
+} BaseShape;
+
+[[nodiscard]] static size_t shape_child_count(BaseShape const shape) {
+  if (shape.node != nullptr) {
+    return shape.node->child_count;
+  }
+  return shape.below == 0 ? 0 : shape.arity;
+}
+
+[[nodiscard]] static BaseShape shape_child(BaseShape const shape,
+                                           size_t const index) {
+  if (shape.node != nullptr) {
+    return (BaseShape){.node = shape.node->children[index].child};
+  }
+  return (BaseShape){.arity = shape.arity, .below = shape.below - 1};
+}
+
 typedef struct {
   ADLiftTree *tree;
   size_t next_node;
@@ -37,16 +61,17 @@ static size_t add_position(TreeBuilder *builder, ADPosition const position) {
 
 /* The caller has checked that every level stays nonnegative, so only the
  * MINUS_INF child of a level-zero node lacks a level. */
-static size_t build_node(TreeBuilder *builder, OrderedTreeNode const *base,
+static size_t build_node(TreeBuilder *builder, BaseShape const base,
                          uint64_t const level, size_t const parent) {
   size_t const index = builder->next_node++;
+  size_t const child_count = shape_child_count(base);
   ADLiftNode *node = builder->tree->nodes + index;
   *node = (ADLiftNode){
       .level = level,
       .parent = parent,
       .first_child = SIZE_MAX,
       .next_sibling = SIZE_MAX,
-      .child_count = base->child_count,
+      .child_count = child_count,
   };
   node->regular = add_position(builder, (ADPosition){.kind = AD_POS_REGULAR,
                                                      .has_level = true,
@@ -59,9 +84,9 @@ static size_t build_node(TreeBuilder *builder, OrderedTreeNode const *base,
                                          .node = index});
 
   size_t previous = SIZE_MAX;
-  for (size_t child_index = 0; child_index < base->child_count; child_index++) {
-    size_t const child = build_node(builder, base->children[child_index].child,
-                                    level - 2, index);
+  for (size_t child_index = 0; child_index < child_count; child_index++) {
+    size_t const child =
+        build_node(builder, shape_child(base, child_index), level - 2, index);
     ADLiftNode *nodes = builder->tree->nodes;
     nodes[child].after = add_position(builder, (ADPosition){.kind = AD_POS_PLUS,
                                                             .has_level = true,
@@ -77,13 +102,12 @@ static size_t build_node(TreeBuilder *builder, OrderedTreeNode const *base,
   return index;
 }
 
-bool ad_lift_tree_build(OrderedTreeNode const *base, PGPlayer const player,
-                        uint64_t const root_level, ADLiftTree *tree,
-                        ADLiftError *error) {
-  if (tree != nullptr) {
-    *tree = (ADLiftTree){0};
-  }
-  if (base == nullptr || tree == nullptr || player > PG_ODD) {
+[[nodiscard]] static bool build_shape(BaseShape const base, size_t const height,
+                                      size_t const node_count,
+                                      PGPlayer const player,
+                                      uint64_t const root_level,
+                                      ADLiftTree *tree, ADLiftError *error) {
+  if (player > PG_ODD) {
     tree_error(error, "invalid host tree input");
     return false;
   }
@@ -91,15 +115,11 @@ bool ad_lift_tree_build(OrderedTreeNode const *base, PGPlayer const player,
     tree_error(error, "the host root level must have the player's parity");
     return false;
   }
-  size_t const height = ordered_tree_height(base);
-  if (height == SIZE_MAX || height > root_level / 2) {
+  if (height > root_level / 2) {
     tree_error(error, "the host tree is too deep for its root level");
     return false;
   }
-
-  size_t node_count = 0;
-  if (!count_nodes(base, &node_count) || node_count > SIZE_MAX / 3 ||
-      node_count > SIZE_MAX / sizeof(ADLiftNode) ||
+  if (node_count > SIZE_MAX / 3 || node_count > SIZE_MAX / sizeof(ADLiftNode) ||
       3 * node_count > SIZE_MAX / sizeof(ADPosition)) {
     tree_error(error, "the host tree is too large");
     return false;
@@ -137,6 +157,68 @@ bool ad_lift_tree_build(OrderedTreeNode const *base, PGPlayer const player,
     return false;
   }
   return true;
+}
+
+bool ad_lift_tree_build(OrderedTreeNode const *base, PGPlayer const player,
+                        uint64_t const root_level, ADLiftTree *tree,
+                        ADLiftError *error) {
+  if (tree != nullptr) {
+    *tree = (ADLiftTree){0};
+  }
+  if (base == nullptr || tree == nullptr) {
+    tree_error(error, "invalid host tree input");
+    return false;
+  }
+  size_t const height = ordered_tree_height(base);
+  size_t node_count = 0;
+  if (height == SIZE_MAX || !count_nodes(base, &node_count)) {
+    tree_error(error, "the host tree is too large");
+    return false;
+  }
+  return build_shape((BaseShape){.node = base}, height, node_count, player,
+                     root_level, tree, error);
+}
+
+bool ad_lift_full_tree_size(size_t const arity, size_t const levels,
+                            size_t *nodes, size_t *leaves) {
+  if (arity == 0 || levels == 0 || nodes == nullptr || leaves == nullptr) {
+    return false;
+  }
+  size_t level_size = 1;
+  size_t total = 1;
+  for (size_t level = 1; level < levels; level++) {
+    if (level_size > SIZE_MAX / arity) {
+      return false;
+    }
+    level_size *= arity;
+    if (total > SIZE_MAX - level_size) {
+      return false;
+    }
+    total += level_size;
+  }
+  *nodes = total;
+  *leaves = level_size;
+  return true;
+}
+
+bool ad_lift_tree_build_full(size_t const arity, size_t const levels,
+                             PGPlayer const player, uint64_t const root_level,
+                             ADLiftTree *tree, ADLiftError *error) {
+  if (tree != nullptr) {
+    *tree = (ADLiftTree){0};
+  }
+  size_t nodes = 0;
+  size_t leaves = 0;
+  if (tree == nullptr || arity == 0 || levels == 0) {
+    tree_error(error, "invalid full host tree input");
+    return false;
+  }
+  if (!ad_lift_full_tree_size(arity, levels, &nodes, &leaves)) {
+    tree_error(error, "the host tree is too large");
+    return false;
+  }
+  return build_shape((BaseShape){.arity = arity, .below = levels - 1},
+                     levels - 1, nodes, player, root_level, tree, error);
 }
 
 void ad_lift_tree_destroy(ADLiftTree *tree) {

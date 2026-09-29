@@ -17,13 +17,14 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `test_ad_lift_tree.c` checks the flattened `leafy_∞(T)` host: position order,
   levels, subtree blocks, `after`, `−∞`, `c+`, top, priority compatibility,
   and the skipping next-compatible search against a linear scan on Strahler
-  hosts.
+  and full `A`-ary hosts.
 - `test_ad_lift.c` checks the lifting solver on the sample games, compares
   full-host regions with the exhaustive solver and with Zielonka on random
   games, checks that restricted Strahler hosts give subsets of the winning
   regions, compares the round and single-vertex schedules, exercises the direct
-  labelling verifier and materialization failures, and covers adaptive, tree,
-  and host-limit modes.
+  labelling verifier and materialization failures, and covers adaptive-t,
+  full `A`-ary, tree, and host-limit modes. The full `n`-ary host is also
+  compared with the exhaustive solver.
 - `test_zielonka.c` checks exact classic and tree-relative decomposition
   witnesses and metrics, verifies literal priority-gap wrappers, and compares
   fixed-seed random games with an exhaustive positional-strategy solver.
