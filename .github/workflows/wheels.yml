@@ -8,12 +8,33 @@ on:
         required: false
         default: ''
         type: string
+    outputs:
+      version:
+        description: Version of the built wheels
+        value: ${{ jobs.version.outputs.version }}
 
 permissions:
   contents: read
 
 jobs:
+  # Derive the version once, so every job in a run agrees even if a tag is
+  # pushed while it runs.
+  version:
+    name: Version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.derive.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag != '' && format('refs/tags/{0}', inputs.tag) || '' }}
+
+      - id: derive
+        run: echo "version=$(python3 ci/version.py)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: version
     name: Wheel (${{ matrix.platform }})
     strategy:
       fail-fast: false
@@ -28,6 +49,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       RELEASE_TAG: ${{ inputs.tag }}
+      STRAHLER_VERSION: ${{ needs.version.outputs.version }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -55,7 +77,6 @@ jobs:
 
       - name: Build and repair wheel
         env:
-          STRAHLER_VERSION: ${{ env.PROJECT_VERSION }}
           CIBW_ENVIRONMENT_LINUX: STRAHLER_VERSION=${{ env.PROJECT_VERSION }}
         run: python -m cibuildwheel --output-dir wheelhouse
 

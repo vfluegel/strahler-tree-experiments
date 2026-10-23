@@ -19,6 +19,8 @@ jobs:
     name: Notebooks release zip
     needs: wheels
     runs-on: ubuntu-24.04
+    env:
+      STRAHLER_VERSION: ${{ needs.wheels.outputs.version }}
     steps:
       - uses: actions/checkout@v7
         with:
