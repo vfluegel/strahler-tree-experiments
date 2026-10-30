@@ -2,7 +2,7 @@ digraph attractor_decompositions {
   graph [rankdir=TB, ordering=out];
   node [shape=box];
   result [label="result (synthetic)"];
-  even_empty [label=<<B>Even</B>: no residual decomposition; see shaved vertices>];
+  even_empty [label=<<B>Even</B>: no decomposition of the remaining game; see shaved vertices>];
   result -> even_empty;
   even_shaved [style="dashed,filled", fillcolor=lightgray, label=<<B>shaved (Even)</B>: 4 vertices<BR/>{0,1,2,6}>];
   even_empty -> even_shaved [style=dashed];

@@ -15,7 +15,7 @@ from nbclient import NotebookClient
 from jupyter_client import KernelManager
 from jupyter_client.kernelspec import KernelSpecManager
 
-from strahler.widgets import GameView, TreeView, _controls_html
+from strahler.widgets import GameView, TreeView, _controls_html, _ascii
 
 EXAMPLES = Path(__file__).resolve().parents[1] / 'jupyter-examples'
 WIDGET_MIME = 'application/vnd.jupyter.widget-view+json'
@@ -71,6 +71,9 @@ def freeze_outputs(notebook, states):
                 del data[WIDGET_MIME]
                 output.get('metadata', {}).pop(WIDGET_MIME, None)
                 data['text/plain'] = 'Static widget snapshot; rerun for interactive controls.'
+            for mime in ('image/svg+xml', 'text/html'):
+                if mime in data:
+                    data[mime] = _ascii(data[mime])
             text = json.dumps(output, ensure_ascii=False)
             if re.search(r'0x[\da-fA-F]{6,}|/(?:home|Users|tmp|usr|opt|var)/|[A-Z]:\\', text):
                 raise ValueError('Volatile output; change the cell to omit paths or memory addresses')

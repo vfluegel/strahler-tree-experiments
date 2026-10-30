@@ -224,9 +224,70 @@ ADTreeMetrics ad_tree_metrics(ADNode const *root) {
   return trap_violation(game, residual, trap, player) == SIZE_MAX;
 }
 
+bool ad_verify_collect(ADVerifyErrors *errors, ADVerifyError *error,
+                       size_t from, size_t to) {
+  if (errors == nullptr || error->condition == AD_VERIFY_MEMORY) {
+    return false;
+  }
+  size_t count = errors->count;
+  if (count >= SIZE_MAX / sizeof(*errors->items) - 1) {
+    return false;
+  }
+  ADVerifyError *items = realloc(errors->items, (count + 1) * sizeof(*items));
+  if (items == nullptr) {
+    return false;
+  }
+  errors->items = items;
+  size_t(*edges)[2] = realloc(errors->edges, (count + 1) * sizeof(*edges));
+  if (edges == nullptr) {
+    return false;
+  }
+  errors->edges = edges;
+  error->path_length = errors->path_length;
+  memcpy(error->path, errors->path, errors->path_length * sizeof(*error->path));
+  items[count] = *error;
+  edges[count][0] = from;
+  edges[count][1] = to;
+  errors->count++;
+  *error = (ADVerifyError){.vertex = SIZE_MAX};
+  return true;
+}
+
+static size_t witness_edge(PGGame const *game, PGSet const *domain,
+                           PGSet const *set, size_t vertex, bool inside) {
+  if (vertex != SIZE_MAX && pg_set_contains(domain, vertex)) {
+    for (size_t e = game->succ_offsets[vertex];
+         e < game->succ_offsets[vertex + 1]; e++) {
+      size_t v = game->successors[e];
+      if (pg_set_contains(domain, v) && pg_set_contains(set, v) == inside) {
+        return v;
+      }
+    }
+  }
+  return SIZE_MAX;
+}
+
+static size_t attractor_witness(PGGame const *game, PGSet const *domain,
+                                PGSet const *target, PGSet const *expected,
+                                PGSet const *stored, size_t vertex,
+                                PGPlayer player) {
+  if (vertex == SIZE_MAX || pg_set_contains(target, vertex)) {
+    return SIZE_MAX;
+  }
+  if (pg_set_contains(expected, vertex) && !pg_set_contains(stored, vertex) &&
+      game->vertices[vertex].owner == player) {
+    return witness_edge(game, domain, target, vertex, true);
+  }
+  if (pg_set_contains(stored, vertex) && !pg_set_contains(expected, vertex) &&
+      game->vertices[vertex].owner != player) {
+    return witness_edge(game, domain, expected, vertex, false);
+  }
+  return SIZE_MAX;
+}
+
 [[nodiscard]] static bool verify_node(PGGame const *game, PGSet const *domain,
-                                      ADNode const *root,
-                                      ADVerifyError *error) {
+                                      ADNode const *root, ADVerifyError *error,
+                                      ADVerifyErrors *errors) {
   /* A valid alpha/d node stores Attr_alpha^W(priority d) as its top
    * attractor. In the remaining domain, every child is a nonempty opponent
    * trap with priorities at most d-2 and a verified alpha/(d-2) subtree. Its
@@ -237,13 +298,15 @@ ADTreeMetrics ad_tree_metrics(ADNode const *root) {
       root->top_attractor.bit_count != game->vertex_count) {
     ad_verify_error(error, AD_VERIFY_NODE, SIZE_MAX,
                     "invalid decomposition node metadata");
-    return false;
+    return ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX);
   }
   if (!priorities_at_most(game, domain, root->priority_bound)) {
     ad_verify_error(error, AD_VERIFY_PRIORITY,
                     priority_violation(game, domain, root->priority_bound),
                     "a domain priority exceeds the node bound");
-    return false;
+    if (!ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX)) {
+      return false;
+    }
   }
 
   PGSet target = {0};
@@ -270,42 +333,76 @@ ADTreeMetrics ad_tree_metrics(ADNode const *root) {
     ad_verify_error(error, AD_VERIFY_TOP,
                     difference(&expected, &root->top_attractor),
                     "the stored top attractor is incorrect");
-    goto failure;
+    size_t vertex = error == nullptr ? SIZE_MAX : error->vertex;
+    size_t to = attractor_witness(game, domain, &target, &expected,
+                                  &root->top_attractor, vertex, root->player);
+    if (!ad_verify_collect(errors, error, to == SIZE_MAX ? SIZE_MAX : vertex,
+                           to))
+      goto failure;
   }
   pg_set_subtract_into(&residual, &root->top_attractor);
 
   if (root->priority_bound < 2 && root->child_count != 0) {
     ad_verify_error(error, AD_VERIFY_CHILD_BOUND, SIZE_MAX,
                     "a bound below two cannot have child traps");
-    goto failure;
+    if (!ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX)) {
+      goto failure;
+    }
+    goto done;
   }
   for (size_t index = 0; index < root->child_count; index++) {
+    if (errors != nullptr) {
+      errors->path[errors->path_length++] = index;
+    }
     ADChild const *child = root->children + index;
     if (pg_set_empty(&child->trap) || !pg_set_subset(&child->trap, &residual) ||
         !trap_conditions(game, &residual, &child->trap, root->player)) {
       ad_verify_error(error, AD_VERIFY_TRAP,
                       trap_witness(game, &residual, &child->trap, root->player),
                       "a child is not a nonempty opponent trap");
-      child_error(error, index);
-      goto failure;
+      if (errors == nullptr) {
+        child_error(error, index);
+      }
+      size_t vertex = error == nullptr ? SIZE_MAX : error->vertex;
+      size_t to = witness_edge(game, &residual, &child->trap, vertex, false);
+      if (!ad_verify_collect(errors, error, to == SIZE_MAX ? SIZE_MAX : vertex,
+                             to))
+        goto failure;
     }
     uint64_t const child_bound = root->priority_bound - 2;
     if (!priorities_at_most(game, &child->trap, child_bound)) {
       ad_verify_error(error, AD_VERIFY_PRIORITY,
                       priority_violation(game, &child->trap, child_bound),
                       "a child priority exceeds its bound");
-      child_error(error, index);
-      goto failure;
+      if (errors == nullptr) {
+        child_error(error, index);
+      }
+      if (!ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX)) {
+        goto failure;
+      }
     }
     if (child->subtree == nullptr || child->subtree->player != root->player ||
-        child->subtree->priority_bound != child_bound ||
-        !verify_node(game, &child->trap, child->subtree, error)) {
-      if (error == nullptr || error->message[0] == '\0') {
-        ad_verify_error(error, AD_VERIFY_CHILD, SIZE_MAX,
-                        "invalid recursive child decomposition");
+        child->subtree->priority_bound != child_bound) {
+      ad_verify_error(error, AD_VERIFY_CHILD, SIZE_MAX,
+                      "invalid recursive child decomposition");
+      if (errors == nullptr) {
+        child_error(error, index);
       }
-      child_error(error, index);
+      if (!ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX)) {
+        goto failure;
+      }
+    } else if ((errors == nullptr || pg_subgame_is_total(game, &child->trap)) &&
+               !verify_node(game, &child->trap, child->subtree, error,
+                            errors)) {
+      if (errors == nullptr) {
+        child_error(error, index);
+      }
       goto failure;
+    }
+    if (errors != nullptr && (!pg_subgame_is_total(game, &residual) ||
+                              !pg_set_subset(&child->trap, &residual))) {
+      errors->path_length--;
+      continue;
     }
     PGSet child_attractor = {0};
     if (!pg_attractor(game, &residual, &child->trap, root->player,
@@ -319,19 +416,34 @@ ADTreeMetrics ad_tree_metrics(ADNode const *root) {
       ad_verify_error(error, AD_VERIFY_ATTRACTOR,
                       difference(&child_attractor, &child->attractor),
                       "a stored child attractor is incorrect");
-      pg_set_destroy(&child_attractor);
-      child_error(error, index);
-      goto failure;
+      size_t vertex = error == nullptr ? SIZE_MAX : error->vertex;
+      size_t to =
+          attractor_witness(game, &residual, &child->trap, &child_attractor,
+                            &child->attractor, vertex, root->player);
+      if (errors == nullptr) {
+        child_error(error, index);
+      }
+      if (!ad_verify_collect(errors, error, to == SIZE_MAX ? SIZE_MAX : vertex,
+                             to)) {
+        pg_set_destroy(&child_attractor);
+        goto failure;
+      }
     }
     pg_set_subtract_into(&residual, &child_attractor);
     pg_set_destroy(&child_attractor);
+    if (errors != nullptr) {
+      errors->path_length--;
+    }
   }
   if (!pg_set_empty(&residual)) {
     ad_verify_error(error, AD_VERIFY_PARTITION, pg_set_next(&residual, 0),
-                    "child attractors do not exhaust the residual domain");
-    goto failure;
+                    "child attractors do not cover the subgame Gᵢ");
+    if (!ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX)) {
+      goto failure;
+    }
   }
 
+done:
   pg_set_destroy(&target);
   pg_set_destroy(&expected);
   pg_set_destroy(&residual);
@@ -360,7 +472,7 @@ bool ad_tree_verify(PGGame const *game, PGSet const *domain, ADNode const *root,
                     "verifier domain is not total");
     return false;
   }
-  return verify_node(game, domain, root, error);
+  return verify_node(game, domain, root, error, nullptr);
 }
 
 void ad_tree_relative_parts_destroy(ADTreeRelativeParts *parts) {
@@ -720,10 +832,11 @@ bool ad_result_verify_complete(PGGame const *game, PGSet const *domain,
 /* The strict verifier compares stored sets exactly. Restrict once, then reuse
  * its conditions, keeping empty-core/nonempty-side children as actual errors.
  */
-[[nodiscard]] static ADNode *
-restrict_node(PGSet const *subgame, ADNode const *root, ADVerifyError *error) {
+[[nodiscard]] static ADNode *restrict_node(PGSet const *subgame,
+                                           ADNode const *root,
+                                           ADVerifyError *error, bool collect) {
   if (root == nullptr || root->player > PG_ODD ||
-      root->priority_bound % 2 != (uint64_t)root->player ||
+      (!collect && root->priority_bound % 2 != (uint64_t)root->player) ||
       root->top_attractor.bit_count != subgame->bit_count ||
       (root->child_count != 0 && root->children == nullptr)) {
     ad_verify_error(error, AD_VERIFY_NODE, SIZE_MAX,
@@ -751,13 +864,15 @@ restrict_node(PGSet const *subgame, ADNode const *root, ADVerifyError *error) {
     if (!child_in_subgame(source, subgame)) {
       continue;
     }
-    if (root->priority_bound < 2) {
+    if (!collect && root->priority_bound < 2) {
       ad_verify_error(error, AD_VERIFY_CHILD_BOUND, SIZE_MAX,
                       "a bound below two cannot have child traps");
       goto failure;
     }
-    if (source->subtree == nullptr || source->subtree->player != root->player ||
-        source->subtree->priority_bound != root->priority_bound - 2) {
+    if (!collect &&
+        (source->subtree == nullptr ||
+         source->subtree->player != root->player ||
+         source->subtree->priority_bound != root->priority_bound - 2)) {
       ad_verify_error(error, AD_VERIFY_CHILD, SIZE_MAX,
                       "invalid recursive child decomposition");
       child_error(error, index);
@@ -772,7 +887,7 @@ restrict_node(PGSet const *subgame, ADNode const *root, ADVerifyError *error) {
     }
     pg_set_intersect_into(&child.trap, subgame);
     pg_set_intersect_into(&child.attractor, subgame);
-    child.subtree = restrict_node(subgame, source->subtree, error);
+    child.subtree = restrict_node(subgame, source->subtree, error, collect);
     if (child.subtree == nullptr) {
       goto child_failure;
     }
@@ -849,7 +964,7 @@ bool ad_tree_check(PGGame const *game, PGSet const *subgame,
                     "verifier domain is not total");
     return false;
   }
-  ADNode *restricted = restrict_node(subgame, root, error);
+  ADNode *restricted = restrict_node(subgame, root, error, false);
   if (restricted == nullptr) {
     return false;
   }
@@ -859,4 +974,32 @@ bool ad_tree_check(PGGame const *game, PGSet const *subgame,
   }
   ad_node_destroy(restricted);
   return valid;
+}
+
+bool ad_tree_check_all(PGGame const *game, PGSet const *subgame,
+                       PGPlayer player, ADNode const *root,
+                       ADVerifyErrors *errors) {
+  ADVerifyError error = {.vertex = SIZE_MAX};
+  if (pg_set_empty(subgame)) {
+    return true;
+  }
+  if (root == nullptr || root->player != player ||
+      !pg_subgame_is_total(game, subgame)) {
+    bool const valid = ad_tree_check(game, subgame, player, root, &error);
+    return valid || ad_verify_collect(errors, &error, SIZE_MAX, SIZE_MAX);
+  }
+  ADNode *restricted = restrict_node(subgame, root, &error, true);
+  if (restricted == nullptr) {
+    if (error.condition == AD_VERIFY_MEMORY) {
+      return false;
+    }
+    return ad_verify_collect(errors, &error, SIZE_MAX, SIZE_MAX);
+  }
+  size_t start = errors->count;
+  bool ok = verify_node(game, subgame, restricted, &error, errors);
+  for (size_t i = start; i < errors->count; i++) {
+    restore_check_path(subgame, root, errors->items + i);
+  }
+  ad_node_destroy(restricted);
+  return ok;
 }

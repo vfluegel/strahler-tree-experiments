@@ -39,13 +39,14 @@ EXPECTED_CALLS = {
 }
 
 
-def count_calls(text, algorithm):
-    """Count calls through the documented C ABI without storing millions of events.
+def count_run(text, algorithm, kinds=("labels", "attractor", "call", "check"), **options):
+    """Count chosen event kinds through the documented C ABI without storing millions of events.
 
     Python trace() keeps its entire event list. The counting observer keeps the
     live H_16 table small without changing the solver.
     """
     import ctypes as C
+    import json
     import strahler
     from strahler import _native
 
@@ -53,15 +54,22 @@ def count_calls(text, algorithm):
     library = _native.library()
     pointer = C.c_void_p
     game, result, error = pointer(), pointer(), pointer()
-    count = 0
+    counts = dict.fromkeys(kinds, 0)
+    prefixes = {f'{"{"}"event":"{kind}",'.encode(): kind for kind in counts}
     errors = []
+    phases = {}
 
     @_native.Callback
     def observe(context, line, length):
-        nonlocal count
         try:
             # shortcut: JSON writer puts event first; update if its line prefix changes.
-            count += C.string_at(line, min(length, 16)) == b'{"event":"call",'
+            prefix = C.string_at(line, min(length, 64)).split(b',', 1)[0] + b','
+            if prefix in prefixes:
+                counts[prefixes[prefix]] += 1
+            if prefix == b'{"event":"phase",':
+                event = json.loads(C.string_at(line, length))
+                if event['phase'] == 't_raised':
+                    phases['t'] = event['value']
             return 1
         except BaseException as exc:
             errors.append(exc)
@@ -79,10 +87,21 @@ def count_calls(text, algorithm):
     try:
         encoded = text.encode('utf-8')
         require(library.strahler_game_parse(encoded, len(encoded), C.byref(game), C.byref(error)))
-        flags = (C.c_char_p * 2)(f'--algorithm={algorithm}'.encode(), b'--trace-limit=10000000')
-        require(library.strahler_decompose(game, flags, 2, observe, None, C.byref(result), C.byref(error)))
-        return count
+        flags = _native.options(['--trace-limit=10000000'], options, algorithm)
+        require(library.strahler_decompose(game, flags, len(flags), observe, None, C.byref(result), C.byref(error)))
+        return counts, json.loads(C.string_at(result)), phases
     finally:
         library.strahler_game_free(game)
         library.strahler_free(result)
         library.strahler_free(error)
+
+
+def count_events(text, algorithm, kinds=("labels", "attractor", "call", "check"), **options):
+    """Return streaming counts and completeness, with no retained event list."""
+    counts, result, phases = count_run(text, algorithm, kinds, **options)
+    return counts, result['complete']
+
+
+def count_calls(text, algorithm):
+    """Compatibility helper for notebook 03's recorded call table."""
+    return count_events(text, algorithm, kinds=('call',))[0]['call']

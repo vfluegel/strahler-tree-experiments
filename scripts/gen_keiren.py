@@ -872,7 +872,8 @@ def intro(rows):
         ])
         + "Paired values use Even / Odd (E / O); CSV columns use _even and _odd. "
         "A hyphen in the tables or an empty CSV field means unavailable. "
-        "Tree metrics cover the residual decomposition or occupied progress-measure tree, "
+        "Tree metrics cover the remaining game (after preprocessing and earlier shaving rounds): "
+        "its decomposition or occupied progress-measure tree, "
         "including its extra root. Empty trees have zero metrics. Connector boxes, shaved "
         "regions and unresolved vertices do not count. Parameters and trees describe the "
         "final round; winning counts include all rounds.\n\n"

@@ -12,14 +12,26 @@ HERE = Path(__file__).resolve().parent
 BACKENDS = ('zielonka', 'zielonka-sym', 'lifting', 'lifting-sym')
 
 
+def won_vertices(result, player):
+    """Include wins from preprocessing and every shaving round, once per vertex."""
+    won = set(result.regions[player]) | set(result.data['initial_won'][player])
+    for shave in result.data['shaves']:
+        won.update(shave['attracted'][player])
+    return won
+
+
 def metrics_table(results):
     rows = []
     for name, result in results.items():
         for player, metrics in enumerate(result.metrics['trees']):
             rows.append([name, 'Even' if player == 0 else 'Odd',
                          *(metrics[key] for key in ('nodes', 'leaves', 'height', 'strahler')),
-                         len(result.regions[player]), result.complete, len(result.unresolved)])
-    table(['backend', 'player', 'nodes', 'leaves', 'height', 'Strahler', 'residual won', 'complete', 'unresolved'], rows)
+                         len(result.regions[player]), len(won_vertices(result, player)),
+                         result.complete, len(result.unresolved)])
+    table(['backend', 'player', 'nodes', 'leaves', 'height', 'Strahler', 'dominion', 'won', 'complete', 'unresolved'], rows)
+    print("dominion: vertices covered by this player's attractor decomposition (its tree); "
+          "won: every vertex this player wins, including vertices removed by preprocessing (+pre) "
+          "or earlier shaving rounds (+iter); unresolved: vertices neither player's search certified.")
 
 
 def table(headers, rows):

@@ -98,6 +98,14 @@ class TraceCursor:
             return self.stack[-1]['sets'].get('G_i', self.stack[-1]['event']['subgame'])
         return self.active
 
+    def candidate_path(self, player):
+        event = self.state.event
+        if event['event'] == 'result' or self.run.events[0]['algorithm'] == 'lifting':
+            return ()
+        if event['event'] == 'check' and event['player'] == player:
+            return tuple(event['path'])
+        return tuple(self.stack[-1]['event']['paths'][player]) if self.stack else ()
+
     def candidate(self, player):
         """Candidate, domain, and partial-materializer diagnostics at this step."""
         if player not in (0, 1):

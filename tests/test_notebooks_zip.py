@@ -17,11 +17,20 @@ class NotebooksZip(unittest.TestCase):
             shutil.copyfile(Path(__file__).resolve().parents[1] / 'ci' / script.name, script)
             notebooks = root / 'jupyter-examples'
             (notebooks / 'data').mkdir(parents=True)
+            (notebooks / 'nester').mkdir()
             files = {'README.md': '# Notebooks\n', 'requirements.txt': 'jupyterlab\n',
-                     'example.ipynb': '{}', 'data/game.pg': '0 0 0 0;',
+                     'example.ipynb': '{}', '07-symmetric-lifting-kary-nester.ipynb': '{}',
+                     'symmetric_lifting.py': '# measurement helper\n',
+                     'nester/Nestern=1.gm.bz2': 'compressed fixture',
+                     'nester/history.csv': 'game,backend\n', 'data/game.pg': '0 0 0 0;',
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)
+            data = {'keiren/results.csv': 'archive,game,backend\nmlsolver,Nestern=1.gm,lifting\n',
+                    'KEIREN.md': '# Column definitions\n'}
+            (root / 'keiren').mkdir()
+            for name, content in data.items():
+                (root / name).write_text(content)
             wheels = root / 'wheels'
             wheels.mkdir()
             names = [f'strahler-0.4-py3-none-{platform}.whl' for platform in
@@ -33,11 +42,13 @@ class NotebooksZip(unittest.TestCase):
             prefix = 'strahler-notebooks-0.4/'
             with ZipFile(root / 'out/strahler-notebooks-0.4.zip') as bundle:
                 self.assertEqual(set(bundle.namelist()),
-                                 {prefix + name for name in files} |
+                                 {prefix + name for name in files.keys() | data.keys()} |
                                  {prefix + 'wheels/' + name for name in names})
                 for name, content in files.items():
                     if name != 'requirements.txt':
                         self.assertEqual(bundle.read(prefix + name).decode(), content)
+                for name, content in data.items():
+                    self.assertEqual(bundle.read(prefix + name).decode(), content)
                 self.assertEqual(bundle.read(prefix + 'requirements.txt').decode(),
                                  '--find-links ./wheels\n--only-binary strahler\n'
                                  'strahler==0.4\njupyterlab\n')

@@ -21,7 +21,7 @@ digraph attractor_decompositions {
   even_round_1_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 2</TD></TR><TR><TD>|<I>V</I>| = 3</TD><TD>|<I>H</I>| = 1</TD></TR><TR><TD>|<I>T</I>| = 0</TD><TD>|<I>S</I>| = 1</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>V</I> = {0,3,4}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>H</I> = {0}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>T</I> = {}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>S</I> = {4}</TD></TR></TABLE>>];
   even_round_1_0 -> even_round_1_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD><I>i</I> = 1</TD></TR><TR><TD>|<I>R</I><SUB><I>i</I></SUB>| = 1</TD></TR><TR><TD ALIGN="LEFT"><I>R</I><SUB><I>i</I></SUB> = {3}</TD></TR></TABLE>>];
   even_round_1_0_0 [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4" CELLPADDING="1"><TR><TD COLSPAN="2"><B>Even</B> <I>d</I> = 0</TD></TR><TR><TD>|<I>V</I>| = 1</TD><TD>|<I>H</I>| = 1</TD></TR><TR><TD>|<I>T</I>| = 0</TD><TD>|<I>S</I>| = 0</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>V</I> = {3}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>H</I> = {3}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>T</I> = {}</TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><I>S</I> = {}</TD></TR></TABLE>>];
-  odd_empty [label=<<B>Odd</B>: no residual decomposition; see shaved vertices>];
+  odd_empty [label=<<B>Odd</B>: no decomposition of the remaining game; see shaved vertices>];
   result -> odd_empty;
   odd_shaved_1 [style="dashed,filled", fillcolor=lightgray, label=<<B>shaved (Odd)</B>, round 1: 1 vertices<BR/>{6}>];
   odd_empty -> odd_shaved_1 [style=dashed];

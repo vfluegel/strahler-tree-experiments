@@ -103,7 +103,7 @@ Games with rows from a non-majority build were rerun after earlier rows reported
 | timeout_seconds, memory_gib, jobs, max_host_leaves, machine | Recorded execution limits and machine for each row; memory_gib is in 2^30 bytes. |
 | solver_build | First line of pg2adot --version, with Meson build type and optimization when available. Empty for older rows until explicitly backfilled. |
 
-Paired values use Even / Odd (E / O); CSV columns use _even and _odd. A hyphen in the tables or an empty CSV field means unavailable. Tree metrics cover the residual decomposition or occupied progress-measure tree, including its extra root. Empty trees have zero metrics. Connector boxes, shaved regions and unresolved vertices do not count. Parameters and trees describe the final round; winning counts include all rounds.
+Paired values use Even / Odd (E / O); CSV columns use _even and _odd. A hyphen in the tables or an empty CSV field means unavailable. Tree metrics cover the remaining game (after preprocessing and earlier shaving rounds): its decomposition or occupied progress-measure tree, including its extra root. Empty trees have zero metrics. Connector boxes, shaved regions and unresolved vertices do not count. Parameters and trees describe the final round; winning counts include all rounds.
 
 Depth counts nodes from the root (depth 1); means have three decimal places.
 
@@ -124,7 +124,7 @@ player's attractor decompositions; the game's Strahler number is the larger of
 the two. For a complete result without shaving, the larger of the reported Even
 and Odd values is an upper bound for the game's.
 With shaving or partial results, the metrics describe only the represented
-residual region.
+part of the remaining game.
 
 ## Winner checks
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Reproduce the operator and compare cold, residual, and certified-TOP lifting.
+"""Reproduce the operator and compare cold and certified-TOP lifting.
 
 The independent model is checked against pg2adot's complete witnesses and lift
-counts on every input. It keeps the original compact priorities on residuals.
+counts on every input. It also tests dominion removal, keeping the original
+compact priorities on the remaining game (after preprocessing and earlier shaving rounds).
 """
 
 import argparse

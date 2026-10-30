@@ -13,6 +13,11 @@ EXAMPLES = Path(__file__).resolve().parents[1] / 'jupyter-examples'
 NOTEBOOKS = sorted(EXAMPLES.glob('*.ipynb'))
 
 
+@pytest.fixture(autouse=True)
+def examples_path(monkeypatch):
+    monkeypatch.syspath_prepend(str(EXAMPLES))
+
+
 @pytest.fixture
 def executor():
     import importlib.util
@@ -111,8 +116,8 @@ def test_freeze_rejects_errors_and_volatile_output(executor):
             executor.freeze_outputs(notebook, {})
 
 
-def test_six_notebooks_and_version_mismatch(monkeypatch, capsys):
-    assert len(NOTEBOOKS) == 6
+def test_seven_notebooks_and_version_mismatch(monkeypatch, capsys):
+    assert len(NOTEBOOKS) == 7
     import importlib.metadata
     from types import SimpleNamespace
     monkeypatch.setitem(sys.modules, 'strahler', SimpleNamespace(version=lambda: '0.0.1'))
@@ -125,6 +130,7 @@ def test_six_notebooks_and_version_mismatch(monkeypatch, capsys):
 
 @pytest.mark.parametrize('path', NOTEBOOKS, ids=lambda path: path.name)
 def test_saved_outputs(path):
+    from html import unescape
     notebook = json.loads(path.read_text(encoding='utf-8'))
     assert 'widgets' not in notebook['metadata']
     counts = []
@@ -135,11 +141,22 @@ def test_saved_outputs(path):
                 f'{path}: rerun scripts/execute_notebooks.py')
             assert 'execution' not in cell['metadata']
             assert not list(errors(cell)), path
+            text = unescape(json.dumps(cell['outputs']))
+            assert 'residual' not in text, path
+            if '<th>dominion</th>' in text:
+                assert '<th>dominion</th><th>won</th>' in text, path
+                assert text.count('<th>dominion</th>') == text.count(
+                    "dominion: vertices covered by this player's attractor decomposition (its tree); "
+                    "won: every vertex this player wins, including vertices removed by preprocessing (+pre) "
+                    "or earlier shaving rounds (+iter); unresolved: vertices neither player's search certified."), path
             for output in cell['outputs']:
                 data = output.get('data', {})
                 if ('application/vnd.jupyter.widget-view+json' in data or
                     ''.join(data.get('text/plain', [])).startswith('Static widget snapshot;')):
                     assert data.get('image/svg+xml') or data.get('text/html'), path
+                for mime in ('image/svg+xml', 'text/html'):
+                    if mime in data:
+                        assert ''.join(data[mime]).isascii(), (path, mime)
                 if output['output_type'] == 'execute_result':
                     assert output['execution_count'] == cell['execution_count']
             compile(''.join(cell['source']), str(path), 'exec')
@@ -198,3 +215,110 @@ def test_execute_notebook(path, tmp_path):
     elapsed = perf_counter() - started
     assert not list(errors(notebook)), list(errors(notebook))
     print(f'{path.name}: {elapsed:.2f}s')
+
+
+def test_freeze_makes_all_static_mime_ascii(executor):
+    import nbformat
+    from html import unescape
+    notebook = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell('')])
+    data = {'image/svg+xml': '<svg>ε</svg>', 'text/html': '<p>ε μ</p>'}
+    notebook.cells[0].outputs = [nbformat.v4.new_output('display_data', data=data)]
+    executor.freeze_outputs(notebook, {})
+    for mime, text in notebook.cells[0].outputs[0].data.items():
+        assert text.isascii() and 'ε' in unescape(text)
+
+
+def test_metrics_table_counts_all_wins(monkeypatch, capsys):
+    import strahler
+    import notebook_support as support
+
+    result = strahler.Result(json.dumps(dict(
+        trees=[None, None], regions=[[0], []], initial_won=[[1], [10]],
+        shaves=[dict(attracted=[[2, 3], [11]]), dict(attracted=[[3, 4], [12]])],
+        complete=False, unresolved=[20],
+        metrics=dict(trees=[dict(nodes=1, leaves=1, height=1, strahler=1),
+                            dict(nodes=0, leaves=0, height=0, strahler=0)]))))
+    assert support.won_vertices(result, 0) == {0, 1, 2, 3, 4}
+    assert support.won_vertices(result, 1) == {10, 11, 12}
+    tables = []
+    monkeypatch.setattr(support, 'table', lambda headers, rows: tables.append((headers, rows)))
+    support.metrics_table({'partial': result})
+    headers, rows = tables[0]
+    assert headers == ['backend', 'player', 'nodes', 'leaves', 'height', 'Strahler',
+                       'dominion', 'won', 'complete', 'unresolved']
+    assert rows == [['partial', 'Even', 1, 1, 1, 1, 1, 5, False, 1],
+                    ['partial', 'Odd', 0, 0, 0, 0, 0, 3, False, 1]]
+    assert capsys.readouterr().out == (
+        "dominion: vertices covered by this player's attractor decomposition (its tree); "
+        "won: every vertex this player wins, including vertices removed by preprocessing (+pre) "
+        "or earlier shaving rounds (+iter); unresolved: vertices neither player's search certified.\n")
+    assert result.data['shaves'][1]['attracted'][0] == [3, 4]
+
+
+def test_notebook07_helpers():
+    import strahler
+    import runpy
+    helper = runpy.run_path(str(EXAMPLES / 'otj22.py'))
+    hk, count_events = helper['hk'], helper['count_events']
+    from symmetric_lifting import nester_formula, historical_maxima, history, _strahler, KARY_MEASUREMENTS
+    assert nester_formula(2) == 'nu X_1. mu X_2. (q_1 | <a>(X_1 & (q_2 | <a>X_2)))'
+    assert nester_formula(3).startswith('nu X_1. mu X_2. nu X_3.')
+    with pytest.raises(ValueError):
+        nester_formula(0)
+    counts, complete = count_events(hk(4), 'lifting-sym', kary=2)
+    row = next(r for r in KARY_MEASUREMENTS['rows'] if r['k'] == 4 and r['algorithm'] == 'lifting-sym' and r['kary'] == 2)
+    assert complete and counts == {key: row[key] for key in counts}
+    assert historical_maxima() and {r['solver_build'] for r in history()}
+    assert len(list((EXAMPLES / 'nester').glob('*.gm.bz2'))) == 8
+    assert _strahler({'children': [{'node': {}}, {'node': {}}]}) == 2
+
+
+def test_worker_deadline_keeps_the_last_finished_attempt(monkeypatch):
+    import subprocess
+    import symmetric_lifting as experiment
+    def expire(*args, **kwargs):
+        raise subprocess.TimeoutExpired('worker', 1, output=b'{"outcome":"partial","strahler":[1,0],"parameters":[{"H":3,"K":1,"t":2}]}\n{"unfinished"')
+    monkeypatch.setattr(experiment.subprocess, 'run', expire)
+    row = experiment.bounded_worker(dict(kind='nester'), 1)
+    assert row['outcome'] == 'timeout' and row['strahler'] == [1, 0]
+    assert row['stopped_by'] == '1 s deadline'
+    assert row['parameters'] == [{'H': 3, 'K': 1, 't': 2}]
+
+
+def test_nester_history_sources(tmp_path, monkeypatch, capsys):
+    import symmetric_lifting as experiment
+    examples = tmp_path / 'jupyter-examples'
+    (examples / 'nester').mkdir(parents=True)
+    extract = (EXAMPLES / 'nester/history.csv').read_bytes()
+    (examples / 'nester/history.csv').write_bytes(extract)
+    monkeypatch.setattr(experiment, 'HERE', examples)
+    fallback = experiment.history()
+    assert 'Full keiren/results.csv absent' in capsys.readouterr().out
+    # The release zip and repository layouts both supply the full CSV.
+    for base in (examples, tmp_path):
+        (base / 'keiren').mkdir()
+        (base / 'keiren/results.csv').write_bytes(extract + b'pgsolver,pgsolver/games/other.gm\n')
+        assert experiment.history() == fallback
+        assert not capsys.readouterr().out
+
+
+@pytest.mark.parametrize('backend', ['lifting-adaptive', 'lifting', 'lifting-sym', 'zielonka'])
+def test_nester_uses_untraced_solver_parameters(backend, monkeypatch, capsys):
+    import resource
+    from types import SimpleNamespace
+    import strahler
+    import symmetric_lifting as experiment
+    calls = []
+    parameters = [{'H': 9, 'K': 2, 't': 7}, {'H': 8, 'K': 2, 't': 6}]
+    def solve(game, algorithm, **options):
+        calls.append((algorithm, options))
+        return SimpleNamespace(data=dict(complete=True, parameters=parameters,
+            metrics=dict(trees=[dict(strahler=2), dict(strahler=1)]), trees=[None, None]))
+    monkeypatch.setattr(strahler, 'decompose', solve)
+    monkeypatch.setattr(resource, 'setrlimit', lambda *args: None)
+    experiment._worker(dict(kind='nester', game='Nestern=1.gm.bz2', backend=backend))
+    row = json.loads(capsys.readouterr().out)
+    assert row['parameters'] == parameters and row['strahler'] == [2, 1]
+    options = (dict(adaptive_t=True, tree_k=4, max_host_leaves=4096) if backend == 'lifting-adaptive'
+               else dict(tree_k=1) if backend in ('lifting', 'lifting-sym') else {})
+    assert calls == [('lifting' if backend == 'lifting-adaptive' else backend, options)]

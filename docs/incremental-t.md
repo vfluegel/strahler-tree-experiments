@@ -162,11 +162,12 @@ make the total exceed a single cold run at an oracle-provided final t.
 ## Removing certified dominions: scheme (i)
 
 The experiment also tests dominion removal: at each t, lift Even and then
-Odd on the current residual, immediately remove each nonempty certified
+Odd on the remaining game (after preprocessing and earlier shaving rounds),
+immediately remove each nonempty certified
 dominion's attractor, and retain its witness. Keep the original compact
 priority bounds and the original sequence of hosts. Attractor removal
-preserves a total residual and sound winning-region assignments. At the
-universal final host every residual vertex is assigned.
+preserves a total remaining game and sound winning-region assignments. At the
+universal final host every vertex of the remaining game is assigned.
 
 The retained witness is an ordered sequence of `(dominion, attractor, tree)`
 chunks per player. It is not, without additional assembly, a single classic
@@ -180,7 +181,7 @@ experiment independently verifies all these conditions.
 
 The assembled witness adds a root, can add leaves or increase the Strahler
 number, and need not fit the final lifting host. It composes successful
-residual searches; it is not the least decomposition at that host.
+searches on the remaining game; it is not the least decomposition at that host.
 For comparisons, the experiment pads the cold tree with the same empty root
 to account for the added level. The CLI uses certified-TOP seeding to preserve
 the exact tree without a second witness-assembly path in the C solver.
@@ -196,8 +197,8 @@ meson test -C build --print-errorlogs
 Every experimental input checks the independent Python operator against C's
 cold final tree and exact lift count; C's cold-adaptive, cold-final and
 incremental final witnesses must be identical. Winning regions are compared
-with the independently verified residual composition. The tests also compare
-the complete seeded and cold label arrays, exercise partial results, K caps,
+with the independently verified composition from searches on the remaining
+game. The tests also compare the complete seeded and cold label arrays, exercise partial results, K caps,
 start t, leaf budgets, and require actual lift savings. Counts and selected
 results are recorded in [research/incremental-t.json](research/incremental-t.json).
 
@@ -211,17 +212,17 @@ and all cold/incremental final trees agree. The aggregate lift counts are:
 | One cold run at the final t | 99,636 |
 | Existing cold adaptive search | 114,627 |
 | Certified-TOP incremental search | 54,686 |
-| Residual/attractor scheme (i) | 52,417 |
+| Attractor removal on the remaining game (i) | 52,417 |
 
 Incremental uses fewer lifts than cold adaptive on 414/628 games and fewer
-than the oracle-final cold run on 408/628 games. The residual composition,
-after matching the extra root on the cold side, has the same shape and sets
+than the oracle-final cold run on 408/628 games. The composition from searches
+on the remaining game, after matching the extra root on the cold side, has the same shape and sets
 on 572/628 games and differs on 56. Its regions always agree. These are
 lift-count comparisons. Host construction, verification and sorting also take
 time, so fewer lifts do not guarantee a faster run. On `strahler_two.pg`, for
-example, cold final/cold adaptive/incremental/residual use 35/58/29/19
+example, cold final/cold adaptive/incremental/remaining game use 35/58/29/19
 lifts respectively; the exact incremental tree is preserved even when
-residual removal is cheaper.
+attractor removal on the remaining game is cheaper.
 
 The large `cabp_swp.ehoa.pg` is excluded from this model comparison. Default
 lifting rejects its host at the leaf limit; a timed incremental attempt

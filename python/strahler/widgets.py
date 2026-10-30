@@ -34,6 +34,20 @@ _OWNER_STYLES = {
 }
 _PART_COLOURS = dict(H='#dbeafe', T='#dcfce7', S='#ffedd5')
 _EDGE_LIMIT = 200
+_VIOLATION_COLOURS = ('#2563eb', '#b45309')
+
+
+def _ascii(text):
+    return text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
+
+
+def _violation_title(layer, violation):
+    return f"{layer['name']}: {violation['condition']} at node {json.dumps(violation['path'], separators=(',', ':'))}"
+
+
+def _violations(view, field, value):
+    return [(layer, v) for layer in view.outlines for v in layer['violations'] if v[field] == value]
+
 
 _CSS = """
 .strahler { font: 14px system-ui, sans-serif; color: #182538; background: #fff;
@@ -50,6 +64,11 @@ _CSS = """
 
 _ESM = r"""
 const NS = 'http://www.w3.org/2000/svg';
+function violations(model, field, value) {
+  return model.get('outlines').flatMap(layer => layer.violations.filter(v => JSON.stringify(v[field]) === JSON.stringify(value)).map(v => [layer,v]));
+}
+function violationTitle(layer, v) { return `${layer.name}: ${v.condition} at node ${JSON.stringify(v.path)}`; }
+
 function element(tag, text, parent) {
   const e = document.createElement(tag);
   if (text !== null) e.textContent = text;
@@ -81,15 +100,20 @@ function vertex(model, v, svg, painters) {
   if (style) {
     const shape = svgElement(style.shape, {...style.attrs, transform:`translate(${x} ${y})`}, group);
     painters.push(() => { for (const [k,value] of Object.entries(vertexAttrs(model,v.id))) shape.setAttribute(k,value); });
+    const failed = violations(model,'vertex',v.id);
+    failed.forEach(([layer,violation],i) => {
+      const ring = svgElement(style.shape, {...style.attrs,transform:`translate(${x} ${y}) scale(${1.18+i*.15})`,fill:'none',stroke:layer.colour,'stroke-width':3},group);
+      svgElement('title',{},ring).textContent = violationTitle(layer,violation);
+    });
     svgElement('text', {x,y:y+4,'text-anchor':'middle'}, group).textContent = v.priority;
     svgElement('text', {x,y:y+31,'text-anchor':'middle'}, group).textContent = name;
   } else svgElement('text', {x,y:y+4,'text-anchor':'middle'}, group).textContent = name;
-  const description = style ? `${name}: priority ${v.priority}, ${style.player} (${style.label})` : `Vertex ${name}; game metadata unavailable`;
+  const description = (style ? `${name}: priority ${v.priority}, ${style.player} (${style.label})` : `Vertex ${name}; game metadata unavailable`) + violations(model,'vertex',v.id).map(([l,v])=>' · '+violationTitle(l,v)).join('');
   svgElement('title', {}, group).textContent = description;
   if (model.get('kind') === 'game') interactive(group, `Select vertex ${description}`, () => { model.set('selected',v.id); model.save_changes(); });
   else group.setAttribute('pointer-events','none');
 }
-function gameEdges(svg, vertices, edges, markerID, colour) {
+function gameEdges(svg, vertices, edges, markerID, colour, title=null, width=1) {
   if (!edges.length) return;
   const defs = svgElement('defs', {}, svg);
   const marker = svgElement('marker', {id:markerID,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'}, defs);
@@ -100,16 +124,22 @@ function gameEdges(svg, vertices, edges, markerID, colour) {
     const len = Math.hypot(dx,dy) || 1, r = 29;
     const path = a === b ? `M ${x-14} ${y-20} C ${x-48} ${y-46} ${x+48} ${y-46} ${x+14} ${y-20}` :
       `M ${x+dx*r/len} ${y+dy*r/len} Q ${(x+u)/2-dy*.12} ${(y+v)/2+dx*.12} ${u-dx*r/len} ${v-dy*r/len}`;
-    svgElement('path', {d:path,fill:'none',stroke:colour,'marker-end':`url(#${markerID})`,'pointer-events':'none'}, svg);
+    const edge = svgElement('path', {d:path,fill:'none',stroke:colour,'stroke-width':width,'marker-end':`url(#${markerID})`}, svg);
+    if(title)svgElement('title',{},edge).textContent=title;
+    else edge.setAttribute('pointer-events','none');
   }
 }
 function game(model, el) {
   const d = model.get('data'), painters = [];
   const svg = svgElement('svg', {viewBox:'0 0 800 520',role:'group','aria-label':'Parity game. Squares Even, pentagons Odd.'}, el);
   gameEdges(svg,d.vertices,d.edges,'arrow-'+model.model_id,'#64748b');
+  for (const [i,layer] of model.get('outlines').entries()) for (const v of layer.violations) if(v.edge) {
+    gameEdges(svg,d.vertices,[v.edge],`violation-${model.model_id}-${i}`,layer.colour,violationTitle(layer,v),5-i*2);
+  }
   for (const v of d.vertices) vertex(model,v,svg,painters);
   const legend = element('div','Square: Even · Pentagon: Odd · ',el);
   for (const set of model.get('highlights')) { const label = element('span',`${set.name}  `,legend); label.style.backgroundColor = set.colour; }
+  for (const layer of model.get('outlines')) { const label=element('span',layer.name+'  ',legend); label.style.color=layer.colour; }
   return () => painters.forEach(paint => paint());
 }
 function tree(model, el) {
@@ -133,6 +163,10 @@ function tree(model, el) {
     });
   };
   const outline = (g, n, attrs) => {
+    for (const [layer,v] of violations(model,'path',n.path)) {
+      const ring=svgElement('rect',{...attrs,fill:'none',stroke:layer.colour,'stroke-width':7},g);
+      svgElement('title',{},ring).textContent=violationTitle(layer,v);
+    }
     const rect = svgElement('rect', {...attrs,'data-node-outline':JSON.stringify(n.path)},g);
     painters.push(() => {
       const hot = JSON.stringify(model.get('hovered_path')) === JSON.stringify(n.path);
@@ -156,7 +190,7 @@ function tree(model, el) {
       for (const child of n.children) visit(child,outer);
       const [x,y,w,h] = n.box;
       outline(outer,n,{x,y,width:w,height:h,fill:'none','pointer-events':'none'});
-      svgElement('title',{},outer).textContent = n.label;
+      svgElement('title',{},outer).textContent = n.label + violations(model,'path',n.path).map(([l,v])=>' · '+violationTitle(l,v)).join('');
     };
     visit(root,svg);
     if (model.get('edges') && root.game.edges.length <= root.edge_limit) gameEdges(svg,root.game.vertices,root.game.edges,'arrow-'+model.model_id,'#94a3b8');
@@ -172,7 +206,7 @@ function tree(model, el) {
       const g = svgElement('g',{},svg); hover(g,n);
       outline(g,n,{x:x-58,y:y-17,width:116,height:34,rx:5,fill:'#dbeafe'});
       svgElement('text',{x,y:y+4,'text-anchor':'middle','pointer-events':'none'},g).textContent = n.label;
-      svgElement('title',{},g).textContent = `${n.label}: ${n.vertices.join(', ')}`;
+      svgElement('title',{},g).textContent = `${n.label}: ${n.vertices.join(', ')}` + violations(model,'path',n.path).map(([l,v])=>' · '+violationTitle(l,v)).join('');
     };
     visit(root);
   }
@@ -233,7 +267,7 @@ export default { render({model,el}) {
     paint();
     if(active!==null){const node=Array.from(el.querySelectorAll(`[${attribute}]`)).find(e=>e.getAttribute(attribute)===active);if(node)node.focus();}
   };
-  const fields=model.get('kind')==='tree'?['data','mode','edges']:['data'];
+  const fields=model.get('kind')==='tree'?['data','mode','edges','outlines']:['data','outlines'];
   const paintFields=['hovered','hovered_path','selected'];
   // Game legends also change when highlight layers change.
   const highlights=()=>{if(model.get('kind')==='game')draw();else paint();};
@@ -361,16 +395,22 @@ def _svg_vertex(svg, vertex, view):
     if style:
         _svg(group, style['shape'], dict(style['attrs'], transform=f'translate({x} {y})',
                                         **_vertex_attrs(view, vertex['id'])))
+        for i, (layer, violation) in enumerate(_violations(view, 'vertex', vertex['id'])):
+            ring = _svg(group, style['shape'], dict(style['attrs'],
+                        transform=f'translate({x} {y}) scale({1.18+i*.15})', fill='none',
+                        stroke=layer['colour'], **{'stroke-width': 3}))
+            _svg(ring, 'title', text=_violation_title(layer, violation))
         _svg(group, 'text', {'x': x, 'y': y+4, 'text-anchor': 'middle'}, vertex['priority'])
         _svg(group, 'text', {'x': x, 'y': y+31, 'text-anchor': 'middle'}, name)
         description = f"{name}: priority {vertex['priority']}, {style['player']} ({style['label']})"
     else:
         _svg(group, 'text', {'x': x, 'y': y+4, 'text-anchor': 'middle'}, name)
         description = f'Vertex {name}; game metadata unavailable'
+    description += ''.join(' · ' + _violation_title(l, v) for l, v in _violations(view, 'vertex', vertex['id']))
     _svg(group, 'title', text=description)
 
 
-def _svg_edges(svg, vertices, edges, marker_id, colour):
+def _svg_edges(svg, vertices, edges, marker_id, colour, title=None, width=1):
     if not edges:
         return
     marker = _svg(_svg(svg, 'defs'), 'marker', dict(id=marker_id, viewBox='0 0 10 10', refX=9, refY=5,
@@ -385,8 +425,12 @@ def _svg_edges(svg, vertices, edges, marker_id, colour):
         path = (f'M {x-14} {y-20} C {x-48} {y-46} {x+48} {y-46} {x+14} {y-20}'
                 if a == b else f'M {x+dx*29/length} {y+dy*29/length} '
                 f'Q {(x+u)/2-dy*.12} {(y+v)/2+dx*.12} {u-dx*29/length} {v-dy*29/length}')
-        _svg(svg, 'path', {'d': path, 'fill': 'none', 'stroke': colour,
-                          'marker-end': f'url(#{marker_id})', 'pointer-events': 'none'})
+        edge = _svg(svg, 'path', {'d': path, 'fill': 'none', 'stroke': colour,
+                          'stroke-width': width, 'marker-end': f'url(#{marker_id})'})
+        if title:
+            _svg(edge, 'title', text=title)
+        else:
+            edge.set('pointer-events', 'none')
 
 
 def _check_vertex_ids(vertices):
@@ -401,12 +445,24 @@ class _View(anywidget.AnyWidget):
     data = t.Any(allow_none=True).tag(sync=True)
     hovered = t.List(t.Int()).tag(sync=True)
     highlights = t.List(t.Dict()).tag(sync=True)
+    outlines = t.List(t.Dict()).tag(sync=True)
     selected = t.Any(allow_none=True).tag(sync=True)
     mode = t.Enum(['squares', 'tree', 'boxes'], default_value='squares').tag(sync=True)
     edges = t.Bool(True).tag(sync=True)
     hovered_path = t.Any(allow_none=True).tag(sync=True)
     owner_styles = t.Dict(_OWNER_STYLES).tag(sync=True)
     next_kind = t.Unicode('call').tag(sync=True)
+
+    def show_check(self, verdict, player, path=()):
+        """Replace one player's AD violation outlines; a successful check clears them."""
+        if player not in (0, 1):
+            raise ValueError('player must be 0 or 1')
+        layer = dict(player=player, name=('Even', 'Odd')[player] + ' AD violation',
+                     colour=_VIOLATION_COLOURS[player], violations=[
+                         dict(condition=v.condition.name, path=list(path + v.path),
+                              vertex=v.vertex, edge=None if v.edge is None else list(v.edge))
+                         for v in verdict.violations])
+        self.outlines = [l for l in self.outlines if l['player'] != player] + ([layer] if layer['violations'] else [])
 
     def _repr_mimebundle_(self, **kwargs):
         bundle = super()._repr_mimebundle_(**kwargs)
@@ -462,6 +518,11 @@ class GameView(_View):
     def _static_svg(self):
         svg = _svg_root(800, 520, 'Parity game. Squares Even, pentagons Odd.')
         _svg_edges(svg, self.data['vertices'], self.data['edges'], 'strahler-arrow-game', '#64748b')
+        for i, layer in enumerate(self.outlines):
+            for v in layer['violations']:
+                if v['edge'] is not None:
+                    _svg_edges(svg, self.data['vertices'], [v['edge']], f'strahler-violation-{i}',
+                               layer['colour'], _violation_title(layer, v), 5-i*2)
         for vertex in self.data['vertices']:
             _svg_vertex(svg, vertex, self)
         _svg(svg, 'text', dict(x=8, y=490), 'Square: Even · Pentagon: Odd')
@@ -471,7 +532,10 @@ class GameView(_View):
             _svg(svg, 'rect', dict(x=x, y=496, width=width, height=20, fill=_svg_colour(layer['colour'])))
             _svg(svg, 'text', dict(x=x+4, y=510), layer['name'])
             x += width + 4
-        return ET.tostring(svg, encoding='unicode')
+        for layer in self.outlines:
+            _svg(svg, 'text', dict(x=x, y=484, fill=layer['colour']), layer['name'])
+            x += len(layer['name']) * 8 + 12
+        return _ascii(ET.tostring(svg, encoding='unicode'))
 
 
 def _tree_data(tree, path=(), label=None):
@@ -586,6 +650,9 @@ class TreeView(_View):
             def outline(group, n, attrs):
                 hot = self.hovered_path == n['path']
                 selected = self.selected == n['path']
+                for layer, violation in _violations(self, 'path', n['path']):
+                    ring = _svg(group, 'rect', dict(attrs, fill='none', stroke=layer['colour'], **{'stroke-width': 7}))
+                    _svg(ring, 'title', text=_violation_title(layer, violation))
                 _svg(group, 'rect', dict(attrs, stroke='#c026d3' if hot else '#dc2626' if selected else '#64748b',
                      **{'data-node-outline': json.dumps(n['path'], separators=(',', ':')),
                         'stroke-width': 4 if hot or selected else 1}))
@@ -603,7 +670,7 @@ class TreeView(_View):
                         visit(child, group)
                     x, y, w, h = n['box']
                     outline(group, n, dict(x=x, y=y, width=w, height=h, fill='none', **{'pointer-events': 'none'}))
-                    _svg(group, 'title', text=n['label'])
+                    _svg(group, 'title', text=n['label'] + ''.join(' · ' + _violation_title(l, v) for l, v in _violations(self, 'path', n['path'])))
                 else:
                     x, y = n['xy']
                     for child in n['children']:
@@ -613,7 +680,7 @@ class TreeView(_View):
                     group = _svg(svg, 'g', {'data-path': json.dumps(n['path'], separators=(',', ':'))})
                     outline(group, n, dict(x=x-58, y=y-17, width=116, height=34, rx=5, fill='#dbeafe'))
                     _svg(group, 'text', {'x': x, 'y': y+4, 'text-anchor': 'middle', 'pointer-events': 'none'}, n['label'])
-                    _svg(group, 'title', text=f"{n['label']}: {', '.join(map(str, n['vertices']))}")
+                    _svg(group, 'title', text=f"{n['label']}: {', '.join(map(str, n['vertices']))}" + ''.join(' · ' + _violation_title(l, v) for l, v in _violations(self, 'path', n['path'])))
 
             visit(self.data, svg)
             if self.mode == 'squares':
@@ -623,22 +690,22 @@ class TreeView(_View):
                 for vertex in graph['vertices']:
                     _svg_vertex(svg, vertex, self)
                 _svg(svg, 'text', dict(x=5, y=self.data['extent']['squares'][1]-8), 'Square: Even · Pentagon: Odd')
-        return ET.tostring(svg, encoding='unicode')
+        return _ascii(ET.tostring(svg, encoding='unicode'))
 
 _PLAIN = [
     'McNZEven(G, h, ε, ω)  [McNZOdd exchanges players]',
     'If G is empty, return ∅ (paper base: h=0 before priority normalization)',
     'G₁ ← G; i ← 0',
     'Repeat:',
-    '  i ← i+1; H_i ← priority-h vertices in G_i',
-    '  A_i ← Attr_Even^G_i(H_i)',
-    '  G′_i ← G_i \\ A_i',
-    '  U′_i ← McNZOdd(G′_i, h−1, ω·i, ε)',
-    '  A′_i ← Attr_Odd^G_i(U′_i)',
-    '  S_Odd(ω·i) ← A′_i \\ U′_i; G_{i+1} ← G_i \\ A′_i',
-    'Until G_{i+1} = G_i',
+    '  i ← i+1; H_i ← priority-h vertices in Gᵢ',
+    '  A_i ← Attr_Even^Gᵢ(H_i)',
+    '  G′ᵢ ← Gᵢ \\ A_i',
+    '  U′_i ← McNZOdd(G′ᵢ, h−1, ω·i, ε)',
+    '  A′_i ← Attr_Odd^Gᵢ(U′_i)',
+    '  S_Odd(ω·i) ← A′_i \\ U′_i; G_{i+1} ← Gᵢ \\ A′_i',
+    'Until G_{i+1} = Gᵢ',
     'H_Even(ε) ← H_i; T_Even(ε) ← A_i \\ H_i',
-    'Return G_i',
+    'Return Gᵢ',
 ]
 _MEMORY = [
     'McNZFastEven(G, h, ε, ω)  [McNZFastOdd exchanges players]',
@@ -648,17 +715,17 @@ _MEMORY = [
     '  Set S_Even(ε) to G; return ∅',
     'G₁ ← G; i ← 0',
     'Repeat with the next child ω·i:',
-    '  H_i ← priority-h vertices; A_i ← Attr_Even^G_i(H_i)',
+    '  H_i ← priority-h vertices; A_i ← Attr_Even^Gᵢ(H_i)',
     '  Set/Move top fibres using A_i and H_i',
     '  Remove the escaping attractor from the retained child (entry correction)',
-    '  G′_i ← the resulting child core in G_i',
-    '  U′_i ← McNZFastOdd(G′_i, h−1, ω·i, ε)',
-    '  S′_i ← Attr_Odd^G_i(U′_i)',
+    '  G′ᵢ ← the resulting child core in Gᵢ',
+    '  U′_i ← McNZFastOdd(G′ᵢ, h−1, ω·i, ε)',
+    '  S′_i ← Attr_Odd^Gᵢ(U′_i)',
     '  Set S_Odd(ω·i) to S′_i \\ U′_i',
     '  Move S′_i to at least S_Even(ε)',
-    '  G_{i+1} ← G_i \\ S′_i',
+    '  G_{i+1} ← Gᵢ \\ S′_i',
     'Until the Even candidate restricted to G_{i+1} is an AD',
-    'Return G_{i+1}  [corrected residual index]',
+    'Return G_{i+1}  [corrected subgame index]',
 ]
 _LIFTING = [
     'Build the Strahler host for each player',
@@ -666,7 +733,7 @@ _LIFTING = [
     'Short-lift an unstable vertex to its next valid label',
     'End the round; repeat until labels stabilize',
     'Adaptive host: raise t and repeat if needed',
-    'Iterative shaving: attract certified winners; restart on the residual',
+    'Iterative shaving: attract certified winners; restart on the remaining game (after preprocessing and earlier shaving rounds)',
     'Materialize and independently check the resulting certificates',
 ]
 
@@ -687,7 +754,7 @@ def _controls_html(data):
                           f"path {badge['path']}; vertex {badge['vertex']}. {badge['message']}")
         if badge['problems']:
             html += paragraph('Materializer: ' + json.dumps(badge['problems']))
-    return html
+    return _ascii(html)
 
 
 class Stepper(VBox):
@@ -725,8 +792,18 @@ class Stepper(VBox):
     def seek(self, index):
         self.state = self.cursor.seek(index)
         self.badges = [self.cursor.badge(p) for p in range(2)]
-        for view, tree in zip(self.tree_views, self.state.trees):
+        self.game_view.outlines = []
+        backend = self.run.events[0]['algorithm']
+        for player, (view, tree) in enumerate(zip(self.tree_views, self.state.trees)):
+            if backend == 'lifting':
+                tree = self.cursor.candidate(player)[0]
+            elif backend.endswith('-sym') and tree is not None and self.state.event['event'] != 'result':
+                # Symmetric checks locate nodes by host paths, including gaps.
+                tree = self.state.candidate(player)
             view.tree = tree
+            verdict = self.cursor.verify(player)
+            self.game_view.show_check(verdict, player)
+            view.show_check(verdict, player, self.cursor.candidate_path(player))
         self.game_view.highlights = []
         self.game_view.highlight(self.cursor.subgame, '#dbeafe', 'current subgame')
         colours = {'G_i': '#dbeafe', 'A_i': '#bbf7d0', 'H_i': '#fef08a', "U′_i": '#fed7aa', 'side attractor': '#e9d5ff'}
@@ -736,7 +813,6 @@ class Stepper(VBox):
                 if name in sets:
                     self.game_view.highlight(sets[name], colour, name)
         frames = []
-        backend = self.run.events[0]['algorithm']
         memory = backend.endswith('-sym')
         procedure = 'UnivFast' if backend == 'lifting-sym' else ('McNZFast' if memory else 'McNZ')
         for frame in self.cursor.stack:

@@ -40,7 +40,7 @@ player's attractor decompositions; the game's Strahler number is the larger of
 the two. For a complete result without shaving, the larger of the reported Even
 and Odd values is an upper bound for the game's.
 With shaving or partial results, the metrics describe only the represented
-residual region.
+part of the remaining game (after preprocessing and earlier shaving rounds).
 
 ## Preprocessing and shaving
 

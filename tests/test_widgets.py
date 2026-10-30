@@ -315,3 +315,64 @@ def test_replacing_notebook_panels_closes_owned_comms():
         assert panel.comm is None and call_tree.comm is None
         assert stepper.comm is None and stepper.game_view.comm is None
         assert all(tree.comm is None for tree in stepper.tree_views)
+
+
+def test_violation_outlines_both_players_and_ascii_svg():
+    from html import unescape
+    with strahler.Game.from_text('10 2 0 10;20 0 1 30;30 0 0 30;40 0 0 30;') as game:
+        tree = dict(h=2, H=[10], T=[], S=[], children=[
+            dict(h=0, H=[20], T=[], S=[], children=[]),
+            dict(h=0, H=[30], T=[], S=[], children=[])])
+        verdict = strahler.check(game, tree, 0)
+        view = GameView(game)
+        view.show_check(verdict, 0)
+        view.show_check(verdict, 1)
+        assert [layer['name'] for layer in view.get_state()['outlines']] == ['Even AD violation', 'Odd AD violation']
+        assert len({layer['colour'] for layer in view.outlines} | {'#c026d3'}) == 3
+        svg = view._static_svg()
+        assert svg.isascii()
+        parsed = ET.fromstring(svg)
+        for layer in view.outlines:
+            assert layer['name'] in ''.join(parsed.itertext())
+            assert parsed.findall(f"s:path[@stroke=\"{layer['colour']}\"]", NS)
+        for mode in ('squares', 'tree'):
+            candidate = TreeView(tree, view, mode=mode)
+            candidate.show_check(verdict, 0)
+            svg = candidate._static_svg()
+            assert svg.isascii() and '&#949;' in svg and 'ε' in unescape(svg)
+            parsed = ET.fromstring(svg)
+            assert 'ε' in ''.join(parsed.itertext())
+            assert 'TRAP at node [0]' in ''.join(parsed.itertext())
+            assert parsed.findall('.//s:rect[@stroke="#2563eb"]', NS)
+        # Live labels remain Unicode.
+        assert candidate.data['name'] == 'ε'
+
+
+def test_stepper_outlines_follow_both_current_verdicts():
+    with strahler.Game.from_text(hk(4)) as game:
+        stepper = Stepper(strahler.trace(game, 'zielonka-sym'))
+        stepper.next('check')
+        for player in (0, 1):
+            verdict = stepper.verify(player)
+            layer = [l for l in stepper.game_view.outlines if l['player'] == player]
+            assert bool(layer) == bool(verdict.violations)
+            if layer:
+                assert len(layer[0]['violations']) == len(verdict.violations)
+                assert stepper.tree_views[player].outlines
+        before = stepper.game_view.outlines
+        stepper.step()
+        stepper.back()
+        assert stepper.game_view.outlines == before
+        stepper.end()
+        assert not stepper.game_view.outlines
+
+
+def test_lifting_outlines_use_the_materialized_candidate_paths():
+    with strahler.Game.from_text(hk(2)) as game:
+        stepper = Stepper(strahler.trace(game, 'lifting', kary=2))
+        stepper.next('lift')
+        for player, view in enumerate(stepper.tree_views):
+            candidate = stepper.cursor.candidate(player)[0]
+            expected = TreeView(candidate, game=game)
+            assert view.data == expected.data
+            expected.close()

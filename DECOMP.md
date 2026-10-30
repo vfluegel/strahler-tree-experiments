@@ -18,8 +18,8 @@ This page is generated; do not hand-edit it. See the [regeneration instructions]
 Paired values, including parameters, use Even / Odd (E / O). Unknown
 winning counts are `?`; a dash means no value or tree is available.
 
-Tree metrics cover the remaining game's decomposition trees or occupied
-progress-measure trees, including their extra root. Empty trees have zero metrics;
+Tree metrics cover the remaining game (after preprocessing and earlier shaving rounds):
+its decomposition trees or occupied progress-measure trees, including their extra root. Empty trees have zero metrics;
 connector boxes, shaved regions and unresolved vertices do not count.
 
 The `.metrics` files have one line per field, with `even=` and `odd=` values.
@@ -42,7 +42,7 @@ player's attractor decompositions; the game's Strahler number is the larger of
 the two. For a complete result without shaving, the larger of the reported Even
 and Odd values is an upper bound for the game's.
 With shaving or partial results, the metrics describe only the represented
-residual region.
+part of the remaining game.
 
 ## Preprocessing and shaving
 
@@ -54,11 +54,11 @@ The `+pre` rows pass `--initial-shave=all --compress` before running the selecte
 
 Adaptive solvers use the remainder's priority and size bounds. Compression and shaving can lower these bounds, allowing lower t values and smaller hosts.
 
-The `+iter` rows add `--iter-shave`, available only for lifting-based backends, including progress measures. After lifting stabilises, remove certified dominions and their attractors, then retry the remainder. Fixed host bounds stay the same. Adaptive lifting advances to the next t on the smaller game, keeping the initial residual's host bounds.
+The `+iter` rows add `--iter-shave`, available only for lifting-based backends, including progress measures. After lifting stabilises, remove certified dominions and their attractors, then retry the remainder. Fixed host bounds stay the same. Adaptive lifting advances to the next t on the smaller game, keeping the initial remaining game's host bounds.
 
 Shaved rounds show the round and t that certified them; progress measures print a graph per round with its parameters.
 
-Won counts all rounds and initial shaving, including attracted vertices, once each. Tree metrics and parameters describe only the final round: the residual decomposition or occupied measure tree, excluding earlier certificates and attracted vertices.
+Won counts all rounds and initial shaving, including attracted vertices, once each. Tree metrics and parameters describe only the final round: the decomposition of the remaining game or occupied measure tree, excluding earlier certificates and attracted vertices.
 
 Progress measures process Even's dominion and attractor before running Odd on the remainder. `+pre+iter` combines both steps.
 

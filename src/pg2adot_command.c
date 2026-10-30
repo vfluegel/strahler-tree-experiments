@@ -747,6 +747,7 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
                 preprocessed.shaved[PG_SHAVE_WCWC][1]);
   }
 
+  ADLiftSolveStats lift_stats = {0};
   if (algorithm == ALGORITHM_ZIELONKA) {
     ZielonkaError solver_error = {0};
     ZielonkaStats stats = {0};
@@ -780,12 +781,11 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
                       pg_set_count(domain));
     }
   } else {
-    ADLiftSolveStats stats = {0};
     ADLiftError lift_error = {0};
-    if (!ad_lift_solve(&game, domain, &lift_options, &result, &stats,
+    if (!ad_lift_solve(&game, domain, &lift_options, &result, &lift_stats,
                        &lift_error)) {
       fprintf(io->err, "Solver failed: %s\n", lift_error.message);
-      if (stats.budget_exhausted) {
+      if (lift_stats.budget_exhausted) {
         fputs("Use --adaptive-t, --tree-k, --kary, a larger "
               "--max-host-leaves, or --algorithm=zielonka\n",
               io->err);
@@ -793,26 +793,27 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       status = EXIT_SOLVER;
       goto cleanup;
     }
-    if (stats.budget_exhausted) {
+    if (lift_stats.budget_exhausted) {
       fprintf(io->err, "Warning: %s; the result is partial\n",
               lift_error.message);
-    } else if (stats.vertices != 0 &&
+    } else if (lift_stats.vertices != 0 &&
                lift_options.mode == AD_LIFT_HOST_ADAPTIVE &&
-               stats.adaptive_complete) {
+               lift_stats.adaptive_complete) {
       fprintf(io->err,
               "Adaptive t: complete at t=%zu (Even complete at t=%zu, Odd "
               "complete at t=%zu)\n",
-              stats.first_complete_t, stats.player[PG_EVEN].first_full_t,
-              stats.player[PG_ODD].first_full_t);
-    } else if (stats.vertices != 0 &&
+              lift_stats.first_complete_t,
+              lift_stats.player[PG_EVEN].first_full_t,
+              lift_stats.player[PG_ODD].first_full_t);
+    } else if (lift_stats.vertices != 0 &&
                lift_options.mode == AD_LIFT_HOST_ADAPTIVE) {
       fprintf(io->err,
               "Adaptive t: incomplete at t=%zu with K capped at %zu; the "
               "result is partial\n",
-              stats.t_full, lift_options.k);
+              lift_stats.t_full, lift_options.k);
     }
     if (print_stats) {
-      write_lifting_stats(io, &stats, &lift_options, &result);
+      write_lifting_stats(io, &lift_stats, &lift_options, &result);
     }
   }
 
@@ -885,8 +886,24 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
     wrote = ad_json_result_fields(&writer, &result, player);
     if (wrote) {
       fputs(",\"metrics\":", io->out);
-      wrote = ad_json_metrics(io->out, &result, player) &&
-              fputs("}\n", io->out) >= 0;
+      wrote = ad_json_metrics(io->out, &result, player);
+      fputs(",\"parameters\":[", io->out);
+      for (size_t candidate = 0; candidate < 2; candidate++) {
+        fputs(candidate == 0 ? "{" : ",{", io->out);
+        if (lift_stats.vertices != 0) {
+          ADLiftPlayerStats const *current = lift_stats.player + candidate;
+          fprintf(io->out, "\"H\":%zu", current->height);
+          if (lift_options.mode == AD_LIFT_HOST_KARY) {
+            fprintf(io->out, ",\"arity\":%zu", current->arity);
+          } else if (lift_options.mode != AD_LIFT_HOST_TREE) {
+            fprintf(io->out, ",\"K\":%zu,\"t\":%zu", current->k, current->t);
+          }
+        }
+        fputc('}', io->out);
+      }
+      wrote = fprintf(io->out, "],\"budget_exhausted\":%s}\n",
+                      lift_stats.budget_exhausted ? "true" : "false") >= 0 &&
+              wrote;
     }
   } else {
     wrote = ad_tree_write_dot(io->out, &game, &result, player, view, labels,

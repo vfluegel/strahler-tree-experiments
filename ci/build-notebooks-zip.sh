@@ -29,6 +29,8 @@ with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
     for path in sorted(notebooks.rglob('*')):
         if path.is_file() and path != notebooks / 'requirements.txt':
             bundle.write(path, f'{name}/{path.relative_to(notebooks)}')
+    for path in ('keiren/results.csv', 'KEIREN.md'):
+        bundle.write(root / path, f'{name}/{path}')
     bundle.writestr(f'{name}/requirements.txt',
                     f'--find-links ./wheels\n--only-binary strahler\n'
                     f'strahler=={version}\n{requirements}')

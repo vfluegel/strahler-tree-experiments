@@ -370,7 +370,7 @@ static bool read_node(PGGame const *game, JSONValue const *value,
 
 static bool relative_check(PGGame const *game, PGSet const *domain,
                            JSONValue const *value, ADNode const *node,
-                           ADVerifyError *error) {
+                           ADVerifyError *error, ADVerifyErrors *errors) {
   if (node == nullptr || pg_set_empty(domain)) {
     return true;
   }
@@ -403,8 +403,10 @@ static bool relative_check(PGGame const *game, PGSet const *domain,
         ad_verify_error(error, condition, vertex,
                         "tree-relative H/T/S parts disagree with the node "
                         "bound or partition");
-        valid = false;
-        break;
+        valid = ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX);
+        if (!valid) {
+          break;
+        }
       }
       pg_set_add(&seen, vertex);
     }
@@ -421,7 +423,7 @@ static bool relative_check(PGGame const *game, PGSet const *domain,
       if (pg_set_contains(&node->children[i].attractor, vertex)) {
         ad_verify_error(error, AD_VERIFY_PARTITION, vertex,
                         "tree-relative S overlaps the node core");
-        valid = false;
+        valid = ad_verify_collect(errors, error, SIZE_MAX, SIZE_MAX);
         break;
       }
     }
@@ -429,8 +431,14 @@ static bool relative_check(PGGame const *game, PGSet const *domain,
   pg_set_destroy(&seen);
   JSONValue const *child = json_member(value, "children")->child;
   for (size_t i = 0; i < node->child_count && valid; i++, child = child->next) {
-    valid =
-        relative_check(game, domain, child, node->children[i].subtree, error);
+    if (errors != nullptr) {
+      errors->path[errors->path_length++] = i;
+    }
+    valid = relative_check(game, domain, child, node->children[i].subtree,
+                           error, errors);
+    if (errors != nullptr) {
+      errors->path_length--;
+    }
     if (!valid && error->path_length < AD_PATH_CAPACITY) {
       memmove(error->path + 1, error->path,
               error->path_length * sizeof(*error->path));
@@ -442,7 +450,8 @@ static bool relative_check(PGGame const *game, PGSet const *domain,
 }
 
 static void check_json(FILE *out, PGGame const *game, bool ok,
-                       ADVerifyError const *result) {
+                       ADVerifyError const *result,
+                       ADVerifyErrors const *violations) {
   fprintf(out, "{\"ok\":%s,\"condition\":%d,\"path\":[", ok ? "true" : "false",
           (int)result->condition);
   for (size_t i = 0; i < result->path_length; i++) {
@@ -456,6 +465,33 @@ static void check_json(FILE *out, PGGame const *game, bool ok,
   }
   fputs(",\"message\":", out);
   json_string(out, result->message);
+  if (violations != nullptr) {
+    fputs(",\"violations\":[", out);
+    for (size_t i = 0; i < violations->count; i++) {
+      ADVerifyError const *item = violations->items + i;
+      fprintf(out, "%s{\"condition\":%d,\"path\":[", i == 0 ? "" : ",",
+              (int)item->condition);
+      for (size_t j = 0; j < item->path_length; j++) {
+        fprintf(out, "%s%zu", j == 0 ? "" : ",", item->path[j]);
+      }
+      fputs("],\"vertex\":", out);
+      if (item->vertex == SIZE_MAX) {
+        fputs("null", out);
+      } else {
+        fprintf(out, "%" PRIu64, game->vertices[item->vertex].external_id);
+      }
+      fputs(",\"edge\":", out);
+      if (violations->edges[i][0] == SIZE_MAX) {
+        fputs("null", out);
+      } else {
+        fprintf(out, "[%" PRIu64 ",%" PRIu64 "]",
+                game->vertices[violations->edges[i][0]].external_id,
+                game->vertices[violations->edges[i][1]].external_id);
+      }
+      fputc('}', out);
+    }
+    fputc(']', out);
+  }
   fputc('}', out);
 }
 
@@ -497,8 +533,15 @@ int strahler_check(strahler_game const *handle, char const *tree_json,
     ADVerifyError result = {.vertex = SIZE_MAX};
     bool const ok =
         ad_tree_check(game, &domain, (PGPlayer)player, root, &result) &&
-        relative_check(game, &domain, tree, root, &result);
-    if (result.condition == AD_VERIFY_MEMORY) {
+        relative_check(game, &domain, tree, root, &result, nullptr);
+    ADVerifyErrors violations = {0};
+    ADVerifyError relative = {.vertex = SIZE_MAX};
+    bool const collected =
+        ok ||
+        (ad_tree_check_all(game, &domain, (PGPlayer)player, root,
+                           &violations) &&
+         relative_check(game, &domain, tree, root, &relative, &violations));
+    if (!collected || result.condition == AD_VERIFY_MEMORY) {
       errno = ENOMEM;
       status = failure(error, 6, "Failed to allocate checker state");
     } else {
@@ -507,11 +550,13 @@ int strahler_check(strahler_game const *handle, char const *tree_json,
       if (out == nullptr) {
         status = failure(error, 6, "Failed to allocate JSON stream");
       } else {
-        check_json(out, game, ok, &result);
+        check_json(out, game, ok, &result, &violations);
         fputc('\n', out);
         status = finish(out, json, error, !ferror(out));
       }
     }
+    free(violations.items);
+    free(violations.edges);
   } else {
     status = failure(error, 2,
                      "Invalid tree or subgame JSON (expected h,H,T,S,children "
@@ -642,7 +687,7 @@ int strahler_materialize_partial(strahler_game const *handle,
     if (i != 0) {
       fputc(',', out);
     }
-    check_json(out, game, false, problems + i);
+    check_json(out, game, false, problems + i, nullptr);
   }
   fputs("]}\n", out);
   status = finish(out, json, error, wrote && !ferror(out));

@@ -15,7 +15,7 @@ from strahler import _native
 from trace_replay import Replay
 from otj22 import hk
 from test_json import SLOW
-from gen_decomp import BACKENDS, discover_games
+from gen_decomp import BACKENDS, discover_games, player_stats
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get('STRAHLER_BUILD_DIR', ROOT / 'build'))
@@ -63,12 +63,13 @@ def test_examples_match_cli_bytes(path, backend):
 
 @pytest.mark.parametrize('args', [(), ('--tree-k=1',), ('--kary=1',),
     ('--tree-file=' + str(ROOT / 'tests/trees/one_child.tree'),),
-    ('--adaptive-t',), ('--adaptive-t=incremental',), ('--adaptive-t', '--tree-k=1')])
+    ('--adaptive-t',), ('--adaptive-t=incremental',), ('--adaptive-t', '--tree-k=1'),
+    ('--adaptive-t', '--max-host-leaves=1')])
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 @pytest.mark.parametrize('iteration', [False, True])
 def test_host_modes(args, algorithm, iteration):
     text = (ROOT / 'tests/games/strahler_two.pg').read_text()
-    flags = [f'--algorithm={algorithm}', *args, *(['--iter-shave'] if iteration else [])]
+    flags = [f'--algorithm={algorithm}', '--stats', *args, *(['--iter-shave'] if iteration else [])]
     expected = cli('pg2adot', ['--format=json', *flags], text)
     with strahler.Game.from_text(text) as game:
         if algorithm == 'lifting-sym' and any(a.startswith('--adaptive-t') for a in args):
@@ -82,6 +83,11 @@ def test_host_modes(args, algorithm, iteration):
         result = strahler.decompose(game, args=flags)
         assert expected.returncode == 0, expected.stderr
         assert result.to_json() == expected.stdout
+        reported = player_stats(expected.stderr)
+        assert result.data['parameters'] == [
+            {key: int(stats[key]) for key in ('H', 'K', 't', 'arity') if key in stats}
+            for stats in reported]
+        assert result.data['budget_exhausted'] == ('budget_exhausted=yes' in expected.stderr)
         observed = strahler.trace(game, args=flags)
         assert observed.state(-1).trees == observed.result.trees == result.trees
 
@@ -353,3 +359,20 @@ with strahler.Game.from_text('0 0 0 0;') as game:
         raise AssertionError('deep label host accepted')
 '''], capture_output=True, text=True, timeout=15)
     assert completed.returncode == 0, (completed.returncode, completed.stderr)
+
+
+def test_all_violations_keep_first_failure_and_external_edges():
+    with strahler.Game.from_text('10 2 0 10;20 0 1 30;30 0 0 30;40 0 0 30;') as game:
+        child = lambda vertices: dict(h=0, H=vertices, T=[], S=[], children=[])
+        tree = dict(h=2, H=[10], T=[], S=[], children=[child([20]), child([30])])
+        result = strahler.check(game, tree, 0)
+        assert (result.condition, result.path, result.vertex) == (strahler.Condition.TRAP, (0,), 20)
+        assert result.violations == (
+            strahler.Violation(strahler.Condition.TRAP, (0,), 20, (20, 30)),
+            strahler.Violation(strahler.Condition.ATTRACTOR, (1,), 40, (40, 30)))
+        tree['children'][0]['H'] = []
+        # The first child is pruned; the later failure keeps its original index.
+        restricted = strahler.check(game, tree, 0, [10, 30, 40])
+        assert restricted.path == restricted.violations[0].path == (1,)
+        tree['children'][1]['S'] = [40]
+        assert strahler.check(game, tree, 0, [10, 30, 40]).violations == ()

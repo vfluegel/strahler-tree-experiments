@@ -39,7 +39,7 @@ def test_inline_esm_syntax(tmp_path):
 
 
 @pytest.mark.parametrize('kind,edges', [('game', True), ('squares', True), ('squares', False), ('tree', True)])
-@pytest.mark.parametrize('fixture', ['fig1', 'h4', 'dense'])
+@pytest.mark.parametrize('fixture', ['fig1', 'h4', 'dense', 'violations', 'symmetric-violations'])
 def test_svg_geometry_matches_frontend(tmp_path, kind, fixture, edges):
     node = shutil.which('node')
     if not node:
@@ -48,18 +48,32 @@ def test_svg_geometry_matches_frontend(tmp_path, kind, fixture, edges):
         pytest.skip('node is not installed; widget layout comparison unavailable')
     pytest.importorskip('anywidget')
     import strahler
-    from strahler.widgets import GameView, TreeView
+    from strahler.widgets import GameView, TreeView, Stepper
     from otj22 import hk
 
     root = SOURCE.parents[2]
     text = ((root / 'tests/games/otj22-fig1.gm').read_text() if fixture == 'fig1' else hk(4)
-            if fixture == 'h4' else '\n'.join(
+            if fixture in ('h4', 'symmetric-violations') else '\n'.join(
                 f'{v} 2 {v % 2} ' + ','.join(map(str, range(15))) + ';' for v in range(15)))
+    if fixture == 'violations':
+        text = '10 2 0 10;20 0 1 30;30 0 0 30;40 0 0 30;'
     with strahler.Game.from_text(text) as game:
         import runpy
         tree = (runpy.run_path(str(root / 'jupyter-examples/otj22.py'))['PAPER_FIG1']
                 if fixture == 'fig1' else strahler.decompose(game, 'zielonka').trees[0])
+        if fixture == 'violations':
+            tree = dict(h=2, H=[10], T=[], S=[], children=[
+                dict(h=0, H=[20], T=[], S=[], children=[]),
+                dict(h=0, H=[30], T=[], S=[], children=[])])
         view = GameView(game) if kind == 'game' else TreeView(tree, game=game, mode=kind, edges=edges)
+        if fixture == 'symmetric-violations':
+            stepper = Stepper(strahler.trace(game, 'lifting-sym', kary=2))
+            stepper.seek(389)
+            assert stepper.state.event['path'] == [1, 1]
+            assert stepper.verify(1).condition is strahler.Condition.TOP
+            view = stepper.game_view if kind == 'game' else stepper.tree_views[1]
+            if kind != 'game':
+                view.mode, view.edges = kind, edges
         if kind == 'game':
             view.highlight(game.vertices[:2], '#abc', 'layer')
             view.selected = game.vertices[0]
@@ -70,7 +84,11 @@ def test_svg_geometry_matches_frontend(tmp_path, kind, fixture, edges):
             view.hovered_path = child['path']
             view.hovered = child['vertices']
             view.selected = [1]
-        fields = ('kind', 'data', 'highlights', 'hovered', 'selected', 'mode', 'edges', 'hovered_path', 'owner_styles')
+        if fixture == 'violations':
+            verdict = strahler.check(game, tree, 0)
+            view.show_check(verdict, 0)
+            view.show_check(verdict, 1)
+        fields = ('kind', 'data', 'highlights', 'outlines', 'hovered', 'selected', 'mode', 'edges', 'hovered_path', 'owner_styles')
         state = {key: getattr(view, key) for key in fields}
         source = tmp_path / 'widgets.mjs'
         source.write_text(frontend(), encoding='utf-8')
@@ -106,6 +124,12 @@ console.log(JSON.stringify({groups,edges,viewBox}));
                                 capture_output=True, text=True)
         actual = json.loads(result.stdout)
         svg = ET.fromstring(view._static_svg())
+        if fixture == 'symmetric-violations' and kind != 'game':
+            node = svg.find('.//{http://www.w3.org/2000/svg}g[@data-path="[1,1]"]')
+            assert node is not None
+            assert any(e.get('stroke') == '#b45309' for e in node)
+            shapes = next(shapes for path, shapes in actual['groups'] if path == '[1,1]')
+            assert any(attrs.get('stroke') == '#b45309' for tag, attrs, text in shapes)
         assert list(map(float, actual['viewBox'].split())) == list(map(float, svg.get('viewBox').split()))
         groups, edges = [], []
         for element in svg.iter():
@@ -124,7 +148,7 @@ console.log(JSON.stringify({groups,edges,viewBox}));
                 return {key: ([float(n) for n in re.findall(r'-?\d+(?:\.\d+)?(?:e[+-]?\d+)?', value)]
                               if key in ('d', 'x', 'y', 'x1', 'x2', 'y1', 'y2', 'cx', 'cy',
                                          'r', 'rx', 'width', 'height', 'stroke-width', 'transform', 'points') else
-                              value.replace('arrow-fixture', 'strahler-arrow-' + ('game' if kind == 'game' else 'squares'))) for key, value in attrs.items()}
+                              value.replace('violation-fixture', 'strahler-violation').replace('arrow-fixture', 'strahler-arrow-' + ('game' if kind == 'game' else 'squares'))) for key, value in attrs.items()}
             return [[row[0], attributes(row[1]), *row[2:]] for row in rows]
 
         for expected_group, actual_group in zip(sorted(groups), sorted(actual['groups']), strict=True):

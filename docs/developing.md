@@ -404,8 +404,9 @@ standard input. The default algorithm is attractor-decomposition lifting.
   progress; both adaptive modes advance to the next t on the smaller game.
   It also supports `lifting-sym`; Zielonka variants reject it. DOT retains
   each shaved region's round, adaptive t, and certified decomposition, plus
-  the final residual decomposition. Verification replays the certificates
-  and attractors; `--stats` lists rounds and vertices shaved per round.
+  the final decomposition of the
+  remaining game (after preprocessing and earlier shaving rounds). Verification
+  replays the certificates and attractors; `--stats` lists rounds and vertices shaved per round.
   Restricted hosts can still end partial. `--shave` has been removed in
   favour of `--initial-shave`; there is no alias.
 - `--compress` merges consecutive distinct priorities of the same parity,
@@ -443,8 +444,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   nonempty calls and attractor counts to region sizes and tree metrics.
   Symmetric variants report calls, attractors, Move/Set counts, certification
   lifts and the Even separator size; `lifting-sym` also reports host sizes.
-  With preprocessing, it also reports residual and shaved sizes and counts per
-  rule, including attracted vertices; a vertex is counted only against the
+  With preprocessing, it also reports sizes of the remaining game and shaved regions,
+  and counts per rule, including attracted vertices; a vertex is counted only against the
   rule that removed it.
   Both `pg2adot` and `pg2pmdot` also print one final line such as
   `start: vertex=20 winner=even`. `vertex` is the file's `start N;` ID, defaulting
@@ -452,7 +453,7 @@ standard input. The default algorithm is attractor-decomposition lifting.
   absent from the game. Parsing maps the ID to its dense index after sorting and
   replacing declarations. Priority compaction and compression keep that index;
   initial and iterative shaving contribute their certified winners even after
-  removal from the residual game. Partial results report a winner only when
+  removal from the remaining game. Partial results report a winner only when
   certified. This line is independent of `--player` and the output format.
 - `--no-verify` skips the decomposition and shaved-region closure checks and
   is intended for debugging.
@@ -485,12 +486,13 @@ gaps do not add empty levels or exhaust the recursion limit. It still shows
 bounds on the original priority scale by default. Use
 `--priority-mode=compact` to show the internal bounds instead.
 
-With shaving, roots and tree metrics describe only the residual game. A shaded
+With shaving, roots and tree metrics describe only the remaining game. A shaded
 `shaved (Even)` / `shaved (Odd)` node attached to the corresponding root reports
 the solved vertices separately, including their IDs with `--labels=sets`.
-An empty residual is a complete result with no decomposition; shaved vertices
-count as won when deciding completeness. Verification checks the residual
-decomposition and, in the full game, that shaved regions are closed under their
+An empty remaining game is a complete result with no decomposition; shaved
+vertices count as won when deciding completeness. Verification checks the
+decomposition of the remaining game and, in the full game, that shaved regions
+are closed under their
 winner's attractor and that the loser cannot force an exit. The rules establish
 their winning parity. The implementation follows the behavior of
 [Oink](https://github.com/trolando/oink) (Apache-2.0); cycle searches use
@@ -537,11 +539,12 @@ holding that measure. The tool reads a PGSolver file, `-`, or standard input.
 Priorities are made gap-free internally. DOT's `p` labels identify the counter
 priority of each component, on the original scale by default. Preprocessing
 keeps shaved vertices in separate shaded nodes; they have no progress measure.
-An empty residual produces empty trees and empty leaf streams.
+An empty remaining game produces empty trees and empty leaf streams.
 
-By default, each player starts from bottom on the full residual game at every
+By default, each player starts from bottom on the full remaining game at every
 parameter choice. Neither player's dominion is removed before the other's
-run. Search stops at the first choice whose non-top sets cover the residual.
+run. Search stops at the first choice whose non-top sets cover the remaining
+game.
 Oink's counter player is the opponent of the winner named on our tree:
 Even's tree uses odd counters and Odd's tree uses even counters.
 
@@ -577,15 +580,15 @@ have no finite measure. Succinct repeats a bit budget if it made progress;
 Strahler keeps Oink's original outer bound
 `k_max=min(t_max+2,max_depth)` and can end partial when that search is
 exhausted. Fixed parameters request just one round. Each graph describes that
-round's residual; the trees do not accumulate wins from earlier rounds.
+round's remaining game; the trees do not accumulate wins from earlier rounds.
 
 `--format=leaves` prints `even: ` and `odd: ` lines, with `e` for an empty
 bitstring and `|` after each distinct measure. Remove the player prefix to
 feed one line to `pms2dot --reorder`. Raw streams retain Oink's first occurrence
 order in ascending (priority, external ID) vertex order. DOT sorts branches in the paper's order
 `0β < ε < 1β`. Oink's unspecified tie ordering, its preprocessing, and its
-last-residual-only printer can make other byte comparisons differ. Incremental
-leaf output adds `# round ...` parameter lines before each pair of streams.
+printer of only the last remaining game can make other byte comparisons differ.
+Incremental leaf output adds `# round ...` parameter lines before each pair of streams.
 
 An optional live differential test compares both backends with pinned Oink
 on seeded random games and quick examples. Set `OINK_BIN` and run
@@ -776,15 +779,20 @@ Following the common header and `game`, the document contains, in order:
 
 - `initial_won: [even, odd]`: the vertices solved by initial preprocessing.
 - `complete`: boolean; false certifies only the reported dominions.
-- `regions: [even, odd]`: residual winning regions, each a vertex array.
+- `regions: [even, odd]`: winning regions in the remaining game, each a vertex array.
 - `unresolved`: the remaining vertices, without a winning claim.
 - `trees: [even, odd]`: each tree is `null` or the recursive object below.
 - `shaves`: ordered entries `{certified, attracted: [even, odd]}`. Each
   `certified` is exactly `{complete, regions, unresolved, trees, shaves}` with
   these same meanings; `attracted` records the whole removed winning region.
-- `metrics: {trees: [even, odd], shaves}`: metrics for the residual trees;
+- `metrics: {trees: [even, odd], shaves}`: metrics for the trees of the remaining game;
   `shaves[i]` recursively describes `shaves[i].certified` in the same metrics
   format. Metrics are kept outside tree objects for trace compatibility.
+- `parameters: [even, odd]`: final host bounds from the same solver statistics
+  as `--stats`: `H,K,t` for Strahler hosts, `H,arity` for k-ary hosts, and `H`
+  for file hosts. Empty remaining games and recursive solvers have empty objects.
+- `budget_exhausted`: true when an adaptive host exceeded the leaf limit;
+  the returned parameters still describe the last hosts that actually ran.
 
 A decomposition node has exactly these keys, in this order:
 
@@ -796,8 +804,8 @@ A decomposition node has exactly these keys, in this order:
 node, the outer region is partitioned into the core and `S` (vertices outside
 that core). `H` contains the core's vertices of priority `h`; `T` contains the
 stored top attractor minus `H`. Remaining core vertices belong to the ordered
-children. A root's outer region and core both equal its residual dominion, so
-root `S` is empty. Each child carries its own outer attractor and core trap.
+children. A root's outer region and core both equal its dominion in the
+remaining game, so root `S` is empty. Each child carries its own outer attractor and core trap.
 A `null` tree denotes no decomposition. This object, including key order and
 compact serialization, is **byte-for-byte identical** to the same tree in an
 algorithm trace's `result` event. Its sets and `h` do not depend on the DOT view.
@@ -818,7 +826,7 @@ internal node takes the largest child number, adding 1 when at least two
 children share that maximum. Empty trees have number 0. These metrics
 describe the represented trees, including partial results, rather than claiming
 a minimum over all possible decompositions. Final winners combine
-`initial_won`, residual `regions`, and each shave's `attracted` arrays.
+`initial_won`, `regions` of the remaining game, and each shave's `attracted` arrays.
 
 ### Progress measures and prefix trees: strahler-pm/1
 
@@ -935,10 +943,11 @@ Intermediate replay retains root S and roots containing only S, since those
 are actual algorithm positions. Apply dominion pruning only for comparisons
 with materialized results. Each shaving entry
 has `certified` (a result of the same format) and `attracted: [even, odd]`.
-The result describes residual trees separately from earlier shaving certificates.
+The result describes trees of the remaining game separately from earlier
+shaving certificates.
 Initial preprocessing is reported by `preprocessed` with its active vertices.
-The final winning regions combine `initial_won`, the residual `regions`, and
-each shave's `attracted` sets. The already-won vertices are the preprocessing
+The final winning regions combine `initial_won`, the `regions` of the remaining
+game, and each shave's `attracted` sets. The already-won vertices are the preprocessing
 summary in DOT, without invented decomposition nodes.
 
 Zielonka emits sets after stored-tree writes and uses `phase: "discard"` to
@@ -954,7 +963,7 @@ root S. No attractor decomposition is substituted for unfinished labels.
 labels. Other phases are `host_built` (node count in `value`), `t_raised` (t in
 `value`), `dominion_certified`, `iteration_done` (result and iteration index),
 and `shave_applied` (certified result and shave index). Replayers retain the
-certified trees when a shave is applied, then continue with the residual game.
+certified trees when a shave is applied, then continue with the remaining game.
 `tests/trace_replay.py` implements these rules without reading result trees
 into its state, and compares its state with every final result.
 
@@ -1191,8 +1200,15 @@ stored sets, runs `ad_tree_check`, and preserves paths before child pruning.
 Check JSON has this shape:
 
 ```json
-{"ok":false,"condition":4,"path":[0],"vertex":42,"message":"a domain priority exceeds the node bound"}
+{"ok":false,"condition":4,"path":[0],"vertex":42,"message":"a domain priority exceeds the node bound","violations":[{"condition":4,"path":[0],"vertex":42,"edge":null}]}
 ```
+
+`violations` adds located independent conditions without changing the original
+first-failure fields or the ABI. Edges use external IDs. Set comparisons,
+priority bounds, totality and traps retain one witness per condition/node; H/T/S entry
+checks collect every inconsistent entry. Invalid metadata stops its branch;
+dependent attractor checks require total domains and contained targets.
+Python exposes immutable `Violation` records in `CheckResult.violations`.
 
 Conditions use these stable numeric values:
 
