@@ -37,8 +37,9 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `test_pg_set.c` tests the owned dense-index bitset and its move semantics.
 - `test_pg_preprocess.c` checks shared option parsing, each shaving rule,
   fixpoint iteration, full-game closure verification, compression bounds, and
-  residual lifting/Zielonka results against the exhaustive solver. Separate
-  30-second scaling cases exercise loops, wcwc, and all on 100,000-vertex games
+  lifting/Zielonka results on the remaining game (after preprocessing and
+  earlier shaving rounds) against the exhaustive solver. Separate 30-second
+  scaling cases exercise loops, wcwc, and all on 100,000-vertex games
   with independent loops or wcwc candidates without a controlled cycle.
 - `test_pg_attractor.c` compares the predecessor-queue attractor against an
   independent fixed-point implementation on fixed and random subgames, and
@@ -117,7 +118,7 @@ metadata, while traps and child attractors are edge metadata. Count and set
 goldens cover the classic, tree-relative, and Jurdziński views and are parsed
 by Graphviz during the Meson suite. In the tree-relative view, each node is
 checked as the partition `V = H + T + R_1 + ... + R_k + S`, with every `R_i`
-a trap for the other player in the current residual game. The Jurdziński view
+a trap for the other player in the current subgame Gᵢ. The Jurdziński view
 uses the same checked partition to expand the witness into `leafy(T)`, with
 visible level ranks and empty added leaves omitted. The solver and verifier
 use compact priorities; the DOT writer can show the corresponding source
@@ -196,7 +197,7 @@ regions. Successor checks cover zero budgets, truncation and strictly
 increasing measures through top. Corrupted measures and invalid inputs must
 be rejected. `pm_*` goldens cover DOT and leaf output, both players, partial
 results, set truncation, preprocessing, original/compact priority labels,
-statistics, empty residuals and per-round incremental output.
+statistics, empty remaining games and per-round incremental output.
 
 `check-pm-oracle.sh` compares the unprefixed Even stream on `pm_cycle.pg`
 against `oink_strpm_cycle.out` and `oink_sspm_cycle.out`. The streams `0|00|`

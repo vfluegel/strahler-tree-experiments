@@ -34,7 +34,8 @@ typedef enum {
 
 typedef struct ADShaveRound ADShaveRound;
 
-/* region[p] is the final residual dominion, decomposed by decomposition[p].
+/* region[p] is the final dominion in the remaining game (after preprocessing
+ * and earlier shaving rounds), decomposed by decomposition[p].
  * Earlier certified dominions and their attracted winners are in shaves. */
 typedef struct {
   PGSet region[2];
@@ -95,6 +96,15 @@ typedef struct {
   char message[256];
 } ADVerifyError;
 
+typedef struct {
+  ADVerifyError *items;
+  size_t (*edges)[2]; /* Internal indices, SIZE_MAX when no single edge
+                         witnesses it. */
+  size_t count;
+  size_t path_length;
+  size_t path[AD_PATH_CAPACITY];
+} ADVerifyErrors;
+
 size_t ad_verify_dead_end(PGGame const *game, PGSet const *domain);
 void ad_verify_error(ADVerifyError *error, ADVerifyCondition condition,
                      size_t vertex, char const *message);
@@ -126,6 +136,15 @@ void ad_result_destroy(ADResult *result);
                                  PGPlayer player, ADNode const *root,
                                  ADVerifyError *error);
 
+/* Collect conditions, retaining original paths; false means allocation failure.
+ * Free items and edges. */
+[[nodiscard]] bool ad_tree_check_all(PGGame const *game, PGSet const *subgame,
+                                     PGPlayer player, ADNode const *root,
+                                     ADVerifyErrors *errors);
+[[nodiscard]] bool ad_verify_collect(ADVerifyErrors *errors,
+                                     ADVerifyError *error, size_t from,
+                                     size_t to);
+
 /* Derive the tree-relative parts for a classic node: H is the priority-bound
  * target in core, T is the rest of the stored top attractor, and S is
  * outer \ core. The caller owns the returned sets and must destroy them with
@@ -144,7 +163,8 @@ void ad_tree_relative_parts_destroy(ADTreeRelativeParts *parts);
 /* Each nonempty region must be an opponent trap in domain with a verified
  * classic decomposition, the regions must be disjoint, and unresolved must be
  * the rest of domain. Shaving certificates and their exact attractors are
- * checked in order before the residual result. Complete results pass as well.
+ * checked in order before the result on the remaining game. Complete results
+ * pass as well.
  */
 [[nodiscard]] bool ad_result_verify_partial(PGGame const *game,
                                             PGSet const *domain,

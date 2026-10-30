@@ -263,7 +263,8 @@ static void test_solver_errors(void) {
   size_t const children = root->child_count;
   root->child_count = 0;
   assert(!ad_tree_verify(&game, &domain, root, &verification));
-  assert(strstr(verification.message, "exhaust") != nullptr);
+  assert(strstr(verification.message,
+                "child attractors do not cover the subgame Gᵢ") != nullptr);
   root->child_count = children;
   result.decomposition[PG_EVEN] = nullptr;
   assert(!ad_result_verify_complete(&game, &domain, &result, &verification));

@@ -1,6 +1,6 @@
 # Offline Jupyter examples
 
-Six notebooks for the public `strahler` Python API. Run each notebook from top
+Seven notebooks for the public `strahler` Python API. Run each notebook from top
 to bottom. Its first cell prints the package and library versions and stops if
 they differ. Use this directory as the notebook working directory so its game
 and Python helpers are importable. Rendering uses inline ESM/CSS and SVG, with no
@@ -14,7 +14,19 @@ for Jupyter and the optional Python dependencies.
 | [03-otj22-mcnaughton-zielonka](03-otj22-mcnaughton-zielonka.ipynb) | Figure 1, Hₖ, both recursive algorithms, call trees, live k=2…16 counts |
 | [04-step-through-lifting](04-step-through-lifting.ipynb) | Strahler/adaptive hosts, +iter, lifts/rounds/phases, partial candidates |
 | [05-compare-backends](05-compare-backends.ipynb) | +pre/+iter metrics, generated and progress-measure prefix trees |
-| [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, failure locations, repair |
+| [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
+| [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
+
+Metrics tables use `dominion` for the number of vertices covered by a player's
+attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
+`won` counts every certified
+win, including preprocessing (`+pre`), earlier shaving rounds (`+iter`), and their
+attractors, once per vertex. `unresolved` counts vertices neither player's search
+certified. Tree metrics cover only the reported dominion. Tables with these
+columns print their definitions; `notebook_support.won_vertices(result, player)`
+combines all wins.
+Notebook 07 labels Strahler numbers as tree metrics; progress-measure rows
+describe occupied measure trees, and AD rows describe dominion decompositions.
 
 ## Release zip
 
@@ -34,6 +46,9 @@ self-contained for the game, generator, helpers, and frontend assets. JupyterLab
 anywidget, and their dependencies must already be installed or available from
 a local wheel cache for a fully offline installation. Launching installed
 notebooks and using the views requires no network.
+The zip also includes the full `keiren/results.csv` and `KEIREN.md` column
+definitions. Notebook 07 reads the repository CSV in a checkout, the bundled
+copy in a release, or announces a Nester-only fallback if both are absent.
 
 For Colab or a single machine, each wheel is also attached to the release, e.g.
 `%pip install https://github.com/vfluegel/strahler-tree-experiments/releases/download/v<version>/strahler-<version>-py3-none-manylinux_2_28_x86_64.whl`.
@@ -95,6 +110,9 @@ print(stepper.verify(stepper.state.event['player']))
 display(view, stepper, stepper.call_tree())
 ```
 
+- `GameView.show_check(verdict, player)` and `TreeView.show_check(verdict, player)`
+  outline located violations: blue for Even, brown for Odd, with condition/node
+  titles and witness edges. Successful checks clear that player’s layer.
 - `GameView(game, coordinates={id: (x, y), ...})` scales caller coordinates.
   Squares are Even, regular pentagons Odd; labels show priority and name. `selected` is
   the clicked external ID. Named highlight layers are replaced independently.

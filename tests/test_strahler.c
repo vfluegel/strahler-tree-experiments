@@ -29,7 +29,30 @@ static void clear(char **json, char **error) {
   *error = nullptr;
 }
 
+static void check_violations(void) {
+  char const *text = "10 2 0 10;20 0 1 30;30 0 0 30;40 0 0 30;";
+  char const *tree = "{\"h\":2,\"H\":[10],\"T\":[],\"S\":[],\"children\":["
+                     "{\"h\":0,\"H\":[20],\"T\":[],\"S\":[],\"children\":[]},"
+                     "{\"h\":0,\"H\":[30],\"T\":[],\"S\":[],\"children\":[]}]}";
+  strahler_game *game = nullptr;
+  char *json = nullptr, *error = nullptr;
+  assert(strahler_game_parse(text, strlen(text), &game, &error) == 0);
+  assert(strahler_check(game, tree, 0, nullptr, 0, &json, &error) == 0);
+  assert(
+      strstr(json, "\"ok\":false,\"condition\":7,\"path\":[0],\"vertex\":20") !=
+      nullptr);
+  assert(strstr(json, "\"violations\":[{\"condition\":7,\"path\":[0],"
+                      "\"vertex\":20,\"edge\":[20,30]}") != nullptr);
+  assert(
+      strstr(json,
+             "{\"condition\":9,\"path\":[1],\"vertex\":40,\"edge\":[40,30]}") !=
+      nullptr);
+  clear(&json, &error);
+  strahler_game_free(game);
+}
+
 int main(void) {
+  check_violations();
   char const *text = "parity 2;0 2 1 1 \"root\";1 1 1 1;2 1 1 2;";
   strahler_game *game = nullptr;
   char *json = nullptr, *error = nullptr;

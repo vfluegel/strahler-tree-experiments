@@ -110,7 +110,7 @@ static void trace_return(TracePaths *paths, PGGame const *game,
   PGPlayer const beta = (PGPlayer)(1 - alpha);
   PGSet residual = {0};
   if (!pg_set_clone(&residual, domain)) {
-    solver_error(error, "failed to allocate the residual domain");
+    solver_error(error, "failed to allocate the subgame Gᵢ");
     goto failure;
   }
   ADNode *beta_accumulator =
@@ -268,7 +268,7 @@ static void trace_return(TracePaths *paths, PGGame const *game,
         &beta_accumulator->children[beta_accumulator->child_count - 1]
              .attractor);
     if (pg_set_count(&residual) >= previous_size) {
-      solver_error(error, "opponent attractor did not shrink the residual");
+      solver_error(error, "opponent attractor did not shrink the subgame Gᵢ");
       goto iteration_failure;
     }
 

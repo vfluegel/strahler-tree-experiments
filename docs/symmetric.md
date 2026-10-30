@@ -10,15 +10,17 @@ higher player Q has node b at level h+1. Write
 - `C_P(a) = {v : a <= D_P(v) < a^S}` for the core, excluding its side;
 - `S_P(a) = {v : D_P(v) = a^S}` for the side fibre, including TOP at a root.
 
-Let R be the ambient residual in which this call's subgame was selected (the
-whole active domain for the initial call). The corrected entry condition is
+Let Gᵢ be the subgame in the caller's sequence G₁ ⊇ G₂ ⊇ … after earlier
+children's attractors have been removed, in which this call's subgame was
+selected (the whole active domain for the initial call). The corrected entry
+condition is
 
 ```text
-V(G) = R ∩ C_P(a) ∩ (C_Q(b) ∪ S_Q(b)).
+V(G) = Gᵢ ∩ C_P(a) ∩ (C_Q(b) ∪ S_Q(b)).
 ```
 
 Thus each entry label is in `[a, a^S)` for P and `[b, b^S]` for Q. G must be
-total and, for a recursive child, a trap for the caller's lower player in R.
+total and, for a recursive child, a trap for the caller's lower player in Gᵢ.
 Keep the lemma's other entry requirements: `D_P <= A_P` and `D_Q <= A_Q`
 pointwise, where A is the respective least valid labelling on the original
 active domain, and the two boundary conditions excluding a forced visit to
@@ -38,7 +40,7 @@ With `--trace=FILE`, the `call` for Even's child has Odd's path at the root,
 and the preceding Odd `labels` event places vertex 1 in that root's S fibre.
 This is the corrected entry condition in the trace: S at a root means TOP.
 The subsequent `check` events record the algorithm's own restricted-labelling
-tests (paper Algorithm 2, entry lines 1 and 4, and the residual test).
+tests (paper Algorithm 2, entry lines 1 and 4, and the G_{i+1} subgame test).
 They do not rerun or change the recursion.
 
 ## Proof sketch
@@ -55,21 +57,21 @@ allow `S_P(a)`. Removing the top-attractor vertices from `C_Q(c)` by Set gives
 the candidate U. Old labels can leave U with escaping edges, so the code uses
 
 ```text
-B = Attr_P^R(R \ U),     U' = U \ B = R \ B.
+B = Attr_P^Gᵢ(Gᵢ \ U),     U' = U \ B = Gᵢ \ B.
 ```
 
 The complement of an attractor is a P-trap and induces a total subgame. Set
-moves `B ∩ U` to `c^S`, so the updated c-core in R is exactly U'. Meanwhile
+moves `B ∩ U` to `c^S`, so the updated c-core in Gᵢ is exactly U'. Meanwhile
 the caller's labels remain in its a-core or a-side. This gives the corrected
 entry equality after swapping players. This closure is an added operation.
 
 For the upper bound, the loop's frontier invariant says that every vertex still
-in R has Q label at least c. This holds for the first child after the higher
+in Gᵢ has Q label at least c. This holds for the first child after the higher
 top fibre is moved; after each iteration, Move advances the preceding child's
-side fibre outside the returned attractor. Thus `R \ U` has Q labels
+side fibre outside the returned attractor. Thus `Gᵢ \ U` has Q labels
 at least `c^S`, not earlier labels. Since `D_Q <= A_Q`, those targets are
 outside the least Q c-core. The entry trap and earlier-label boundary conditions
-allow its Q-strategy to stay in that core within R, so P cannot attract any
+allow its Q-strategy to stay in that core within Gᵢ, so P cannot attract any
 of its vertices to these targets. Thus `B ∩ U` is outside that least core,
 and setting it to `c^S` stays below A_Q. This is Proposition 7.2.6's exclusion
 argument; it also justifies the Sets of top-attractor vertices and of vertices
@@ -77,8 +79,8 @@ attracted to the returned separator.
 
 Induction now uses the corrected entry condition for each nonempty child.
 Move advances only fibres outside their required attractors, preserving
-`D <= A` by Proposition 7.2.3. The return update sets the opponent's residual
-to its side, as in the winning entry case. A vertex already on that side
+`D <= A` by Proposition 7.2.3. The return update sets the opponent's labels on
+G_{i+1} to its side, as in the winning entry case. A vertex already on that side
 needs no core witness for that player; it cannot make `is_ad` succeed there.
 These facts preserve the upper bounds needed by the separator argument.
 Continuing short lifts from `D <= A` then reaches A, as described in §8.3.
@@ -105,7 +107,7 @@ certificate verification. Defining NDEBUG omits these assertions and debug runs.
 `is_ad` implements Proposition 7.2.1; `assign`/`move` implement Proposition
 7.2.3's ⊕/smallMove; `set_side` implements Remark 5. `solve` follows Algorithm
 8 lines 2 to 26 / Algorithm 9 lines 2 to 24. Algorithm 8's loop stops on a valid
-residual; Algorithm 9 exhausts the supplied children. Empty subgames never
+subgame G_{i+1}; Algorithm 9 exhausts the supplied children. Empty subgames never
 recurse. `ad_lift_solve.c` shares host selection; `ad_lift_continue` certifies
 Algorithm 9's final labels without resetting their progress. The original
 `ad_lift.c` computes Algorithm 5's least decomposition using Proposition 7.2.1
@@ -119,11 +121,11 @@ below the independently computed least valid labelling before certification.
 
 | Thesis correspondence | Classification |
 |---|---|
-| Algorithm 8 line 27 returns updated G_{i+1}, not G_i | Indexing erratum. |
+| Algorithm 8 line 27 returns updated G_{i+1}, not Gᵢ | Indexing erratum. |
 | Proposition 7.2.3's T/S unions preserve T/S, not H | Typographical errata. |
 | Lemma 8.2.1 item 4 includes the higher player's side | Proposed invariant erratum; justified in the linked proof sketch. |
 | Move the initial higher root's unsupported top labels | Faithful reading / normalization: its highest-priority target is empty. |
-| Set the opponent's residual labels to the side on return | Faithful bookkeeping addition: the winning entry case's update. |
+| Set the opponent's labels on G_{i+1} to the side on return | Faithful bookkeeping addition: the winning entry case's update. |
 | Close a stale child by removing the escaping player's attractor | Added algorithmic operation; not a typographical correction. |
 | Finish Algorithm 9 with asymmetric short lifts | Thesis §8.3 extension to obtain certificates, with polynomial additional cost. |
 

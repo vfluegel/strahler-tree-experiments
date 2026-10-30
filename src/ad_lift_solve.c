@@ -526,7 +526,7 @@ solve_with_options(PGGame const *game, PGSet const *domain,
   size_t last_winning_t[2] = {0, 0};
   bool succeeded = false;
   if (!pg_set_clone(&remaining, domain)) {
-    solve_error(error, "failed to allocate the residual subgame");
+    solve_error(error, "failed to allocate the remaining game");
     goto cleanup;
   }
   for (;;) {

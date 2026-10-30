@@ -93,10 +93,17 @@ def document(value):
         natural(value['game']['edges'])
         ids(value['game']['priorities'])
     if value['schema'] == 'strahler-decomp/1':
-        assert list(value)[4:] == ['game', 'initial_won', 'complete', 'regions', 'unresolved', 'trees', 'shaves', 'metrics']
+        assert list(value)[4:] == ['game', 'initial_won', 'complete', 'regions', 'unresolved', 'trees', 'shaves', 'metrics', 'parameters', 'budget_exhausted']
         pair(value['initial_won'], ids)
         result(value)
         metrics(value['metrics'])
+        def parameters(item):
+            assert isinstance(item, dict)
+            assert set(item) <= {'H', 'K', 't', 'arity'}
+            for number in item.values():
+                natural(number)
+        pair(value['parameters'], parameters)
+        assert type(value['budget_exhausted']) is bool
     elif value['schema'] == 'strahler-tree/1':
         assert list(value)[4:] == ['parameters', 'tree']
         assert list(value['parameters']) == ['k', 'h', 't']

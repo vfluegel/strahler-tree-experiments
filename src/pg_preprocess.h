@@ -32,8 +32,9 @@ typedef struct {
                                               char const *value);
 
 /* Renumber (or compress) priorities, then shave single/loops/wcwc to a
- * fixpoint. Vertex indices and edges stay unchanged; active is the residual
- * total subgame, won[p] records every shaved winner. On success game holds
+ * fixpoint. Vertex indices and edges stay unchanged; active is the remaining
+ * game (after preprocessing and earlier shaving rounds), a total subgame;
+ * won[p] records every shaved winner. On success game holds
  * the new priorities. A compressed map is not invertible; original_bound
  * displays the largest source priority merged into a level. */
 [[nodiscard]] bool pg_preprocess(PGGame *game,
@@ -41,9 +42,10 @@ typedef struct {
                                  PGPreprocessResult *result);
 void pg_preprocess_destroy(PGPreprocessResult *result);
 
-/* Check the partition, residual totality, winner-attractor closure, and that
- * neither loser can force an exit from its opponent's shaved region in the
- * full game. Seed parity correctness is established by the shaving rules. */
+/* Check the partition, totality of the remaining game, winner-attractor
+ * closure, and that neither loser can force an exit from its opponent's shaved
+ * region in the full game. Seed parity correctness is established by the
+ * shaving rules. */
 [[nodiscard]] bool pg_preprocess_verify(PGGame const *game,
                                         PGPreprocessResult const *result);
 

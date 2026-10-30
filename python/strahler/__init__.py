@@ -17,7 +17,7 @@ from . import _native
 from ._native import InputError, StrahlerError
 from ._replay import Replay
 
-__all__ = ['Game', 'Node', 'Result', 'Trace', 'State', 'CheckResult', 'Condition',
+__all__ = ['Game', 'Node', 'Result', 'Trace', 'State', 'CheckResult', 'Violation', 'Condition',
            'StrahlerError', 'InputError', 'decompose', 'trace', 'check',
            'progress_measures', 'genstree', 'pms_tree', 'materialize_partial',
            'version']
@@ -112,9 +112,11 @@ class Node:
 class Result:
     """A decomposition document. ``to_json()`` retains the exact C output.
 
-    ``trees`` is a pair of Node/None, ``regions`` a pair of frozensets;
+    ``trees`` is a pair of Node/None, ``regions`` a pair of dominion frozensets
+    covered by those attractor decompositions, excluding earlier shaved wins;
     ``complete``, ``metrics`` and ``unresolved`` preserve the solver's claims.
-    ``data`` includes initial_won and iterative shaving certificates.
+    ``data`` includes initial_won, iterative shaving certificates, solver-reported
+    host ``parameters`` (Even/Odd) and the adaptive leaf-limit ``budget_exhausted``.
     """
 
     def __init__(self, text):
@@ -172,17 +174,33 @@ class Condition(IntEnum):
 
 
 @dataclass(frozen=True)
+class Violation:
+    """A located condition, with an optional directed edge in external IDs."""
+    condition: Condition
+    path: tuple
+    vertex: int | None
+    edge: tuple | None
+
+
+@dataclass(frozen=True)
 class CheckResult:
     """Definition 1 check: named condition, child-index path, external vertex.
 
     condition is a Condition IntEnum (0 means OK), vertex is None when
-    unlocated. Failure messages explain the violated condition.
+    unlocated. Failure messages explain the violated condition. ``violations``
+    collects independent conditions at every reachable node. Set comparisons,
+    priority bounds, totality and traps retain one vertex witness per condition
+    and node; an edge is included when a direct move witnesses the failure. Invalid node
+    metadata stops that branch; dependent attractor checks require total
+    domains and contained targets. H/T/S inconsistencies locate every bad entry.
+    Paths refer to the supplied tree, before restricting or pruning children.
     """
     ok: bool
     condition: Condition
     path: tuple
     vertex: int | None
     message: str
+    violations: tuple = ()
 
 
 def _json(value):
@@ -209,6 +227,9 @@ def check(game, tree, player, subgame=None, *, compress=False):
                                   None if subgame is None else _json(sorted(subgame)), int(compress)))
     data['path'] = tuple(data['path'])
     data['condition'] = Condition(data['condition'])
+    data['violations'] = tuple(Violation(Condition(v['condition']), tuple(v['path']),
+                                         v['vertex'], None if v['edge'] is None else tuple(v['edge']))
+                               for v in data.get('violations', ()))
     return CheckResult(**data)
 
 

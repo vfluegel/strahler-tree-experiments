@@ -87,8 +87,16 @@ The library manages JSON format and callback traces, so `--format`, `--trace`,
 `H`, `T`, `S`, tuple `children`, and a tuple `path` of zero-based child indices.
 `to_dict()` returns the documented `{h,H,T,S,children}` JSON shape.
 `regions`, `unresolved`, `complete`, and `metrics` preserve the solver's
-claims. `data` also contains `initial_won` and iterative `shaves`; shaved
-winners have separate certificates and are not in the final residual trees.
+claims. `regions[player]` is the dominion covered by that player's returned
+attractor decomposition. `data` also contains `initial_won` and iterative
+`shaves`; shaved winners have separate certificates outside that dominion.
+The notebook metrics tables call its vertex count `dominion`; `won` counts
+the union of `regions[player]`, `data['initial_won'][player]`, and every
+`shave['attracted'][player]` in `data['shaves']`, once per vertex.
+`unresolved` contains vertices neither player's search certified.
+`data['parameters']` holds the solver-reported Even/Odd host bounds (`H,K,t`
+for Strahler hosts); `data['budget_exhausted']` identifies an adaptive leaf-limit
+stop. These come from the same native statistics as `pg2adot --stats`.
 Partial results certify their reported regions; they do not decide unresolved
 vertices.
 
@@ -144,7 +152,12 @@ uses the same normalization. Pass `compress=True` for a tree produced with
 continues to expose the input priorities.
 
 A `CheckResult` has `ok`, `condition` (a `Condition` IntEnum), tuple `path`,
-external `vertex` or `None`, and `message`. Failed decomposition conditions are
+external `vertex` or `None`, `message`, and tuple `violations`. Each `Violation`
+has a named condition, original node path, external vertex and optional directed
+edge tuple. Set conditions retain one vertex witness per condition/node; invalid
+metadata stops that branch, and dependent checks need total domains. H/T/S
+inconsistencies locate every bad entry. The original first-failure fields keep
+their meaning. Failed decomposition conditions are
 ordinary results. Malformed JSON, unknown IDs, or invalid options raise
 `InputError` (also a `ValueError`); solver/I/O/trace failures raise
 `StrahlerError` with `status`. Allocation failures raise `MemoryError`.
@@ -183,7 +196,7 @@ for Definition 1.
 
 Install `strahler[notebooks]` to enable the optional `strahler.widgets` module.
 Ordinary `import strahler` does not import anywidget, traitlets, or Jupyter.
-The six notebooks and checkout/release setup commands are in
+The seven notebooks and checkout/release setup commands are in
 [jupyter-examples](../jupyter-examples/README.md).
 
 ```python

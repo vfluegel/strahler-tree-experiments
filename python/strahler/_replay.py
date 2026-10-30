@@ -46,12 +46,16 @@ class Replay:
 
         def visit(path):
             if path not in parts:
-                return None
+                return (dict(h=parts[path[:-1]]['h'] - 2, H=[], T=[], S=[], children=[])
+                        if candidate else None)
             node = parts[path]
-            children = [visit(p) for p in sorted(parts)
-                        if len(p) == len(path) + 1 and p[:-1] == path]
+            indices = [p[-1] for p in sorted(parts)
+                       if len(p) == len(path) + 1 and p[:-1] == path]
+            if candidate:
+                # Checker paths must retain gaps in the occupied host children.
+                indices = range(max(indices, default=-1) + 1)
             node = {**{k: sorted(node[k]) for k in 'HTS'}, 'h': node['h'],
-                    'children': [c for c in children if c is not None]}
+                    'children': [visit(path + (i,)) for i in indices]}
             return node
         return visit(root)
 

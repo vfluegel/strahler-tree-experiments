@@ -571,10 +571,11 @@ write_node(FILE *out, PGGame const *game, PGSet const *domain,
                                       bool const shaved) {
   char const *name = player == PG_EVEN ? "Even" : "Odd";
   char const *identifier = player == PG_EVEN ? "even_empty" : "odd_empty";
-  if (fprintf(out, "  %s [label=<<B>%s</B>: %s>];\n", identifier, name,
-              shaved    ? "no residual decomposition; see shaved vertices"
-              : partial ? "<I>D</I> = empty; no certified dominion"
-                        : "<I>W</I> = empty; no decomposition") < 0) {
+  if (fprintf(
+          out, "  %s [label=<<B>%s</B>: %s>];\n", identifier, name,
+          shaved ? "no decomposition of the remaining game; see shaved vertices"
+          : partial ? "<I>D</I> = empty; no certified dominion"
+                    : "<I>W</I> = empty; no decomposition") < 0) {
     return false;
   }
   return !attach || fprintf(out, "  result -> %s;\n", identifier) >= 0;

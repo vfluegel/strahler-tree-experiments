@@ -13,7 +13,7 @@ except ImportError:
 from otj22 import hk
 
 ROOT = Path(__file__).resolve().parents[1]
-FIELDS = ('kind', 'data', 'hovered', 'highlights', 'selected', 'mode', 'next_kind', 'edges', 'hovered_path', 'owner_styles')
+FIELDS = ('kind', 'data', 'hovered', 'highlights', 'outlines', 'selected', 'mode', 'next_kind', 'edges', 'hovered_path', 'owner_styles')
 
 
 @pytest.fixture(scope='module')
