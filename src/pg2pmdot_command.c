@@ -51,6 +51,8 @@ static void usage(FILE *out, char *argv[]) {
         "budget; may be partial\n"
         "  --iter-shave                                Remove dominions "
         "between runs (default: off)\n"
+        "  --search=lexicographic                      Exhaust t for each "
+        "k before raising k\n"
         "  --stats                                     Print statistics to "
         "stderr (default: off)\n"
         "  --no-verify                                 Skip verification "
@@ -172,6 +174,7 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     OPT_T,
     OPT_BITS,
     OPT_INCREMENTAL,
+    OPT_SEARCH,
     OPT_STATS,
     OPT_NO_VERIFY
   };
@@ -190,6 +193,7 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       {"t", required_argument, nullptr, OPT_T},
       {"bits", required_argument, nullptr, OPT_BITS},
       {"iter-shave", no_argument, nullptr, OPT_INCREMENTAL},
+      {"search", required_argument, nullptr, OPT_SEARCH},
       {"stats", no_argument, nullptr, OPT_STATS},
       {"no-verify", no_argument, nullptr, OPT_NO_VERIFY},
       {nullptr, 0, nullptr, 0},
@@ -303,6 +307,12 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       solve_options.incremental = true;
       output.incremental = true;
       break;
+    case OPT_SEARCH:
+      if (strcmp(parser.argument, "lexicographic") != 0) {
+        return cli_error_to(io->err, argv[0], "Invalid --search value");
+      }
+      solve_options.lexicographic = true;
+      break;
     case OPT_STATS:
       output.stats = true;
       break;
@@ -319,6 +329,11 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     goto invalid;
   }
   solve_options.fixed = k_given || bits_given;
+  if (solve_options.lexicographic &&
+      (solve_options.fixed || solve_options.algorithm != PM_STRAHLER)) {
+    return cli_error_to(io->err, argv[0],
+                        "--search requires unfixed Strahler parameters");
+  }
   PGGame game = {0};
   if (io->game == nullptr) {
     FILE *input = io->in;

@@ -98,6 +98,8 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
               PMVisit const visit, void *context, PMError *error) {
   if (game == nullptr || active == nullptr || options == nullptr ||
       visit == nullptr || active->bit_count != game->vertex_count ||
+      (options->lexicographic &&
+       (options->fixed || options->algorithm != PM_STRAHLER)) ||
       game->max_priority >= INT_MAX || !pg_subgame_is_total(game, active)) {
     pm_error(error, "invalid solver arguments");
     return false;
@@ -113,6 +115,15 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
                           .k_max =
                               logarithm + 2 < height ? logarithm + 2 : height,
                           .t_max = logarithm};
+  if (options->lexicographic) {
+    /* A measure tree has at most n occupied leaves and depth+1 levels.
+     * Proposition 3 gives Str <= min(depth+1, floor(log2 n)+1), including
+     * the root, with the same safe bound whether or not dominions are removed.
+     */
+    size_t const measure_height = (size_t)(game->max_priority / 2 + 2);
+    queue.k_max =
+        logarithm + 1 < measure_height ? logarithm + 1 : measure_height;
+  }
   size_t const slots = (queue.k_max + 1) * queue.width;
   PMResult result[2] = {0};
   PGSet remaining = {0};
@@ -130,11 +141,16 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       options->fixed
           ? options->parameters
           : (PMParameters){.k = 1, .t = 1, .bits = max_bits == 0 ? 0 : 1};
-  if (!options->fixed && options->algorithm == PM_STRAHLER) {
+  if (options->lexicographic) {
+    parameters.t = 0;
+  }
+  if (!options->fixed && !options->lexicographic &&
+      options->algorithm == PM_STRAHLER) {
     push(&queue, parameters);
   }
   for (size_t round = 1;; round++) {
-    if (!options->fixed && options->algorithm == PM_STRAHLER) {
+    if (!options->fixed && !options->lexicographic &&
+        options->algorithm == PM_STRAHLER) {
       if (queue.count == 0) {
         if (options->incremental) {
           succeeded = true;
@@ -188,7 +204,18 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       succeeded = true;
       break;
     }
-    if (options->algorithm == PM_STRAHLER) {
+    if (options->lexicographic) {
+      if (parameters.t < queue.t_max) {
+        parameters.t++;
+      } else if (parameters.k < queue.k_max) {
+        parameters.k++;
+        parameters.t = 0;
+      } else {
+        pm_error(error,
+                 "lexicographic search exhausted before covering the game");
+        goto cleanup;
+      }
+    } else if (options->algorithm == PM_STRAHLER) {
       if (parameters.k < queue.k_max) {
         push(&queue, (PMParameters){.k = parameters.k + 1, .t = parameters.t});
       }

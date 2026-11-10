@@ -260,6 +260,59 @@ typedef enum {
   return left < right ? left : right;
 }
 
+[[nodiscard]] static size_t lexicographic_k_max(ADLiftSolveStats const *stats,
+                                                size_t const cap) {
+  size_t const even = stats->player[PG_EVEN].k_full;
+  size_t const odd = stats->player[PG_ODD].k_full;
+  size_t const maximum = even > odd ? even : odd;
+  return cap == 0 ? maximum : smaller(maximum, cap);
+}
+
+/* Proposition 3 and Lemma 16 give t <= floor(log2 n) and
+ * K <= min(H, floor(log2 n)+1). Keep the initial n and heights when shaving.
+ * Exhaust every t for a fixed K before increasing K and resetting t to zero. */
+[[nodiscard]] static bool run_lexicographic(Solver *solver) {
+  ADLiftSolveStats *stats = solver->stats;
+  size_t const maximum = lexicographic_k_max(stats, solver->options->k);
+  size_t const first =
+      solver->options->start_k == 0 ? 1 : solver->options->start_k;
+  bool ran[2] = {false, false};
+  for (size_t k = first; k <= maximum; k++) {
+    AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE, .name = "k_raised",
+             .to = k);
+    size_t const start =
+        k == first ? smaller(solver->options->t, stats->t_full) : 0;
+    for (size_t t = start; t <= stats->t_full; t++) {
+      AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE,
+               .name = "t_raised", .to = t);
+      for (size_t player = 0; player < 2; player++) {
+        size_t const bound = smaller(k, stats->player[player].k_full);
+        HostStatus const status =
+            run_strahler(solver, (PGPlayer)player, bound, t);
+        if (status == HOST_FAILED ||
+            (status == HOST_OVER_BUDGET && (!ran[0] || !ran[1]))) {
+          return false;
+        }
+        if (status == HOST_OVER_BUDGET) {
+          return true;
+        }
+        ran[player] = true;
+      }
+      if (covered(solver)) {
+        stats->adaptive_complete = true;
+        stats->first_complete_t = t;
+        stats->player[PG_EVEN].first_full_t = t;
+        stats->player[PG_ODD].first_full_t = t;
+        return true;
+      }
+      if (solver->options->iter_shave) {
+        return true;
+      }
+    }
+  }
+  return true;
+}
+
 /* Raise t until the dominions cover the domain, using the largest useful K
  * for each t, at most the optional cap. Beyond t_full the hosts only grow, so
  * t stops there; a player whose host does not change is not lifted again. If
@@ -272,6 +325,9 @@ typedef enum {
  * The first t reaching the largest dominion seen is therefore the least t
  * that already found the whole winning region. */
 [[nodiscard]] static bool run_adaptive(Solver *solver) {
+  if (solver->options->lexicographic) {
+    return run_lexicographic(solver);
+  }
   ADLiftSolveStats *stats = solver->stats;
   size_t const cap = solver->options->k;
   bool ran[2] = {false, false};
@@ -359,6 +415,8 @@ typedef enum {
       (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE) ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||
       (options->incremental && options->mode != AD_LIFT_HOST_ADAPTIVE) ||
+      (options->lexicographic &&
+       (options->mode != AD_LIFT_HOST_ADAPTIVE || options->incremental)) ||
       (options->mode == AD_LIFT_HOST_STRAHLER && options->k == 0) ||
       (options->mode == AD_LIFT_HOST_KARY && options->arity == 0) ||
       (options->mode == AD_LIFT_HOST_TREE && options->tree == nullptr) ||
@@ -611,8 +669,14 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       goto cleanup;
     }
     bool const adaptive = options->mode == AD_LIFT_HOST_ADAPTIVE;
-    if (pg_set_empty(&remaining) ||
-        (adaptive && stats->player[0].t >= stats->t_full)) {
+    size_t const even_k = stats->player[PG_EVEN].k;
+    size_t const odd_k = stats->player[PG_ODD].k;
+    size_t const current_k = even_k > odd_k ? even_k : odd_k;
+    bool const last_t = stats->player[0].t >= stats->t_full;
+    bool const last_host =
+        last_t && (!options->lexicographic ||
+                   current_k >= lexicographic_k_max(stats, options->k));
+    if (pg_set_empty(&remaining) || (adaptive && last_host)) {
       if (adaptive && pg_set_empty(&remaining)) {
         stats->adaptive_complete = true;
         stats->first_complete_t = stats->player[0].t;
@@ -621,7 +685,11 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       goto cleanup;
     }
     if (adaptive) {
-      round_options.t = stats->player[0].t + 1;
+      round_options.t =
+          options->lexicographic && last_t ? 0 : stats->player[0].t + 1;
+      if (options->lexicographic) {
+        round_options.start_k = current_k + last_t;
+      }
     }
   }
 cleanup:

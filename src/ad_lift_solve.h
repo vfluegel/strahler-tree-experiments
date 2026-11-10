@@ -42,6 +42,10 @@ typedef struct {
   size_t k;
   /* ADAPTIVE: the first t. */
   size_t t;
+  /* ADAPTIVE: visit (K,t) lexicographically, with K as the outer loop. */
+  bool lexicographic;
+  /* Internal cursor for lexicographic iterative shaving; zero starts at 1. */
+  size_t start_k;
   /* KARY: the arity, at least one. */
   size_t arity;
   /* TREE: the base tree, which must fit below both players' root levels. */

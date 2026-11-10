@@ -62,6 +62,8 @@ static void usage(FILE *out, char *argv[]) {
           "complete; --tree-k caps K\n"
           "  --adaptive-t=incremental                    Reuse certified "
           "opponent wins as TOP\n"
+          "  --search=lexicographic                      Exhaust t for each "
+          "K before raising K\n"
           "  --start-t=T                                 First adaptive t "
           "(default: 0)\n"
           "  --kary=A                                    Lift in a full A-ary "
@@ -258,7 +260,10 @@ static void write_lifting_stats(CLIIO *io, ADLiftSolveStats const *stats,
             name, counts->calls, counts->attractors, counts->moves,
             counts->sets, counts->certification_lifts, counts->separator);
   }
-  if (options->mode == AD_LIFT_HOST_ADAPTIVE) {
+  if (options->lexicographic) {
+    fprintf(io->err, "lifting: search=lexicographic budget_exhausted=%s\n",
+            stats->budget_exhausted ? "yes" : "no");
+  } else if (options->mode == AD_LIFT_HOST_ADAPTIVE) {
     fputs("lifting: first_complete_t=", io->err);
     if (stats->adaptive_complete) {
       fprintf(io->err, "%zu even_first_full_t=%zu odd_first_full_t=%zu",
@@ -328,6 +333,7 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
     OPTION_TREE_K,
     OPTION_ADAPTIVE_T,
     OPTION_START_T,
+    OPTION_SEARCH,
     OPTION_KARY,
     OPTION_TREE_FILE,
     OPTION_MAX_HOST_LEAVES,
@@ -352,6 +358,7 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       {"tree-k", required_argument, nullptr, OPTION_TREE_K},
       {"adaptive-t", optional_argument, nullptr, OPTION_ADAPTIVE_T},
       {"start-t", required_argument, nullptr, OPTION_START_T},
+      {"search", required_argument, nullptr, OPTION_SEARCH},
       {"kary", required_argument, nullptr, OPTION_KARY},
       {"tree-file", required_argument, nullptr, OPTION_TREE_FILE},
       {"max-host-leaves", required_argument, nullptr, OPTION_MAX_HOST_LEAVES},
@@ -492,6 +499,12 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       }
       start_t_given = true;
       break;
+    case OPTION_SEARCH:
+      if (strcmp(parser.argument, "lexicographic") != 0) {
+        return cli_error_to(io->err, argv[0], "Invalid --search value");
+      }
+      lift_options.lexicographic = true;
+      break;
     case OPTION_KARY:
       if (!parse_size(parser.argument, &arity) || arity == 0) {
         return cli_error_to(io->err, argv[0], "Invalid --kary value");
@@ -553,6 +566,11 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
   }
   static char const *const names[] = {"lifting", "zielonka", "zielonka-sym",
                                       "lifting-sym"};
+  if (lift_options.lexicographic && adaptive_t) {
+    return cli_error_to(io->err, argv[0],
+                        "--search conflicts with --adaptive-t");
+  }
+  adaptive_t = adaptive_t || lift_options.lexicographic;
   bool const strahler_host = tree_k != 0 || adaptive_t;
   if ((strahler_host ? 1 : 0) + (arity != 0 ? 1 : 0) +
           (tree_path != nullptr ? 1 : 0) >
@@ -796,6 +814,12 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
     if (lift_stats.budget_exhausted) {
       fprintf(io->err, "Warning: %s; the result is partial\n",
               lift_error.message);
+    } else if (lift_options.lexicographic && lift_stats.vertices != 0) {
+      size_t const even_k = lift_stats.player[PG_EVEN].k;
+      size_t const odd_k = lift_stats.player[PG_ODD].k;
+      fprintf(io->err, "Lexicographic search: %s at (K,t)=(%zu,%zu)\n",
+              lift_stats.adaptive_complete ? "complete" : "partial",
+              even_k > odd_k ? even_k : odd_k, lift_stats.player[PG_EVEN].t);
     } else if (lift_stats.vertices != 0 &&
                lift_options.mode == AD_LIFT_HOST_ADAPTIVE &&
                lift_stats.adaptive_complete) {

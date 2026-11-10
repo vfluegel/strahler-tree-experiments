@@ -29,7 +29,8 @@ Download `strahler-notebooks-<version>.zip` from
 [GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases)
 for Python wheels on Linux x86_64 and macOS Apple silicon (11.0+), plus
 installation instructions for pip and uv. The zip includes everything in
-`jupyter-examples/` at the release tag; this checkout has no notebooks yet.
+`jupyter-examples/` at the release tag. The [notebook index](jupyter-examples/README.md)
+describes the examples in this checkout.
 Wheels are also available separately on each release; they are not published
 to PyPI. See [python/README.md](python/README.md) for the
 Python API and installation from a checkout (Python 3.10+).

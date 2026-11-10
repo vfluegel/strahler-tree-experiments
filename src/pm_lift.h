@@ -38,6 +38,8 @@ typedef struct {
   PMParameters parameters;
   bool fixed;
   bool incremental;
+  /* Exhaust t=0..floor(log2 n) before increasing k. */
+  bool lexicographic;
   bool verify;
 } PMOptions;
 

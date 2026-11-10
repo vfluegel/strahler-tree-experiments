@@ -71,6 +71,7 @@ compatibility rules as pg2adot:
 with Game.from_file('tests/games/strahler_two.pg') as game:
     result = decompose(game, 'lifting', adaptive_t='incremental', iter_shave=True)
     result = decompose(game, 'lifting', tree_k=1)  # may be partial
+    result = decompose(game, 'lifting', search='lexicographic', iter_shave=True)
     result = decompose(game, 'lifting-sym', kary=2, initial_shave='all')
     result = decompose(game, args=['--tree-file=tests/trees/one_child.tree'])
 ```
@@ -80,6 +81,11 @@ Use these calls while `game` is open. Keyword underscores become hyphens,
 All lifting hosts are available: full/default, `tree_k`, `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
 `iter_shave=True`. As in the CLI, symmetric lifting rejects adaptive hosts.
+`search='lexicographic'` walks `(k,t)` with `k` as the outer loop and
+`t=0..floor(log2(n))` as the inner loop. It is available in both
+`decompose(game, 'lifting', ...)` and `progress_measures(game, ...)`, with
+or without `iter_shave=True`. It uses the theory caps described in
+[Notebook 08](../jupyter-examples/08-lexicographic-adaptive-nester.ipynb).
 The library manages JSON format and callback traces, so `--format`, `--trace`,
 `--help`, and `--version` are not solver options here.
 
