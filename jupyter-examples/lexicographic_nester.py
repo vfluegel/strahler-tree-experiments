@@ -22,7 +22,10 @@ RESULTS = DATA / 'lexicographic-results.json'
 TIMEOUT_RESULTS = DATA / 'lexicographic-timeouts-60s.json'
 FIVE_MINUTE_RESULTS = DATA / 'lexicographic-timeouts-300s.json'
 FINAL_RESULTS = DATA / 'lexicographic-results-300s.json'
-BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
+SYMMETRIC_RESULTS = DATA / 'lexicographic-symmetric-300s.json'
+BASE_BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
+SYMMETRIC_BACKENDS = ('AD-sym', 'AD-sym+iter')
+BACKENDS = (*BASE_BACKENDS[:2], *SYMMETRIC_BACKENDS, *BASE_BACKENDS[2:])
 
 
 def bounds(vertices, maximum):
@@ -224,7 +227,8 @@ def worker(request):
         options = dict(search='lexicographic', iter_shave=backend.endswith('+iter'))
         if backend.startswith('AD'):
             options['max_host_leaves'] = 2 * sys.maxsize + 1
-            flags = _native.options(None, options, 'lifting')
+            algorithm = 'lifting-sym' if backend in SYMMETRIC_BACKENDS else 'lifting'
+            flags = _native.options(None, options, algorithm)
             text = _native.call('decompose', handle, flags, len(flags),
                                 _native.Callback(), None)
         else:
@@ -271,7 +275,8 @@ def check_agreement(rows):
 
 def recorded_results():
     document = json.loads(RESULTS.read_text(encoding='utf-8'))
-    expected = {(n, backend) for n in range(1, 8) for backend in BACKENDS}
+    expected = {(n, backend) for n in range(1, 8)
+                for backend in document.get('backends', BASE_BACKENDS)}
     assert len(document['rows']) == len(expected)
     assert {(r['n'], r['backend']) for r in document['rows']} == expected
     assert document['fixtures'] == {g['file']: g['sha256'] for g in manifest()}
@@ -297,11 +302,38 @@ def recorded_timeout_results(path=None, baseline_path=None):
     return document
 
 
-def _consolidated_results():
+def recorded_symmetric_results():
+    document = json.loads(SYMMETRIC_RESULTS.read_text(encoding='utf-8'))
+    expected = {(n, backend) for n in range(1, 8) for backend in SYMMETRIC_BACKENDS}
+    assert document['backends'] == list(SYMMETRIC_BACKENDS)
+    assert len(document['rows']) == len(expected)
+    assert {(r['n'], r['backend']) for r in document['rows']} == expected
+    assert document['fixtures'] == {g['file']: g['sha256'] for g in manifest()}
+    for row in document['rows']:
+        assert row['timeout_seconds'] == document['timeout_seconds']
+        assert row['memory_gib'] == document['memory_gib']
+        if row['n'] > document.get('stop_after_n', 7):
+            assert row['outcome'] == 'not measured' and 'seconds' not in row
+        else:
+            assert row['outcome'] != 'not measured'
+    check_agreement(document['rows'])
+    return document
+
+
+def _consolidated_results(include_symmetric=True):
     sources = [(RESULTS, recorded_results()),
                (TIMEOUT_RESULTS, recorded_timeout_results()),
                (FIVE_MINUTE_RESULTS,
                 recorded_timeout_results(FIVE_MINUTE_RESULTS, TIMEOUT_RESULTS))]
+    final = sources[-1][1]
+    backends = BASE_BACKENDS
+    if include_symmetric and SYMMETRIC_RESULTS.exists():
+        symmetric = recorded_symmetric_results()
+        assert symmetric['timeout_seconds'] == final['timeout_seconds']
+        assert symmetric['memory_gib'] == final['memory_gib']
+        assert symmetric.get('stop_after_n') == final.get('stop_after_n')
+        sources.append((SYMMETRIC_RESULTS, symmetric))
+        backends = BACKENDS
     rows = {}
     recordings = {}
     for path, document in sources:
@@ -312,7 +344,6 @@ def _consolidated_results():
             jobs=document.get('jobs', 1))
         for row in document['rows']:
             rows[row['n'], row['backend']] = dict(row, recording=path.name)
-    final = sources[-1][1]
     stop_after_n = final.get('stop_after_n')
     if stop_after_n is not None:
         for key in rows:
@@ -320,8 +351,9 @@ def _consolidated_results():
                 rows[key] = dict(n=key[0], backend=key[1], outcome='not measured',
                                  detail=f'Beyond the Nester-{stop_after_n} frontier',
                                  timeout_seconds=final['timeout_seconds'], memory_gib=final['memory_gib'],
-                                 recording=sources[-1][0].name)
-    ordered = [rows[n, backend] for n in range(1, 8) for backend in BACKENDS]
+                                 recording=(SYMMETRIC_RESULTS.name if key[1] in SYMMETRIC_BACKENDS
+                                            else FIVE_MINUTE_RESULTS.name))
+    ordered = [rows[n, backend] for n in range(1, 8) for backend in backends]
     assert all(r['timeout_seconds'] <= final['timeout_seconds'] for r in ordered)
     assert all(r['timeout_seconds'] == final['timeout_seconds']
                for r in ordered if r['outcome'] == 'timeout')
@@ -364,16 +396,64 @@ def _run_metadata(games):
                 fixtures={g['file']: g['sha256'] for g in games}, rows=[])
 
 
-def run_all(seconds=30, memory_gib=2, output=RESULTS):
+def run_all(seconds=30, memory_gib=2, output=RESULTS, *, backends=BACKENDS,
+            jobs=1, stop_after_n=None):
+    """Measure selected methods, checkpointing and resuming under fixed limits."""
+    if jobs < 1 or seconds <= 0 or memory_gib < 1:
+        raise ValueError('Use positive time, memory and worker limits')
+    if not backends or len(set(backends)) != len(backends) or not set(backends) <= set(BACKENDS):
+        raise ValueError('Choose distinct supported backends')
     games = manifest()
-    document = _run_metadata(games)
+    if stop_after_n is not None and not 1 <= stop_after_n <= max(g['n'] for g in games):
+        raise ValueError('The stopping instance must be in the manifest')
+    output = Path(output)
+    settings = dict(backends=list(backends), timeout_seconds=seconds,
+                    memory_gib=memory_gib, jobs=jobs)
+    if stop_after_n is not None:
+        settings['stop_after_n'] = stop_after_n
+    metadata = _run_metadata(games)
+    if output.exists():
+        document = json.loads(output.read_text(encoding='utf-8'))
+        for key, value in settings.items():
+            assert document[key] == value
+        assert document.get('stop_after_n') == stop_after_n
+        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
+            assert document[key] == metadata[key]
+    else:
+        document = dict(metadata, **settings)
+    rows = {(r['n'], r['backend']): r for r in document['rows']}
+    expected = {(g['n'], b) for g in games for b in backends}
+    assert len(rows) == len(document['rows']) and rows.keys() <= expected
     for game in games:
-        for backend in BACKENDS:
-            row = measure_case(game, backend, seconds, memory_gib)
-            document['rows'].append(row)
-            check_agreement(document['rows'])
-            output.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
-            print(f"n={game['n']} {backend}: {row['outcome']}, "
+        if stop_after_n is not None and game['n'] > stop_after_n:
+            for backend in backends:
+                rows[game['n'], backend] = dict(
+                    n=game['n'], backend=backend, outcome='not measured',
+                    detail=f'Beyond the Nester-{stop_after_n} frontier',
+                    timeout_seconds=seconds, memory_gib=memory_gib)
+
+    def checkpoint():
+        document['rows'] = [rows[g['n'], b] for g in games for b in backends
+                            if (g['n'], b) in rows]
+        check_agreement(document['rows'])
+        temporary = output.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        temporary.replace(output)
+
+    def measure(case):
+        game, backend = case
+        print(f"Starting n={game['n']} {backend} ({seconds:g} s)", flush=True)
+        return measure_case(game, backend, seconds, memory_gib)
+
+    pending = [(g, b) for g in games for b in backends if (g['n'], b) not in rows]
+    checkpoint()
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        futures = [pool.submit(measure, case) for case in pending]
+        for future in as_completed(futures):
+            row = future.result()
+            rows[row['n'], row['backend']] = row
+            checkpoint()
+            print(f"n={row['n']} {row['backend']}: {row['outcome']}, "
                   f"(k,t)=({row.get('k', '?')},{row.get('t', '?')}), "
                   f"{row['seconds']:.2f} s", flush=True)
     return document
@@ -455,7 +535,8 @@ def run_timeouts(seconds=60, memory_gib=2, output=None, baseline_path=None, jobs
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('manifest', 'run', 'rerun-timeouts', 'collect', 'worker'))
+    parser.add_argument('command', choices=('manifest', 'run', 'run-symmetric',
+                                             'rerun-timeouts', 'collect', 'worker'))
     parser.add_argument('--seconds', type=float)
     parser.add_argument('--memory-gib', type=int, default=2)
     parser.add_argument('--jobs', type=int, default=1)
@@ -469,13 +550,21 @@ def main():
         collect_results(args.output or FINAL_RESULTS)
     elif args.command == 'worker':
         worker(json.load(sys.stdin))
+    elif args.command == 'run-symmetric':
+        baseline = _consolidated_results(include_symmetric=False)
+        run_all(args.seconds if args.seconds is not None else baseline['timeout_seconds'],
+                args.memory_gib, args.output or SYMMETRIC_RESULTS,
+                backends=SYMMETRIC_BACKENDS, jobs=args.jobs,
+                stop_after_n=args.stop_after_n if args.stop_after_n is not None
+                else baseline.get('stop_after_n'))
     elif args.command == 'rerun-timeouts':
         run_timeouts(args.seconds if args.seconds is not None else 60,
                      args.memory_gib, args.output or TIMEOUT_RESULTS,
                      baseline_path=args.baseline, jobs=args.jobs, stop_after_n=args.stop_after_n)
     else:
         run_all(args.seconds if args.seconds is not None else 30,
-                args.memory_gib, args.output or RESULTS)
+                args.memory_gib, args.output or RESULTS,
+                jobs=args.jobs, stop_after_n=args.stop_after_n)
 
 
 if __name__ == '__main__':

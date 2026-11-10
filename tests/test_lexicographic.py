@@ -50,9 +50,10 @@ def test_caps_include_the_root_and_powers_of_two(vertices):
 
 
 @pytest.mark.parametrize('iterate', [False, True])
-def test_ad_visits_a_lexicographic_prefix_with_fixed_initial_caps(iterate):
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_ad_visits_a_lexicographic_prefix_with_fixed_initial_caps(iterate, algorithm):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
-        run = strahler.trace(game, 'lifting', search='lexicographic', iter_shave=iterate)
+        run = strahler.trace(game, algorithm, search='lexicographic', iter_shave=iterate)
         visited = []
         k = None
         for event in run.events:
@@ -87,7 +88,8 @@ def test_pm_iter_visits_the_same_grid_before_increasing_k():
 
 
 @pytest.mark.parametrize('iterate', [False, True])
-def test_theory_caps_suffice_for_both_algorithms_and_players(iterate):
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_theory_caps_suffice_for_both_algorithms_and_players(iterate, algorithm):
     rng = random.Random(314159)
     for count in [1, 2, 3, 4, 8, 12]:
         for _ in range(3):
@@ -96,7 +98,7 @@ def test_theory_caps_suffice_for_both_algorithms_and_players(iterate):
                              for v in range(count))
             with strahler.Game.from_text(text) as game:
                 expected = ad_wins(strahler.decompose(game, 'zielonka'))
-                ad = strahler.decompose(game, 'lifting', search='lexicographic', iter_shave=iterate)
+                ad = strahler.decompose(game, algorithm, search='lexicographic', iter_shave=iterate)
                 pm = strahler.progress_measures(game, search='lexicographic', iter_shave=iterate)
                 assert ad.complete and pm['rounds'][-1]['complete']
                 assert ad_wins(ad) == pm_wins(pm) == expected
@@ -115,6 +117,8 @@ def test_theory_caps_suffice_for_both_algorithms_and_players(iterate):
     ('AD', dict(search='other')),
     ('AD', dict(search='lexicographic', adaptive_t=True)),
     ('AD', dict(search='lexicographic', kary=2)),
+    ('AD', dict(algorithm='lifting-sym', search='lexicographic', adaptive_t=True)),
+    ('AD', dict(algorithm='lifting-sym', search='lexicographic', kary=2)),
     ('PM', dict(search='other')),
     ('PM', dict(search='lexicographic', k=2, t=1)),
     ('PM', dict(search='lexicographic', algorithm='succinct')),
@@ -148,7 +152,8 @@ def test_pm_summary_includes_wins_removed_in_earlier_rounds():
 @pytest.fixture
 def recordings(tmp_path, monkeypatch):
     original = experiment.recorded_results()
-    for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS'):
+    for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS',
+                 'SYMMETRIC_RESULTS'):
         monkeypatch.setattr(experiment, name, tmp_path / getattr(experiment, name).name)
     experiment.RESULTS.write_text(json.dumps(original, indent=2) + '\n')
     metadata = {key: value for key, value in original.items() if key != 'rows'}
@@ -273,3 +278,73 @@ def test_frontier_is_preserved_on_resume_and_larger_games_are_not_timeouts(recor
     assert len(larger) == 8
     assert all(r['outcome'] == 'not measured' and 'seconds' not in r for r in larger)
     assert final['stop_after_n'] == 5
+
+
+def test_symmetric_recording_adds_cases_without_repeating_the_baseline(recordings, monkeypatch):
+    for path in (experiment.TIMEOUT_RESULTS, experiment.FIVE_MINUTE_RESULTS):
+        path.write_bytes((EXAMPLES / 'nester' / path.name).read_bytes())
+    baseline = experiment.collect_results()
+    before = {path: path.read_bytes() for path in
+              (experiment.RESULTS, experiment.TIMEOUT_RESULTS, experiment.FIVE_MINUTE_RESULTS)}
+    calls = []
+    example = next(r for r in recordings['rows'] if r['n'] == 1 and r['backend'] == 'AD')
+
+    def measure(game, backend, seconds, memory_gib):
+        calls.append((game['n'], backend))
+        assert backend in experiment.SYMMETRIC_BACKENDS
+        if game['n'] == 1:
+            return dict(example, backend=backend, timeout_seconds=seconds)
+        return dict(n=game['n'], backend=backend, outcome='timeout', seconds=seconds,
+                    timeout_seconds=seconds, memory_gib=memory_gib)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    options = dict(seconds=300, output=experiment.SYMMETRIC_RESULTS,
+                   backends=experiment.SYMMETRIC_BACKENDS, jobs=2, stop_after_n=5)
+    result = experiment.run_all(**options)
+    assert set(calls) == {(n, b) for n in range(1, 6) for b in experiment.SYMMETRIC_BACKENDS}
+    assert len(calls) == 10
+    assert experiment.recorded_symmetric_results() == result
+    assert len(result['rows']) == 14
+    calls.clear()
+    assert experiment.run_all(**options) == result
+    assert not calls
+
+    final = experiment.collect_results()
+    assert experiment.recorded_final_results() == final
+    assert len(final['rows']) == 42
+    assert [r for r in final['rows'] if r['backend'] in experiment.BASE_BACKENDS] == baseline['rows']
+    assert final['recordings'][experiment.SYMMETRIC_RESULTS.name]['sha256'] == hashlib.sha256(
+        experiment.SYMMETRIC_RESULTS.read_bytes()).hexdigest()
+    assert all(path.read_bytes() == content for path, content in before.items())
+
+    # An interrupted recording resumes only its missing case.
+    missing = result['rows'].pop(0)
+    experiment.SYMMETRIC_RESULTS.write_text(json.dumps(result))
+    experiment.run_all(**options)
+    assert calls == [(missing['n'], missing['backend'])]
+    with pytest.raises(AssertionError):
+        experiment.run_all(**dict(options, seconds=301))
+
+
+@pytest.mark.parametrize('iterate', [False, True])
+def test_symmetric_worker_uses_the_same_search_and_winner_certificates(iterate):
+    backend = 'AD-sym+iter' if iterate else 'AD-sym'
+    row = experiment.measure_case(manifest()[1], backend, seconds=10)
+    original = next(r for r in experiment.recorded_results()['rows']
+                    if r['n'] == 2 and r['backend'] == ('AD+iter' if iterate else 'AD'))
+    assert row['outcome'] == 'complete'
+    for key in ('k', 't', 'parameters', 'tree_strahler', 'won', 'unresolved', 'winner_sha256'):
+        assert row[key] == original[key]
+
+
+@pytest.mark.parametrize('options', [dict(tree_k=1), dict(max_host_leaves=1)])
+def test_symmetric_capped_search_keeps_sound_partial_certificates(options):
+    text = '0 2 0 3; 1 2 1 2; 2 0 1 1,4; 3 0 0 3; 4 3 1 3;'
+    with strahler.Game.from_text(text) as game:
+        plain = strahler.decompose(game, 'lifting', search='lexicographic', **options)
+        symmetric = strahler.decompose(game, 'lifting-sym', search='lexicographic', **options)
+        assert not symmetric.complete
+        assert ad_wins(symmetric) == ad_wins(plain)
+        assert symmetric.data['budget_exhausted'] == ('max_host_leaves' in options)
+        for player, tree in enumerate(symmetric.trees):
+            assert strahler.check(game, tree, player, symmetric.regions[player]).ok

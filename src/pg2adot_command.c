@@ -592,7 +592,8 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
             ? "Lifting options cannot be used with --algorithm=zielonka"
             : "Lifting options cannot be used with --algorithm=zielonka-sym");
   }
-  if (algorithm == ALGORITHM_LIFTING_SYM && adaptive_t) {
+  if (algorithm == ALGORITHM_LIFTING_SYM && adaptive_t &&
+      !lift_options.lexicographic) {
     return cli_error_to(
         io->err, argv[0],
         "--adaptive-t cannot be used with --algorithm=lifting-sym");

@@ -55,6 +55,7 @@ typedef struct {
     stats->host_nodes = host->node_count;
     stats->host_leaves = host->leaf_count;
     stats->host_positions = host->position_count;
+    ad_lift_tree_destroy(solver->hosts + player);
     solver->hosts[player] = *host;
     *host = (ADLiftTree){0};
     return true;
@@ -268,6 +269,29 @@ typedef enum {
   return cap == 0 ? maximum : smaller(maximum, cap);
 }
 
+/* Each pair runs Algorithm 9 from bottom on its two fixed hosts. Keep its
+ * certified dominions for the same stopping and shaving rules as lifting. */
+[[nodiscard]] static bool run_symmetric(Solver *solver) {
+  ADResult result = {0};
+  if (!ad_sym_solve_trace(solver->game, solver->domain, solver->hosts,
+                          solver->options->verify, &result,
+                          &solver->stats->symmetric, solver->error,
+                          solver->options->trace)) {
+    return false;
+  }
+  for (size_t player = 0; player < 2; player++) {
+    PlayerOutcome *outcome = solver->outcome + player;
+    outcome_destroy(outcome);
+    pg_set_move(&outcome->dominion, result.region + player);
+    outcome->decomposition = result.decomposition[player];
+    result.decomposition[player] = nullptr;
+    solver->stats->player[player].tree =
+        ad_tree_metrics(outcome->decomposition);
+  }
+  ad_result_destroy(&result);
+  return true;
+}
+
 /* Proposition 3 and Lemma 16 give t <= floor(log2 n) and
  * K <= min(H, floor(log2 n)+1). Keep the initial n and heights when shaving.
  * Exhaust every t for a fixed K before increasing K and resetting t to zero. */
@@ -297,6 +321,9 @@ typedef enum {
           return true;
         }
         ran[player] = true;
+      }
+      if (solver->options->symmetric && !run_symmetric(solver)) {
+        return false;
       }
       if (covered(solver)) {
         stats->adaptive_complete = true;
@@ -412,7 +439,8 @@ typedef enum {
   if (game == nullptr || domain == nullptr || options == nullptr ||
       result == nullptr || domain->bit_count != game->vertex_count ||
       options->mode > AD_LIFT_HOST_TREE ||
-      (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE) ||
+      (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE &&
+       !options->lexicographic) ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||
       (options->incremental && options->mode != AD_LIFT_HOST_ADAPTIVE) ||
       (options->lexicographic &&
@@ -494,7 +522,7 @@ typedef enum {
     break;
   }
 
-  if (succeeded && options->symmetric) {
+  if (succeeded && options->symmetric && !options->lexicographic) {
     ad_result_destroy(result);
     succeeded =
         ad_sym_solve_trace(game, domain, solver.hosts, options->verify, result,

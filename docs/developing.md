@@ -436,7 +436,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   `t` for the first `K` only. With `--iter-shave`, certified dominions and
   their attractors are removed between pairs. The initial vertex count and
   priority bounds set the caps for the whole run. This option requires
-  ordinary `lifting` and conflicts with `--adaptive-t`, k-ary and file hosts.
+  `lifting` or `lifting-sym` and conflicts with `--adaptive-t`, k-ary and file
+  hosts. Symmetric search restarts Algorithm 9 on each fixed host pair.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.

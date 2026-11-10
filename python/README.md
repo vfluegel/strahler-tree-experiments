@@ -80,10 +80,12 @@ Use these calls while `game` is open. Keyword underscores become hyphens,
 `True` emits a flag, and `False`/`None` omit it. Raw `args` are appended.
 All lifting hosts are available: full/default, `tree_k`, `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
-`iter_shave=True`. As in the CLI, symmetric lifting rejects adaptive hosts.
+`iter_shave=True`. Symmetric lifting supports adaptive hosts through
+`search='lexicographic'`; it rejects `adaptive_t`.
 `search='lexicographic'` walks `(k,t)` with `k` as the outer loop and
-`t=0..floor(log2(n))` as the inner loop. It is available in both
-`decompose(game, 'lifting', ...)` and `progress_measures(game, ...)`, with
+`t=0..floor(log2(n))` as the inner loop. It is available in
+`decompose(game, 'lifting', ...)`, `decompose(game, 'lifting-sym', ...)`
+and `progress_measures(game, ...)`, with
 or without `iter_shave=True`. It uses the theory caps described in
 [Notebook 08](../jupyter-examples/08-lexicographic-adaptive-nester.ipynb).
 The library manages JSON format and callback traces, so `--format`, `--trace`,

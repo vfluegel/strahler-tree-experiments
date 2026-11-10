@@ -60,7 +60,7 @@ typedef struct {
   bool incremental;
   /* Attract and remove certified dominions between stabilized runs. */
   bool iter_shave;
-  /* Algorithm 9; adaptive hosts are not supported. */
+  /* Algorithm 9; adaptive hosts require lexicographic search. */
   bool symmetric;
   ADTrace *trace;
 } ADLiftOptions;
