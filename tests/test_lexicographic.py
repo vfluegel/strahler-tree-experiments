@@ -2,6 +2,7 @@
 
 import bz2
 import hashlib
+import json
 from pathlib import Path
 import random
 import sys
@@ -12,6 +13,7 @@ import strahler
 EXAMPLES = Path(__file__).resolve().parents[1] / 'jupyter-examples'
 sys.path.insert(0, str(EXAMPLES))
 from lexicographic_nester import bounds, manifest, pairs, summarize, tree_vertices
+import lexicographic_nester as experiment
 
 
 def ad_wins(result):
@@ -141,3 +143,133 @@ def test_pm_summary_includes_wins_removed_in_earlier_rounds():
         assert summary['outcome'] == 'complete'
         assert sum(summary['won']) == info['vertices']
         assert summary['unresolved'] == 0
+
+
+@pytest.fixture
+def recordings(tmp_path, monkeypatch):
+    original = experiment.recorded_results()
+    for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS'):
+        monkeypatch.setattr(experiment, name, tmp_path / getattr(experiment, name).name)
+    experiment.RESULTS.write_text(json.dumps(original, indent=2) + '\n')
+    metadata = {key: value for key, value in original.items() if key != 'rows'}
+    monkeypatch.setattr(experiment, '_run_metadata', lambda games: dict(metadata, rows=[]))
+    return original
+
+
+@pytest.mark.parametrize('jobs', [1, 2])
+def test_timeout_reruns_preserve_finished_cases_and_resume(recordings, monkeypatch, jobs):
+    before = experiment.RESULTS.read_bytes()
+    selected = {(r['n'], r['backend']): r for r in recordings['rows'] if r['outcome'] == 'timeout'}
+    calls = []
+
+    def measure(game, backend, seconds, memory_gib):
+        key = (game['n'], backend)
+        calls.append(key)
+        return dict(selected[key], timeout_seconds=seconds, memory_gib=memory_gib)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    result = experiment.run_timeouts(jobs=jobs)
+    assert set(calls) == selected.keys() and len(calls) == len(selected)
+    assert result['cases'] == len(selected)
+    assert experiment.recorded_timeout_results() == result
+    assert experiment.RESULTS.read_bytes() == before
+    assert not experiment.TIMEOUT_RESULTS.with_suffix('.json.tmp').exists()
+    calls.clear()
+    assert experiment.run_timeouts(jobs=jobs) == result
+    assert not calls
+
+    experiment.RESULTS.write_bytes(before + b'\n')
+    with pytest.raises(AssertionError):
+        experiment.run_timeouts(jobs=jobs)
+    assert not calls
+
+
+def test_final_results_combine_cases_at_one_cap_with_provenance(recordings, monkeypatch):
+    solved_n3 = next(r for r in recordings['rows']
+                     if r['n'] == 3 and r['backend'] == 'AD')
+    calls = []
+
+    def measure(game, backend, seconds, memory_gib):
+        calls.append((game['n'], backend, seconds))
+        if game['n'] == 3 and (backend == 'PM' or seconds == 300):
+            return dict(solved_n3, backend=backend, timeout_seconds=seconds, seconds=seconds - 1)
+        return dict(n=game['n'], backend=backend, outcome='timeout', seconds=seconds,
+                    timeout_seconds=seconds, memory_gib=memory_gib)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    experiment.run_timeouts()
+    calls.clear()
+    experiment.run_timeouts(seconds=300, output=experiment.FIVE_MINUTE_RESULTS,
+                            baseline_path=experiment.TIMEOUT_RESULTS, jobs=2)
+    assert calls and all((n, backend) != (3, 'PM') and seconds == 300
+                         for n, backend, seconds in calls)
+    final = experiment.collect_results()
+    assert experiment.recorded_final_results() == final
+    assert len(final['rows']) == 28
+    assert final['timeout_seconds'] == 300 and final['memory_gib'] == 2
+    by_case = {(r['n'], r['backend']): r for r in final['rows']}
+    assert by_case[1, 'AD']['recording'] == experiment.RESULTS.name
+    assert by_case[3, 'PM']['recording'] == experiment.TIMEOUT_RESULTS.name
+    assert by_case[3, 'PM+iter']['recording'] == experiment.FIVE_MINUTE_RESULTS.name
+    assert by_case[3, 'PM+iter']['outcome'] == 'complete'
+    assert by_case[4, 'AD']['recording'] == experiment.FIVE_MINUTE_RESULTS.name
+    assert all(r['timeout_seconds'] == 300 for r in final['rows'] if r['outcome'] == 'timeout')
+    for path in (experiment.RESULTS, experiment.TIMEOUT_RESULTS, experiment.FIVE_MINUTE_RESULTS):
+        assert final['recordings'][path.name]['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+
+    final['rows'][0]['outcome'] = 'timeout'
+    experiment.FINAL_RESULTS.write_text(json.dumps(final))
+    with pytest.raises(AssertionError):
+        experiment.recorded_final_results()
+
+
+@pytest.mark.parametrize('options', [dict(seconds=30), dict(jobs=0)])
+def test_rerun_rejects_an_unchanged_deadline_or_no_workers(recordings, monkeypatch, options):
+    def fail(*args, **kwargs):
+        pytest.fail('Invalid run settings must fail before starting a solver')
+
+    monkeypatch.setattr(experiment, 'measure_case', fail)
+    with pytest.raises(ValueError):
+        experiment.run_timeouts(**options)
+
+
+def test_no_timeouts_still_writes_a_valid_empty_recording(recordings, monkeypatch, tmp_path):
+    baseline = tmp_path / 'completed.json'
+    baseline.write_text(json.dumps(dict(recordings, rows=[r for r in recordings['rows']
+                                                         if r['outcome'] == 'complete'])))
+
+    def fail(*args, **kwargs):
+        pytest.fail('Completed cases must not run again')
+
+    monkeypatch.setattr(experiment, 'measure_case', fail)
+    result = experiment.run_timeouts(baseline_path=baseline)
+    assert result['rows'] == [] and result['cases'] == 0
+    assert experiment.recorded_timeout_results(baseline_path=baseline) == result
+
+
+def test_frontier_is_preserved_on_resume_and_larger_games_are_not_timeouts(recordings, monkeypatch):
+    calls = []
+
+    def measure(game, backend, seconds, memory_gib):
+        calls.append(game['n'])
+        return dict(n=game['n'], backend=backend, outcome='timeout', seconds=seconds,
+                    timeout_seconds=seconds, memory_gib=memory_gib)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    experiment.run_timeouts()
+    calls.clear()
+    result = experiment.run_timeouts(seconds=300, output=experiment.FIVE_MINUTE_RESULTS,
+                                    baseline_path=experiment.TIMEOUT_RESULTS, jobs=2, stop_after_n=5)
+    assert calls and max(calls) == 5
+    assert result['cases'] < result['planned_cases'] and result['stop_after_n'] == 5
+    assert experiment.recorded_timeout_results(experiment.FIVE_MINUTE_RESULTS,
+                                              experiment.TIMEOUT_RESULTS) == result
+    calls.clear()
+    assert experiment.run_timeouts(seconds=300, output=experiment.FIVE_MINUTE_RESULTS,
+                                   baseline_path=experiment.TIMEOUT_RESULTS, jobs=2) == result
+    assert not calls
+    final = experiment.collect_results()
+    larger = [r for r in final['rows'] if r['n'] > 5]
+    assert len(larger) == 8
+    assert all(r['outcome'] == 'not measured' and 'seconds' not in r for r in larger)
+    assert final['stop_after_n'] == 5

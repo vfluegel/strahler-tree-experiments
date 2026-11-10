@@ -5,8 +5,8 @@ from pathlib import Path
 
 import strahler
 from IPython.display import HTML, display
-from ipywidgets import Button, HBox, Output, Textarea, VBox
-from strahler.widgets import Stepper
+from ipywidgets import Button, HBox, Label, Layout, Output, Textarea, VBox
+from strahler.widgets import Stepper, TreeView
 
 HERE = Path(__file__).resolve().parent
 BACKENDS = ('zielonka', 'zielonka-sym', 'lifting', 'lifting-sym')
@@ -39,6 +39,30 @@ def table(headers, rows):
         return ''.join(f'<{tag}>{escape(str(value))}</{tag}>' for value in row)
     display(HTML('<table><thead><tr>' + cells('th', headers) + '</tr></thead><tbody>' +
                  ''.join('<tr>' + cells('td', row) + '</tr>' for row in rows) + '</tbody></table>'))
+
+
+def decomposition_views(tree, game):
+    """Show linked tree/block views, with the same layout in saved notebooks."""
+    ordered = TreeView(tree, game=game, mode='tree', edges=False)
+    blocks = ordered.link(TreeView(tree, game=game, mode='squares', edges=False))
+    labels = ('AD tree', 'H/T/S blocks')
+    widths = (300, 560)
+    panels = [VBox([Label(label), view], layout=Layout(flex=f'1 1 {width}px', min_width='260px'))
+              for label, view, width in zip(labels, (ordered, blocks), widths)]
+    pair = HBox(panels, layout=Layout(flex_flow='row wrap', align_items='flex-start'))
+
+    def mime_data(widget):
+        bundle = widget._repr_mimebundle_()
+        return bundle[0] if isinstance(bundle, tuple) else bundle
+
+    bundle = dict(mime_data(pair))
+    bundle['text/html'] = (
+        '<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">' +
+        ''.join(f'<div style="flex:1 1 {width}px;min-width:260px"><p>{label}</p>' +
+                mime_data(view)['image/svg+xml'] + '</div>'
+                for label, view, width in zip(labels, (ordered, blocks), widths)) + '</div>')
+    display(bundle, raw=True)
+    return ordered, blocks
 
 
 def comparison(text, coordinates=None):

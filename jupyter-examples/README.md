@@ -16,7 +16,7 @@ for Jupyter and the optional Python dependencies.
 | [05-compare-backends](05-compare-backends.ipynb) | +pre/+iter metrics, generated and progress-measure prefix trees |
 | [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
 | [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
-| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Keep k fixed while raising t: theory caps, Nester-1 host drawings, all seven plain Nester games with AD/PM and +iter |
+| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic AD/PM search, host trees, lazy positions, linked AD tree/block views, plain Nester frontier |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
@@ -29,9 +29,10 @@ combines all wins.
 Notebook 07 labels Strahler numbers as tree metrics; progress-measure rows
 describe occupied measure trees, and AD rows describe dominion decompositions.
 Notebook 08 uses `search='lexicographic'` for both solvers. It includes a recorded
-30-second/2-GiB experiment for every noncompact Nester game and a short live
-check. Its final cell repeats the full experiment when enabled; ordinary
-execution reads the recorded results and needs no network.
+five-minute/2-GiB comparison through Nester-5, where all four methods time out.
+Larger instances are marked beyond the frontier. Execution reads the recorded
+results and draws Nester-1's trees; it needs no network and does not repeat the
+benchmarks.
 
 ## Release zip
 

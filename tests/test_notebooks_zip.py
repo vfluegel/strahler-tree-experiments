@@ -28,6 +28,9 @@ class NotebooksZip(unittest.TestCase):
                      'nester/Nestern=7.gm.bz2': 'large plain fixture',
                      'nester/plain-manifest.json': '{}',
                      'nester/lexicographic-results.json': '{}',
+                     'nester/lexicographic-timeouts-60s.json': '{}',
+                     'nester/lexicographic-timeouts-300s.json': '{}',
+                     'nester/lexicographic-results-300s.json': '{}',
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)

@@ -17,8 +17,19 @@ The compressed games are unchanged from the downloaded archive.
 
 Notebook 08 uses all seven plain games. `plain-manifest.json` records their
 SHA-256 checksums, graph sizes, normalized priority bounds and theoretical
-host caps. `lexicographic-results.json` records the new AD/PM experiment,
-with and without iterative shaving, plus the Nester-1 certificate trees.
-Each case has a 30-second wall deadline and a 2-GiB address-space limit on Linux.
-The recorded library version and binary checksum identify the build used.
+host caps. `lexicographic-results-300s.json` contains one result per game/method
+for AD and PM, with and without iterative shaving, under a five-minute budget
+and a 2-GiB address-space limit on Linux. It includes the Nester-1 certificate
+trees. Each row identifies its source recording; binary and fixture checksums
+preserve the measurement provenance. Completed cases retain their measured
+time; unresolved cases through Nester-5 were rerun with the full five-minute
+allowance. After all four methods timed out there, the run stopped. Nester-6–7
+are marked beyond the frontier, with no five-minute measurement reported.
+
+The original recordings are `lexicographic-results.json` and
+`lexicographic-timeouts-{60,300}s.json`. The first run used one worker;
+the five-minute rerun used two, each with its own memory and time limit.
+`python lexicographic_nester.py collect` consolidates the recordings, preserving
+the stored stopping point when larger instances were excluded.
+
 Notebook 07 keeps its original n<=4 live experiment.
