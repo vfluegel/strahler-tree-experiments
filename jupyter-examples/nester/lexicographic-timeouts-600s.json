@@ -1,0 +1,265 @@
+{
+  "search": "lexicographic",
+  "version": "0.4.2.dev5+gf902ec3.dirty",
+  "library_sha256": "500736c3fd4dc60dcc5951117dd53c957c0313727b367946621039ccac288456",
+  "recorded_utc": "2026-11-10T22:07:28+00:00",
+  "machine": "Linux x86_64, 4 CPUs",
+  "memory_cap_enforced": true,
+  "fixtures": {
+    "Nestern=1.gm.bz2": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+    "Nestern=2.gm.bz2": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+    "Nestern=3.gm.bz2": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+    "Nestern=4.gm.bz2": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+    "Nestern=5.gm.bz2": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+    "Nestern=6.gm.bz2": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+    "Nestern=7.gm.bz2": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae"
+  },
+  "rows": [
+    {
+      "n": 4,
+      "backend": "AD",
+      "seconds": 600.1027,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "AD-sym",
+      "seconds": 600.1041,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "PM",
+      "seconds": 600.1031,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "PM+iter",
+      "seconds": 600.1025,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 5,
+      "backend": "AD+iter",
+      "seconds": 600.1026,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym+iter",
+      "seconds": 600.103,
+      "timeout_seconds": 600.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "600 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "PM",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 5,
+      "backend": "PM+iter",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM+iter's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD-sym+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "PM",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "PM+iter",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM+iter's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD-sym+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "PM",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "PM+iter",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond PM+iter's Nester-4 frontier (timeout)",
+      "timeout_seconds": 600.0,
+      "memory_gib": 2
+    }
+  ],
+  "baseline_file": "lexicographic-results-300s.json",
+  "baseline_sha256": "76683ac1fcdd20f8e937fffd22ba6978b42d630f981a78dd00ac1b1abe1aa0d6",
+  "backends": [
+    "AD",
+    "AD+iter",
+    "AD-sym",
+    "AD-sym+iter",
+    "PM",
+    "PM+iter"
+  ],
+  "timeout_seconds": 600.0,
+  "memory_gib": 2,
+  "jobs": 2,
+  "planned_cases": 22,
+  "frontiers": {
+    "AD": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    },
+    "AD+iter": {
+      "last_solved_n": 4,
+      "stopped_at_n": 5,
+      "outcome": "timeout"
+    },
+    "AD-sym": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    },
+    "AD-sym+iter": {
+      "last_solved_n": 4,
+      "stopped_at_n": 5,
+      "outcome": "timeout"
+    },
+    "PM": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    },
+    "PM+iter": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    }
+  },
+  "complete": true,
+  "cases": 6
+}

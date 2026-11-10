@@ -2,7 +2,7 @@
 
 import argparse
 import bz2
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, as_completed, wait
 from datetime import datetime, timezone
 import hashlib
 from html import escape
@@ -23,6 +23,8 @@ TIMEOUT_RESULTS = DATA / 'lexicographic-timeouts-60s.json'
 FIVE_MINUTE_RESULTS = DATA / 'lexicographic-timeouts-300s.json'
 FINAL_RESULTS = DATA / 'lexicographic-results-300s.json'
 SYMMETRIC_RESULTS = DATA / 'lexicographic-symmetric-300s.json'
+FRONTIER_RESULTS = DATA / 'lexicographic-timeouts-600s.json'
+LATEST_RESULTS = DATA / 'lexicographic-results-600s.json'
 BASE_BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
 SYMMETRIC_BACKENDS = ('AD-sym', 'AD-sym+iter')
 BACKENDS = (*BASE_BACKENDS[:2], *SYMMETRIC_BACKENDS, *BASE_BACKENDS[2:])
@@ -370,8 +372,11 @@ def _consolidated_results(include_symmetric=True):
 
 def collect_results(output=None):
     """Publish one result per case, retaining the original measurement provenance."""
-    output = Path(output) if output is not None else FINAL_RESULTS
-    document = _consolidated_results()
+    extended = FRONTIER_RESULTS.exists()
+    output = Path(output) if output is not None else LATEST_RESULTS if extended else FINAL_RESULTS
+    if extended and output.resolve() == FINAL_RESULTS.resolve():
+        raise ValueError('Keep the five-minute baseline; write the extended results to a new file')
+    document = _frontier_consolidated_results() if extended else _consolidated_results()
     temporary = output.with_suffix('.json.tmp')
     temporary.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
     temporary.replace(output)
@@ -379,9 +384,74 @@ def collect_results(output=None):
 
 
 def recorded_final_results():
-    document = json.loads(FINAL_RESULTS.read_text(encoding='utf-8'))
-    assert document == _consolidated_results()
+    extended = LATEST_RESULTS.exists()
+    path = LATEST_RESULTS if extended else FINAL_RESULTS
+    document = json.loads(path.read_text(encoding='utf-8'))
+    assert document == (_frontier_consolidated_results() if extended else _consolidated_results())
     return document
+
+
+def _frontier_summary(backend, baseline, rows, stopped=None):
+    solved = [r['n'] for r in [*baseline['rows'], *rows]
+              if r['backend'] == backend and r['outcome'] == 'complete']
+    return dict(last_solved_n=max(solved, default=0),
+                stopped_at_n=stopped['n'] if stopped else None,
+                outcome=stopped['outcome'] if stopped else 'complete')
+
+
+def recorded_frontier_results(path=None, baseline_path=None):
+    path = Path(path) if path is not None else FRONTIER_RESULTS
+    baseline_path = Path(baseline_path) if baseline_path is not None else FINAL_RESULTS
+    baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
+    document = json.loads(path.read_text(encoding='utf-8'))
+    expected = {(r['n'], r['backend']) for r in baseline['rows']
+                if r['outcome'] in ('timeout', 'not measured')}
+    assert document['complete'] and document['backends'] == list(BACKENDS)
+    assert document['baseline_sha256'] == hashlib.sha256(baseline_path.read_bytes()).hexdigest()
+    assert document['fixtures'] == baseline['fixtures']
+    assert document['planned_cases'] == len(expected) == len(document['rows'])
+    by_case = {(r['n'], r['backend']): r for r in document['rows']}
+    assert by_case.keys() == expected
+    assert document['cases'] == sum(r['outcome'] != 'not measured' for r in document['rows'])
+    for backend in BACKENDS:
+        stopped = None
+        for n, b in sorted(expected):
+            if b != backend:
+                continue
+            row = by_case[n, b]
+            assert row['timeout_seconds'] == document['timeout_seconds']
+            assert row['memory_gib'] == document['memory_gib']
+            if stopped is not None:
+                assert row['outcome'] == 'not measured' and 'seconds' not in row
+                assert row['frontier_n'] == stopped['n']
+            else:
+                assert row['outcome'] != 'not measured' and 'seconds' in row
+                if row['outcome'] != 'complete':
+                    stopped = row
+        assert document['frontiers'][backend] == _frontier_summary(
+            backend, baseline, document['rows'], stopped)
+    check_agreement([*baseline['rows'], *document['rows']])
+    return document
+
+
+def _frontier_consolidated_results():
+    baseline = _consolidated_results()
+    assert baseline == json.loads(FINAL_RESULTS.read_text(encoding='utf-8'))
+    extension = recorded_frontier_results()
+    assert extension['memory_gib'] == baseline['memory_gib']
+    by_case = {(r['n'], r['backend']): r for r in baseline['rows']}
+    for row in extension['rows']:
+        by_case[row['n'], row['backend']] = dict(row, recording=FRONTIER_RESULTS.name)
+    recordings = dict(baseline['recordings'])
+    recordings[FRONTIER_RESULTS.name] = dict(
+        sha256=hashlib.sha256(FRONTIER_RESULTS.read_bytes()).hexdigest(),
+        **{key: extension[key] for key in ('version', 'library_sha256', 'recorded_utc',
+                                          'machine', 'memory_cap_enforced', 'jobs')})
+    rows = [by_case[g['n'], b] for g in manifest() for b in BACKENDS]
+    check_agreement(rows)
+    return dict(search='lexicographic', timeout_seconds=extension['timeout_seconds'],
+                memory_gib=extension['memory_gib'], fixtures=baseline['fixtures'],
+                recordings=recordings, frontiers=extension['frontiers'], rows=rows)
 
 
 def _run_metadata(games):
@@ -456,6 +526,101 @@ def run_all(seconds=30, memory_gib=2, output=RESULTS, *, backends=BACKENDS,
             print(f"n={row['n']} {row['backend']}: {row['outcome']}, "
                   f"(k,t)=({row.get('k', '?')},{row.get('t', '?')}), "
                   f"{row['seconds']:.2f} s", flush=True)
+    return document
+
+
+def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jobs=2):
+    """Retry failures in increasing n, stopping each method at its first failure."""
+    if jobs < 1 or seconds <= 0 or memory_gib < 1:
+        raise ValueError('Use positive time, memory and worker limits')
+    games = manifest()
+    baseline_path = Path(baseline_path) if baseline_path is not None else FINAL_RESULTS
+    output = Path(output) if output is not None else FRONTIER_RESULTS
+    if output.resolve() == baseline_path.resolve():
+        raise ValueError('Keep the baseline; write reruns to a separate file')
+    baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
+    expected = {(g['n'], b) for g in games for b in BACKENDS}
+    by_case = {(r['n'], r['backend']): r for r in baseline['rows']}
+    assert len(baseline['rows']) == len(by_case) == len(expected)
+    assert by_case.keys() == expected
+    assert all(r['outcome'] in ('complete', 'timeout', 'not measured') for r in baseline['rows'])
+    selected = {key for key, row in by_case.items() if row['outcome'] != 'complete'}
+    timeouts = [row for row in baseline['rows'] if row['outcome'] == 'timeout']
+    if timeouts and seconds <= max(r['timeout_seconds'] for r in timeouts):
+        raise ValueError('Use a larger deadline than the baseline timeout')
+    metadata = _run_metadata(games)
+    assert baseline['fixtures'] == metadata['fixtures']
+    settings = dict(baseline_file=baseline_path.name,
+                    baseline_sha256=hashlib.sha256(baseline_path.read_bytes()).hexdigest(),
+                    backends=list(BACKENDS), timeout_seconds=seconds,
+                    memory_gib=memory_gib, jobs=jobs, planned_cases=len(selected))
+    if output.exists():
+        document = json.loads(output.read_text(encoding='utf-8'))
+        for key, value in settings.items():
+            assert document[key] == value
+        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
+            assert document[key] == metadata[key]
+    else:
+        document = dict(metadata, **settings, frontiers={}, complete=False, cases=0)
+    rows = {(r['n'], r['backend']): r for r in document['rows']}
+    assert len(rows) == len(document['rows']) and rows.keys() <= selected
+    frontiers = {}
+    plans = {b: sorted(n for n, method in selected if method == b) for b in BACKENDS}
+
+    def checkpoint():
+        document['rows'] = [rows[g['n'], b] for g in games for b in BACKENDS
+                            if (g['n'], b) in rows]
+        document['frontiers'] = {b: frontiers[b] for b in BACKENDS if b in frontiers}
+        document['cases'] = sum(r['outcome'] != 'not measured' for r in rows.values())
+        document['complete'] = len(frontiers) == len(BACKENDS)
+        check_agreement([*baseline['rows'], *document['rows']])
+        temporary = output.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        temporary.replace(output)
+
+    def measure(n, backend):
+        print(f'Starting n={n} {backend} ({seconds:g} s)', flush=True)
+        return measure_case(next(g for g in games if g['n'] == n), backend, seconds, memory_gib)
+
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        futures = {}
+
+        def advance(backend):
+            for index, n in enumerate(plans[backend]):
+                row = rows.get((n, backend))
+                if row is None:
+                    assert not any((later, backend) in rows for later in plans[backend][index + 1:])
+                    futures[pool.submit(measure, n, backend)] = (n, backend)
+                    return
+                if row['outcome'] == 'complete':
+                    continue
+                assert row['outcome'] != 'not measured'
+                for later in plans[backend][index + 1:]:
+                    previous = rows.get((later, backend))
+                    assert previous is None or previous['outcome'] == 'not measured'
+                    rows[later, backend] = dict(
+                        n=later, backend=backend, outcome='not measured', frontier_n=n,
+                        detail=f"Beyond {backend}'s Nester-{n} frontier ({row['outcome']})",
+                        timeout_seconds=seconds, memory_gib=memory_gib)
+                frontiers[backend] = _frontier_summary(backend, baseline, list(rows.values()), row)
+                return
+            frontiers[backend] = _frontier_summary(backend, baseline, list(rows.values()))
+
+        for backend in BACKENDS:
+            advance(backend)
+        checkpoint()
+        while futures:
+            completed, _ = wait(futures, return_when=FIRST_COMPLETED)
+            for future in completed:
+                key = futures.pop(future)
+                row = future.result()
+                assert (row['n'], row['backend']) == key
+                rows[key] = row
+                print(f"n={row['n']} {row['backend']}: {row['outcome']}, "
+                      f"(k,t)=({row.get('k', '?')},{row.get('t', '?')}), "
+                      f"{row['seconds']:.2f} s", flush=True)
+                advance(key[1])
+            checkpoint()
     return document
 
 
@@ -542,12 +707,16 @@ def main():
     parser.add_argument('--jobs', type=int, default=1)
     parser.add_argument('--baseline', type=Path)
     parser.add_argument('--stop-after-n', type=int)
+    parser.add_argument('--frontier', action='store_true',
+                        help='Stop each method after its first failure; extend into unmeasured instances')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
+    if args.frontier and (args.command != 'rerun-timeouts' or args.stop_after_n is not None):
+        parser.error('--frontier requires rerun-timeouts and excludes --stop-after-n')
     if args.command == 'manifest':
         build_manifest()
     elif args.command == 'collect':
-        collect_results(args.output or FINAL_RESULTS)
+        collect_results(args.output)
     elif args.command == 'worker':
         worker(json.load(sys.stdin))
     elif args.command == 'run-symmetric':
@@ -558,9 +727,14 @@ def main():
                 stop_after_n=args.stop_after_n if args.stop_after_n is not None
                 else baseline.get('stop_after_n'))
     elif args.command == 'rerun-timeouts':
-        run_timeouts(args.seconds if args.seconds is not None else 60,
-                     args.memory_gib, args.output or TIMEOUT_RESULTS,
-                     baseline_path=args.baseline, jobs=args.jobs, stop_after_n=args.stop_after_n)
+        if args.frontier:
+            run_frontiers(args.seconds if args.seconds is not None else 600,
+                          args.memory_gib, args.output or FRONTIER_RESULTS,
+                          baseline_path=args.baseline, jobs=args.jobs)
+        else:
+            run_timeouts(args.seconds if args.seconds is not None else 60,
+                         args.memory_gib, args.output or TIMEOUT_RESULTS,
+                         baseline_path=args.baseline, jobs=args.jobs, stop_after_n=args.stop_after_n)
     else:
         run_all(args.seconds if args.seconds is not None else 30,
                 args.memory_gib, args.output or RESULTS,

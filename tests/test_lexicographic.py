@@ -153,7 +153,7 @@ def test_pm_summary_includes_wins_removed_in_earlier_rounds():
 def recordings(tmp_path, monkeypatch):
     original = experiment.recorded_results()
     for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS',
-                 'SYMMETRIC_RESULTS'):
+                 'SYMMETRIC_RESULTS', 'FRONTIER_RESULTS', 'LATEST_RESULTS'):
         monkeypatch.setattr(experiment, name, tmp_path / getattr(experiment, name).name)
     experiment.RESULTS.write_text(json.dumps(original, indent=2) + '\n')
     metadata = {key: value for key, value in original.items() if key != 'rows'}
@@ -348,3 +348,81 @@ def test_symmetric_capped_search_keeps_sound_partial_certificates(options):
         assert symmetric.data['budget_exhausted'] == ('max_host_leaves' in options)
         for player, tree in enumerate(symmetric.trees):
             assert strahler.check(game, tree, player, symmetric.regions[player]).ok
+
+
+@pytest.mark.parametrize('jobs', [1, 2])
+def test_longer_reruns_extend_each_frontier_sequentially_and_resume(recordings, monkeypatch, jobs):
+    for path in (experiment.TIMEOUT_RESULTS, experiment.FIVE_MINUTE_RESULTS,
+                 experiment.SYMMETRIC_RESULTS):
+        path.write_bytes((EXAMPLES / 'nester' / path.name).read_bytes())
+    baseline = experiment.collect_results()
+    before = experiment.FINAL_RESULTS.read_bytes()
+    calls = []
+    stopping = {'AD': 6, 'AD+iter': None, 'AD-sym': 4, 'AD-sym+iter': 5,
+                'PM': 4, 'PM+iter': 5}
+
+    def measure(game, backend, seconds, memory_gib):
+        n = game['n']
+        calls.append((n, backend))
+        assert seconds == 600 and memory_gib == 2
+        if n == stopping[backend]:
+            return dict(n=n, backend=backend, outcome='timeout', seconds=seconds,
+                        timeout_seconds=seconds, memory_gib=memory_gib)
+        donor = next((r for r in baseline['rows'] if r['n'] == n and r['outcome'] == 'complete'),
+                     dict(outcome='complete', winner_sha256=[f'even-{n}', f'odd-{n}']))
+        return dict(donor, n=n, backend=backend, seconds=1,
+                    timeout_seconds=seconds, memory_gib=memory_gib)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    result = experiment.run_frontiers(jobs=jobs)
+    assert result['complete'] and result['cases'] == 11 and result['planned_cases'] == 22
+    assert experiment.recorded_frontier_results() == result
+    assert (6, 'AD') in calls and (7, 'AD') not in calls
+    assert (7, 'AD+iter') in calls
+    assert (4, 'AD-sym') in calls and (5, 'AD-sym') not in calls
+    assert len(calls) == len(set(calls)) == 11
+    for backend in experiment.BACKENDS:
+        ns = [n for n, b in calls if b == backend]
+        assert ns == sorted(ns)
+        frontier = result['frontiers'][backend]
+        assert frontier['stopped_at_n'] == stopping[backend]
+        assert frontier['last_solved_n'] == (stopping[backend] - 1 if stopping[backend] else 7)
+
+    final = experiment.collect_results()
+    assert experiment.recorded_final_results() == final
+    assert final['timeout_seconds'] == 600 and len(final['rows']) == 42
+    assert final['frontiers'] == result['frontiers']
+    completed = [r for r in baseline['rows'] if r['outcome'] == 'complete']
+    assert all(r in final['rows'] for r in completed)
+    assert experiment.FINAL_RESULTS.read_bytes() == before
+    for row in final['rows']:
+        if row['outcome'] == 'timeout':
+            assert row['timeout_seconds'] == 600
+        if row['outcome'] == 'not measured':
+            assert 'seconds' not in row
+    saved = experiment.FRONTIER_RESULTS.read_bytes()
+    calls.clear()
+    assert experiment.run_frontiers(jobs=jobs) == result
+    assert not calls and experiment.FRONTIER_RESULTS.read_bytes() == saved
+    assert experiment.recorded_final_results() == final
+
+    # Simulate interruption while AD's n=6 case was running; keep its earlier successes.
+    result['rows'] = [r for r in result['rows'] if not (r['backend'] == 'AD' and r['n'] >= 6)]
+    result['complete'] = False
+    result['frontiers'].pop('AD')
+    experiment.FRONTIER_RESULTS.write_text(json.dumps(result))
+    resumed = experiment.run_frontiers(jobs=jobs)
+    assert calls == [(6, 'AD')]
+    assert experiment.recorded_frontier_results() == resumed
+    calls.clear()
+    experiment.FINAL_RESULTS.write_bytes(before + b'\n')
+    with pytest.raises(AssertionError):
+        experiment.run_frontiers(jobs=jobs)
+    assert not calls
+
+
+@pytest.mark.parametrize('options', [dict(seconds=300), dict(jobs=0), dict(memory_gib=0)])
+def test_longer_frontier_rerun_rejects_invalid_limits_before_running(monkeypatch, options):
+    monkeypatch.setattr(experiment, 'measure_case', lambda *a, **kw: pytest.fail('Must not run'))
+    with pytest.raises(ValueError):
+        experiment.run_frontiers(**options)

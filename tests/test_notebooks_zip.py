@@ -32,6 +32,8 @@ class NotebooksZip(unittest.TestCase):
                      'nester/lexicographic-timeouts-300s.json': '{}',
                      'nester/lexicographic-results-300s.json': '{}',
                      'nester/lexicographic-symmetric-300s.json': '{}',
+                     'nester/lexicographic-timeouts-600s.json': '{}',
+                     'nester/lexicographic-results-600s.json': '{}',
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)

@@ -29,9 +29,9 @@ combines all wins.
 Notebook 07 labels Strahler numbers as tree metrics; progress-measure rows
 describe occupied measure trees, and AD rows describe dominion decompositions.
 Notebook 08 uses `search='lexicographic'` for both solvers. It includes a recorded
-five-minute/2-GiB comparison of AD, symmetric AD and PM, each with and without
-iterative shaving, through Nester-5.
-Larger instances are marked beyond the frontier. Execution reads the recorded
+ten-minute/2-GiB comparison of AD, symmetric AD and PM, each with and without
+iterative shaving. Each method stops at its first unsuccessful run; larger
+instances are marked beyond that method's frontier. Execution reads the recorded
 results and draws Nester-1's trees; it needs no network and does not repeat the
 benchmarks.
 

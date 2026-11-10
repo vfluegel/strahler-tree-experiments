@@ -17,7 +17,20 @@ The compressed games are unchanged from the downloaded archive.
 
 Notebook 08 uses all seven plain games. `plain-manifest.json` records their
 SHA-256 checksums, graph sizes, normalized priority bounds and theoretical
-host caps. `lexicographic-results-300s.json` contains one result per game/method
+host caps. `lexicographic-results-600s.json` contains the current comparison,
+including the earlier successes and ten-minute reruns. `lexicographic-timeouts-600s.json`
+records those new measurements with the same 2-GiB memory limit. Each method
+starts at its first previous timeout and proceeds in increasing n only after
+a success. Its first unsuccessful run stops that method, leaving larger
+instances unmeasured at 600 seconds. The file records each method's frontier.
+Completed cases retain their original times and provenance.
+
+Run `python jupyter-examples/lexicographic_nester.py rerun-timeouts --frontier --seconds 600 --jobs 2`
+from the repository root with the checkout's library selected, followed by
+`python jupyter-examples/lexicographic_nester.py collect`. Checkpoints resume
+only when the binary, fixtures, baseline and limits match.
+
+The preserved `lexicographic-results-300s.json` contains one result per game/method
 for AD, symmetric AD and PM, with and without iterative shaving, under a
 five-minute budget and a 2-GiB address-space limit on Linux. It includes the Nester-1 certificate
 trees. Each row identifies its source recording; binary and fixture checksums
@@ -39,6 +52,6 @@ The original recordings are `lexicographic-results.json` and
 `lexicographic-timeouts-{60,300}s.json`. The first run used one worker;
 the five-minute rerun used two, each with its own memory and time limit.
 `python lexicographic_nester.py collect` consolidates the recordings, preserving
-the stored stopping point when larger instances were excluded.
+their provenance and the per-method stopping points of the ten-minute extension.
 
 Notebook 07 keeps its original n<=4 live experiment.
