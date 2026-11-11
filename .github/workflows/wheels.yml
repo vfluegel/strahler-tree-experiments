@@ -43,9 +43,13 @@ jobs:
           - os: ubuntu-24.04
             platform: linux-x86_64
             arch: x86_64
+            cc: gcc-14
+            cxx: g++-14
           - os: macos-15
             platform: macos-arm64
             arch: arm64
+            cc: clang
+            cxx: clang++
     runs-on: ${{ matrix.os }}
     env:
       RELEASE_TAG: ${{ inputs.tag }}
@@ -61,7 +65,30 @@ jobs:
           python-version: '3.12'
 
       - name: Install wheel tools
-        run: python -m pip install cibuildwheel==3.2.1 meson==1.8.5
+        run: python -m pip install cibuildwheel==3.2.1 meson==1.8.5 ninja
+
+      - name: Install Linux native-test tools
+        if: matrix.platform == 'linux-x86_64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-14 g++-14 qemu-user
+
+      - name: Check portable and dispatched lifting kernels
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          meson setup build-simd --buildtype=debug -Dlenstree=disabled -Dwerror=true
+          meson compile -C build-simd test_ad_reach test_ad_reach_alloc test_ad_batch test_ad_lift test_ad_sym test_pm_packed test_pm_lift
+          meson test -C build-simd --no-rebuild test_ad_reach test_ad_reach_alloc test_ad_batch test_ad_lift test_ad_sym test_pm_packed test_pm_lift --print-errorlogs
+          STRAHLER_AD_BACKEND=scalar STRAHLER_PM_BACKEND=scalar meson test -C build-simd --no-rebuild test_ad_lift test_ad_sym test_pm_lift --print-errorlogs
+
+      - name: Check dispatch on an x86 CPU without AVX2
+        if: matrix.platform == 'linux-x86_64'
+        run: |
+          qemu-x86_64 -cpu Nehalem build-simd/test_ad_reach
+          qemu-x86_64 -cpu Nehalem build-simd/test_ad_lift
+          qemu-x86_64 -cpu Nehalem build-simd/test_pm_packed
 
       - name: Check architecture and release version
         env:

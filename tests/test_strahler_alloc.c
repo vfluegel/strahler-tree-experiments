@@ -118,9 +118,12 @@ int main(void) {
       strahler_free(error);
       error = nullptr;
       if (status == 0) {
-        assert(allocation < nth);
-        completed = true;
-        break;
+        /* Optional packed workspaces may fall back after allocation failure. */
+        if (allocation < nth) {
+          completed = true;
+          break;
+        }
+        continue;
       }
       assert(status == 6 && allocation >= nth);
     }

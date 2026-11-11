@@ -36,6 +36,8 @@ class NotebooksZip(unittest.TestCase):
                      'nester/lexicographic-results-600s.json': '{}',
                      'nester/lexicographic-repeat-shaving-600s.json': '{}',
                      'nester/lexicographic-results-repeat-shaving-600s.json': '{}',
+                     'nester/lexicographic-simd-600s.json': '{}',
+                     'nester/lexicographic-results-simd-600s.json': '{}',
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)
