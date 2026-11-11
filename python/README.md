@@ -88,6 +88,8 @@ All lifting hosts are available: full/default, `tree_k`, `kary`, `tree_file`,
 and `progress_measures(game, ...)`, with
 or without `iter_shave=True`. It uses the theory caps described in
 [Notebook 08](../jupyter-examples/08-lexicographic-adaptive-nester.ipynb).
+With iterative shaving, a productive round repeats the same `(k,t)` on the
+remaining game; the search advances only after a round removes no vertices.
 The library manages JSON format and callback traces, so `--format`, `--trace`,
 `--help`, and `--version` are not solver options here.
 

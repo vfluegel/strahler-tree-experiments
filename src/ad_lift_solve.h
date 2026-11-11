@@ -58,7 +58,8 @@ typedef struct {
   bool verify;
   /* ADAPTIVE: seed TOP with the previously certified opponent dominion. */
   bool incremental;
-  /* Attract and remove certified dominions between stabilized runs. */
+  /* Attract and remove certified dominions between stabilized runs; reuse
+   * the host while removal makes progress, then advance adaptive search. */
   bool iter_shave;
   /* Algorithm 9; adaptive hosts require lexicographic search. */
   bool symmetric;

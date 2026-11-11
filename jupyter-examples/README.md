@@ -34,6 +34,8 @@ iterative shaving. Each method stops at its first unsuccessful run; larger
 instances are marked beyond that method's frontier. Execution reads the recorded
 results and draws Nester-1's trees; it needs no network and does not repeat the
 benchmarks.
+The current comparison remeasures all six methods after correcting `+iter`
+to repeat the same `(k,t)` while shaving removes vertices.
 
 ## Release zip
 

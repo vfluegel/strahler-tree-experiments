@@ -401,7 +401,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   repeating to a fixpoint as removals expose further dominions.
 - `--iter-shave` attracts and removes certified dominions after lifting
   stabilises. Fixed hosts are reused until complete or a round makes no
-  progress; both adaptive modes advance to the next t on the smaller game.
+  progress. Adaptive searches also reuse the current host while vertices are
+  removed, advancing their parameters only after a round makes no progress.
   It also supports `lifting-sym`; Zielonka variants reject it. DOT retains
   each shaved region's round, adaptive t, and certified decomposition, plus
   the final decomposition of the
@@ -434,8 +435,9 @@ standard input. The default algorithm is attractor-decomposition lifting.
   These caps follow from Proposition 3 and Lemma 16 of the Strahler paper.
   `--tree-k=K` can impose a smaller cap; `--start-t=T` changes the starting
   `t` for the first `K` only. With `--iter-shave`, certified dominions and
-  their attractors are removed between pairs. The initial vertex count and
-  priority bounds set the caps for the whole run. This option requires
+  their attractors are removed after each attempt. Repeat the current pair
+  while removal makes progress, then advance lexicographically. The initial
+  vertex count and priority bounds set the caps for the whole run. This option requires
   `lifting` or `lifting-sym` and conflicts with `--adaptive-t`, k-ary and file
   hosts. Symmetric search restarts Algorithm 9 on each fixed host pair.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
@@ -579,6 +581,8 @@ per-player cap is `min(depth+1,floor(log2(n))+1)`, including the measure
 tree's root; it applies with or without `--iter-shave`. The caps keep their
 initial values as shaving removes vertices. This option requires Strahler
 lifting and conflicts with fixed `k/t` or `bits`.
+With `--iter-shave`, it repeats the current `(k,t)` while a round removes
+vertices, and advances only after a round removes none.
 These results may be partial. Roots say `partial` and, with `--player=both`,
 a dashed Unresolved node lists the remaining vertices. `--stats` reports the
 chosen parameters, depths, vertex counts, lifts, attempts and top counts on

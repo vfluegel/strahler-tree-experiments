@@ -25,6 +25,8 @@ FINAL_RESULTS = DATA / 'lexicographic-results-300s.json'
 SYMMETRIC_RESULTS = DATA / 'lexicographic-symmetric-300s.json'
 FRONTIER_RESULTS = DATA / 'lexicographic-timeouts-600s.json'
 LATEST_RESULTS = DATA / 'lexicographic-results-600s.json'
+REPEAT_SHAVING_RESULTS = DATA / 'lexicographic-repeat-shaving-600s.json'
+REPEAT_SHAVING_FINAL_RESULTS = DATA / 'lexicographic-results-repeat-shaving-600s.json'
 BASE_BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
 SYMMETRIC_BACKENDS = ('AD-sym', 'AD-sym+iter')
 BACKENDS = (*BASE_BACKENDS[:2], *SYMMETRIC_BACKENDS, *BASE_BACKENDS[2:])
@@ -178,6 +180,10 @@ def summarize(document, backend, info):
         k, t = max(p['K'] for p in parameters), parameters[0]['t']
         attempts = (k - 1) * (info['t_max'] + 1) + t + 1
         rounds = len(document['shaves']) + 1
+        if backend.endswith('+iter'):
+            # A final empty residual is a verdict, rather than another solve.
+            attempts = len(document['shaves']) + int(
+                bool(document['unresolved']) or any(document['regions']))
         budget = document['budget_exhausted']
         example = dict(parameters=parameters, trees=document['trees'],
                        shaves=document['shaves'])
@@ -372,6 +378,15 @@ def _consolidated_results(include_symmetric=True):
 
 def collect_results(output=None):
     """Publish one result per case, retaining the original measurement provenance."""
+    if REPEAT_SHAVING_RESULTS.exists():
+        output = Path(output) if output is not None else REPEAT_SHAVING_FINAL_RESULTS
+        if output.resolve() in (FINAL_RESULTS.resolve(), LATEST_RESULTS.resolve()):
+            raise ValueError('Keep the earlier recordings; write the fresh comparison to a new file')
+        document = _repeat_shaving_consolidated_results()
+        temporary = output.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        temporary.replace(output)
+        return document
     extended = FRONTIER_RESULTS.exists()
     output = Path(output) if output is not None else LATEST_RESULTS if extended else FINAL_RESULTS
     if extended and output.resolve() == FINAL_RESULTS.resolve():
@@ -384,6 +399,10 @@ def collect_results(output=None):
 
 
 def recorded_final_results():
+    if REPEAT_SHAVING_FINAL_RESULTS.exists():
+        document = json.loads(REPEAT_SHAVING_FINAL_RESULTS.read_text(encoding='utf-8'))
+        assert document == _repeat_shaving_consolidated_results()
+        return document
     extended = LATEST_RESULTS.exists()
     path = LATEST_RESULTS if extended else FINAL_RESULTS
     document = json.loads(path.read_text(encoding='utf-8'))
@@ -404,8 +423,11 @@ def recorded_frontier_results(path=None, baseline_path=None):
     baseline_path = Path(baseline_path) if baseline_path is not None else FINAL_RESULTS
     baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
     document = json.loads(path.read_text(encoding='utf-8'))
+    fresh = document.get('rerun_all', False)
     expected = {(r['n'], r['backend']) for r in baseline['rows']
-                if r['outcome'] in ('timeout', 'not measured')}
+                if fresh or r['outcome'] in ('timeout', 'not measured')}
+    if fresh:
+        assert document['iter_shave_policy'] == 'repeat-until-stalled'
     assert document['complete'] and document['backends'] == list(BACKENDS)
     assert document['baseline_sha256'] == hashlib.sha256(baseline_path.read_bytes()).hexdigest()
     assert document['fixtures'] == baseline['fixtures']
@@ -429,7 +451,7 @@ def recorded_frontier_results(path=None, baseline_path=None):
                 if row['outcome'] != 'complete':
                     stopped = row
         assert document['frontiers'][backend] == _frontier_summary(
-            backend, baseline, document['rows'], stopped)
+            backend, dict(rows=[]) if fresh else baseline, document['rows'], stopped)
     check_agreement([*baseline['rows'], *document['rows']])
     return document
 
@@ -452,6 +474,23 @@ def _frontier_consolidated_results():
     return dict(search='lexicographic', timeout_seconds=extension['timeout_seconds'],
                 memory_gib=extension['memory_gib'], fixtures=baseline['fixtures'],
                 recordings=recordings, frontiers=extension['frontiers'], rows=rows)
+
+
+def _repeat_shaving_consolidated_results():
+    document = recorded_frontier_results(REPEAT_SHAVING_RESULTS, LATEST_RESULTS)
+    assert document['rerun_all']
+    metadata = dict(
+        sha256=hashlib.sha256(REPEAT_SHAVING_RESULTS.read_bytes()).hexdigest(),
+        **{key: document[key] for key in ('version', 'library_sha256', 'recorded_utc',
+                                         'machine', 'memory_cap_enforced', 'jobs')})
+    rows = {(r['n'], r['backend']): dict(r, recording=REPEAT_SHAVING_RESULTS.name)
+            for r in document['rows']}
+    return dict(search='lexicographic', timeout_seconds=document['timeout_seconds'],
+                memory_gib=document['memory_gib'], fixtures=document['fixtures'],
+                iter_shave_policy=document['iter_shave_policy'], rerun_all=True,
+                recordings={REPEAT_SHAVING_RESULTS.name: metadata},
+                frontiers=document['frontiers'],
+                rows=[rows[g['n'], b] for g in manifest() for b in BACKENDS])
 
 
 def _run_metadata(games):
@@ -529,13 +568,16 @@ def run_all(seconds=30, memory_gib=2, output=RESULTS, *, backends=BACKENDS,
     return document
 
 
-def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jobs=2):
-    """Retry failures in increasing n, stopping each method at its first failure."""
+def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jobs=2,
+                  rerun_all=False):
+    """Run increasing n to each method's first failure, optionally remeasuring all cases."""
     if jobs < 1 or seconds <= 0 or memory_gib < 1:
         raise ValueError('Use positive time, memory and worker limits')
     games = manifest()
-    baseline_path = Path(baseline_path) if baseline_path is not None else FINAL_RESULTS
-    output = Path(output) if output is not None else FRONTIER_RESULTS
+    baseline_path = Path(baseline_path) if baseline_path is not None else (
+        LATEST_RESULTS if rerun_all else FINAL_RESULTS)
+    output = Path(output) if output is not None else (
+        REPEAT_SHAVING_RESULTS if rerun_all else FRONTIER_RESULTS)
     if output.resolve() == baseline_path.resolve():
         raise ValueError('Keep the baseline; write reruns to a separate file')
     baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
@@ -544,9 +586,9 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
     assert len(baseline['rows']) == len(by_case) == len(expected)
     assert by_case.keys() == expected
     assert all(r['outcome'] in ('complete', 'timeout', 'not measured') for r in baseline['rows'])
-    selected = {key for key, row in by_case.items() if row['outcome'] != 'complete'}
+    selected = {key for key, row in by_case.items() if rerun_all or row['outcome'] != 'complete'}
     timeouts = [row for row in baseline['rows'] if row['outcome'] == 'timeout']
-    if timeouts and seconds <= max(r['timeout_seconds'] for r in timeouts):
+    if not rerun_all and timeouts and seconds <= max(r['timeout_seconds'] for r in timeouts):
         raise ValueError('Use a larger deadline than the baseline timeout')
     metadata = _run_metadata(games)
     assert baseline['fixtures'] == metadata['fixtures']
@@ -554,8 +596,11 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
                     baseline_sha256=hashlib.sha256(baseline_path.read_bytes()).hexdigest(),
                     backends=list(BACKENDS), timeout_seconds=seconds,
                     memory_gib=memory_gib, jobs=jobs, planned_cases=len(selected))
+    if rerun_all:
+        settings.update(rerun_all=True, iter_shave_policy='repeat-until-stalled')
     if output.exists():
         document = json.loads(output.read_text(encoding='utf-8'))
+        assert document.get('rerun_all', False) == rerun_all
         for key, value in settings.items():
             assert document[key] == value
         for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
@@ -565,6 +610,7 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
     rows = {(r['n'], r['backend']): r for r in document['rows']}
     assert len(rows) == len(document['rows']) and rows.keys() <= selected
     frontiers = {}
+    summary_baseline = dict(rows=[]) if rerun_all else baseline
     plans = {b: sorted(n for n, method in selected if method == b) for b in BACKENDS}
 
     def checkpoint():
@@ -602,9 +648,9 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
                         n=later, backend=backend, outcome='not measured', frontier_n=n,
                         detail=f"Beyond {backend}'s Nester-{n} frontier ({row['outcome']})",
                         timeout_seconds=seconds, memory_gib=memory_gib)
-                frontiers[backend] = _frontier_summary(backend, baseline, list(rows.values()), row)
+                frontiers[backend] = _frontier_summary(backend, summary_baseline, list(rows.values()), row)
                 return
-            frontiers[backend] = _frontier_summary(backend, baseline, list(rows.values()))
+            frontiers[backend] = _frontier_summary(backend, summary_baseline, list(rows.values()))
 
         for backend in BACKENDS:
             advance(backend)
@@ -709,10 +755,14 @@ def main():
     parser.add_argument('--stop-after-n', type=int)
     parser.add_argument('--frontier', action='store_true',
                         help='Stop each method after its first failure; extend into unmeasured instances')
+    parser.add_argument('--rerun-all', action='store_true',
+                        help='Remeasure every case from n=1; requires --frontier')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     if args.frontier and (args.command != 'rerun-timeouts' or args.stop_after_n is not None):
         parser.error('--frontier requires rerun-timeouts and excludes --stop-after-n')
+    if args.rerun_all and not args.frontier:
+        parser.error('--rerun-all requires --frontier')
     if args.command == 'manifest':
         build_manifest()
     elif args.command == 'collect':
@@ -729,8 +779,10 @@ def main():
     elif args.command == 'rerun-timeouts':
         if args.frontier:
             run_frontiers(args.seconds if args.seconds is not None else 600,
-                          args.memory_gib, args.output or FRONTIER_RESULTS,
-                          baseline_path=args.baseline, jobs=args.jobs)
+                          args.memory_gib, args.output or (REPEAT_SHAVING_RESULTS if args.rerun_all
+                                                         else FRONTIER_RESULTS),
+                          baseline_path=args.baseline or (LATEST_RESULTS if args.rerun_all else None),
+                          jobs=args.jobs, rerun_all=args.rerun_all)
         else:
             run_timeouts(args.seconds if args.seconds is not None else 60,
                          args.memory_gib, args.output or TIMEOUT_RESULTS,

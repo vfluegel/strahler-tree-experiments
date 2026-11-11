@@ -55,36 +55,66 @@ def test_ad_visits_a_lexicographic_prefix_with_fixed_initial_caps(iterate, algor
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
         run = strahler.trace(game, algorithm, search='lexicographic', iter_shave=iterate)
         visited = []
+        shaves = []
         k = None
         for event in run.events:
             if event.get('phase') == 'k_raised':
                 k = event['value']
             elif event.get('phase') == 't_raised':
                 visited.append((k, event['value']))
+            elif event.get('phase') == 'shave_applied':
+                shaves.append((len(visited), any(event['result']['regions'])))
         expected = list(pairs(len(game.vertices), max(p['H'] for p in run.result.data['parameters'])))
-        assert visited == expected[:len(visited)]
+        distinct = [pair for i, pair in enumerate(visited) if i == 0 or pair != visited[i - 1]]
+        assert distinct == expected[:len(distinct)]
         assert run.result.complete
         assert ad_wins(run.result) == ad_wins(strahler.decompose(game, 'zielonka'))
         if not iterate:
             assert (2, 0) in visited  # Reached only after exhausting every t for K=1.
         else:
             assert len(run.result.data['shaves']) > 0
-            assert visited[:2] == [(1, 0), (1, 1)]
+            assert visited[:2] == [(1, 0), (1, 0)]
+            for index, removed in shaves:
+                if index < len(visited):
+                    assert (visited[index] == visited[index - 1]) == removed
 
 
-def test_pm_iter_visits_the_same_grid_before_increasing_k():
-    info = manifest()[0]
+def test_pm_iter_repeats_productive_pairs_and_advances_only_when_stalled():
+    info = manifest()[1]
     with strahler.Game.from_text(bz2.decompress((EXAMPLES / 'nester' / info['file']).read_bytes()).decode()) as game:
         data = strahler.progress_measures(game, search='lexicographic', iter_shave=True)
         expected = list(pairs(info['vertices'], max(info['PM_depth']) + 1))
+        pair_index = 0
+        before = info['vertices']
+        repeated = False
         for index, round_ in enumerate(data['rounds']):
             assert round_['round'] == index + 1
-            k, t = expected[index]
+            k, t = expected[pair_index]
             for player in round_['trees']:
                 params = player['parameters']
                 assert (params['k'], params['t']) == (min(k, params['depth'] + 1), t)
+            after = len(round_['unresolved'])
+            if not round_['complete']:
+                if after < before:
+                    repeated = True
+                else:
+                    pair_index += 1
+            before = after
+        assert repeated
         assert data['rounds'][-1]['complete']
         assert pm_wins(data) == ad_wins(strahler.decompose(game, 'zielonka'))
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_ad_repeats_a_productive_pair_at_the_end_of_a_capped_grid(algorithm):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        run = strahler.trace(game, algorithm, search='lexicographic', iter_shave=True,
+                             tree_k=1, start_t=2)
+        assert run.result.complete
+        assert all(p['K'] == 1 and p['t'] == 2 for p in run.result.data['parameters'])
+        attempts = [e['value'] for e in run.events if e.get('phase') == 't_raised']
+        assert attempts == [2, 2]
+        assert ad_wins(run.result) == ad_wins(strahler.decompose(game, 'zielonka'))
 
 
 @pytest.mark.parametrize('iterate', [False, True])
@@ -153,7 +183,8 @@ def test_pm_summary_includes_wins_removed_in_earlier_rounds():
 def recordings(tmp_path, monkeypatch):
     original = experiment.recorded_results()
     for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS',
-                 'SYMMETRIC_RESULTS', 'FRONTIER_RESULTS', 'LATEST_RESULTS'):
+                 'SYMMETRIC_RESULTS', 'FRONTIER_RESULTS', 'LATEST_RESULTS',
+                 'REPEAT_SHAVING_RESULTS', 'REPEAT_SHAVING_FINAL_RESULTS'):
         monkeypatch.setattr(experiment, name, tmp_path / getattr(experiment, name).name)
     experiment.RESULTS.write_text(json.dumps(original, indent=2) + '\n')
     metadata = {key: value for key, value in original.items() if key != 'rows'}
@@ -333,8 +364,13 @@ def test_symmetric_worker_uses_the_same_search_and_winner_certificates(iterate):
     original = next(r for r in experiment.recorded_results()['rows']
                     if r['n'] == 2 and r['backend'] == ('AD+iter' if iterate else 'AD'))
     assert row['outcome'] == 'complete'
-    for key in ('k', 't', 'parameters', 'tree_strahler', 'won', 'unresolved', 'winner_sha256'):
+    for key in ('won', 'unresolved', 'winner_sha256'):
         assert row[key] == original[key]
+    if iterate:
+        assert (row['k'], row['t']) == (1, 0)
+        assert (row['k'], row['t']) < (original['k'], original['t'])
+    else:
+        assert row['parameters'] == original['parameters']
 
 
 @pytest.mark.parametrize('options', [dict(tree_k=1), dict(max_host_leaves=1)])
@@ -426,3 +462,40 @@ def test_longer_frontier_rerun_rejects_invalid_limits_before_running(monkeypatch
     monkeypatch.setattr(experiment, 'measure_case', lambda *a, **kw: pytest.fail('Must not run'))
     with pytest.raises(ValueError):
         experiment.run_frontiers(**options)
+
+
+@pytest.mark.parametrize('jobs', [1, 2])
+def test_fresh_frontiers_remeasure_successes_at_the_same_deadline(recordings, monkeypatch, jobs):
+    reference = json.loads((EXAMPLES / 'nester' / experiment.LATEST_RESULTS.name).read_text())
+    experiment.LATEST_RESULTS.write_text(json.dumps(reference))
+    original = experiment.LATEST_RESULTS.read_bytes()
+    calls = []
+
+    def measure(game, backend, seconds, memory_gib):
+        calls.append((game['n'], backend))
+        if game['n'] == 2:
+            return dict(n=2, backend=backend, outcome='timeout', seconds=seconds,
+                        timeout_seconds=seconds, memory_gib=memory_gib)
+        donor = next(r for r in reference['rows'] if r['n'] == 1 and r['backend'] == backend)
+        return dict(donor, seconds=7, timeout_seconds=seconds)
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    options = dict(jobs=jobs, rerun_all=True)
+    result = experiment.run_frontiers(**options)
+    assert set(calls) == {(n, b) for n in (1, 2) for b in experiment.BACKENDS}
+    assert len(calls) == result['cases'] == 12
+    assert result['planned_cases'] == len(result['rows']) == 42
+    assert experiment.recorded_frontier_results(
+        experiment.REPEAT_SHAVING_RESULTS, experiment.LATEST_RESULTS) == result
+    assert all(f['last_solved_n'] == 1 and f['stopped_at_n'] == 2
+               for f in result['frontiers'].values())
+    final = experiment.collect_results()
+    assert experiment.recorded_final_results() == final
+    assert final['rerun_all'] and final['iter_shave_policy'] == 'repeat-until-stalled'
+    assert all(r['timeout_seconds'] == 600 for r in final['rows'])
+    assert all(r['seconds'] == 7 for r in final['rows'] if r['outcome'] == 'complete')
+    assert experiment.LATEST_RESULTS.read_bytes() == original
+    calls.clear()
+    before = experiment.REPEAT_SHAVING_RESULTS.read_bytes()
+    assert experiment.run_frontiers(**options) == result
+    assert not calls and experiment.REPEAT_SHAVING_RESULTS.read_bytes() == before

@@ -725,21 +725,16 @@ static void test_iter_shave(void) {
   options = options_for(AD_LIFT_HOST_ADAPTIVE, 0);
   options.iter_shave = true;
   result = solve(&game, &domain, &options, &stats);
-  assert(stats.first_complete_t == 1);
-  assert(stats.player[PG_EVEN].first_full_t == 1);
+  assert(stats.first_complete_t == 0);
+  assert(stats.player[PG_EVEN].first_full_t == 0);
   assert(stats.player[PG_ODD].first_full_t == 0);
   ad_result_destroy(&result);
   options.max_host_leaves = 1;
   result = solve(&game, &domain, &options, &stats);
-  assert(result.kind == AD_RESULT_PARTIAL && stats.budget_exhausted);
-  assert(stats.iterations == 1 && result.shave_count == 1);
-  for (size_t player = 0; player < 2; player++) {
-    assert(result.decomposition[player] == nullptr);
-    assert(stats.player[player].tree.nodes == 0);
-    assert(stats.player[player].tree.leaves == 0);
-    assert(stats.player[player].tree.height == 0);
-    assert(stats.player[player].tree.strahler == 0);
-  }
+  assert(result.kind == AD_RESULT_COMPLETE && !stats.budget_exhausted);
+  assert(stats.iterations == 2 && result.shave_count == 1);
+  assert(stats.player[PG_EVEN].t == 0 &&
+         stats.player[PG_EVEN].host_leaves == 1);
   ad_result_destroy(&result);
   pg_set_destroy(&domain);
   check_iter_shave(&game);

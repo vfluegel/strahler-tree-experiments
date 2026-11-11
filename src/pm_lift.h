@@ -38,7 +38,8 @@ typedef struct {
   PMParameters parameters;
   bool fixed;
   bool incremental;
-  /* Exhaust t=0..floor(log2 n) before increasing k. */
+  /* Exhaust t=0..floor(log2 n) before increasing k. With incremental removal,
+   * repeat a pair while it removes vertices. */
   bool lexicographic;
   bool verify;
 } PMOptions;

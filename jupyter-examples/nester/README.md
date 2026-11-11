@@ -17,7 +17,19 @@ The compressed games are unchanged from the downloaded archive.
 
 Notebook 08 uses all seven plain games. `plain-manifest.json` records their
 SHA-256 checksums, graph sizes, normalized priority bounds and theoretical
-host caps. `lexicographic-results-600s.json` contains the current comparison,
+host caps. `lexicographic-results-repeat-shaving-600s.json` contains the current
+comparison: every method is remeasured from n=1 with a 600-second / 2-GiB budget,
+repeating `(k,t)` after a productive shaving round and advancing only when a
+round removes no vertices. `lexicographic-repeat-shaving-600s.json` stores the
+fresh measurements and each method's stopping frontier. Every displayed
+measurement comes from the corrected build; older results serve only as a
+winning-region reference and remain unchanged.
+
+Run `python jupyter-examples/lexicographic_nester.py rerun-timeouts --frontier --rerun-all --seconds 600 --jobs 2`
+from the repository root with the corrected checkout's library selected,
+followed by `python jupyter-examples/lexicographic_nester.py collect`.
+
+The preserved `lexicographic-results-600s.json` contains the earlier comparison,
 including the earlier successes and ten-minute reruns. `lexicographic-timeouts-600s.json`
 records those new measurements with the same 2-GiB memory limit. Each method
 starts at its first previous timeout and proceeds in increasing n only after
@@ -51,7 +63,7 @@ fixtures and limits match.
 The original recordings are `lexicographic-results.json` and
 `lexicographic-timeouts-{60,300}s.json`. The first run used one worker;
 the five-minute rerun used two, each with its own memory and time limit.
-`python lexicographic_nester.py collect` consolidates the recordings, preserving
-their provenance and the per-method stopping points of the ten-minute extension.
+`python lexicographic_nester.py collect` publishes the newest completed comparison,
+preserving measurement provenance and each method's stopping point.
 
 Notebook 07 keeps its original n<=4 live experiment.

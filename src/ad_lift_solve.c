@@ -704,7 +704,7 @@ solve_with_options(PGGame const *game, PGSet const *domain,
     bool const last_host =
         last_t && (!options->lexicographic ||
                    current_k >= lexicographic_k_max(stats, options->k));
-    if (pg_set_empty(&remaining) || (adaptive && last_host)) {
+    if (pg_set_empty(&remaining) || (adaptive && last_host && !progress)) {
       if (adaptive && pg_set_empty(&remaining)) {
         stats->adaptive_complete = true;
         stats->first_complete_t = stats->player[0].t;
@@ -713,10 +713,12 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       goto cleanup;
     }
     if (adaptive) {
-      round_options.t =
-          options->lexicographic && last_t ? 0 : stats->player[0].t + 1;
+      round_options.t = progress ? stats->player[0].t
+                        : options->lexicographic && last_t
+                            ? 0
+                            : stats->player[0].t + 1;
       if (options->lexicographic) {
-        round_options.start_k = current_k + last_t;
+        round_options.start_k = current_k + (!progress && last_t);
       }
     }
   }

@@ -205,6 +205,11 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       break;
     }
     if (options->lexicographic) {
+      /* A smaller remaining game may fit the same host. Advance the grid
+       * only after this pair stops exposing new dominions. */
+      if (options->incremental && pg_set_count(&remaining) < before) {
+        continue;
+      }
       if (parameters.t < queue.t_max) {
         parameters.t++;
       } else if (parameters.k < queue.k_max) {
