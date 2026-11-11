@@ -87,8 +87,8 @@ static int degree_order(void const *a, void const *b) {
  * duplicate; padding repeats the last edge and never enters pending counts. */
 static bool layout(ADReach *work) {
   size_t const n = pg_set_count(work->domain), total = work->game->vertex_count;
-  if (n == 0 || n > INT_MAX - 8 || n > SIZE_MAX / sizeof(Source) ||
-      total > SIZE_MAX / sizeof(int)) {
+  if (n == 0 || total == 0 || n > INT_MAX - 8 ||
+      n > SIZE_MAX / sizeof(Source) || total > SIZE_MAX / sizeof(int)) {
     return false;
   }
   size_t const slots = (n + 7) / 8 * 8;
