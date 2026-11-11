@@ -184,7 +184,8 @@ def recordings(tmp_path, monkeypatch):
     original = experiment.recorded_results()
     for name in ('RESULTS', 'TIMEOUT_RESULTS', 'FIVE_MINUTE_RESULTS', 'FINAL_RESULTS',
                  'SYMMETRIC_RESULTS', 'FRONTIER_RESULTS', 'LATEST_RESULTS',
-                 'REPEAT_SHAVING_RESULTS', 'REPEAT_SHAVING_FINAL_RESULTS'):
+                 'REPEAT_SHAVING_RESULTS', 'REPEAT_SHAVING_FINAL_RESULTS',
+                 'SIMD_RESULTS', 'SIMD_FINAL_RESULTS'):
         monkeypatch.setattr(experiment, name, tmp_path / getattr(experiment, name).name)
     experiment.RESULTS.write_text(json.dumps(original, indent=2) + '\n')
     metadata = {key: value for key, value in original.items() if key != 'rows'}

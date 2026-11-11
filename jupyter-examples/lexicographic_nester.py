@@ -27,6 +27,8 @@ FRONTIER_RESULTS = DATA / 'lexicographic-timeouts-600s.json'
 LATEST_RESULTS = DATA / 'lexicographic-results-600s.json'
 REPEAT_SHAVING_RESULTS = DATA / 'lexicographic-repeat-shaving-600s.json'
 REPEAT_SHAVING_FINAL_RESULTS = DATA / 'lexicographic-results-repeat-shaving-600s.json'
+SIMD_RESULTS = DATA / 'lexicographic-simd-600s.json'
+SIMD_FINAL_RESULTS = DATA / 'lexicographic-results-simd-600s.json'
 BASE_BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
 SYMMETRIC_BACKENDS = ('AD-sym', 'AD-sym+iter')
 BACKENDS = (*BASE_BACKENDS[:2], *SYMMETRIC_BACKENDS, *BASE_BACKENDS[2:])
@@ -378,6 +380,16 @@ def _consolidated_results(include_symmetric=True):
 
 def collect_results(output=None):
     """Publish one result per case, retaining the original measurement provenance."""
+    if SIMD_RESULTS.exists():
+        output = Path(output) if output is not None else SIMD_FINAL_RESULTS
+        if output.resolve() in (FINAL_RESULTS.resolve(), LATEST_RESULTS.resolve(),
+                                REPEAT_SHAVING_FINAL_RESULTS.resolve()):
+            raise ValueError('Keep the earlier recordings; write the SIMD comparison to a new file')
+        document = _fresh_consolidated_results(SIMD_RESULTS, REPEAT_SHAVING_FINAL_RESULTS)
+        temporary = output.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(document, indent=2) + '\n', encoding='utf-8')
+        temporary.replace(output)
+        return document
     if REPEAT_SHAVING_RESULTS.exists():
         output = Path(output) if output is not None else REPEAT_SHAVING_FINAL_RESULTS
         if output.resolve() in (FINAL_RESULTS.resolve(), LATEST_RESULTS.resolve()):
@@ -399,6 +411,10 @@ def collect_results(output=None):
 
 
 def recorded_final_results():
+    if SIMD_FINAL_RESULTS.exists():
+        document = json.loads(SIMD_FINAL_RESULTS.read_text(encoding='utf-8'))
+        assert document == _fresh_consolidated_results(SIMD_RESULTS, REPEAT_SHAVING_FINAL_RESULTS)
+        return document
     if REPEAT_SHAVING_FINAL_RESULTS.exists():
         document = json.loads(REPEAT_SHAVING_FINAL_RESULTS.read_text(encoding='utf-8'))
         assert document == _repeat_shaving_consolidated_results()
@@ -477,18 +493,22 @@ def _frontier_consolidated_results():
 
 
 def _repeat_shaving_consolidated_results():
-    document = recorded_frontier_results(REPEAT_SHAVING_RESULTS, LATEST_RESULTS)
+    return _fresh_consolidated_results(REPEAT_SHAVING_RESULTS, LATEST_RESULTS)
+
+
+def _fresh_consolidated_results(source, baseline):
+    document = recorded_frontier_results(source, baseline)
     assert document['rerun_all']
     metadata = dict(
-        sha256=hashlib.sha256(REPEAT_SHAVING_RESULTS.read_bytes()).hexdigest(),
+        sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
         **{key: document[key] for key in ('version', 'library_sha256', 'recorded_utc',
                                          'machine', 'memory_cap_enforced', 'jobs')})
-    rows = {(r['n'], r['backend']): dict(r, recording=REPEAT_SHAVING_RESULTS.name)
+    rows = {(r['n'], r['backend']): dict(r, recording=source.name)
             for r in document['rows']}
     return dict(search='lexicographic', timeout_seconds=document['timeout_seconds'],
                 memory_gib=document['memory_gib'], fixtures=document['fixtures'],
                 iter_shave_policy=document['iter_shave_policy'], rerun_all=True,
-                recordings={REPEAT_SHAVING_RESULTS.name: metadata},
+                recordings={source.name: metadata},
                 frontiers=document['frontiers'],
                 rows=[rows[g['n'], b] for g in manifest() for b in BACKENDS])
 
@@ -499,6 +519,8 @@ def _run_metadata(games):
 
     return dict(search='lexicographic', version=strahler.version(),
                 library_sha256=hashlib.sha256(Path(_native.library()._name).read_bytes()).hexdigest(),
+                lifting_backends={name: os.environ.get(name, 'auto') for name in
+                                  ('STRAHLER_AD_BACKEND', 'STRAHLER_PM_BACKEND')},
                 recorded_utc=datetime.now(timezone.utc).isoformat(timespec='seconds'),
                 machine=f'{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs',
                 memory_cap_enforced=sys.platform.startswith('linux'),
