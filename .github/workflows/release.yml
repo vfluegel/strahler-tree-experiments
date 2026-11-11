@@ -89,7 +89,6 @@ jobs:
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 graphviz libboost-dev ninja-build pipx
           pipx install meson==1.8.5

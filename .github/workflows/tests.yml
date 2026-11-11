@@ -62,7 +62,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-format-18 shellcheck
 
@@ -104,7 +103,6 @@ jobs:
       - name: Install dependencies
         run: |
           echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 graphviz ninja-build pipx
           pipx install meson==1.8.5
@@ -162,7 +160,6 @@ jobs:
       - name: Install dependencies
         run: |
           printf 'TMPDIR=%s\nOINK_BIN=%s/oink-build/oink\n' "$RUNNER_TEMP" "$RUNNER_TEMP" >> "$GITHUB_ENV"
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 cmake ninja-build pipx libboost-filesystem-dev libboost-iostreams-dev libboost-random-dev libboost-regex-dev
           pipx install meson==1.8.5
@@ -205,7 +202,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 graphviz libboost-dev ninja-build pipx
           pipx install meson==1.8.5
@@ -233,7 +229,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y g++-14 gcc-14 graphviz libboost-dev ninja-build pipx
           pipx install meson==1.8.5
@@ -261,7 +256,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 clang-tidy-18 libboost-dev ninja-build pipx
           pipx install meson==1.8.5
@@ -289,7 +283,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y g++-14 gcc-14 gcovr graphviz libboost-dev ninja-build pipx
           pipx install meson==1.8.5
@@ -343,7 +336,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y clang-18 graphviz libboost-dev ninja-build pipx
           pipx install meson==1.8.5
@@ -374,7 +366,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y g++-14 gcc-14 graphviz libboost-dev ninja-build pipx valgrind
           pipx install meson==1.8.5
@@ -411,7 +402,6 @@ jobs:
       - name: Install Linux compiler
         if: runner.os == 'Linux'
         run: |
-          sudo ci/use-ubuntu-mirrors.sh
           sudo apt-get update
           sudo apt-get install -y gcc-14 g++-14
           echo 'CC=gcc-14' >> "$GITHUB_ENV"
