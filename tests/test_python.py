@@ -64,7 +64,7 @@ def test_examples_match_cli_bytes(path, backend):
 @pytest.mark.parametrize('args', [(), ('--tree-k=1',), ('--kary=1',),
     ('--tree-file=' + str(ROOT / 'tests/trees/one_child.tree'),),
     ('--adaptive-t',), ('--adaptive-t=incremental',), ('--adaptive-t', '--tree-k=1'),
-    ('--adaptive-t', '--max-host-leaves=1')])
+    ('--adaptive-t', '--max-host-leaves=1'), ('--search=lexicographic',)])
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 @pytest.mark.parametrize('iteration', [False, True])
 def test_host_modes(args, algorithm, iteration):

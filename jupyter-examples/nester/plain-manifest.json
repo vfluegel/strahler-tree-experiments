@@ -1,0 +1,189 @@
+{
+  "source": "https://doi.org/10.6084/m9.figshare.6004130.v1",
+  "archive": "mlsolver",
+  "figshare_file": 10792904,
+  "games": [
+    {
+      "n": 1,
+      "file": "Nestern=1.gm.bz2",
+      "vertices": 22,
+      "edges": 26,
+      "priorities": 5,
+      "normalized_maximum": 5,
+      "sha256": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+      "t_max": 4,
+      "AD_height": [
+        4,
+        3
+      ],
+      "PM_depth": [
+        3,
+        3
+      ],
+      "AD_k_max": [
+        4,
+        3
+      ],
+      "PM_k_max": [
+        4,
+        4
+      ]
+    },
+    {
+      "n": 2,
+      "file": "Nestern=2.gm.bz2",
+      "vertices": 365,
+      "edges": 479,
+      "priorities": 9,
+      "normalized_maximum": 9,
+      "sha256": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+      "t_max": 8,
+      "AD_height": [
+        6,
+        5
+      ],
+      "PM_depth": [
+        5,
+        5
+      ],
+      "AD_k_max": [
+        6,
+        5
+      ],
+      "PM_k_max": [
+        6,
+        6
+      ]
+    },
+    {
+      "n": 3,
+      "file": "Nestern=3.gm.bz2",
+      "vertices": 3029,
+      "edges": 4035,
+      "priorities": 12,
+      "normalized_maximum": 13,
+      "sha256": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+      "t_max": 11,
+      "AD_height": [
+        8,
+        7
+      ],
+      "PM_depth": [
+        7,
+        7
+      ],
+      "AD_k_max": [
+        8,
+        7
+      ],
+      "PM_k_max": [
+        8,
+        8
+      ]
+    },
+    {
+      "n": 4,
+      "file": "Nestern=4.gm.bz2",
+      "vertices": 14053,
+      "edges": 18499,
+      "priorities": 14,
+      "normalized_maximum": 15,
+      "sha256": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+      "t_max": 13,
+      "AD_height": [
+        9,
+        8
+      ],
+      "PM_depth": [
+        8,
+        8
+      ],
+      "AD_k_max": [
+        9,
+        8
+      ],
+      "PM_k_max": [
+        9,
+        9
+      ]
+    },
+    {
+      "n": 5,
+      "file": "Nestern=5.gm.bz2",
+      "vertices": 62707,
+      "edges": 82920,
+      "priorities": 16,
+      "normalized_maximum": 17,
+      "sha256": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+      "t_max": 15,
+      "AD_height": [
+        10,
+        9
+      ],
+      "PM_depth": [
+        9,
+        9
+      ],
+      "AD_k_max": [
+        10,
+        9
+      ],
+      "PM_k_max": [
+        10,
+        10
+      ]
+    },
+    {
+      "n": 6,
+      "file": "Nestern=6.gm.bz2",
+      "vertices": 259455,
+      "edges": 339108,
+      "priorities": 18,
+      "normalized_maximum": 19,
+      "sha256": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+      "t_max": 17,
+      "AD_height": [
+        11,
+        10
+      ],
+      "PM_depth": [
+        10,
+        10
+      ],
+      "AD_k_max": [
+        11,
+        10
+      ],
+      "PM_k_max": [
+        11,
+        11
+      ]
+    },
+    {
+      "n": 7,
+      "file": "Nestern=7.gm.bz2",
+      "vertices": 1021740,
+      "edges": 1337584,
+      "priorities": 20,
+      "normalized_maximum": 21,
+      "sha256": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae",
+      "t_max": 19,
+      "AD_height": [
+        12,
+        11
+      ],
+      "PM_depth": [
+        11,
+        11
+      ],
+      "AD_k_max": [
+        12,
+        11
+      ],
+      "PM_k_max": [
+        12,
+        12
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Offline Jupyter examples
 
-Seven notebooks for the public `strahler` Python API. Run each notebook from top
+Eight notebooks for the public `strahler` Python API. Run each notebook from top
 to bottom. Its first cell prints the package and library versions and stops if
 they differ. Use this directory as the notebook working directory so its game
 and Python helpers are importable. Rendering uses inline ESM/CSS and SVG, with no
@@ -16,6 +16,7 @@ for Jupyter and the optional Python dependencies.
 | [05-compare-backends](05-compare-backends.ipynb) | +pre/+iter metrics, generated and progress-measure prefix trees |
 | [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
 | [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
+| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic and ratio AD/symmetric AD/PM search, host trees, linked AD tree/block views, Nester frontier and (k,t) boundary |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
@@ -27,6 +28,14 @@ columns print their definitions; `notebook_support.won_vertices(result, player)`
 combines all wins.
 Notebook 07 labels Strahler numbers as tree metrics; progress-measure rows
 describe occupied measure trees, and AD rows describe dominion decompositions.
+Notebook 08 uses `search='lexicographic'` for both solvers. It includes a recorded
+ten-minute/2-GiB comparison of AD, symmetric AD and PM, each with and without
+iterative shaving. Each method stops at its first unsuccessful run; larger
+instances are marked beyond that method's frontier. Execution reads the recorded
+results and draws Nester-1's trees; it needs no network and does not repeat the
+benchmarks.
+The current comparison remeasures all six methods after correcting `+iter`
+to repeat the same `(k,t)` while shaving removes vertices.
 
 ## Release zip
 

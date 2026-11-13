@@ -401,7 +401,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   repeating to a fixpoint as removals expose further dominions.
 - `--iter-shave` attracts and removes certified dominions after lifting
   stabilises. Fixed hosts are reused until complete or a round makes no
-  progress; both adaptive modes advance to the next t on the smaller game.
+  progress. Adaptive searches also reuse the current host while vertices are
+  removed, advancing their parameters only after a round makes no progress.
   It also supports `lifting-sym`; Zielonka variants reject it. DOT retains
   each shaved region's round, adaptive t, and certified decomposition, plus
   the final decomposition of the
@@ -428,6 +429,24 @@ standard input. The default algorithm is attractor-decomposition lifting.
   host from bottom. Adaptive `--stats` includes `total_lifts` across all
   tried hosts.
   See [the incremental analysis](incremental-t.md) for proofs and results.
+- `--search=lexicographic` tries `(K,t)=(1,0),(1,1),...,(1,t_max),(2,0),...`.
+  It exhausts `t` at one `K` before increasing `K`, with
+  `t_max=floor(log2(n))` and each player's `K_max=min(H,t_max+1)`.
+  These caps follow from Proposition 3 and Lemma 16 of the Strahler paper.
+  `--tree-k=K` can impose a smaller cap; `--start-t=T` changes the starting
+  `t` for the first `K` only. With `--iter-shave`, certified dominions and
+  their attractors are removed after each attempt. Repeat the current pair
+  while removal makes progress, then advance lexicographically. The initial
+  vertex count and priority bounds set the caps for the whole run. This option requires
+  `lifting` or `lifting-sym` and conflicts with `--adaptive-t`, k-ary and file
+  hosts. Symmetric search restarts Algorithm 9 on each fixed host pair.
+- `--search=ratio` in AD lifting (including symmetric lifting) and Strahler PM
+  uses the same caps and shaving rules, starting at `(1,1)`
+  and choosing the smallest integer `max(k,t)/min(k,t)` with Oink's heap tie
+  order; it never visits `t=0`, so a game with `t_max=0` exhausts immediately.
+  For lexicographic AD or Strahler PM search, `--start-k=K --start-t=T` skips
+  earlier pairs (default `(1,0)`, `K>=1` within the cap, `T` clamped to `t_max`);
+  starting pairs are rejected with ratio search.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.
@@ -563,6 +582,14 @@ a zero-bit budget. Depth is the number of counter-parity levels, including
 empty intervening levels.
 
 `--k=K --t=T` fixes Strahler parameters; `--bits=B` fixes succinct's budget.
+`--search=lexicographic` instead starts at `(k,t)=(1,0)` by default and exhausts
+`t=0..floor(log2(n))` before increasing `k`. For this search the theoretical
+per-player cap is `min(depth+1,floor(log2(n))+1)`, including the measure
+tree's root; it applies with or without `--iter-shave`. The caps keep their
+initial values as shaving removes vertices. This option requires Strahler
+lifting and conflicts with fixed `k/t` or `bits`.
+With `--iter-shave`, it repeats the current `(k,t)` while a round removes
+vertices, and advances only after a round removes none.
 These results may be partial. Roots say `partial` and, with `--player=both`,
 a dashed Unresolved node lists the remaining vertices. `--stats` reports the
 chosen parameters, depths, vertex counts, lifts, attempts and top counts on
@@ -791,6 +818,8 @@ Following the common header and `game`, the document contains, in order:
 - `parameters: [even, odd]`: final host bounds from the same solver statistics
   as `--stats`: `H,K,t` for Strahler hosts, `H,arity` for k-ary hosts, and `H`
   for file hosts. Empty remaining games and recursive solvers have empty objects.
+- `round_pairs`: the final selected pair without shaving, or each shaving
+  round's pair; present with ratio search or an explicit lexicographic `start_k`.
 - `budget_exhausted`: true when an adaptive host exceeded the leaf limit;
   the returned parameters still describe the last hosts that actually ran.
 

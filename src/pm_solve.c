@@ -36,68 +36,15 @@ static size_t floor_log2(size_t value) {
   return logarithm;
 }
 
-static size_t ratio(PMParameters const parameters) {
-  return parameters.k > parameters.t ? parameters.k / parameters.t
-                                     : parameters.t / parameters.k;
-}
-
-typedef struct {
-  PMParameters *heap;
-  bool *seen;
-  size_t count;
-  size_t width;
-  size_t k_max;
-  size_t t_max;
-} ParameterQueue;
-
-static void push(ParameterQueue *queue, PMParameters const parameters) {
-  size_t const key = parameters.k * queue->width + parameters.t;
-  if (queue->seen[key]) {
-    return;
-  }
-  queue->seen[key] = true;
-  size_t hole = queue->count++;
-  while (hole != 0) {
-    size_t const parent = (hole - 1) / 2;
-    if (ratio(queue->heap[parent]) <= ratio(parameters)) {
-      break;
-    }
-    queue->heap[hole] = queue->heap[parent];
-    hole = parent;
-  }
-  queue->heap[hole] = parameters;
-}
-
-static PMParameters pop(ParameterQueue *queue) {
-  PMParameters const result = queue->heap[0];
-  PMParameters const last = queue->heap[--queue->count];
-  size_t hole = 0;
-  /* Match std::priority_queue's integer-ratio comparator, including ties. */
-  while (2 * hole + 1 < queue->count) {
-    size_t child = 2 * hole + 1;
-    if (child + 1 < queue->count &&
-        ratio(queue->heap[child + 1]) <= ratio(queue->heap[child])) {
-      child++;
-    }
-    queue->heap[hole] = queue->heap[child];
-    hole = child;
-  }
-  while (hole != 0) {
-    size_t const parent = (hole - 1) / 2;
-    if (ratio(queue->heap[parent]) <= ratio(last)) {
-      break;
-    }
-    queue->heap[hole] = queue->heap[parent];
-    hole = parent;
-  }
-  queue->heap[hole] = last;
-  return result;
-}
-
 bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
               PMVisit const visit, void *context, PMError *error) {
   if (game == nullptr || active == nullptr || options == nullptr ||
       visit == nullptr || active->bit_count != game->vertex_count ||
+      ((options->lexicographic || options->ratio) &&
+       (options->fixed || options->algorithm != PM_STRAHLER)) ||
+      (options->lexicographic && options->ratio) ||
+      ((options->start_k != 0 || options->start_t != 0) &&
+       !options->lexicographic) ||
       game->max_priority >= INT_MAX || !pg_subgame_is_total(game, active)) {
     pm_error(error, "invalid solver arguments");
     return false;
@@ -113,6 +60,15 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
                           .k_max =
                               logarithm + 2 < height ? logarithm + 2 : height,
                           .t_max = logarithm};
+  if (options->lexicographic || options->ratio) {
+    /* A measure tree has at most n occupied leaves and depth+1 levels.
+     * Proposition 3 gives Str <= min(depth+1, floor(log2 n)+1), including
+     * the root, with the same safe bound whether or not dominions are removed.
+     */
+    size_t const measure_height = (size_t)(game->max_priority / 2 + 2);
+    queue.k_max =
+        logarithm + 1 < measure_height ? logarithm + 1 : measure_height;
+  }
   size_t const slots = (queue.k_max + 1) * queue.width;
   PMResult result[2] = {0};
   PGSet remaining = {0};
@@ -130,20 +86,33 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       options->fixed
           ? options->parameters
           : (PMParameters){.k = 1, .t = 1, .bits = max_bits == 0 ? 0 : 1};
-  if (!options->fixed && options->algorithm == PM_STRAHLER) {
-    push(&queue, parameters);
+  if (options->lexicographic) {
+    parameters.k = options->start_k == 0 ? 1 : options->start_k;
+    parameters.t =
+        options->start_t < queue.t_max ? options->start_t : queue.t_max;
+    if (parameters.k > queue.k_max) {
+      pm_error(error, "start k exceeds the search cap");
+      goto cleanup;
+    }
+  }
+  if (!options->fixed && !options->lexicographic &&
+      options->algorithm == PM_STRAHLER) {
+    if (!options->ratio || queue.t_max >= 1) {
+      parameter_queue_push(&queue, parameters);
+    }
   }
   for (size_t round = 1;; round++) {
-    if (!options->fixed && options->algorithm == PM_STRAHLER) {
+    if (vertices != 0 && !options->fixed && !options->lexicographic &&
+        options->algorithm == PM_STRAHLER) {
       if (queue.count == 0) {
-        if (options->incremental) {
+        if (options->incremental && !options->ratio) {
           succeeded = true;
           break;
         }
         pm_error(error, "parameter search exhausted before covering the game");
         goto cleanup;
       }
-      parameters = pop(&queue);
+      parameters = options->ratio ? queue.heap[0] : parameter_queue_pop(&queue);
     }
     size_t const before = pg_set_count(&remaining);
     for (size_t player = 0; player < 2; player++) {
@@ -188,12 +157,34 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       succeeded = true;
       break;
     }
-    if (options->algorithm == PM_STRAHLER) {
-      if (parameters.k < queue.k_max) {
-        push(&queue, (PMParameters){.k = parameters.k + 1, .t = parameters.t});
+    if (options->lexicographic) {
+      /* A smaller remaining game may fit the same host. Advance the grid
+       * only after this pair stops exposing new dominions. */
+      if (options->incremental && pg_set_count(&remaining) < before) {
+        continue;
       }
       if (parameters.t < queue.t_max) {
-        push(&queue, (PMParameters){.k = parameters.k, .t = parameters.t + 1});
+        parameters.t++;
+      } else if (parameters.k < queue.k_max) {
+        parameters.k++;
+        parameters.t = 0;
+      } else {
+        pm_error(error,
+                 "lexicographic search exhausted before covering the game");
+        goto cleanup;
+      }
+    } else if (options->ratio) {
+      if (!options->incremental || before == pg_set_count(&remaining)) {
+        parameter_queue_advance(&queue);
+      }
+    } else if (options->algorithm == PM_STRAHLER) {
+      if (parameters.k < queue.k_max) {
+        parameter_queue_push(
+            &queue, (PMParameters){.k = parameters.k + 1, .t = parameters.t});
+      }
+      if (parameters.t < queue.t_max) {
+        parameter_queue_push(
+            &queue, (PMParameters){.k = parameters.k, .t = parameters.t + 1});
       }
     } else if (!options->incremental || before == pg_set_count(&remaining)) {
       if (parameters.bits >= max_bits) {

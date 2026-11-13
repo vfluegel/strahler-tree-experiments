@@ -116,8 +116,8 @@ def test_freeze_rejects_errors_and_volatile_output(executor):
             executor.freeze_outputs(notebook, {})
 
 
-def test_seven_notebooks_and_version_mismatch(monkeypatch, capsys):
-    assert len(NOTEBOOKS) == 7
+def test_eight_notebooks_and_version_mismatch(monkeypatch, capsys):
+    assert len(NOTEBOOKS) == 8
     import importlib.metadata
     from types import SimpleNamespace
     monkeypatch.setitem(sys.modules, 'strahler', SimpleNamespace(version=lambda: '0.0.1'))
@@ -269,7 +269,7 @@ def test_notebook07_helpers():
     row = next(r for r in KARY_MEASUREMENTS['rows'] if r['k'] == 4 and r['algorithm'] == 'lifting-sym' and r['kary'] == 2)
     assert complete and counts == {key: row[key] for key in counts}
     assert historical_maxima() and {r['solver_build'] for r in history()}
-    assert len(list((EXAMPLES / 'nester').glob('*.gm.bz2'))) == 8
+    assert len(list((EXAMPLES / 'nester').glob('*.gm.bz2'))) == 11
     assert _strahler({'children': [{'node': {}}, {'node': {}}]}) == 2
 
 

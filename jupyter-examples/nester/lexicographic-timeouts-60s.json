@@ -1,0 +1,246 @@
+{
+  "search": "lexicographic",
+  "version": "0.4.2.dev5+gf902ec3",
+  "library_sha256": "94aafb7f659b22b3eac63bef2b8e5dc40faa346cbd0f0d069ca34309ac3b38da",
+  "recorded_utc": "2026-11-10T11:50:21+00:00",
+  "machine": "Linux x86_64, 4 CPUs",
+  "memory_cap_enforced": true,
+  "fixtures": {
+    "Nestern=1.gm.bz2": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+    "Nestern=2.gm.bz2": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+    "Nestern=3.gm.bz2": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+    "Nestern=4.gm.bz2": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+    "Nestern=5.gm.bz2": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+    "Nestern=6.gm.bz2": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+    "Nestern=7.gm.bz2": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae"
+  },
+  "rows": [
+    {
+      "n": 3,
+      "backend": "PM",
+      "seconds": 60.0624,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 3,
+      "backend": "PM+iter",
+      "seconds": 59.6714,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 3,
+      "attempts": 40,
+      "rounds": 40,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        },
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        }
+      ],
+      "tree_strahler": [
+        4,
+        0
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "version": "0.4.2.dev5+gf902ec3"
+    },
+    {
+      "n": 4,
+      "backend": "AD",
+      "seconds": 60.0567,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "AD+iter",
+      "seconds": 31.3481,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 2,
+      "attempts": 17,
+      "rounds": 17,
+      "parameters": [
+        {
+          "H": 9,
+          "K": 2,
+          "t": 2
+        },
+        {
+          "H": 8,
+          "K": 2,
+          "t": 2
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "version": "0.4.2.dev5+gf902ec3"
+    },
+    {
+      "n": 4,
+      "backend": "PM",
+      "seconds": 60.0623,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "PM+iter",
+      "seconds": 60.063,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "AD",
+      "seconds": 60.0169,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "AD+iter",
+      "seconds": 60.0633,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "PM",
+      "seconds": 60.0561,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "PM+iter",
+      "seconds": 60.0638,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 6,
+      "backend": "AD",
+      "seconds": 60.0656,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 6,
+      "backend": "AD+iter",
+      "seconds": 60.0657,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 6,
+      "backend": "PM",
+      "seconds": 60.0685,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 6,
+      "backend": "PM+iter",
+      "seconds": 60.0708,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 7,
+      "backend": "AD",
+      "seconds": 60.075,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 7,
+      "backend": "AD+iter",
+      "seconds": 60.0743,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 7,
+      "backend": "PM",
+      "seconds": 60.0836,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    },
+    {
+      "n": 7,
+      "backend": "PM+iter",
+      "seconds": 60.09,
+      "timeout_seconds": 60.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "60 s wall deadline"
+    }
+  ],
+  "baseline_file": "lexicographic-results.json",
+  "baseline_sha256": "8a9464b4514ea4fd67bf54e3f107918563a92816f2580f92d083aa965fe3ec21",
+  "timeout_seconds": 60.0,
+  "memory_gib": 2,
+  "cases": 18
+}

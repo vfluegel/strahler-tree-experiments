@@ -1,0 +1,506 @@
+{
+  "search": "lexicographic",
+  "version": "0.4.2.dev5+gf902ec3.dirty",
+  "library_sha256": "943751b2ec9af7eccc4c0d3a872d12f2479baf7a3a510f1f642d4551b4539432",
+  "recorded_utc": "2026-11-10T21:36:06+00:00",
+  "machine": "Linux x86_64, 4 CPUs",
+  "memory_cap_enforced": true,
+  "fixtures": {
+    "Nestern=1.gm.bz2": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+    "Nestern=2.gm.bz2": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+    "Nestern=3.gm.bz2": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+    "Nestern=4.gm.bz2": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+    "Nestern=5.gm.bz2": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+    "Nestern=6.gm.bz2": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+    "Nestern=7.gm.bz2": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "backend": "AD-sym",
+      "seconds": 0.2185,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 1,
+      "backend": "AD-sym+iter",
+      "seconds": 0.2276,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 2,
+      "backend": "AD-sym",
+      "seconds": 0.2307,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 11,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 5,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 2,
+      "backend": "AD-sym+iter",
+      "seconds": 0.216,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 1,
+      "attempts": 2,
+      "rounds": 2,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 1,
+          "t": 1
+        },
+        {
+          "H": 5,
+          "K": 1,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 3,
+      "backend": "AD-sym",
+      "seconds": 1.4682,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 14,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 3,
+      "backend": "AD-sym+iter",
+      "seconds": 0.6975,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 14,
+      "rounds": 14,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 4,
+      "backend": "AD-sym",
+      "seconds": 300.103,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "300 s wall deadline"
+    },
+    {
+      "n": 4,
+      "backend": "AD-sym+iter",
+      "seconds": 9.4533,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 2,
+      "attempts": 17,
+      "rounds": 17,
+      "parameters": [
+        {
+          "H": 9,
+          "K": 2,
+          "t": 2
+        },
+        {
+          "H": 8,
+          "K": 2,
+          "t": 2
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "version": "0.4.2.dev5+gf902ec3.dirty"
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym",
+      "seconds": 300.1034,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "300 s wall deadline"
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym+iter",
+      "seconds": 300.0598,
+      "timeout_seconds": 300,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "300 s wall deadline"
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "detail": "Beyond the Nester-5 frontier",
+      "timeout_seconds": 300,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "detail": "Beyond the Nester-5 frontier",
+      "timeout_seconds": 300,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "detail": "Beyond the Nester-5 frontier",
+      "timeout_seconds": 300,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "detail": "Beyond the Nester-5 frontier",
+      "timeout_seconds": 300,
+      "memory_gib": 2
+    }
+  ],
+  "backends": [
+    "AD-sym",
+    "AD-sym+iter"
+  ],
+  "timeout_seconds": 300,
+  "memory_gib": 2,
+  "jobs": 2,
+  "stop_after_n": 5
+}

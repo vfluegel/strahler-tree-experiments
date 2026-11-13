@@ -1,10 +1,11 @@
 outcome: complete
 Adaptive t: complete at t=1 (Even complete at t=1, Odd complete at t=0)
 lifting: vertices=5596 t_full=12 result=complete
-iter-shave: rounds=2
+iter-shave: rounds=3
 iter-shave: round=1 t=0 shaved=13 even=13 odd=0
-iter-shave: round=2 t=1 shaved=5583 even=5583 odd=0
+iter-shave: round=2 t=0 shaved=0 even=0 odd=0
+iter-shave: round=3 t=1 shaved=5583 even=5583 odd=0
 lifting: first_complete_t=1 even_first_full_t=1 odd_first_full_t=0 budget_exhausted=no
-lifting even: root_level=14 H=8 k_full=8 host=strahler K=2 t=1 host_nodes=172 host_leaves=39 positions=516 rounds=92 lifts=140892 top=0 total_lifts=179587 region=5583 tree_nodes=22 tree_leaves=5 tree_height=7 strahler=2
-lifting odd: root_level=15 H=8 k_full=8 host=strahler K=2 t=1 host_nodes=172 host_leaves=39 positions=516 rounds=739 lifts=615390 top=5583 total_lifts=659740 region=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
+lifting even: root_level=14 H=8 k_full=8 host=strahler K=2 t=1 host_nodes=172 host_leaves=39 positions=516 rounds=92 lifts=140892 top=0 total_lifts=218229 region=5583 tree_nodes=22 tree_leaves=5 tree_height=7 strahler=2
+lifting odd: root_level=15 H=8 k_full=8 host=strahler K=2 t=1 host_nodes=172 host_leaves=39 positions=516 rounds=739 lifts=615390 top=5583 total_lifts=703964 region=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
 start: vertex=0 winner=even

@@ -20,9 +20,22 @@ class NotebooksZip(unittest.TestCase):
             (notebooks / 'nester').mkdir()
             files = {'README.md': '# Notebooks\n', 'requirements.txt': 'jupyterlab\n',
                      'example.ipynb': '{}', '07-symmetric-lifting-kary-nester.ipynb': '{}',
+                     '08-lexicographic-adaptive-nester.ipynb': '{}',
                      'symmetric_lifting.py': '# measurement helper\n',
+                     'lexicographic_nester.py': '# lexicographic experiment helper\n',
                      'nester/Nestern=1.gm.bz2': 'compressed fixture',
                      'nester/history.csv': 'game,backend\n', 'data/game.pg': '0 0 0 0;',
+                     'nester/Nestern=7.gm.bz2': 'large plain fixture',
+                     'nester/plain-manifest.json': '{}',
+                     'nester/lexicographic-results.json': '{}',
+                     'nester/lexicographic-timeouts-60s.json': '{}',
+                     'nester/lexicographic-timeouts-300s.json': '{}',
+                     'nester/lexicographic-results-300s.json': '{}',
+                     'nester/lexicographic-symmetric-300s.json': '{}',
+                     'nester/lexicographic-timeouts-600s.json': '{}',
+                     'nester/lexicographic-results-600s.json': '{}',
+                     'nester/lexicographic-repeat-shaving-600s.json': '{}',
+                     'nester/lexicographic-results-repeat-shaving-600s.json': '{}',
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)

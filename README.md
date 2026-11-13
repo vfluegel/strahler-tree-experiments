@@ -29,7 +29,8 @@ Download `strahler-notebooks-<version>.zip` from
 [GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases)
 for Python wheels on Linux x86_64 and macOS Apple silicon (11.0+), plus
 installation instructions for pip and uv. The zip includes everything in
-`jupyter-examples/` at the release tag; this checkout has no notebooks yet.
+`jupyter-examples/` at the release tag. The [notebook index](jupyter-examples/README.md)
+describes the examples in this checkout.
 Wheels are also available separately on each release; they are not published
 to PyPI. See [python/README.md](python/README.md) for the
 Python API and installation from a checkout (Python 3.10+).
@@ -89,7 +90,7 @@ shared modules and tests, with the exception below.
 
 ### NOTICE
 
-`src/pm_lift.c`, `src/pm_solve.c`, `src/pm_internal.h`, `src/strpm.c`, and
+`src/parameter_queue.h`, `src/pm_lift.c`, `src/pm_solve.c`, `src/pm_internal.h`, `src/strpm.c`, and
 `src/sspm.c` derive from [Oink](https://github.com/trolando/oink) and
 [Vanessa Flügel's fork](https://github.com/vfluegel/oink), branch `print-pms`
 (checkout `51c2640fe650fd18d9331cfe5133cf3605a98c31`; tree printing introduced

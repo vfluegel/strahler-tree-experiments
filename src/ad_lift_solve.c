@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "ad_lift_solve.h"
+#include "parameter_queue.h"
 #include "pg_attractor.h"
 #include "stree.h"
 
@@ -41,6 +42,7 @@ typedef struct {
   ADLiftOptions const *options;
   ADLiftSolveStats *stats;
   ADLiftError *error;
+  ParameterQueue *queue;
   PlayerOutcome outcome[2];
   ADLiftTree hosts[2];
 } Solver;
@@ -55,6 +57,7 @@ typedef struct {
     stats->host_nodes = host->node_count;
     stats->host_leaves = host->leaf_count;
     stats->host_positions = host->position_count;
+    ad_lift_tree_destroy(solver->hosts + player);
     solver->hosts[player] = *host;
     *host = (ADLiftTree){0};
     return true;
@@ -260,6 +263,103 @@ typedef enum {
   return left < right ? left : right;
 }
 
+[[nodiscard]] static size_t lexicographic_k_max(ADLiftSolveStats const *stats,
+                                                size_t const cap) {
+  size_t const even = stats->player[PG_EVEN].k_full;
+  size_t const odd = stats->player[PG_ODD].k_full;
+  size_t const maximum = even > odd ? even : odd;
+  return cap == 0 ? maximum : smaller(maximum, cap);
+}
+
+/* Each pair runs Algorithm 9 from bottom on its two fixed hosts. Keep its
+ * certified dominions for the same stopping and shaving rules as lifting. */
+[[nodiscard]] static bool run_symmetric(Solver *solver) {
+  ADResult result = {0};
+  if (!ad_sym_solve_trace(solver->game, solver->domain, solver->hosts,
+                          solver->options->verify, &result,
+                          &solver->stats->symmetric, solver->error,
+                          solver->options->trace)) {
+    return false;
+  }
+  for (size_t player = 0; player < 2; player++) {
+    PlayerOutcome *outcome = solver->outcome + player;
+    outcome_destroy(outcome);
+    pg_set_move(&outcome->dominion, result.region + player);
+    outcome->decomposition = result.decomposition[player];
+    result.decomposition[player] = nullptr;
+    solver->stats->player[player].tree =
+        ad_tree_metrics(outcome->decomposition);
+  }
+  ad_result_destroy(&result);
+  return true;
+}
+
+/* Keep the initial n and heights while shaving. Ratio and lexicographic
+ * search use the same hosts, certificates and per-player caps. */
+[[nodiscard]] static bool run_exhaustive(Solver *solver) {
+  ADLiftSolveStats *stats = solver->stats;
+  size_t const maximum = lexicographic_k_max(stats, solver->options->k);
+  bool const ratio = solver->options->ratio;
+  ParameterQueue *queue = solver->queue;
+  if (ratio && queue->heap == nullptr &&
+      !parameter_queue_init(queue, maximum, stats->t_full)) {
+    solve_error(solver->error, "failed to allocate parameter search");
+    return false;
+  }
+  size_t k = solver->options->start_k == 0 ? 1 : solver->options->start_k;
+  size_t t = smaller(solver->options->t, stats->t_full);
+  size_t previous_k = 0;
+  bool ran[2] = {false, false};
+  while (ratio ? queue->count != 0 : k <= maximum) {
+    if (ratio) {
+      k = queue->heap[0].k;
+      t = queue->heap[0].t;
+    }
+    if (ratio || k != previous_k) {
+      AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE,
+               .name = "k_raised", .to = k);
+      previous_k = k;
+    }
+    AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE, .name = "t_raised",
+             .to = t);
+    for (size_t player = 0; player < 2; player++) {
+      size_t const bound = smaller(k, stats->player[player].k_full);
+      HostStatus const status =
+          run_strahler(solver, (PGPlayer)player, bound, t);
+      if (status == HOST_FAILED ||
+          (status == HOST_OVER_BUDGET && (!ran[0] || !ran[1]))) {
+        return false;
+      }
+      if (status == HOST_OVER_BUDGET) {
+        return true;
+      }
+      ran[player] = true;
+    }
+    if (solver->options->symmetric && !run_symmetric(solver)) {
+      return false;
+    }
+    if (covered(solver)) {
+      stats->adaptive_complete = true;
+      stats->first_complete_t = t;
+      stats->player[PG_EVEN].first_full_t = t;
+      stats->player[PG_ODD].first_full_t = t;
+      return true;
+    }
+    if (solver->options->iter_shave) {
+      return true;
+    }
+    if (ratio) {
+      parameter_queue_advance(queue);
+    } else if (t < stats->t_full) {
+      t++;
+    } else {
+      k++;
+      t = 0;
+    }
+  }
+  return true;
+}
+
 /* Raise t until the dominions cover the domain, using the largest useful K
  * for each t, at most the optional cap. Beyond t_full the hosts only grow, so
  * t stops there; a player whose host does not change is not lifted again. If
@@ -272,6 +372,9 @@ typedef enum {
  * The first t reaching the largest dominion seen is therefore the least t
  * that already found the whole winning region. */
 [[nodiscard]] static bool run_adaptive(Solver *solver) {
+  if (solver->options->lexicographic || solver->options->ratio) {
+    return run_exhaustive(solver);
+  }
   ADLiftSolveStats *stats = solver->stats;
   size_t const cap = solver->options->k;
   bool ran[2] = {false, false};
@@ -337,11 +440,10 @@ typedef enum {
   return true;
 }
 
-[[nodiscard]] static bool solve_once(PGGame const *game, PGSet const *domain,
-                                     PGSet const *host_domain,
-                                     ADLiftOptions const *options,
-                                     ADResult *result, ADLiftSolveStats *stats,
-                                     ADLiftError *error) {
+[[nodiscard]] static bool
+solve_once(PGGame const *game, PGSet const *domain, PGSet const *host_domain,
+           ADLiftOptions const *options, ParameterQueue *queue,
+           ADResult *result, ADLiftSolveStats *stats, ADLiftError *error) {
   if (error != nullptr) {
     *error = (ADLiftError){0};
   }
@@ -356,9 +458,15 @@ typedef enum {
   if (game == nullptr || domain == nullptr || options == nullptr ||
       result == nullptr || domain->bit_count != game->vertex_count ||
       options->mode > AD_LIFT_HOST_TREE ||
-      (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE) ||
+      (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE &&
+       !options->lexicographic && !options->ratio) ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||
       (options->incremental && options->mode != AD_LIFT_HOST_ADAPTIVE) ||
+      (options->lexicographic && options->ratio) ||
+      (options->ratio && (options->start_k != 0 || options->t != 0)) ||
+      (options->start_k != 0 && !options->lexicographic) ||
+      ((options->lexicographic || options->ratio) &&
+       (options->mode != AD_LIFT_HOST_ADAPTIVE || options->incremental)) ||
       (options->mode == AD_LIFT_HOST_STRAHLER && options->k == 0) ||
       (options->mode == AD_LIFT_HOST_KARY && options->arity == 0) ||
       (options->mode == AD_LIFT_HOST_TREE && options->tree == nullptr) ||
@@ -401,12 +509,19 @@ typedef enum {
     shape->k_full = smaller(shape->height, stats->t_full + 1);
   }
 
+  if (options->lexicographic &&
+      options->start_k > lexicographic_k_max(stats, options->k)) {
+    solve_error(error, "start k exceeds the search cap");
+    ad_result_destroy(result);
+    return false;
+  }
   Solver solver = {
       .game = game,
       .domain = domain,
       .options = options,
       .stats = stats,
       .error = error,
+      .queue = queue,
   };
   bool succeeded = true;
   switch (options->mode) {
@@ -436,7 +551,8 @@ typedef enum {
     break;
   }
 
-  if (succeeded && options->symmetric) {
+  if (succeeded && options->symmetric && !options->lexicographic &&
+      !options->ratio) {
     ad_result_destroy(result);
     succeeded =
         ad_sym_solve_trace(game, domain, solver.hosts, options->verify, result,
@@ -455,7 +571,9 @@ typedef enum {
   } else if (succeeded) {
     for (size_t player = 0; player < 2; player++) {
       PlayerOutcome *outcome = solver.outcome + player;
-      pg_set_move(&result->region[player], &outcome->dominion);
+      if (outcome->dominion.bit_count != 0) {
+        pg_set_move(&result->region[player], &outcome->dominion);
+      }
       result->decomposition[player] = outcome->decomposition;
       outcome->decomposition = nullptr;
     }
@@ -502,13 +620,15 @@ typedef enum {
 
 [[nodiscard]] static bool
 solve_with_options(PGGame const *game, PGSet const *domain,
-                   ADLiftOptions const *options, ADResult *result,
-                   ADLiftSolveStats *stats, ADLiftError *error) {
+                   ADLiftOptions const *options, ParameterQueue *queue,
+                   ADResult *result, ADLiftSolveStats *stats,
+                   ADLiftError *error) {
   if (error != nullptr) {
     *error = (ADLiftError){0};
   }
   if (options == nullptr || !options->iter_shave) {
-    return solve_once(game, domain, domain, options, result, stats, error);
+    return solve_once(game, domain, domain, options, queue, result, stats,
+                      error);
   }
   ADLiftSolveStats local_stats = {0};
   if (stats == nullptr) {
@@ -531,13 +651,18 @@ solve_with_options(PGGame const *game, PGSet const *domain,
   }
   for (;;) {
     ADLiftSolveStats current = {0};
-    if (!solve_once(game, &remaining, domain, &round_options, result, &current,
-                    error)) {
+    if (!solve_once(game, &remaining, domain, &round_options, queue, result,
+                    &current, error)) {
       if (current.budget_exhausted && stats->iterations != 0 &&
           options->mode == AD_LIFT_HOST_ADAPTIVE) {
         stats->budget_exhausted = true;
         succeeded = empty_residual(&remaining, result);
       }
+      goto cleanup;
+    }
+    if (options->ratio && queue->count == 0 && current.player[0].k == 0) {
+      *stats = current;
+      succeeded = true;
       goto cleanup;
     }
     AD_TRACE(options->trace, .kind = AD_TRACE_PHASE, .name = "iteration_done",
@@ -581,6 +706,8 @@ solve_with_options(PGGame const *game, PGSet const *domain,
     ADShaveRound *shave = history.shaves + history.shave_count++;
     *shave = (ADShaveRound){
         .certified = *result,
+        .k = stats->player[0].k > stats->player[1].k ? stats->player[0].k
+                                                     : stats->player[1].k,
         .t = options->mode == AD_LIFT_HOST_ADAPTIVE ? stats->player[0].t
                                                     : SIZE_MAX,
     };
@@ -611,8 +738,19 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       goto cleanup;
     }
     bool const adaptive = options->mode == AD_LIFT_HOST_ADAPTIVE;
-    if (pg_set_empty(&remaining) ||
-        (adaptive && stats->player[0].t >= stats->t_full)) {
+    size_t const even_k = stats->player[PG_EVEN].k;
+    size_t const odd_k = stats->player[PG_ODD].k;
+    size_t const current_k = even_k > odd_k ? even_k : odd_k;
+    bool const last_t = stats->player[0].t >= stats->t_full;
+    if (adaptive && options->ratio && queue->count != 0 && !progress) {
+      parameter_queue_advance(queue);
+    }
+    bool const last_host =
+        options->ratio
+            ? queue->count == 0
+            : last_t && (!options->lexicographic ||
+                         current_k >= lexicographic_k_max(stats, options->k));
+    if (pg_set_empty(&remaining) || (adaptive && last_host && !progress)) {
       if (adaptive && pg_set_empty(&remaining)) {
         stats->adaptive_complete = true;
         stats->first_complete_t = stats->player[0].t;
@@ -620,8 +758,15 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       succeeded = empty_residual(&remaining, result);
       goto cleanup;
     }
-    if (adaptive) {
-      round_options.t = stats->player[0].t + 1;
+    if (adaptive && !options->ratio) {
+      /* Advance the private round cursor, preserving the caller's start. */
+      round_options.t = progress ? stats->player[0].t
+                        : options->lexicographic && last_t
+                            ? 0
+                            : stats->player[0].t + 1;
+      if (options->lexicographic) {
+        round_options.start_k = current_k + (!progress && last_t);
+      }
     }
   }
 cleanup:
@@ -650,8 +795,10 @@ bool ad_lift_solve(PGGame const *game, PGSet const *domain,
   if (trace != nullptr) {
     trace->nesting++;
   }
+  ParameterQueue queue = {0};
   bool success =
-      solve_with_options(game, domain, options, result, stats, error);
+      solve_with_options(game, domain, options, &queue, result, stats, error);
+  parameter_queue_destroy(&queue);
   if (trace != nullptr) {
     if (--trace->nesting == 0 && success) {
       AD_TRACE(trace, .kind = AD_TRACE_RESULT, .result = result);

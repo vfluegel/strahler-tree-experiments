@@ -1,15 +1,12 @@
 #ifndef PM_LIFT_H
 #define PM_LIFT_H 1
 
+#include "parameter_queue.h"
 #include "pg_attractor.h"
 
 typedef enum { PM_STRAHLER, PM_SUCCINCT } PMAlgorithm;
 
-typedef struct {
-  size_t k;
-  size_t t;
-  size_t bits;
-} PMParameters;
+typedef ParameterPair PMParameters;
 
 typedef struct {
   bool top;
@@ -38,6 +35,13 @@ typedef struct {
   PMParameters parameters;
   bool fixed;
   bool incremental;
+  /* Exhaust t=0..floor(log2 n) before increasing k. With incremental removal,
+   * repeat a pair while it removes vertices. */
+  bool lexicographic;
+  bool ratio;
+  /* Lexicographic start; zero k means the default 1. */
+  size_t start_k;
+  size_t start_t;
   bool verify;
 } PMOptions;
 

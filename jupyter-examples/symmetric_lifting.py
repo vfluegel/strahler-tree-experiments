@@ -148,6 +148,8 @@ def measure_kary(ks=(4, 8, 12, 16)):
 def measure_nester(seconds=1.5):
     rows = []
     for path in sorted((HERE / 'nester').glob('*.gm.bz2')):
+        if int(path.name.split('=')[1].split('_')[0].split('.')[0]) > 4:
+            continue  # Notebook 08 bundles larger plain games; keep this smoke run small.
         for backend in NESTER_BACKENDS:
             row = bounded_worker(dict(kind='nester', game=path.name, backend=backend), seconds)
             rows.append(dict(game=path.name.removesuffix('.bz2'), backend=backend, **row))

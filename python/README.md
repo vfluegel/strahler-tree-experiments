@@ -71,6 +71,7 @@ compatibility rules as pg2adot:
 with Game.from_file('tests/games/strahler_two.pg') as game:
     result = decompose(game, 'lifting', adaptive_t='incremental', iter_shave=True)
     result = decompose(game, 'lifting', tree_k=1)  # may be partial
+    result = decompose(game, 'lifting', search='lexicographic', iter_shave=True)
     result = decompose(game, 'lifting-sym', kary=2, initial_shave='all')
     result = decompose(game, args=['--tree-file=tests/trees/one_child.tree'])
 ```
@@ -79,7 +80,21 @@ Use these calls while `game` is open. Keyword underscores become hyphens,
 `True` emits a flag, and `False`/`None` omit it. Raw `args` are appended.
 All lifting hosts are available: full/default, `tree_k`, `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
-`iter_shave=True`. As in the CLI, symmetric lifting rejects adaptive hosts.
+`iter_shave=True`. Symmetric lifting supports adaptive hosts through
+`search='lexicographic'` or `search='ratio'`; it rejects `adaptive_t`.
+`search='lexicographic'` walks `(k,t)` with `k` as the outer loop and
+`t=0..floor(log2(n))` as the inner loop. It is available in
+`decompose(game, 'lifting', ...)`, `decompose(game, 'lifting-sym', ...)`
+and `progress_measures(game, ...)`, with
+or without `iter_shave=True`. It uses the theory caps described in
+[Notebook 08](../jupyter-examples/08-lexicographic-adaptive-nester.ipynb).
+`search='ratio'` uses the same caps and Oink's smallest integer-ratio heap
+order from `(1,1)`, skipping `t=0` because its ratio is undefined.
+Lexicographic search accepts `start_k=K, start_t=T` to skip earlier pairs
+(default `(1,0)`, `K>=1` within the cap, `T` clamped to `floor(log2(n))`);
+ratio search rejects these options.
+With iterative shaving, a productive round repeats the same `(k,t)` on the
+remaining game; the search advances only after a round removes no vertices.
 The library manages JSON format and callback traces, so `--format`, `--trace`,
 `--help`, and `--version` are not solver options here.
 

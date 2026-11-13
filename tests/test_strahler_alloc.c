@@ -50,9 +50,13 @@ int main(void) {
                        "{\"vertex\":1,\"path\":[0],\"part\":\"S\"},"
                        "{\"vertex\":2,\"path\":[1],\"part\":\"S\"}]}";
   strahler_game *game = nullptr;
+  strahler_game *adaptive_game = nullptr;
   char *error = nullptr;
   assert(strahler_game_parse(text, strlen(text), &game, &error) == 0);
-  for (size_t scenario = 0; scenario < 12; scenario++) {
+  char const *adaptive_text = "0 2 0 3;1 2 1 2;2 0 1 1,4;3 0 0 3;4 3 1 3;";
+  assert(strahler_game_parse(adaptive_text, strlen(adaptive_text),
+                             &adaptive_game, &error) == 0);
+  for (size_t scenario = 0; scenario < 18; scenario++) {
     bool completed = false;
     for (size_t nth = 1; nth < 20000; nth++) {
       allocation = 0;
@@ -96,6 +100,26 @@ int main(void) {
       case 11:
         status = strahler_check(game, tree, 1, "[0,1,2]", 1, &json, &error);
         break;
+      case 12:
+      case 13:
+      case 14:
+      case 15: {
+        char const *search_args[] = {"--algorithm=lifting-sym",
+                                     scenario >= 14 ? "--search=ratio"
+                                                    : "--search=lexicographic",
+                                     "--iter-shave"};
+        status = strahler_decompose(adaptive_game, search_args,
+                                    scenario % 2 == 0 ? 2 : 3, observe, nullptr,
+                                    &json, &error);
+        break;
+      }
+      case 16:
+      case 17: {
+        char const *search_args[] = {"--search=ratio", "--iter-shave"};
+        status = strahler_progress_measures(
+            adaptive_game, search_args, scenario == 16 ? 1 : 2, &json, &error);
+        break;
+      }
       default:
         assert(false);
       }
@@ -119,6 +143,7 @@ int main(void) {
   assert(strahler_game_parse(nullptr, 0, &invalid, &error) == 6);
   assert(error == nullptr && invalid == nullptr);
   fail_at = SIZE_MAX;
+  strahler_game_free(adaptive_game);
   strahler_game_free(game);
   return 0;
 }
