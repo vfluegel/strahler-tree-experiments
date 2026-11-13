@@ -535,6 +535,25 @@ def test_ratio_order_and_repeat_on_progress(algorithm, iterate):
 
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 @pytest.mark.parametrize('iterate', [False, True])
+def test_ratio_completes_when_preprocessing_removes_every_vertex(algorithm, iterate):
+    with strahler.Game.from_text('0 0 0 0;1 1 1 1;') as game:
+        run = strahler.trace(game, algorithm, search='ratio', iter_shave=iterate,
+                             initial_shave='all')
+        assert run.result.complete and not run.result.unresolved
+        assert visited_pairs(run) == []
+        assert run.result.data['round_pairs'] == []
+        assert ad_wins(run.result) == [{0}, {1}]
+        check_document(run.result.data)
+        pm = strahler.progress_measures(game, search='ratio', iter_shave=iterate,
+                                        initial_shave='all')
+        assert len(pm['rounds']) == 1
+        assert pm['rounds'][0]['complete'] and not pm['rounds'][0]['unresolved']
+        assert pm_wins(pm) == [{0}, {1}]
+        check_document(pm)
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
 def test_ratio_exhaustion_with_a_cap_and_without_admissible_pairs(algorithm, iterate):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
         run = strahler.trace(game, algorithm, search='ratio', tree_k=1, iter_shave=iterate)

@@ -102,7 +102,7 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
     }
   }
   for (size_t round = 1;; round++) {
-    if (!options->fixed && !options->lexicographic &&
+    if (vertices != 0 && !options->fixed && !options->lexicographic &&
         options->algorithm == PM_STRAHLER) {
       if (queue.count == 0) {
         if (options->incremental && !options->ratio) {
