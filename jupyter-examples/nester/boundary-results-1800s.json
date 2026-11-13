@@ -1,0 +1,3309 @@
+{
+  "search": "lexicographic",
+  "version": "0.4.2.dev15+g7946fc0",
+  "library_sha256": "dab1f2e6abddc99bc3fbdad6a2df17a7eab5fbf5f9a2925aa801de31346cb4af",
+  "recorded_utc": "2026-11-13T14:03:24+00:00",
+  "machine": "Linux x86_64, 4 CPUs",
+  "memory_cap_enforced": true,
+  "fixtures": {
+    "Nestern=1.gm.bz2": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+    "Nestern=2.gm.bz2": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+    "Nestern=3.gm.bz2": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+    "Nestern=4.gm.bz2": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+    "Nestern=5.gm.bz2": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+    "Nestern=6.gm.bz2": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+    "Nestern=7.gm.bz2": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "backend": "AD",
+      "seconds": 0.1147,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "final_pair": [
+        1,
+        0
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 1,
+      "backend": "AD+iter",
+      "seconds": 0.1133,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "final_pair": [
+        1,
+        0
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 1,
+      "backend": "AD-sym",
+      "seconds": 0.1148,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "final_pair": [
+        1,
+        0
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 1,
+      "backend": "AD-sym+iter",
+      "seconds": 0.1147,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 4,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 3,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "H": 4,
+            "K": 1,
+            "t": 0
+          },
+          {
+            "H": 3,
+            "K": 1,
+            "t": 0
+          }
+        ],
+        "trees": [
+          {
+            "h": 6,
+            "H": [],
+            "T": [],
+            "S": [],
+            "children": [
+              {
+                "h": 4,
+                "H": [
+                  17
+                ],
+                "T": [
+                  16
+                ],
+                "S": [
+                  0
+                ],
+                "children": [
+                  {
+                    "h": 2,
+                    "H": [],
+                    "T": [],
+                    "S": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      6,
+                      7,
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      19,
+                      20,
+                      21
+                    ],
+                    "children": [
+                      {
+                        "h": 0,
+                        "H": [
+                          5
+                        ],
+                        "T": [],
+                        "S": [
+                          13,
+                          14,
+                          15
+                        ],
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          null
+        ],
+        "shaves": []
+      },
+      "final_pair": [
+        1,
+        0
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 1,
+      "backend": "PM",
+      "seconds": 0.1148,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 2,
+      "attempts": 8,
+      "rounds": 1,
+      "parameters": [
+        {
+          "k": 2,
+          "t": 2,
+          "bits": 1,
+          "depth": 3
+        },
+        {
+          "k": 2,
+          "t": 2,
+          "bits": 1,
+          "depth": 3
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "k": 2,
+            "t": 2,
+            "bits": 1,
+            "depth": 3
+          },
+          {
+            "k": 2,
+            "t": 2,
+            "bits": 1,
+            "depth": 3
+          }
+        ],
+        "rounds": [
+          {
+            "round": 8,
+            "complete": true,
+            "unresolved": [],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": {
+                  "priority": 37,
+                  "vertices": null,
+                  "children": [
+                    {
+                      "label": "000",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      5
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "000",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      17
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "00",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      16
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "001",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      15
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "0",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      14
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "010",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      13
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "100",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      12
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "10",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      11,
+                                      21
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "101",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      10,
+                                      20
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "1",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      9,
+                                      19
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "110",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      8,
+                                      18
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "11",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      7
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "111",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      6
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "100",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      4
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "10",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      3
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "101",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      2
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "1",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      1
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "110",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      0
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          }
+        ]
+      },
+      "final_pair": [
+        2,
+        2
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 1,
+      "backend": "PM+iter",
+      "seconds": 0.1145,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 2,
+      "attempts": 9,
+      "rounds": 9,
+      "parameters": [
+        {
+          "k": 2,
+          "t": 2,
+          "bits": 1,
+          "depth": 3
+        },
+        {
+          "k": 2,
+          "t": 2,
+          "bits": 1,
+          "depth": 3
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        22,
+        0
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "853271f4c25a66123b78f72bd5e7fbea7f2abdbcb413ffc4e33916d268ffb771",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ],
+      "example": {
+        "parameters": [
+          {
+            "k": 2,
+            "t": 2,
+            "bits": 1,
+            "depth": 3
+          },
+          {
+            "k": 2,
+            "t": 2,
+            "bits": 1,
+            "depth": 3
+          }
+        ],
+        "rounds": [
+          {
+            "round": 1,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": {
+                  "priority": 37,
+                  "vertices": null,
+                  "children": [
+                    {
+                      "label": "",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      5
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 1,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 1,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 4,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 5,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 3,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 3,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 6,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 4,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 1,
+                  "t": 4,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 7,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 0,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 8,
+            "complete": false,
+            "unresolved": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 1,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 1,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          },
+          {
+            "round": 9,
+            "complete": true,
+            "unresolved": [],
+            "trees": [
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": {
+                  "priority": 37,
+                  "vertices": null,
+                  "children": [
+                    {
+                      "label": "",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "000",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      17
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "00",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      16
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "001",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      15
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "0",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      14
+                                    ],
+                                    "children": []
+                                  }
+                                },
+                                {
+                                  "label": "010",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      13
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "100",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      12
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "10",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      11,
+                                      21
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "101",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      10,
+                                      20
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "1",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      9,
+                                      19
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "110",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      8,
+                                      18
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "11",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      7
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "label": "111",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      6
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "100",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      4
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "10",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      3
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "101",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      2
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "1",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      1
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "label": "110",
+                      "node": {
+                        "priority": 33,
+                        "vertices": null,
+                        "children": [
+                          {
+                            "label": "",
+                            "node": {
+                              "priority": 1,
+                              "vertices": null,
+                              "children": [
+                                {
+                                  "label": "",
+                                  "node": {
+                                    "priority": null,
+                                    "vertices": [
+                                      0
+                                    ],
+                                    "children": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "shaved": [],
+                "attracted": []
+              },
+              {
+                "parameters": {
+                  "k": 2,
+                  "t": 2,
+                  "bits": 1,
+                  "depth": 3
+                },
+                "tree": null,
+                "shaved": [],
+                "attracted": []
+              }
+            ]
+          }
+        ]
+      },
+      "final_pair": [
+        2,
+        2
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "AD",
+      "seconds": 0.1707,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 11,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 5,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "AD+iter",
+      "seconds": 0.1145,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 2,
+      "rounds": 2,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 5,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        1,
+        0
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "AD-sym",
+      "seconds": 0.1243,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 11,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 5,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "AD-sym+iter",
+      "seconds": 0.114,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 1,
+      "t": 0,
+      "attempts": 2,
+      "rounds": 2,
+      "parameters": [
+        {
+          "H": 6,
+          "K": 1,
+          "t": 0
+        },
+        {
+          "H": 5,
+          "K": 1,
+          "t": 0
+        }
+      ],
+      "tree_strahler": [
+        1,
+        0
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        1,
+        0
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "PM",
+      "seconds": 0.224,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 3,
+      "t": 2,
+      "attempts": 10,
+      "rounds": 1,
+      "parameters": [
+        {
+          "k": 3,
+          "t": 2,
+          "bits": 1,
+          "depth": 5
+        },
+        {
+          "k": 3,
+          "t": 2,
+          "bits": 1,
+          "depth": 5
+        }
+      ],
+      "tree_strahler": [
+        3,
+        2
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        3,
+        2
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        2
+      ]
+    },
+    {
+      "n": 2,
+      "backend": "PM+iter",
+      "seconds": 0.1656,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 3,
+      "t": 2,
+      "attempts": 11,
+      "rounds": 11,
+      "parameters": [
+        {
+          "k": 3,
+          "t": 2,
+          "bits": 1,
+          "depth": 5
+        },
+        {
+          "k": 3,
+          "t": 2,
+          "bits": 1,
+          "depth": 5
+        }
+      ],
+      "tree_strahler": [
+        3,
+        0
+      ],
+      "won": [
+        325,
+        40
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "fb8e78b7d237695d18949e5b28868345c3fba18d8c40f045fec867a01bf5a91d",
+        "3c4380a534d6046800cf9382aa5cc5e07ff3b3e6225bd5ad01363bb99dfcc944"
+      ],
+      "final_pair": [
+        3,
+        2
+      ],
+      "round_pairs": [
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        2
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "AD",
+      "seconds": 2.0723,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "AD+iter",
+      "seconds": 2.1565,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 15,
+      "rounds": 15,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          9
+        ],
+        [
+          1,
+          10
+        ],
+        [
+          1,
+          11
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "AD-sym",
+      "seconds": 0.1503,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 1,
+      "rounds": 1,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        1
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "AD-sym+iter",
+      "seconds": 0.632,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 15,
+      "rounds": 15,
+      "parameters": [
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 7,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "round_pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          1,
+          5
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          8
+        ],
+        [
+          1,
+          9
+        ],
+        [
+          1,
+          10
+        ],
+        [
+          1,
+          11
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        1,
+        0
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "PM",
+      "seconds": 245.8508,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 3,
+      "attempts": 14,
+      "rounds": 1,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        },
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        }
+      ],
+      "tree_strahler": [
+        4,
+        2
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        4,
+        3
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        3,
+        2
+      ]
+    },
+    {
+      "n": 3,
+      "backend": "PM+iter",
+      "seconds": 57.2216,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 3,
+      "attempts": 15,
+      "rounds": 15,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        },
+        {
+          "k": 4,
+          "t": 3,
+          "bits": 1,
+          "depth": 7
+        }
+      ],
+      "tree_strahler": [
+        4,
+        0
+      ],
+      "won": [
+        1993,
+        1036
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "3f65c99ed632175686616fb19bf1e9e7dc4b737256b3c9b09bad68e5a22e9d61",
+        "7a545dae910fdf601bafaa43487782fb867277965924efca8f10d8bb6f168893"
+      ],
+      "final_pair": [
+        4,
+        3
+      ],
+      "round_pairs": [
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          3,
+          6
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          3,
+          9
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          4,
+          1
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        3,
+        2
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "AD",
+      "seconds": 1800.1034,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "AD+iter",
+      "seconds": 35.1201,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 2,
+      "rounds": 2,
+      "parameters": [
+        {
+          "H": 9,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "round_pairs": [
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "AD-sym",
+      "seconds": 1800.105,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "AD-sym+iter",
+      "seconds": 6.8921,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 2,
+      "t": 1,
+      "attempts": 2,
+      "rounds": 2,
+      "parameters": [
+        {
+          "H": 9,
+          "K": 2,
+          "t": 1
+        },
+        {
+          "H": 8,
+          "K": 2,
+          "t": 1
+        }
+      ],
+      "tree_strahler": [
+        2,
+        0
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "final_pair": [
+        2,
+        1
+      ],
+      "round_pairs": [
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "PM",
+      "seconds": 16.28,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 4,
+      "attempts": 2,
+      "rounds": 1,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 4,
+          "bits": 1,
+          "depth": 8
+        },
+        {
+          "k": 4,
+          "t": 4,
+          "bits": 1,
+          "depth": 8
+        }
+      ],
+      "tree_strahler": [
+        4,
+        2
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "final_pair": [
+        4,
+        4
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        4,
+        3
+      ]
+    },
+    {
+      "n": 4,
+      "backend": "PM+iter",
+      "seconds": 2.5283,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 4,
+      "attempts": 3,
+      "rounds": 3,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 4,
+          "bits": 1,
+          "depth": 8
+        },
+        {
+          "k": 4,
+          "t": 4,
+          "bits": 1,
+          "depth": 8
+        }
+      ],
+      "tree_strahler": [
+        4,
+        0
+      ],
+      "won": [
+        7868,
+        6185
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+        "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+      ],
+      "final_pair": [
+        4,
+        4
+      ],
+      "round_pairs": [
+        [
+          4,
+          3
+        ],
+        [
+          4,
+          3
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        4,
+        3
+      ]
+    },
+    {
+      "n": 5,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 5,
+      "backend": "AD+iter",
+      "seconds": 1800.1038,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 5,
+      "backend": "AD-sym+iter",
+      "seconds": 1800.1039,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        2,
+        1
+      ]
+    },
+    {
+      "n": 5,
+      "backend": "PM",
+      "seconds": 1186.6236,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 6,
+      "attempts": 3,
+      "rounds": 1,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 6,
+          "bits": 1,
+          "depth": 9
+        },
+        {
+          "k": 4,
+          "t": 6,
+          "bits": 1,
+          "depth": 9
+        }
+      ],
+      "tree_strahler": [
+        4,
+        2
+      ],
+      "won": [
+        27417,
+        35290
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "971e4637c2e68ee2e1981ad9681d3a19211c760ad72638502b37b37ffc5e2acf",
+        "1767a24e288c2e180fdb81081215d95a6317c9b4c58d91d5bb7f57a24ee8a272"
+      ],
+      "final_pair": [
+        4,
+        6
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        4,
+        4
+      ]
+    },
+    {
+      "n": 5,
+      "backend": "PM+iter",
+      "seconds": 154.2162,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "complete",
+      "k": 4,
+      "t": 6,
+      "attempts": 5,
+      "rounds": 5,
+      "parameters": [
+        {
+          "k": 4,
+          "t": 6,
+          "bits": 1,
+          "depth": 9
+        },
+        {
+          "k": 4,
+          "t": 6,
+          "bits": 1,
+          "depth": 9
+        }
+      ],
+      "tree_strahler": [
+        4,
+        0
+      ],
+      "won": [
+        27417,
+        35290
+      ],
+      "unresolved": 0,
+      "winner_sha256": [
+        "971e4637c2e68ee2e1981ad9681d3a19211c760ad72638502b37b37ffc5e2acf",
+        "1767a24e288c2e180fdb81081215d95a6317c9b4c58d91d5bb7f57a24ee8a272"
+      ],
+      "final_pair": [
+        4,
+        6
+      ],
+      "round_pairs": [
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "version": "0.4.2.dev15+g7946fc0",
+      "start_pair": [
+        4,
+        4
+      ]
+    },
+    {
+      "n": 6,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD-sym+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 6,
+      "backend": "PM",
+      "seconds": 1800.1069,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        4,
+        6
+      ]
+    },
+    {
+      "n": 6,
+      "backend": "PM+iter",
+      "seconds": 1800.0287,
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2,
+      "outcome": "timeout",
+      "detail": "1800 s wall deadline",
+      "start_pair": [
+        4,
+        6
+      ]
+    },
+    {
+      "n": 7,
+      "backend": "AD",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym",
+      "outcome": "not measured",
+      "frontier_n": 4,
+      "detail": "Beyond AD-sym's Nester-4 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "AD-sym+iter",
+      "outcome": "not measured",
+      "frontier_n": 5,
+      "detail": "Beyond AD-sym+iter's Nester-5 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "PM",
+      "outcome": "not measured",
+      "frontier_n": 6,
+      "detail": "Beyond PM's Nester-6 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    },
+    {
+      "n": 7,
+      "backend": "PM+iter",
+      "outcome": "not measured",
+      "frontier_n": 6,
+      "detail": "Beyond PM+iter's Nester-6 frontier (timeout)",
+      "timeout_seconds": 1800.0,
+      "memory_gib": 2
+    }
+  ],
+  "baseline_file": "lexicographic-results-600s.json",
+  "baseline_sha256": "df52e609617389211a1430d0e31843fb6e417ac5a236dc0921e2eb71085bef8e",
+  "backends": [
+    "AD",
+    "AD+iter",
+    "AD-sym",
+    "AD-sym+iter",
+    "PM",
+    "PM+iter"
+  ],
+  "timeout_seconds": 1800.0,
+  "memory_gib": 2,
+  "jobs": 2,
+  "planned_cases": 42,
+  "rerun_all": true,
+  "iter_shave_policy": "repeat-until-stalled",
+  "mode": "boundary",
+  "frontiers": {
+    "AD": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    },
+    "AD+iter": {
+      "last_solved_n": 4,
+      "stopped_at_n": 5,
+      "outcome": "timeout"
+    },
+    "AD-sym": {
+      "last_solved_n": 3,
+      "stopped_at_n": 4,
+      "outcome": "timeout"
+    },
+    "AD-sym+iter": {
+      "last_solved_n": 4,
+      "stopped_at_n": 5,
+      "outcome": "timeout"
+    },
+    "PM": {
+      "last_solved_n": 5,
+      "stopped_at_n": 6,
+      "outcome": "timeout"
+    },
+    "PM+iter": {
+      "last_solved_n": 5,
+      "stopped_at_n": 6,
+      "outcome": "timeout"
+    }
+  },
+  "complete": true,
+  "cases": 30
+}
