@@ -56,7 +56,7 @@ int main(void) {
   char const *adaptive_text = "0 2 0 3;1 2 1 2;2 0 1 1,4;3 0 0 3;4 3 1 3;";
   assert(strahler_game_parse(adaptive_text, strlen(adaptive_text),
                              &adaptive_game, &error) == 0);
-  for (size_t scenario = 0; scenario < 14; scenario++) {
+  for (size_t scenario = 0; scenario < 18; scenario++) {
     bool completed = false;
     for (size_t nth = 1; nth < 20000; nth++) {
       allocation = 0;
@@ -101,12 +101,23 @@ int main(void) {
         status = strahler_check(game, tree, 1, "[0,1,2]", 1, &json, &error);
         break;
       case 12:
-      case 13: {
+      case 13:
+      case 14:
+      case 15: {
         char const *search_args[] = {"--algorithm=lifting-sym",
-                                     "--search=lexicographic", "--iter-shave"};
+                                     scenario >= 14 ? "--search=ratio"
+                                                    : "--search=lexicographic",
+                                     "--iter-shave"};
         status = strahler_decompose(adaptive_game, search_args,
-                                    scenario == 12 ? 2 : 3, observe, nullptr,
+                                    scenario % 2 == 0 ? 2 : 3, observe, nullptr,
                                     &json, &error);
+        break;
+      }
+      case 16:
+      case 17: {
+        char const *search_args[] = {"--search=ratio", "--iter-shave"};
+        status = strahler_progress_measures(
+            adaptive_game, search_args, scenario == 16 ? 1 : 2, &json, &error);
         break;
       }
       default:

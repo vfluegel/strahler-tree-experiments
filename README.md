@@ -90,7 +90,7 @@ shared modules and tests, with the exception below.
 
 ### NOTICE
 
-`src/pm_lift.c`, `src/pm_solve.c`, `src/pm_internal.h`, `src/strpm.c`, and
+`src/parameter_queue.h`, `src/pm_lift.c`, `src/pm_solve.c`, `src/pm_internal.h`, `src/strpm.c`, and
 `src/sspm.c` derive from [Oink](https://github.com/trolando/oink) and
 [Vanessa Flügel's fork](https://github.com/vfluegel/oink), branch `print-pms`
 (checkout `51c2640fe650fd18d9331cfe5133cf3605a98c31`; tree printing introduced

@@ -132,6 +132,21 @@ else:
         else:
             invalid("--k=1")
             invalid("--algorithm=succinct", "--k=1", "--t=1")
+        for arguments in [("--search=bad",), ("--start-k=1",),
+                          ("--search=lexicographic", "--start-k=0"),
+                          ("--search=lexicographic", "--start-k=-1"),
+                          ("--search=lexicographic", "--start-t=-1"),
+                          ("--search=ratio", "--start-k=1"),
+                          ("--search=ratio", "--start-t=0")]:
+            invalid(*arguments)
+        fixture = source / 'tests/games/strahler_two.pg'
+        for search in ('lexicographic', 'ratio'):
+            arguments = [f'--search={search}', '--stats']
+            if search == 'lexicographic':
+                arguments += ['--start-k=2', '--start-t=1']
+            result = run(*arguments, str(fixture))
+            assert result.returncode == 0, result
+            assert ('K=2 t=1' if program == 'pg2adot' else 'k=2 t=1') in result.stderr
         game = "parity 0;\n0 0 0 0;\n"
         for arguments in [(), ("-",), ("--", "-")]:
             result = run(*arguments, input=game)

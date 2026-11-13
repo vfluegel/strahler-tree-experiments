@@ -44,7 +44,9 @@ typedef struct {
   size_t t;
   /* ADAPTIVE: visit (K,t) lexicographically, with K as the outer loop. */
   bool lexicographic;
-  /* Internal cursor for lexicographic iterative shaving; zero starts at 1. */
+  /* ADAPTIVE: Oink integer-ratio order, starting at (1,1), skipping t=0. */
+  bool ratio;
+  /* Lexicographic start; zero starts at 1. t is the first t. */
   size_t start_k;
   /* KARY: the arity, at least one. */
   size_t arity;
@@ -61,7 +63,7 @@ typedef struct {
   /* Attract and remove certified dominions between stabilized runs; reuse
    * the host while removal makes progress, then advance adaptive search. */
   bool iter_shave;
-  /* Algorithm 9; adaptive hosts require lexicographic search. */
+  /* Algorithm 9; adaptive hosts require lexicographic or ratio search. */
   bool symmetric;
   ADTrace *trace;
 } ADLiftOptions;

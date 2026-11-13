@@ -93,7 +93,15 @@ def document(value):
         natural(value['game']['edges'])
         ids(value['game']['priorities'])
     if value['schema'] == 'strahler-decomp/1':
-        assert list(value)[4:] == ['game', 'initial_won', 'complete', 'regions', 'unresolved', 'trees', 'shaves', 'metrics', 'parameters', 'budget_exhausted']
+        fields = ['game', 'initial_won', 'complete', 'regions', 'unresolved', 'trees',
+                  'shaves', 'metrics', 'parameters', 'budget_exhausted']
+        if 'round_pairs' in value:
+            fields.insert(-1, 'round_pairs')
+            assert isinstance(value['round_pairs'], list)
+            for attempt in value['round_pairs']:
+                pair(attempt, natural)
+                assert attempt[0] >= 1
+        assert list(value)[4:] == fields
         pair(value['initial_won'], ids)
         result(value)
         metrics(value['metrics'])
