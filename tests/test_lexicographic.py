@@ -12,6 +12,7 @@ import strahler
 
 EXAMPLES = Path(__file__).resolve().parents[1] / 'jupyter-examples'
 sys.path.insert(0, str(EXAMPLES))
+from json_check import document as check_document
 from lexicographic_nester import bounds, manifest, pairs, summarize, tree_vertices
 import lexicographic_nester as experiment
 
@@ -145,11 +146,16 @@ def test_theory_caps_suffice_for_both_algorithms_and_players(iterate, algorithm)
 
 @pytest.mark.parametrize('algorithm,options', [
     ('AD', dict(search='other')),
+    ('AD', dict(search='ratio', adaptive_t=True)),
+    ('AD', dict(search='ratio', algorithm='zielonka')),
+    ('AD', dict(search='ratio', algorithm='lifting-sym', adaptive_t=True)),
     ('AD', dict(search='lexicographic', adaptive_t=True)),
     ('AD', dict(search='lexicographic', kary=2)),
     ('AD', dict(algorithm='lifting-sym', search='lexicographic', adaptive_t=True)),
     ('AD', dict(algorithm='lifting-sym', search='lexicographic', kary=2)),
     ('PM', dict(search='other')),
+    ('PM', dict(search='ratio', k=2, t=1)),
+    ('PM', dict(search='ratio', algorithm='succinct')),
     ('PM', dict(search='lexicographic', k=2, t=1)),
     ('PM', dict(search='lexicographic', algorithm='succinct')),
 ])
@@ -499,3 +505,149 @@ def test_fresh_frontiers_remeasure_successes_at_the_same_deadline(recordings, mo
     before = experiment.REPEAT_SHAVING_RESULTS.read_bytes()
     assert experiment.run_frontiers(**options) == result
     assert not calls and experiment.REPEAT_SHAVING_RESULTS.read_bytes() == before
+
+
+def visited_pairs(run):
+    visited, k = [], None
+    for event in run.events:
+        if event.get('phase') == 'k_raised':
+            k = event['value']
+        elif event.get('phase') == 't_raised':
+            visited.append((k, event['value']))
+    return visited
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+def test_ratio_order_and_repeat_on_progress(algorithm, iterate):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        run = strahler.trace(game, algorithm, search='ratio', iter_shave=iterate)
+        assert visited_pairs(run) == ([(1, 1), (1, 1)] if iterate else [(1, 1), (2, 1)])
+        check_document(run.result.data)
+        assert run.result.data['round_pairs'] == ([[1, 1], [1, 1]] if iterate else [[2, 1]])
+        assert run.result.complete
+        assert ad_wins(run.result) == ad_wins(strahler.decompose(game, 'zielonka'))
+        pm = strahler.progress_measures(game, search='ratio', iter_shave=iterate)
+        assert pm_wins(pm) == ad_wins(run.result)
+        assert [(max(p['parameters']['k'] for p in r['trees']), r['trees'][0]['parameters']['t'])
+                for r in pm['rounds']] == ([(1, 1), (1, 1)] if iterate else [(2, 1)])
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+def test_ratio_exhaustion_with_a_cap_and_without_admissible_pairs(algorithm, iterate):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        run = strahler.trace(game, algorithm, search='ratio', tree_k=1, iter_shave=iterate)
+        assert visited_pairs(run) == ([(1, 1), (1, 1)] if iterate else [(1, 1), (1, 2)])
+        assert run.result.complete == iterate
+    with strahler.Game.from_text('0 0 0 0;') as game:
+        run = strahler.trace(game, algorithm, search='ratio', iter_shave=iterate)
+        assert not run.result.complete and visited_pairs(run) == []
+        assert run.result.data['round_pairs'] == []
+        assert run.result.unresolved == {0}
+        with pytest.raises(strahler.StrahlerError, match='search exhausted'):
+            strahler.progress_measures(game, search='ratio', iter_shave=iterate)
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+@pytest.mark.parametrize('start', [(1, 1), (2, 0), (2, 99)])
+def test_warm_start_skips_the_prefix_and_clamps_t(algorithm, iterate, start):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        k, t = start
+        run = strahler.trace(game, algorithm, search='lexicographic', start_k=k,
+                             start_t=t, iter_shave=iterate)
+        check_document(run.result.data)
+        visits = visited_pairs(run)
+        assert visits[0] == (k, min(t, 2))
+        expected = list(pairs(5, 3))
+        offset = expected.index(visits[0])
+        distinct = [p for i, p in enumerate(visits) if i == 0 or p != visits[i - 1]]
+        assert distinct == expected[offset:offset + len(distinct)]
+        pm = strahler.progress_measures(game, search='lexicographic', start_k=k,
+                                        start_t=t, iter_shave=iterate)
+        first = pm['rounds'][0]['trees'][0]['parameters']
+        if iterate:
+            assert (first['k'], first['t']) == visits[0]
+        assert pm['rounds'][-1]['complete'] and run.result.complete
+        assert ad_wins(run.result) == pm_wins(pm) == ad_wins(strahler.decompose(game, 'zielonka'))
+
+
+@pytest.mark.parametrize('solver', [strahler.decompose, strahler.progress_measures])
+@pytest.mark.parametrize('options', [dict(start_k=1), dict(start_t=0),
+    dict(search='ratio', start_k=1), dict(search='ratio', start_t=0),
+    dict(search='lexicographic', start_k=0), dict(search='lexicographic', start_k=-1),
+    dict(search='lexicographic', start_t=-1), dict(search='ratio', kary=2)])
+def test_new_search_option_validation(solver, options):
+    with strahler.Game.from_text('0 0 0 0;') as game:
+        with pytest.raises(strahler.InputError):
+            solver(game, **options)
+
+
+@pytest.mark.parametrize('mode', ['ratio', 'boundary'])
+@pytest.mark.parametrize('jobs', [1, 2])
+def test_new_frontiers_resume_and_propagate_same_method_boundary(tmp_path, monkeypatch, mode, jobs):
+    calls = []
+    reference = json.loads(experiment.LATEST_RESULTS.read_text())
+    output = tmp_path / f'{mode}.json'
+
+    def measure(game, backend, seconds, memory_gib, *, search, start_pair=None):
+        n = game['n']
+        calls.append((n, backend))
+        assert search == ('ratio' if mode == 'ratio' else 'lexicographic')
+        if mode == 'boundary':
+            assert start_pair == ([1, 0] if n == 1 else [2, experiment.BACKENDS.index(backend) + 1])
+        row = dict(n=n, backend=backend, outcome='timeout', seconds=seconds,
+                   timeout_seconds=seconds, memory_gib=memory_gib)
+        if start_pair is not None:
+            row['start_pair'] = list(start_pair)
+        if n == 1:
+            donor = next(r for r in reference['rows'] if r['n'] == n and r['backend'] == backend)
+            final = [2, experiment.BACKENDS.index(backend) + 1]
+            row.update(donor, seconds=1, timeout_seconds=seconds, k=final[0], t=final[1],
+                       final_pair=final, rounds=2,
+                       round_pairs=[start_pair or [1, 1], final])
+        return row
+
+    monkeypatch.setattr(experiment, 'measure_case', measure)
+    run = experiment.run_ratio if mode == 'ratio' else experiment.run_boundary
+    load = experiment.recorded_ratio_results if mode == 'ratio' else experiment.recorded_boundary_results
+    result = run(seconds=60, output=output, jobs=jobs, max_n=3)
+    assert set(calls) == {(n, b) for n in (1, 2) for b in experiment.BACKENDS}
+    assert result['cases'] == 12 and len(result['rows']) == 18
+    assert load(output) == result
+    assert all(f['last_solved_n'] == 1 and f['stopped_at_n'] == 2 for f in result['frontiers'].values())
+    calls.clear()
+    before = output.read_bytes()
+    assert run(seconds=60, output=output, jobs=jobs, max_n=3) == result
+    assert output.read_bytes() == before and not calls
+    document = json.loads(before)
+    document['library_sha256'] = '0' * 64
+    output.write_text(json.dumps(document))
+    with pytest.raises(AssertionError):
+        run(seconds=60, output=output, jobs=jobs, max_n=3)
+    assert not calls
+
+
+@pytest.mark.parametrize('run', [experiment.run_ratio, experiment.run_boundary])
+@pytest.mark.parametrize('options', [dict(seconds=0), dict(memory_gib=0), dict(jobs=0),
+                                     dict(max_n=0), dict(max_n=8)])
+def test_new_frontiers_validate_limits_before_running(monkeypatch, run, options):
+    monkeypatch.setattr(experiment, 'measure_case', lambda *a, **kw: pytest.fail('Must not run'))
+    with pytest.raises(ValueError):
+        run(**options)
+
+
+def test_pm_ratio_retries_productive_round_then_advances_after_a_stall():
+    info = manifest()[0]
+    with strahler.Game.from_text(bz2.decompress((EXAMPLES / 'nester' / info['file']).read_bytes()).decode()) as game:
+        document = strahler.progress_measures(game, search='ratio', iter_shave=True)
+        sequence = [(max(p['parameters']['k'] for p in r['trees']),
+                     r['trees'][0]['parameters']['t']) for r in document['rounds']]
+        assert sequence == [(1, 1), (1, 1), (2, 1), (2, 2)]
+        before = info['vertices']
+        for index, round_ in enumerate(document['rounds'][:-1]):
+            after = len(round_['unresolved'])
+            assert (sequence[index + 1] == sequence[index]) == (after < before)
+            before = after
+        assert pm_wins(document) == ad_wins(strahler.decompose(game, 'zielonka'))

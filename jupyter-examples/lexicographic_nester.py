@@ -1,4 +1,4 @@
-"""Offline Nester experiments with the same lexicographic search in AD and PM."""
+"""Offline Nester experiments with shared exhaustive search orders in AD and PM."""
 
 import argparse
 import bz2
@@ -27,6 +27,8 @@ FRONTIER_RESULTS = DATA / 'lexicographic-timeouts-600s.json'
 LATEST_RESULTS = DATA / 'lexicographic-results-600s.json'
 REPEAT_SHAVING_RESULTS = DATA / 'lexicographic-repeat-shaving-600s.json'
 REPEAT_SHAVING_FINAL_RESULTS = DATA / 'lexicographic-results-repeat-shaving-600s.json'
+RATIO_RESULTS = DATA / 'ratio-results-600s.json'
+BOUNDARY_RESULTS = DATA / 'boundary-results-1800s.json'
 BASE_BACKENDS = ('AD', 'AD+iter', 'PM', 'PM+iter')
 SYMMETRIC_BACKENDS = ('AD-sym', 'AD-sym+iter')
 BACKENDS = (*BASE_BACKENDS[:2], *SYMMETRIC_BACKENDS, *BASE_BACKENDS[2:])
@@ -232,7 +234,10 @@ def worker(request):
     handle = _native.call('game_parse', raw, len(raw), handle=True)
     del raw
     try:
-        options = dict(search='lexicographic', iter_shave=backend.endswith('+iter'))
+        options = dict(search=request.get('search', 'lexicographic'),
+                       iter_shave=backend.endswith('+iter'))
+        if 'start_pair' in request:
+            options.update(start_k=request['start_pair'][0], start_t=request['start_pair'][1])
         if backend.startswith('AD'):
             options['max_host_leaves'] = 2 * sys.maxsize + 1
             algorithm = 'lifting-sym' if backend in SYMMETRIC_BACKENDS else 'lifting'
@@ -245,16 +250,35 @@ def worker(request):
         document = json.loads(text)
         del text
         result = summarize(document, backend, info)
+        if request.get('record_pairs'):
+            result['final_pair'] = [result['k'], result['t']]
+            if backend.endswith('+iter'):
+                result['round_pairs'] = (document['round_pairs'] if backend.startswith('AD') else
+                    [[max(p['parameters']['k'] for p in r['trees']),
+                      r['trees'][0]['parameters']['t']] for r in document['rounds']])
+                result['rounds'] = len(result['round_pairs'])
+                result['attempts'] = result['rounds']
+            elif backend.startswith('AD'):
+                if options['search'] == 'ratio':
+                    # Full-game AD retains only the final pair without a trace.
+                    result.pop('attempts', None)
+                elif 'start_pair' in request:
+                    k, t = request['start_pair']
+                    result['attempts'] -= (k - 1) * (info['t_max'] + 1) + min(t, info['t_max'])
         result['version'] = strahler.version()
         print(json.dumps(result), flush=True)
     finally:
         _native.library().strahler_game_free(handle)
 
 
-def measure_case(game, backend, seconds=30, memory_gib=2):
+def measure_case(game, backend, seconds=30, memory_gib=2, *, search=None, start_pair=None):
     if backend not in BACKENDS:
         raise ValueError(f'Unknown backend: {backend}')
     request = dict(game=game, backend=backend, memory_gib=memory_gib)
+    if search is not None:
+        request.update(search=search, record_pairs=True)
+    if start_pair is not None:
+        request['start_pair'] = list(start_pair)
     started = perf_counter()
     try:
         process = subprocess.run([sys.executable, str(Path(__file__).resolve()), 'worker'],
@@ -270,6 +294,8 @@ def measure_case(game, backend, seconds=30, memory_gib=2):
                           detail=detail[:300], returncode=process.returncode)
     except subprocess.TimeoutExpired:
         result = dict(outcome='timeout', detail=f'{seconds:g} s wall deadline')
+    if start_pair is not None:
+        result['start_pair'] = list(start_pair)
     return dict(n=game['n'], backend=backend, seconds=round(perf_counter() - started, 4),
                 timeout_seconds=seconds, memory_gib=memory_gib, **result)
 
@@ -425,7 +451,8 @@ def recorded_frontier_results(path=None, baseline_path=None):
     document = json.loads(path.read_text(encoding='utf-8'))
     fresh = document.get('rerun_all', False)
     expected = {(r['n'], r['backend']) for r in baseline['rows']
-                if fresh or r['outcome'] in ('timeout', 'not measured')}
+                if (fresh or r['outcome'] in ('timeout', 'not measured'))
+                and r['n'] <= document.get('max_n', 7)}
     if fresh:
         assert document['iter_shave_policy'] == 'repeat-until-stalled'
     assert document['complete'] and document['backends'] == list(BACKENDS)
@@ -569,14 +596,21 @@ def run_all(seconds=30, memory_gib=2, output=RESULTS, *, backends=BACKENDS,
 
 
 def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jobs=2,
-                  rerun_all=False):
+                  rerun_all=False, mode=None, max_n=None):
     """Run increasing n to each method's first failure, optionally remeasuring all cases."""
     if jobs < 1 or seconds <= 0 or memory_gib < 1:
         raise ValueError('Use positive time, memory and worker limits')
+    if mode not in (None, 'ratio', 'boundary'):
+        raise ValueError('Unknown frontier mode')
+    if mode is not None:
+        rerun_all = True
     games = manifest()
+    if max_n is not None and not 1 <= max_n <= max(g['n'] for g in games):
+        raise ValueError('The stopping instance must be in the manifest')
     baseline_path = Path(baseline_path) if baseline_path is not None else (
         LATEST_RESULTS if rerun_all else FINAL_RESULTS)
     output = Path(output) if output is not None else (
+        DATA / f'{mode}-results-{seconds:g}s.json' if mode else
         REPEAT_SHAVING_RESULTS if rerun_all else FRONTIER_RESULTS)
     if output.resolve() == baseline_path.resolve():
         raise ValueError('Keep the baseline; write reruns to a separate file')
@@ -586,11 +620,16 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
     assert len(baseline['rows']) == len(by_case) == len(expected)
     assert by_case.keys() == expected
     assert all(r['outcome'] in ('complete', 'timeout', 'not measured') for r in baseline['rows'])
-    selected = {key for key, row in by_case.items() if rerun_all or row['outcome'] != 'complete'}
+    selected = {key for key, row in by_case.items()
+                if (rerun_all or row['outcome'] != 'complete') and key[0] <= (max_n or 7)}
     timeouts = [row for row in baseline['rows'] if row['outcome'] == 'timeout']
     if not rerun_all and timeouts and seconds <= max(r['timeout_seconds'] for r in timeouts):
         raise ValueError('Use a larger deadline than the baseline timeout')
     metadata = _run_metadata(games)
+    if mode is not None:
+        metadata['search'] = 'ratio' if mode == 'ratio' else 'lexicographic'
+        for game in games:
+            assert hashlib.sha256((DATA / game['file']).read_bytes()).hexdigest() == game['sha256']
     assert baseline['fixtures'] == metadata['fixtures']
     settings = dict(baseline_file=baseline_path.name,
                     baseline_sha256=hashlib.sha256(baseline_path.read_bytes()).hexdigest(),
@@ -598,9 +637,14 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
                     memory_gib=memory_gib, jobs=jobs, planned_cases=len(selected))
     if rerun_all:
         settings.update(rerun_all=True, iter_shave_policy='repeat-until-stalled')
+    if mode is not None:
+        settings['mode'] = mode
+    if max_n is not None:
+        settings['max_n'] = max_n
     if output.exists():
         document = json.loads(output.read_text(encoding='utf-8'))
         assert document.get('rerun_all', False) == rerun_all
+        assert document.get('mode') == mode and document.get('max_n') == max_n
         for key, value in settings.items():
             assert document[key] == value
         for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
@@ -626,7 +670,13 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
 
     def measure(n, backend):
         print(f'Starting n={n} {backend} ({seconds:g} s)', flush=True)
-        return measure_case(next(g for g in games if g['n'] == n), backend, seconds, memory_gib)
+        options = {}
+        if mode is not None:
+            options['search'] = metadata['search']
+        if mode == 'boundary':
+            options['start_pair'] = [1, 0] if n == 1 else rows[n - 1, backend]['final_pair']
+        return measure_case(next(g for g in games if g['n'] == n), backend, seconds, memory_gib,
+                            **options)
 
     with ThreadPoolExecutor(max_workers=jobs) as pool:
         futures = {}
@@ -668,6 +718,47 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
                 advance(key[1])
             checkpoint()
     return document
+
+
+def run_ratio(seconds=600, memory_gib=2, output=None, jobs=2, max_n=None):
+    return run_frontiers(seconds, memory_gib, output, jobs=jobs, mode='ratio', max_n=max_n)
+
+
+def run_boundary(seconds=1800, memory_gib=2, output=None, jobs=2, max_n=None):
+    return run_frontiers(seconds, memory_gib, output, jobs=jobs, mode='boundary', max_n=max_n)
+
+
+def _recorded_search_results(path, mode):
+    document = recorded_frontier_results(path, LATEST_RESULTS)
+    assert document['mode'] == mode
+    assert document['search'] == ('ratio' if mode == 'ratio' else 'lexicographic')
+    assert len(document['library_sha256']) == 64 and document['version']
+    rows = {(r['n'], r['backend']): r for r in document['rows']}
+    for row in document['rows']:
+        if mode == 'boundary' and row['outcome'] != 'not measured':
+            assert row['start_pair'] == ([1, 0] if row['n'] == 1 else
+                                         rows[row['n'] - 1, row['backend']]['final_pair'])
+        if row['outcome'] != 'complete':
+            continue
+        assert row['final_pair'] == [row['k'], row['t']]
+        assert row['k'] >= 1 and row['t'] >= (mode == 'ratio')
+        if row['backend'].endswith('+iter'):
+            assert len(row['round_pairs']) == row['rounds']
+            assert row['round_pairs'][-1] == row['final_pair']
+            if mode == 'boundary':
+                assert row['round_pairs'][0] == row['start_pair']
+            else:
+                assert row['round_pairs'][0] == [1, 1]
+                assert all(k >= 1 and t >= 1 for k, t in row['round_pairs'])
+    return document
+
+
+def recorded_ratio_results(path=None):
+    return _recorded_search_results(Path(path) if path is not None else RATIO_RESULTS, 'ratio')
+
+
+def recorded_boundary_results(path=None):
+    return _recorded_search_results(Path(path) if path is not None else BOUNDARY_RESULTS, 'boundary')
 
 
 def run_timeouts(seconds=60, memory_gib=2, output=None, baseline_path=None, jobs=1, stop_after_n=None):
@@ -747,18 +838,21 @@ def run_timeouts(seconds=60, memory_gib=2, output=None, baseline_path=None, jobs
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('manifest', 'run', 'run-symmetric',
-                                             'rerun-timeouts', 'collect', 'worker'))
+                                             'rerun-timeouts', 'run-ratio', 'run-boundary',
+                                             'collect', 'worker'))
     parser.add_argument('--seconds', type=float)
     parser.add_argument('--memory-gib', type=int, default=2)
-    parser.add_argument('--jobs', type=int, default=1)
+    parser.add_argument('--jobs', type=int)
     parser.add_argument('--baseline', type=Path)
-    parser.add_argument('--stop-after-n', type=int)
+    parser.add_argument('--stop-after-n', '--max-n', dest='stop_after_n', type=int)
     parser.add_argument('--frontier', action='store_true',
                         help='Stop each method after its first failure; extend into unmeasured instances')
     parser.add_argument('--rerun-all', action='store_true',
                         help='Remeasure every case from n=1; requires --frontier')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
+    if args.jobs is None:
+        args.jobs = 2 if args.command in ('run-ratio', 'run-boundary') else 1
     if args.frontier and (args.command != 'rerun-timeouts' or args.stop_after_n is not None):
         parser.error('--frontier requires rerun-timeouts and excludes --stop-after-n')
     if args.rerun_all and not args.frontier:
@@ -769,6 +863,13 @@ def main():
         collect_results(args.output)
     elif args.command == 'worker':
         worker(json.load(sys.stdin))
+    elif args.command in ('run-ratio', 'run-boundary'):
+        if args.baseline is not None:
+            parser.error('--baseline is not supported by run-ratio/run-boundary')
+        ratio = args.command == 'run-ratio'
+        (run_ratio if ratio else run_boundary)(
+            args.seconds if args.seconds is not None else 600 if ratio else 1800,
+            args.memory_gib, args.output, jobs=args.jobs, max_n=args.stop_after_n)
     elif args.command == 'run-symmetric':
         baseline = _consolidated_results(include_symmetric=False)
         run_all(args.seconds if args.seconds is not None else baseline['timeout_seconds'],
