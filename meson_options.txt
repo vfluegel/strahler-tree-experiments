@@ -7,3 +7,6 @@ option(
 
 option('python', type : 'feature', value : 'disabled',
   description : 'Install the ctypes Python package for libstrahler')
+
+option('fuzz', type : 'boolean', value : false,
+  description : 'Build libFuzzer targets; requires Clang with ASan and UBSan')

@@ -14,6 +14,9 @@ project(
 )
 
 add_project_arguments('-fvisibility=hidden', language : 'c')
+if get_option('fuzz')
+  add_project_arguments('-fsanitize=fuzzer-no-link', language : ['c', 'cpp'])
+endif
 
 lenstree_option = get_option('lenstree')
 boost_dep = dependency('boost', required : false)
@@ -1680,3 +1683,16 @@ test_ad_reach_alloc_exe = executable('test_ad_reach_alloc', ['tests/test_ad_reac
 test('test_ad_reach_alloc', test_ad_reach_alloc_exe)
 
 test('test_lift_backends', python, args : [files('tests/test_lift_backends.py'), meson.current_build_dir()], depends : [pg2adot, pg2pmdot], timeout : 120)
+
+foreach target : ['solvers', 'parse']
+  fuzz_source = 'tests/fuzz/' + target + '.cc'
+  fuzz_replay = executable('fuzz-' + target + '-replay', [fuzz_source, 'tests/fuzz/replay.cc'],
+    include_directories : source_includes, link_with : libstrahler)
+  test('fuzz_replay_' + target, fuzz_replay,
+    args : [meson.project_source_root() / 'tests/fuzz/corpus' / target],
+    suite : 'fuzz', timeout : 300)
+  if get_option('fuzz')
+    executable('fuzz-' + target, fuzz_source, include_directories : source_includes,
+      link_with : libstrahler, link_args : ['-fsanitize=fuzzer'])
+  endif
+endforeach

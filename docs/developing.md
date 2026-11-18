@@ -18,6 +18,9 @@ Valgrind separately. To run the memory check locally after building:
 ci/check-valgrind.sh build
 ```
 
+Fuzz targets and the mutation check are described in
+[tests/fuzz/README.md](../tests/fuzz/README.md).
+
 After changing the library or a notebook, run `python scripts/execute_notebooks.py`
 from the repository root with the notebook venv activated. It saves the example
 outputs and static widget views for GitHub. Setup and tests are in
