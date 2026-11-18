@@ -148,13 +148,17 @@ ad_lift_tree_dep = declare_dependency(
   link_with : ad_lift_tree_lib,
 )
 
+lift_simd_sources = files('src/lift_simd.c', 'src/lift_simd_x86.c', 'src/lift_simd_neon.c')
+lift_simd_lib = static_library('lift_simd', lift_simd_sources)
+lift_simd_dep = declare_dependency(include_directories : source_includes, link_with : lift_simd_lib)
+
 ad_lift_lib = static_library(
   'ad_lift',
-  ['src/ad_lift.c', 'src/ad_lift_solve.c', 'src/ad_sym.c'],
-  dependencies : [ad_lift_tree_dep, ad_tree_dep, stree_dep],
+  ['src/ad_lift.c', 'src/ad_lift_solve.c', 'src/ad_sym.c', 'src/ad_reach.c', 'src/ad_batch.c'],
+  dependencies : [ad_lift_tree_dep, ad_tree_dep, stree_dep, lift_simd_dep],
 )
 ad_lift_dep = declare_dependency(
-  dependencies : [ad_lift_tree_dep, ad_tree_dep, stree_dep],
+  dependencies : [ad_lift_tree_dep, ad_tree_dep, stree_dep, lift_simd_dep],
   include_directories : source_includes,
   link_with : ad_lift_lib,
 )
@@ -180,8 +184,8 @@ ad_tree_dot_dep = declare_dependency(
 
 pm_lift_lib = static_library(
   'pm_lift',
-  ['src/pm_lift.c', 'src/pm_solve.c', 'src/strpm.c', 'src/sspm.c'],
-  dependencies : [pg_attractor_dep, json_utils_dep],
+  ['src/pm_lift.c', 'src/pm_solve.c', 'src/strpm.c', 'src/sspm.c', 'src/pm_packed.c'],
+  dependencies : [pg_attractor_dep, json_utils_dep, lift_simd_dep],
 )
 pm_lift_dep = declare_dependency(
   dependencies : pg_attractor_dep,
@@ -1527,7 +1531,7 @@ test('test_ad_trace', test_ad_trace)
 test_ad_trace_alloc = executable('test_ad_trace_alloc',
   ['tests/test_ad_trace_alloc.c', 'src/ad_trace.c', 'src/ad_tree_json.c', 'src/json_utils.c', 'src/ad_tree.c',
    'src/pg_set.c', 'src/pg_attractor.c', 'src/zielonka.c', 'src/ad_lift.c',
-   'src/ad_sym.c', 'src/ad_lift_solve.c'],
+   'src/ad_sym.c', 'src/ad_lift_solve.c', 'src/ad_reach.c', lift_simd_sources],
   dependencies : [ad_lift_tree_dep, stree_dep, pg_game_dep],
   c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L', '-include', meson.project_source_root() / 'tests/trace_allocator.h'])
 test('test_ad_trace_alloc', test_ad_trace_alloc, timeout : 120)
@@ -1625,11 +1629,11 @@ api_alloc_sources = files('src/cli_version.c', 'src/cli_commands.c',
   'src/stree.c', 'src/ordered_tree.c', 'src/dot_utils.c', 'src/json_utils.c',
   'src/pg_game.c', 'src/pg_set.c', 'src/pg_attractor.c', 'src/pg_preprocess.c',
   'src/ad_tree.c', 'src/ad_tree_json.c', 'src/ad_trace.c', 'src/zielonka.c',
-  'src/ad_lift_tree.c', 'src/ad_lift.c', 'src/ad_lift_solve.c', 'src/ad_sym.c',
+  'src/ad_lift_tree.c', 'src/ad_lift.c', 'src/ad_lift_solve.c', 'src/ad_sym.c', 'src/ad_reach.c',
   'src/ad_tree_dot.c', 'src/pg_dot.c', 'src/pm_lift.c', 'src/pm_solve.c',
-  'src/strpm.c', 'src/sspm.c', 'src/pm_tree_dot.c')
+  'src/strpm.c', 'src/sspm.c', 'src/pm_packed.c', 'src/pm_tree_dot.c')
 api_alloc_test = executable('test_strahler_alloc',
-  ['tests/test_strahler_alloc.c', strahler_sources, api_alloc_sources, version_header],
+  ['tests/test_strahler_alloc.c', strahler_sources, api_alloc_sources, lift_simd_sources, version_header],
   include_directories : source_includes,
   c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L', '-include',
     meson.project_source_root() / 'tests/trace_allocator.h'])
@@ -1659,3 +1663,20 @@ if python_option.enabled()
       depends : [libstrahler, pg2adot, pg2pmdot, genstree, pms2dot])
   endforeach
 endif
+
+test_ad_reach_exe = executable('test_ad_reach', ['tests/test_ad_reach.c', 'tests/reference_attractor.c'], dependencies : ad_lift_dep, c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L'])
+test('test_ad_reach', test_ad_reach_exe, timeout : 120)
+
+test_pm_packed_exe = executable('test_pm_packed', 'tests/test_pm_packed.c', dependencies : [pm_lift_dep, lift_simd_dep], c_args : ['-UNDEBUG'])
+test('test_pm_packed', test_pm_packed_exe)
+foreach backend : ['scalar', 'packed', 'lookup', 'compare', 'both']
+  test('test_pm_lift_' + backend, test_pm_lift_exe, env : ['STRAHLER_PM_BACKEND=' + backend], workdir : meson.project_source_root())
+endforeach
+
+test_ad_batch_exe = executable('test_ad_batch', 'tests/test_ad_batch.c', dependencies : ad_lift_dep, c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L'])
+test('test_ad_batch', test_ad_batch_exe)
+
+test_ad_reach_alloc_exe = executable('test_ad_reach_alloc', ['tests/test_ad_reach_alloc.c', 'src/ad_reach.c'], dependencies : [pg_attractor_dep, lift_simd_dep], c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L', '-include', meson.project_source_root() / 'tests/trace_allocator.h'])
+test('test_ad_reach_alloc', test_ad_reach_alloc_exe)
+
+test('test_lift_backends', python, args : [files('tests/test_lift_backends.py'), meson.current_build_dir()], depends : [pg2adot, pg2pmdot], timeout : 120)

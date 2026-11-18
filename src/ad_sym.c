@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ad_reach.h"
 #include "ad_sym.h"
 #include "pg_attractor.h"
 #include "utils.h"
@@ -15,10 +16,16 @@ typedef struct {
 } Label;
 
 typedef struct {
+  size_t regular, minus, after;
+} Ordinal;
+
+typedef struct {
   PGGame const *game;
   ADLiftTree tree[2];
   size_t capacity[2];
   Label *labels[2];
+  Ordinal *ordinals[2];
+  size_t generation[2];
   bool memory;
   size_t arity;
   PGSet safe;
@@ -28,6 +35,69 @@ typedef struct {
   ADTrace *trace;
   size_t (*trace_paths)[AD_PATH_CAPACITY];
 } Sym;
+
+static void rank_nodes(ADLiftTree const *tree, Ordinal *ordinals,
+                       size_t const node, size_t *rank) {
+  ordinals[node].regular = (*rank)++;
+  ordinals[node].minus = (*rank)++;
+  for (size_t child = tree->nodes[node].first_child; child != SIZE_MAX;
+       child = tree->nodes[child].next_sibling) {
+    rank_nodes(tree, ordinals, child, rank);
+    (*rank)++;
+  }
+  ordinals[node].after = *rank;
+}
+
+/* Rebuild on every host growth. In particular, appending a sibling changes
+ * ordinals in other subtrees even though structured node IDs stay stable. */
+static ADReach *rank_view(Sym *state, PGSet const *domain,
+                          PGPlayer const player) {
+  if (state->trace != nullptr || ad_reach_scalar_requested() ||
+      pg_set_count(domain) < 64 || !pg_subgame_is_total(state->game, domain)) {
+    return nullptr;
+  }
+  ADLiftTree const *tree = state->tree + player;
+  if (tree->node_count > SIZE_MAX / sizeof(Ordinal)) {
+    return nullptr;
+  }
+  if (state->generation[player] != tree->node_count) {
+    Ordinal *ordinals = malloc(tree->node_count * sizeof(*ordinals));
+    if (ordinals == nullptr) {
+      return nullptr;
+    }
+    size_t rank = 0;
+    rank_nodes(tree, ordinals, 0, &rank);
+    free(state->ordinals[player]);
+    state->ordinals[player] = ordinals;
+    state->generation[player] = tree->node_count;
+  }
+  char const *choice = getenv("STRAHLER_AD_BACKEND");
+  /* A recursive domain is checked once: its packed adjacency cannot be
+   * amortized across lifting snapshots. Keep SIMD selectable for comparison. */
+  if (choice == nullptr || strcmp(choice, "auto") == 0) {
+    choice = "fused";
+  }
+  ADReach *work = ad_reach_create_backend(state->game, domain, player, choice);
+  if (work == nullptr) {
+    return nullptr;
+  }
+  ADReachLabel *labels = ad_reach_labels(work);
+  for (size_t v = pg_set_next(domain, 0); v != SIZE_MAX;
+       v = pg_set_next(domain, v + 1)) {
+    Label const label = state->labels[player][v];
+    Ordinal const ordinal = state->ordinals[player][label.node];
+    labels[v] = (ADReachLabel){
+        .rank = label.kind == AD_POS_REGULAR     ? ordinal.regular
+                : label.kind == AD_POS_MINUS_INF ? ordinal.minus
+                                                 : ordinal.after,
+        .after = ordinal.after,
+        .kind = label.kind == AD_POS_REGULAR ? AD_REACH_REGULAR
+                : label.node == 0 && label.kind == AD_POS_PLUS ? AD_REACH_TOP
+                                                               : AD_REACH_LAZY};
+  }
+  ad_reach_compute(work);
+  return work;
+}
 
 static void sym_error(ADLiftError *error, char const *message) {
   if (error != nullptr && error->message[0] == '\0') {
@@ -91,9 +161,9 @@ static void sym_error(ADLiftError *error, char const *message) {
 
 /* Proposition 7.2.1, restricted to this call's subgame. Failure to satisfy a
  * condition is distinct from failure to allocate an attractor. */
-[[nodiscard]] static bool is_ad_impl(Sym *state, PGSet const *domain,
-                                     PGPlayer const player, size_t const node,
-                                     bool *valid) {
+[[nodiscard]] static bool is_ad_scalar(Sym *state, PGSet const *domain,
+                                       PGPlayer const player, size_t const node,
+                                       bool *valid) {
   *valid = false;
   pg_set_clear(&state->checked);
   for (size_t vertex = pg_set_next(domain, 0); vertex != SIZE_MAX;
@@ -175,6 +245,57 @@ static void sym_error(ADLiftError *error, char const *message) {
     }
   }
   *valid = true;
+  return true;
+}
+
+[[nodiscard]] static bool is_ad_impl(Sym *state, PGSet const *domain,
+                                     PGPlayer const player, size_t const node,
+                                     bool *valid) {
+  ADReach *work = rank_view(state, domain, player);
+  if (work == nullptr) {
+    return is_ad_scalar(state, domain, player, node, valid);
+  }
+  unsigned char const *good = ad_reach_good(work);
+  *valid = false;
+  pg_set_clear(&state->checked);
+  /* Replay the original inspection order, including early failure and the
+   * number of side-attractor tests. Computing later fibres cannot affect it. */
+  for (size_t v = pg_set_next(domain, 0); v != SIZE_MAX;
+       v = pg_set_next(domain, v + 1)) {
+    if (!in_core(state, player, node, v)) {
+      goto done;
+    }
+    if (pg_set_contains(&state->checked, v)) {
+      continue;
+    }
+    Label const label = state->labels[player][v];
+    if (label.kind == AD_POS_REGULAR) {
+      if (!good[v]) {
+        goto done;
+      }
+      continue;
+    }
+    state->stats->attractors++;
+    bool reached = true;
+    for (size_t other = v; other != SIZE_MAX;
+         other = pg_set_next(domain, other + 1)) {
+      Label const current = state->labels[player][other];
+      if (current.node == label.node && current.kind == label.kind) {
+        pg_set_add(&state->checked, other);
+        reached &= good[other] != 0;
+      }
+    }
+    if (!reached) {
+      goto done;
+    }
+  }
+  *valid = true;
+done:
+  if (getenv("STRAHLER_BACKEND_REPORT") != nullptr) {
+    fprintf(stderr, "AD symmetric recursive rank check: %zu vertices\n",
+            pg_set_count(domain));
+  }
+  ad_reach_destroy(work);
   return true;
 }
 
@@ -720,6 +841,7 @@ sym_solve_trace(PGGame const *game, PGSet const *domain,
   for (size_t player = 0; player < 2; player++) {
     ad_lift_tree_destroy(state.tree + player);
     free(state.labels[player]);
+    free(state.ordinals[player]);
   }
   pg_set_destroy(&separator);
   pg_set_destroy(&state.safe);
@@ -732,6 +854,7 @@ failure:
   for (size_t player = 0; player < 2; player++) {
     ad_lift_tree_destroy(state.tree + player);
     free(state.labels[player]);
+    free(state.ordinals[player]);
   }
   pg_set_destroy(&separator);
   pg_set_destroy(&state.safe);

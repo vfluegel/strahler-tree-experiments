@@ -28,7 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lift_simd.h"
 #include "pm_internal.h"
+#include "pm_packed.h"
 
 void pm_error(PMError *error, char const *message) {
   if (error != nullptr) {
@@ -108,6 +110,9 @@ typedef struct {
   PMResult *result;
   PMMeasure tmp;
   PMMeasure best;
+  PMPacked *packed;
+  PMPacked packed_tmp, packed_best;
+  bool lookup, comparison;
 } LiftWork;
 
 static int priority_index(PMResult const *result, uint64_t const priority) {
@@ -132,8 +137,67 @@ static void progress(LiftWork *work, size_t const from, size_t const to,
   }
 }
 
+static void packed_progress(LiftWork *work, size_t const from, size_t const to,
+                            int const pindex) {
+  work->packed_tmp = work->packed[to];
+  if (work->game->vertices[from].priority % 2 != work->result->player) {
+    pm_packed_successor(&work->packed_tmp, pindex, work->result->depth,
+                        (int)work->result->parameters.k,
+                        (int)work->result->parameters.t, work->lookup);
+  }
+}
+
+static bool packed_vertex(LiftWork *work, size_t const vertex,
+                          size_t const target) {
+  PMResult *result = work->result;
+  result->attempts++;
+  PMPacked *current = work->packed + vertex;
+  if (current->top) {
+    return false;
+  }
+  int const pindex =
+      priority_index(result, work->game->vertices[vertex].priority);
+  bool const maximum = work->game->vertices[vertex].owner != result->player;
+  if (maximum && target != SIZE_MAX) {
+    packed_progress(work, vertex, target, pindex);
+    if (pm_packed_compare(&work->packed_tmp, current, pindex,
+                          work->comparison) <= 0) {
+      return false;
+    }
+    *current = work->packed_tmp;
+  } else {
+    bool first = true;
+    for (size_t edge = work->game->succ_offsets[vertex];
+         edge < work->game->succ_offsets[vertex + 1]; edge++) {
+      size_t const to = work->game->successors[edge];
+      if (!pg_set_contains(work->active, to)) {
+        continue;
+      }
+      packed_progress(work, vertex, to, pindex);
+      int const cmp =
+          first ? 0
+                : pm_packed_compare(&work->packed_tmp, &work->packed_best,
+                                    pindex, work->comparison);
+      if (first || (maximum ? cmp > 0 : cmp < 0)) {
+        work->packed_best = work->packed_tmp;
+      }
+      first = false;
+    }
+    if (first || pm_packed_compare(current, &work->packed_best, pindex,
+                                   work->comparison) >= 0) {
+      return false;
+    }
+    *current = work->packed_best;
+  }
+  result->lifts++;
+  return true;
+}
+
 static bool lift_vertex(LiftWork *work, size_t const vertex,
                         size_t const target) {
+  if (work->packed != nullptr) {
+    return packed_vertex(work, vertex, target);
+  }
   PMResult *result = work->result;
   result->attempts++;
   PMMeasure *current = &result->measure[vertex];
@@ -225,6 +289,7 @@ bool pm_lift(PGGame const *game, PGSet const *active,
                                 sizeof(predecessors[0]));
   PGSet dirty = {0};
   bool succeeded = false;
+  PMPacked *packed = nullptr;
   if (result->measure != nullptr) {
     result->measure[0].bits = bits;
     result->measure[0].levels = levels;
@@ -274,6 +339,29 @@ bool pm_lift(PGGame const *game, PGSet const *active,
       .tmp = {.bits = bits + count * stride, .levels = levels + count * stride},
       .best = {.bits = bits + (count + 1) * stride,
                .levels = levels + (count + 1) * stride}};
+  char const *backend = getenv("STRAHLER_PM_BACKEND");
+  if (algorithm == PM_STRAHLER && backend != nullptr &&
+      strcmp(backend, "scalar") != 0 && strcmp(backend, "auto") != 0 &&
+      pm_packed_eligible(depth, parameters.k, parameters.t) &&
+      count <= SIZE_MAX / sizeof(PMPacked)) {
+    packed = malloc((count == 0 ? 1 : count) * sizeof(*packed));
+    bool encodable = packed != nullptr;
+    for (size_t v = 0; encodable && v < count; v++) {
+      encodable = pm_pack(result->measure + v, packed + v);
+    }
+    if (encodable) {
+      work.packed = packed;
+      work.lookup = backend == nullptr || strcmp(backend, "lookup") == 0 ||
+                    strcmp(backend, "both") == 0;
+      work.comparison = backend == nullptr || strcmp(backend, "compare") == 0 ||
+                        strcmp(backend, "both") == 0;
+    }
+  }
+  if (getenv("STRAHLER_BACKEND_REPORT") != nullptr) {
+    fprintf(stderr, "PM backend %s, lookup=%d comparison=%d ISA=%s\n",
+            work.packed == nullptr ? "scalar" : "packed", work.lookup,
+            work.comparison, lift_isa_name(lift_isa()));
+  }
   size_t queued = 0;
   /* Oink's uintqueue is a stack; order affects untruncated Strahler tails. */
   for (size_t step = 0; step < count || queued != 0;) {
@@ -302,12 +390,16 @@ bool pm_lift(PGGame const *game, PGSet const *active,
   }
   for (size_t vertex = pg_set_next(active, 0); vertex != SIZE_MAX;
        vertex = pg_set_next(active, vertex + 1)) {
+    if (work.packed != nullptr) {
+      pm_unpack(work.packed + vertex, result->measure + vertex);
+    }
     if (!result->measure[vertex].top) {
       pg_set_add(&result->region, vertex);
     }
   }
   succeeded = true;
 cleanup:
+  free(packed);
   free(order);
   free(queue);
   free(predecessors);

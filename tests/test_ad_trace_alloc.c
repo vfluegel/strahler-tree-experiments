@@ -135,9 +135,12 @@ int main(void) {
       fail_at = SIZE_MAX;
       ad_result_destroy(&result);
       if (success) {
-        assert(allocation < nth);
-        completed = true;
-        break;
+        /* Optional acceleration may fail allocation and finish via scalar.
+         * Continue until the injected failure is beyond every allocation. */
+        if (allocation < nth) {
+          completed = true;
+          break;
+        }
       }
       assert(allocation >= nth);
       if (scenario < 3) {

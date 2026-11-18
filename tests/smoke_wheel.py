@@ -3,6 +3,7 @@
 from importlib.metadata import version
 from pathlib import Path
 import sys
+import os
 
 import strahler
 
@@ -38,3 +39,24 @@ except strahler.InputError:
 else:
     raise AssertionError('invalid input was accepted')
 print(f'Installed strahler {strahler.version()}: smoke test passed')
+
+# The wheel must contain every dispatched object on both target architectures.
+# This graph is large enough to enter AD's vector layout. Compare complete
+# documents, including deterministic lift counts and certificates.
+text = 'parity 79;\n' + '\n'.join(
+    f'{v} {v % 5} {v % 2} {(v + 1) % 80},{(v + 7) % 80};' for v in range(80))
+with strahler.Game.from_text(text) as game:
+    for algorithm in ('lifting', 'lifting-sym'):
+        os.environ['STRAHLER_AD_BACKEND'] = 'scalar'
+        expected = strahler.decompose(game, algorithm, tree_k=2).data
+        for backend in ('fused', 'packed', 'dense', 'queue', 'dirty', 'byte'):
+            os.environ['STRAHLER_AD_BACKEND'] = backend
+            assert strahler.decompose(game, algorithm, tree_k=2).data == expected
+    os.environ.pop('STRAHLER_AD_BACKEND')
+    os.environ['STRAHLER_PM_BACKEND'] = 'scalar'
+    expected = strahler.progress_measures(game, algorithm='strahler', k=3, t=2)
+    for backend in ('packed', 'lookup', 'compare', 'both'):
+        os.environ['STRAHLER_PM_BACKEND'] = backend
+        assert strahler.progress_measures(game, algorithm='strahler', k=3, t=2) == expected
+    os.environ.pop('STRAHLER_PM_BACKEND')
+print('Installed wheel: scalar and dispatched lifting backends agree')

@@ -17,8 +17,25 @@ The compressed games are unchanged from the downloaded archive.
 
 Notebook 08 uses all seven plain games. `plain-manifest.json` records their
 SHA-256 checksums, graph sizes, normalized priority bounds and theoretical
-host caps. `lexicographic-results-repeat-shaving-600s.json` contains the current
-comparison: every method is remeasured from n=1 with a 600-second / 2-GiB budget,
+host caps. `lexicographic-results-simd-600s.json` contains the current comparison;
+`lexicographic-simd-600s.json` records the fresh measurements and stopping
+frontiers. All six methods are rerun from n=1 after the portable lifting changes,
+with the same 600-second / 2-GiB limits and two workers. Earlier completed cases
+retain their host choices, trees, winners and other non-timing metrics.
+
+To repeat the experiment with the checkout's library selected, use a new output
+path so the committed measurements stay intact:
+
+```sh
+python jupyter-examples/lexicographic_nester.py rerun-timeouts --frontier --rerun-all --seconds 600 --jobs 2 --baseline jupyter-examples/nester/lexicographic-results-repeat-shaving-600s.json --output /tmp/nester-rerun-600s.json
+```
+
+`python jupyter-examples/lexicographic_nester.py collect` rebuilds the notebook's
+consolidated table from the saved SIMD recording. [SIMD.md](../../SIMD.md)
+describes the selected backends and matched-input benchmarks.
+
+The preserved `lexicographic-results-repeat-shaving-600s.json` contains the
+previous corrected comparison: every method was remeasured from n=1 with a 600-second / 2-GiB budget,
 repeating `(k,t)` after a productive shaving round and advancing only when a
 round removes no vertices. `lexicographic-repeat-shaving-600s.json` stores the
 fresh measurements and each method's stopping frontier. Every displayed

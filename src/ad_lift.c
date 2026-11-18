@@ -1,7 +1,9 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "ad_lift.h"
+#include "ad_reach.h"
 #include "pg_attractor.h"
 
 /* Why short lifts compute the least valid labelling.
@@ -108,12 +110,15 @@ typedef struct {
   PGSet invalid;
   size_t attractors;
   ADTrace *trace;
+  ADReach *reach;
+  size_t *occupied;
+  size_t lazy_groups;
 } LiftState;
 
 /* Mark every invalid vertex of the current labelling. Positions are visited in
  * host order; below holds {μ < ℓ} when position ℓ is reached, so a lazy
  * position costs one reach-through-safe attractor computation. */
-[[nodiscard]] static bool mark_invalid(LiftState *state) {
+[[nodiscard]] static bool mark_invalid_scalar(LiftState *state) {
   ADLiftTree const *host = state->host;
   size_t count = 0;
   LabelledVertex *sorted =
@@ -179,12 +184,57 @@ typedef struct {
   return true;
 }
 
+static bool lazy(ADLiftTree const *host, size_t const label) {
+  return label != host->top && host->positions[label].kind != AD_POS_REGULAR;
+}
+
+static void install_rank(LiftState *state, size_t const vertex) {
+  assert(state->reach != nullptr && state->occupied != nullptr);
+  size_t const label = state->labels[vertex];
+  ADPosition const position = state->host->positions[label];
+  ad_reach_labels(state->reach)[vertex] = (ADReachLabel){
+      .rank = label,
+      .after = position.kind == AD_POS_REGULAR
+                   ? state->host->nodes[position.node].after
+                   : 0,
+      .kind = label == state->host->top         ? AD_REACH_TOP
+              : position.kind == AD_POS_REGULAR ? AD_REACH_REGULAR
+                                                : AD_REACH_LAZY};
+  if (lazy(state->host, label) && state->occupied[label]++ == 0) {
+    state->lazy_groups++;
+  }
+}
+
+[[nodiscard]] static bool mark_invalid(LiftState *state) {
+  if (state->reach == nullptr) {
+    return mark_invalid_scalar(state);
+  }
+  ad_reach_compute(state->reach);
+  unsigned char const *good = ad_reach_good(state->reach);
+  pg_set_clear(&state->invalid);
+  for (size_t v = pg_set_next(state->active, 0); v != SIZE_MAX;
+       v = pg_set_next(state->active, v + 1)) {
+    if (!good[v]) {
+      pg_set_add(&state->invalid, v);
+    }
+  }
+  /* Preserve the public count of per-position attractor tests. */
+  state->attractors += state->lazy_groups;
+  return true;
+}
+
 static void lift(LiftState *state, size_t const vertex) {
   /* TOP is always valid, so an invalid vertex lies strictly below it. */
   size_t const previous = state->labels[vertex];
   state->labels[vertex] =
       ad_lift_tree_first_compatible(state->host, state->labels[vertex] + 1,
                                     state->game->vertices[vertex].priority);
+  if (state->reach != nullptr) {
+    if (lazy(state->host, previous) && --state->occupied[previous] == 0) {
+      state->lazy_groups--;
+    }
+    install_rank(state, vertex);
+  }
   if (state->trace != nullptr) {
     ADPosition const *position = state->host->positions + state->labels[vertex];
     ad_trace_label(state->trace, state->host, vertex,
@@ -283,6 +333,19 @@ void ad_lift_labelling_destroy(ADLiftLabelling *labelling) {
       }
     }
   }
+  if (trace == nullptr && !ad_reach_scalar_requested() &&
+      host->position_count <= SIZE_MAX / sizeof(*state.occupied)) {
+    state.occupied = calloc(host->position_count, sizeof(*state.occupied));
+    if (state.occupied != nullptr) {
+      state.reach = ad_reach_create(game, active, host->player);
+    }
+    if (state.reach != nullptr) {
+      for (size_t v = pg_set_next(active, 0); v != SIZE_MAX;
+           v = pg_set_next(active, v + 1)) {
+        install_rank(&state, v);
+      }
+    }
+  }
   ADLiftStats stats = {.max_position = SIZE_MAX};
   while (true) {
     if (!mark_invalid(&state)) {
@@ -336,6 +399,8 @@ void ad_lift_labelling_destroy(ADLiftLabelling *labelling) {
   result->labels = state.labels;
   result->vertex_count = count;
   result->stats = stats;
+  ad_reach_destroy(state.reach);
+  free(state.occupied);
   free(state.sorted);
   pg_set_destroy(&state.below);
   pg_set_destroy(&state.safe);
@@ -343,6 +408,8 @@ void ad_lift_labelling_destroy(ADLiftLabelling *labelling) {
   return true;
 
 failure:
+  ad_reach_destroy(state.reach);
+  free(state.occupied);
   free(state.labels);
   free(state.sorted);
   pg_set_destroy(&state.below);
