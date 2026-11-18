@@ -1,0 +1,62 @@
+[
+  {
+    "name": "portable-block-keeps-worst-edge",
+    "file": "src/lift_simd.c",
+    "old": "if (owned[lane] ? value < best : value > best) {",
+    "new": "if (owned[lane] ? value > best : value > best) {"
+  },
+  {
+    "name": "portable-block-limit-off-by-one",
+    "file": "src/lift_simd.c",
+    "old": "if (best <= limits[lane] && (next[lane] & 1) != 0) {",
+    "new": "if (best < limits[lane] && (next[lane] & 1) != 0) {"
+  },
+  {
+    "name": "avx2-block-swaps-owner-blend",
+    "file": "src/lift_simd_x86.c",
+    "old": "_mm256_blendv_epi8(hi, lo, owner);",
+    "new": "_mm256_blendv_epi8(lo, hi, owner);"
+  },
+  {
+    "name": "dirty-tail-skips-requeue",
+    "file": "src/ad_reach.c",
+    "old": "        if (!work->queued[next]) {\n          work->queued[next] = 1;\n          work->queue[tail] = next;\n          tail = (tail + 1) % work->blocks;\n          queued++;\n        }",
+    "new": "        if (!work->queued[next] && next != b) {\n          work->queued[next] = 1;\n          work->queue[tail] = next;\n          tail = (tail + 1) % work->blocks;\n          queued++;\n        }"
+  },
+  {
+    "name": "queue-tail-counts-strict-successors",
+    "file": "src/ad_reach.c",
+    "old": "pending += pg_set_contains(work->domain, u) &&\n                   work->labels[u].rank >= work->labels[v].rank;",
+    "new": "pending += pg_set_contains(work->domain, u) &&\n                   work->labels[u].rank > work->labels[v].rank;"
+  },
+  {
+    "name": "byte-regular-limit-off-by-one",
+    "file": "src/ad_reach.c",
+    "old": "work->limits[i] = (int)code - 1;",
+    "new": "work->limits[i] = (int)code;"
+  },
+  {
+    "name": "fused-lazy-ignores-blockers",
+    "file": "src/ad_reach.c",
+    "old": "if (game->vertices[v].owner != work->player && --work->pending[v] != 0) {",
+    "new": "if (game->vertices[v].owner != work->player && --work->pending[v] > 1) {"
+  },
+  {
+    "name": "packed-compare-flips-empty-level",
+    "file": "src/pm_packed.c",
+    "old": "return (a->bits[i] & 1) ? 1 : -1;",
+    "new": "return (a->bits[i] & 1) ? -1 : 1;"
+  },
+  {
+    "name": "ssse3-compare-drops-mask-delta",
+    "file": "src/lift_simd_x86.c",
+    "old": "      _mm_or_si128(_mm_and_si128(_mm_xor_si128(va, vb), _mm_and_si128(ma, mb)),\n                   _mm_xor_si128(ma, mb));",
+    "new": "      _mm_or_si128(_mm_and_si128(_mm_xor_si128(va, vb), _mm_and_si128(ma, mb)),\n                   _mm_setzero_si128());"
+  },
+  {
+    "name": "ssse3-count-table-wrong-entry",
+    "file": "src/lift_simd_x86.c",
+    "old": "_mm_setr_epi8(0, 1, 2, 0, 0, 3, 5, 0, 0, 7, 4, 0, 6, 0, 0, 0);",
+    "new": "_mm_setr_epi8(0, 1, 3, 0, 0, 3, 5, 0, 0, 7, 4, 0, 6, 0, 0, 0);"
+  }
+]

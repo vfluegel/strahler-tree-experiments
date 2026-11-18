@@ -106,6 +106,35 @@ def test_pm_iter_repeats_productive_pairs_and_advances_only_when_stalled():
         assert pm_wins(data) == ad_wins(strahler.decompose(game, 'zielonka'))
 
 
+def test_fixed_pair_maps_are_recorded_and_inferred_along_host_inclusion():
+    import fixed_pair_maps as maps
+
+    document = maps.recorded_maps()
+    least = {(s['n'], s['backend']): s['least'] for s in maps.smallest_pairs(document)}
+    assert least == {(4, 'AD-sym'): [(3, 1)], (4, 'AD-sym+iter'): [(2, 1)],
+                     (5, 'AD-sym'): [(3, 1)], (5, 'AD-sym+iter'): [(3, 1)]}
+    rows = [dict(k=1, t=1, outcome='unsolved', unresolved=1, seconds=1),
+            dict(k=2, t=1, outcome='solved', rounds=1, seconds=1),
+            dict(k=1, t=2, outcome='timeout', timeout_seconds=600)]
+    cells = maps.classify(rows, 3, 2)
+    assert cells[1, 0][0] == 'implied-failed' and cells[3, 2][0] == 'implied-solved'
+    assert cells[2, 1][1] == '\u2605' and cells[1, 2][1] == 'T'
+    assert cells[2, 0][0] == 'unknown'
+    assert maps.monotonicity_violations([
+        dict(n=1, backend='AD-sym', k=1, t=1, outcome='solved'),
+        dict(n=1, backend='AD-sym', k=2, t=1, outcome='unsolved')])
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_tree_t_pins_the_host_and_clamps_to_the_universal_t(algorithm):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        default = strahler.decompose(game, algorithm, tree_k=2).data['parameters']
+        pinned = strahler.decompose(game, algorithm, tree_k=2, tree_t=0).data['parameters']
+        clamped = strahler.decompose(game, algorithm, tree_k=2, tree_t=63).data['parameters']
+        assert all(p['t'] == 0 for p in pinned)
+        assert default[0]['t'] > 0 and clamped == default
+
+
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 def test_ad_repeats_a_productive_pair_at_the_end_of_a_capped_grid(algorithm):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:

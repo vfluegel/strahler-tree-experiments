@@ -58,6 +58,8 @@ static void usage(FILE *out, char *argv[]) {
           "priorities (default: off)\n"
           "  --tree-k=K                                  Lift in U^K_{t,H}; "
           "may be partial\n"
+          "  --tree-t=T                                  Fix t in --tree-k's "
+          "host (default: t_full)\n"
           "  --adaptive-t                                Raise t until "
           "complete; --tree-k caps K\n"
           "  --adaptive-t=incremental                    Reuse certified "
@@ -340,6 +342,7 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
     OPTION_NO_VERIFY,
     OPTION_ALGORITHM,
     OPTION_TREE_K,
+    OPTION_TREE_T,
     OPTION_ADAPTIVE_T,
     OPTION_START_T,
     OPTION_SEARCH,
@@ -366,6 +369,7 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       {"no-verify", no_argument, nullptr, OPTION_NO_VERIFY},
       {"algorithm", required_argument, nullptr, OPTION_ALGORITHM},
       {"tree-k", required_argument, nullptr, OPTION_TREE_K},
+      {"tree-t", required_argument, nullptr, OPTION_TREE_T},
       {"adaptive-t", optional_argument, nullptr, OPTION_ADAPTIVE_T},
       {"start-t", required_argument, nullptr, OPTION_START_T},
       {"search", required_argument, nullptr, OPTION_SEARCH},
@@ -395,6 +399,8 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       .verify = true,
   };
   size_t tree_k = 0;
+  bool tree_t_given = false;
+  size_t tree_t = 0;
   bool adaptive_t = false;
   bool start_t_given = false;
   size_t start_t = 0;
@@ -495,6 +501,12 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
       if (!parse_size(parser.argument, &tree_k) || tree_k == 0) {
         return cli_error_to(io->err, argv[0], "Invalid --tree-k value");
       }
+      break;
+    case OPTION_TREE_T:
+      if (!parse_size(parser.argument, &tree_t)) {
+        return cli_error_to(io->err, argv[0], "Invalid --tree-t value");
+      }
+      tree_t_given = true;
       break;
     case OPTION_ADAPTIVE_T:
       if (parser.argument != nullptr &&
@@ -599,6 +611,10 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
         io->err, argv[0],
         "Use at most one of --tree-k or --adaptive-t, --kary, and --tree-file");
   }
+  if (tree_t_given && (tree_k == 0 || adaptive_t)) {
+    return cli_error_to(io->err, argv[0],
+                        "--tree-t requires --tree-k without adaptive search");
+  }
   if ((lift_options.start_k != 0 && !lift_options.lexicographic) ||
       (start_t_given && lift_options.ratio)) {
     return cli_error_to(io->err, argv[0],
@@ -631,6 +647,8 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
   } else if (tree_k != 0) {
     lift_options.mode = AD_LIFT_HOST_STRAHLER;
     lift_options.k = tree_k;
+    lift_options.fixed_t = tree_t_given;
+    lift_options.t = tree_t;
   } else if (arity != 0) {
     lift_options.mode = AD_LIFT_HOST_KARY;
     lift_options.arity = arity;

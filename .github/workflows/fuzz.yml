@@ -1,0 +1,95 @@
+name: fuzz
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: Seconds to fuzz each target
+        default: "1800"
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    name: libFuzzer with ASan and UBSan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+      SECONDS_PER_TARGET: ${{ github.event_name == 'pull_request' && '300' || inputs.seconds || '1800' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 libclang-rt-18-dev ninja-build pipx
+          pipx install meson==1.8.5
+
+      - name: Build
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: |
+          meson setup build-fuzz --buildtype=debugoptimized -Dfuzz=true \
+            -Db_sanitize=address,undefined -Db_lundef=false -Dlenstree=disabled -Dwerror=true
+          meson compile -C build-fuzz fuzz-solvers fuzz-parse
+
+      - name: Fuzz each target
+        run: |
+          status=0
+          for target in solvers parse; do
+            mkdir -p "findings/$target" "grown/$target"
+            cp -a "tests/fuzz/corpus/$target/." "grown/$target/"
+            max_len=512
+            if [ "$target" = parse ]; then max_len=4096; fi
+            if ! "build-fuzz/fuzz-$target" "grown/$target" \
+                -max_total_time="$SECONDS_PER_TARGET" -rss_limit_mb=2048 -timeout=60 \
+                -max_len="$max_len" -len_control=20 -print_final_stats=1 \
+                -artifact_prefix="findings/$target/" >"findings/$target.log" 2>&1; then
+              status=1
+            fi
+            tail -n 30 "findings/$target.log"
+          done
+          exit "$status"
+
+      - name: Upload findings and grown corpora
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-findings
+          path: |
+            findings
+            grown
+
+  mutants:
+    name: Saved corpus catches backend bugs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-14 gcc-14 ninja-build pipx
+          pipx install meson==1.8.5
+
+      - name: Run mutants
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: python3 tests/fuzz/mutants.py

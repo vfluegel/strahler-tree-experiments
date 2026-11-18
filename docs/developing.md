@@ -18,6 +18,9 @@ Valgrind separately. To run the memory check locally after building:
 ci/check-valgrind.sh build
 ```
 
+Fuzz targets and the mutation check are described in
+[tests/fuzz/README.md](../tests/fuzz/README.md).
+
 After changing the library or a notebook, run `python scripts/execute_notebooks.py`
 from the repository root with the notebook venv activated. It saves the example
 outputs and static widget views for GitHub. Setup and tests are in
@@ -416,7 +419,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   level shows its largest original priority, and an intervening empty
   bound shows that priority plus the compact offset.
 - `--tree-k=K` lifts in the smaller Strahler host `U^K_{t,H}`. The result may
-  be partial.
+  be partial. `t` defaults to `floor(log2 n)`; `--tree-t=T` fixes it, clamped to
+  that value. `--tree-t` requires `--tree-k` and excludes adaptive search.
 - `--adaptive-t` lifts in `U^K_{t,H}` with `t = 0, 1, ...` and the largest
   useful `K = min(H, t + 1)` until the result is complete. It reports the
   smallest such `t` on standard error, together with the smallest `t` at which
