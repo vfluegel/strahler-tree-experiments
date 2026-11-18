@@ -2,7 +2,7 @@ lifting-sym: vertices=5 t_full=2 result=complete
 iter-shave: rounds=2
 iter-shave: round=1 shaved=3 even=3 odd=0
 iter-shave: round=2 shaved=2 even=2 odd=0
-lifting-sym: calls=1 attractors=7 moves=3 sets=3 certification_lifts=0 separator=2
+lifting-sym: calls=1 attractors=3 moves=1 sets=1 certification_lifts=0 separator=2
 lifting-sym even: root_level=4 H=3 k_full=3 host=strahler K=1 t=2 host_nodes=3 host_leaves=1 positions=9 region=2 tree_nodes=2 tree_leaves=1 tree_height=2 strahler=1
 lifting-sym odd: root_level=3 H=2 k_full=2 host=strahler K=1 t=2 host_nodes=2 host_leaves=1 positions=6 region=0 tree_nodes=0 tree_leaves=0 tree_height=0 strahler=0
 start: vertex=0 winner=even
