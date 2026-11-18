@@ -51,6 +51,7 @@ struct ADShaveRound {
   PGSet attracted[2];
   /* SIZE_MAX for fixed hosts. */
   size_t t;
+  size_t k;
 };
 
 typedef struct {

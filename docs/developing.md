@@ -440,6 +440,13 @@ standard input. The default algorithm is attractor-decomposition lifting.
   vertex count and priority bounds set the caps for the whole run. This option requires
   `lifting` or `lifting-sym` and conflicts with `--adaptive-t`, k-ary and file
   hosts. Symmetric search restarts Algorithm 9 on each fixed host pair.
+- `--search=ratio` in AD lifting (including symmetric lifting) and Strahler PM
+  uses the same caps and shaving rules, starting at `(1,1)`
+  and choosing the smallest integer `max(k,t)/min(k,t)` with Oink's heap tie
+  order; it never visits `t=0`, so a game with `t_max=0` exhausts immediately.
+  For lexicographic AD or Strahler PM search, `--start-k=K --start-t=T` skips
+  earlier pairs (default `(1,0)`, `K>=1` within the cap, `T` clamped to `t_max`);
+  starting pairs are rejected with ratio search.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.
@@ -575,7 +582,7 @@ a zero-bit budget. Depth is the number of counter-parity levels, including
 empty intervening levels.
 
 `--k=K --t=T` fixes Strahler parameters; `--bits=B` fixes succinct's budget.
-`--search=lexicographic` instead starts at `(k,t)=(1,0)` and exhausts
+`--search=lexicographic` instead starts at `(k,t)=(1,0)` by default and exhausts
 `t=0..floor(log2(n))` before increasing `k`. For this search the theoretical
 per-player cap is `min(depth+1,floor(log2(n))+1)`, including the measure
 tree's root; it applies with or without `--iter-shave`. The caps keep their
@@ -811,6 +818,8 @@ Following the common header and `game`, the document contains, in order:
 - `parameters: [even, odd]`: final host bounds from the same solver statistics
   as `--stats`: `H,K,t` for Strahler hosts, `H,arity` for k-ary hosts, and `H`
   for file hosts. Empty remaining games and recursive solvers have empty objects.
+- `round_pairs`: the final selected pair without shaving, or each shaving
+  round's pair; present with ratio search or an explicit lexicographic `start_k`.
 - `budget_exhausted`: true when an adaptive host exceeded the leaf limit;
   the returned parameters still describe the last hosts that actually ran.
 

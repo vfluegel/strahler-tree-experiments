@@ -51,8 +51,10 @@ static void usage(FILE *out, char *argv[]) {
         "budget; may be partial\n"
         "  --iter-shave                                Remove dominions "
         "between runs (default: off)\n"
-        "  --search=lexicographic                      Exhaust t for each "
-        "k before raising k\n"
+        "  --search=lexicographic|ratio                Select exhaustive "
+        "parameter order\n"
+        "  --start-k=K --start-t=T                      First lexicographic "
+        "pair (default: 1,0)\n"
         "  --stats                                     Print statistics to "
         "stderr (default: off)\n"
         "  --no-verify                                 Skip verification "
@@ -175,6 +177,8 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     OPT_BITS,
     OPT_INCREMENTAL,
     OPT_SEARCH,
+    OPT_START_K,
+    OPT_START_T,
     OPT_STATS,
     OPT_NO_VERIFY
   };
@@ -194,6 +198,8 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       {"bits", required_argument, nullptr, OPT_BITS},
       {"iter-shave", no_argument, nullptr, OPT_INCREMENTAL},
       {"search", required_argument, nullptr, OPT_SEARCH},
+      {"start-k", required_argument, nullptr, OPT_START_K},
+      {"start-t", required_argument, nullptr, OPT_START_T},
       {"stats", no_argument, nullptr, OPT_STATS},
       {"no-verify", no_argument, nullptr, OPT_NO_VERIFY},
       {nullptr, 0, nullptr, 0},
@@ -208,6 +214,7 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
                    .start_winner = "unresolved"};
   bool k_given = false;
   bool t_given = false;
+  bool start_t_given = false;
   bool bits_given = false;
   int option = 0;
   while ((option = cli_next_option(argc, argv, &parser, options)) != -1) {
@@ -307,11 +314,26 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       solve_options.incremental = true;
       output.incremental = true;
       break;
+    case OPT_START_K:
+      if (!parse_size(parser.argument, &solve_options.start_k) ||
+          solve_options.start_k == 0) {
+        return cli_error_to(io->err, argv[0], "Invalid --start-k value");
+      }
+      break;
+    case OPT_START_T:
+      if (!parse_size(parser.argument, &solve_options.start_t)) {
+        return cli_error_to(io->err, argv[0], "Invalid --start-t value");
+      }
+      start_t_given = true;
+      break;
     case OPT_SEARCH:
-      if (strcmp(parser.argument, "lexicographic") != 0) {
+      if (strcmp(parser.argument, "lexicographic") != 0 &&
+          strcmp(parser.argument, "ratio") != 0) {
         return cli_error_to(io->err, argv[0], "Invalid --search value");
       }
-      solve_options.lexicographic = true;
+      solve_options.lexicographic =
+          strcmp(parser.argument, "lexicographic") == 0;
+      solve_options.ratio = strcmp(parser.argument, "ratio") == 0;
       break;
     case OPT_STATS:
       output.stats = true;
@@ -329,10 +351,15 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     goto invalid;
   }
   solve_options.fixed = k_given || bits_given;
-  if (solve_options.lexicographic &&
+  if ((solve_options.lexicographic || solve_options.ratio) &&
       (solve_options.fixed || solve_options.algorithm != PM_STRAHLER)) {
     return cli_error_to(io->err, argv[0],
                         "--search requires unfixed Strahler parameters");
+  }
+  if ((solve_options.start_k != 0 || start_t_given) &&
+      !solve_options.lexicographic) {
+    return cli_error_to(io->err, argv[0],
+                        "--start-k/--start-t require lexicographic search");
   }
   PGGame game = {0};
   if (io->game == nullptr) {

@@ -594,6 +594,39 @@ static void test_partial_and_adaptive(void) {
   pg_game_destroy(&game);
 }
 
+static void test_exhaustive_search(void) {
+  PGGame game = parse(partial_game);
+  PGSet domain = full_domain(&game);
+  for (size_t symmetric = 0; symmetric < 2; symmetric++) {
+    for (size_t iterate = 0; iterate < 2; iterate++) {
+      ADLiftOptions options = options_for(AD_LIFT_HOST_ADAPTIVE, 0);
+      options.symmetric = symmetric;
+      options.iter_shave = iterate;
+      options.ratio = true;
+      ADLiftSolveStats stats = {0};
+      ADResult result = solve(&game, &domain, &options, &stats);
+      expect_regions(&result, iterate ? 2 : 5, 0);
+      assert(stats.adaptive_complete && stats.player[0].t == 1);
+      assert(stats.player[0].k == (iterate ? 1 : 2));
+      ad_result_destroy(&result);
+      options.ratio = false;
+      options.lexicographic = true;
+      options.start_k = 2;
+      options.t = 99;
+      result = solve(&game, &domain, &options, &stats);
+      expect_regions(&result, 5, 0);
+      assert(stats.player[0].k == 2 && stats.player[0].t == 2);
+      ad_result_destroy(&result);
+      options.start_k = 4;
+      ADLiftError error = {0};
+      assert(!ad_lift_solve(&game, &domain, &options, &result, &stats, &error));
+      assert(strstr(error.message, "start k") != nullptr);
+    }
+  }
+  pg_set_destroy(&domain);
+  pg_game_destroy(&game);
+}
+
 static void expect_same_tree(ADNode const *left, ADNode const *right) {
   assert((left == nullptr) == (right == nullptr));
   if (left == nullptr) {
@@ -877,6 +910,7 @@ int main(void) {
   test_verifier_rejections();
   test_materialize_rejects_empty_core();
   test_partial_and_adaptive();
+  test_exhaustive_search();
   test_incremental();
   test_iter_shave();
   test_kary_hosts();
