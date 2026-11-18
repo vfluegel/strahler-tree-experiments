@@ -727,19 +727,27 @@ sym_solve_trace(PGGame const *game, PGSet const *domain,
       }
     }
   }
+  /* Shaving can remove the highest priorities, but supplied hosts keep their
+   * roots. The lower root still identifies the player who moves first. */
+  uint64_t top = maximum;
+  if (hosts != nullptr) {
+    uint64_t const even = hosts[PG_EVEN].nodes[0].level;
+    uint64_t const odd = hosts[PG_ODD].nodes[0].level;
+    top = even < odd ? even : odd;
+  }
   /* The upper root has no highest-priority vertices. Its empty top attractor
    * must be moved before visiting its children (Lemma 8.2.1's call invariant).
    */
-  PGPlayer const upper = (PGPlayer)(1 - maximum % 2);
+  PGPlayer const first = (PGPlayer)(top % 2);
+  PGPlayer const upper = (PGPlayer)(1 - first);
   if (!pg_set_empty(domain) &&
       !move(&state, domain, upper, 0, AD_POS_MINUS_INF, &state.lower)) {
     goto failure;
   }
-  if (!pg_set_empty(domain) &&
-      !solve(&state, &separator, (PGPlayer)(maximum % 2), 0, 0)) {
+  if (!pg_set_empty(domain) && !solve(&state, &separator, first, 0, 0)) {
     goto failure;
   }
-  stats->separator = maximum % 2 == PG_EVEN
+  stats->separator = first == PG_EVEN
                          ? pg_set_count(&separator)
                          : pg_set_count(domain) - pg_set_count(&separator);
   for (size_t player = 0; player < 2; player++) {
@@ -819,7 +827,6 @@ sym_solve_trace(PGGame const *game, PGSet const *domain,
              .name = "dominion_certified", .vertices = result->region + player);
     pg_set_subtract_into(&result->unresolved, result->region + player);
   }
-  PGPlayer const first = (PGPlayer)(maximum % 2);
   pg_set_clear(&state.safe);
   pg_set_union_into(&state.safe, result->region + (1 - first));
   pg_set_intersect_into(&state.safe, &separator);
