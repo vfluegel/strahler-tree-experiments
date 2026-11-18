@@ -16,7 +16,7 @@ for Jupyter and the optional Python dependencies.
 | [05-compare-backends](05-compare-backends.ipynb) | +pre/+iter metrics, generated and progress-measure prefix trees |
 | [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
 | [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
-| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic AD/symmetric AD/PM search, host trees, lazy positions, linked AD tree/block views, plain Nester frontier |
+| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic and ratio AD/symmetric AD/PM search, host trees, linked AD tree/block views, Nester frontier and (k,t) boundary |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.

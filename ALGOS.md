@@ -75,6 +75,12 @@ in the full game. Exits into one's own removed region are winning; vertices
 where the opponent could force an exit into its region were already attracted
 out.
 
+AD lifting (including symmetric lifting) and Strahler PM support `search='ratio'`,
+using the lexicographic caps and shaving rules with Oink's integer-ratio heap
+order from `(1,1)`; `t=0` is never visited because its ratio is undefined.
+Lexicographic search also accepts `start_k=K, start_t=T` (`--start-k=K --start-t=T`)
+to skip earlier pairs, defaulting to `(1,0)` and clamping `T` to the initial cap.
+
 Adaptive solvers use the priority and size bounds left by initial preprocessing.
 Compression and shaving can lower these bounds, allowing lower t values and
 smaller hosts. Iterative shaving reduces the game searched in later rounds.
