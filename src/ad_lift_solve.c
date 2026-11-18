@@ -503,8 +503,11 @@ typedef enum {
       size_t const k = options->mode == AD_LIFT_HOST_FULL
                            ? k_full
                            : smaller(options->k, k_full);
-      succeeded = run_strahler(&solver, (PGPlayer)player, k, stats->t_full) ==
-                  HOST_BUILT;
+      size_t const t =
+          options->mode == AD_LIFT_HOST_STRAHLER && options->fixed_t
+              ? smaller(options->t, stats->t_full)
+              : stats->t_full;
+      succeeded = run_strahler(&solver, (PGPlayer)player, k, t) == HOST_BUILT;
     }
     break;
   case AD_LIFT_HOST_ADAPTIVE:

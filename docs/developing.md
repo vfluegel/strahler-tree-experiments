@@ -416,7 +416,8 @@ standard input. The default algorithm is attractor-decomposition lifting.
   level shows its largest original priority, and an intervening empty
   bound shows that priority plus the compact offset.
 - `--tree-k=K` lifts in the smaller Strahler host `U^K_{t,H}`. The result may
-  be partial.
+  be partial. `t` defaults to `floor(log2 n)`; `--tree-t=T` fixes it, clamped to
+  that value. `--tree-t` requires `--tree-k` and excludes adaptive search.
 - `--adaptive-t` lifts in `U^K_{t,H}` with `t = 0, 1, ...` and the largest
   useful `K = min(H, t + 1)` until the result is complete. It reports the
   smallest such `t` on standard error, together with the smallest `t` at which

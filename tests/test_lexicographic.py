@@ -106,6 +106,16 @@ def test_pm_iter_repeats_productive_pairs_and_advances_only_when_stalled():
 
 
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_tree_t_pins_the_host_and_clamps_to_the_universal_t(algorithm):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        default = strahler.decompose(game, algorithm, tree_k=2).data['parameters']
+        pinned = strahler.decompose(game, algorithm, tree_k=2, tree_t=0).data['parameters']
+        clamped = strahler.decompose(game, algorithm, tree_k=2, tree_t=63).data['parameters']
+        assert all(p['t'] == 0 for p in pinned)
+        assert default[0]['t'] > 0 and clamped == default
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 def test_ad_repeats_a_productive_pair_at_the_end_of_a_capped_grid(algorithm):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
         run = strahler.trace(game, algorithm, search='lexicographic', iter_shave=True,

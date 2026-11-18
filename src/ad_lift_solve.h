@@ -40,8 +40,10 @@ typedef struct {
   ADLiftHostMode mode;
   /* STRAHLER: K, at least one. ADAPTIVE: a cap on K, or zero for none. */
   size_t k;
-  /* ADAPTIVE: the first t. */
+  /* ADAPTIVE: the first t. STRAHLER with fixed_t: the host's t. */
   size_t t;
+  /* STRAHLER: use U^K_{t,H}, with t clamped to t_full, instead of t_full. */
+  bool fixed_t;
   /* ADAPTIVE: visit (K,t) lexicographically, with K as the outer loop. */
   bool lexicographic;
   /* Internal cursor for lexicographic iterative shaving; zero starts at 1. */

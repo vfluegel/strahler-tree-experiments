@@ -78,7 +78,8 @@ with Game.from_file('tests/games/strahler_two.pg') as game:
 
 Use these calls while `game` is open. Keyword underscores become hyphens,
 `True` emits a flag, and `False`/`None` omit it. Raw `args` are appended.
-All lifting hosts are available: full/default, `tree_k`, `kary`, `tree_file`,
+All lifting hosts are available: full/default, `tree_k` (optionally with
+`tree_t`), `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
 `iter_shave=True`. Symmetric lifting supports adaptive hosts through
 `search='lexicographic'`; it rejects `adaptive_t`.

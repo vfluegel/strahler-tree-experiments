@@ -138,7 +138,7 @@ def decompose(game, algorithm=None, *, args=None, **options):
 
     Algorithms: zielonka, zielonka-sym, lifting, lifting-sym. Host options and
     preprocessing use the CLI's spelling, e.g. adaptive_t='incremental',
-    tree_k=2, kary=2, tree_file=path, initial_shave='all', iter_shave=True.
+    tree_k=2, tree_t=1, kary=2, tree_file=path, initial_shave='all', iter_shave=True.
     """
     flags = _native.options(args, options, algorithm)
     return Result(_native.call('decompose', game._pointer(), flags, len(flags),

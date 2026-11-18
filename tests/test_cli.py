@@ -126,6 +126,8 @@ else:
         if program == "pg2adot":
             for arguments in [("--tree-file=",), ("--adaptive-t=bad",),
                               ("--start-t=2",), ("--tree-k=1", "--kary=2"),
+                              ("--tree-t=1",), ("--tree-k=1", "--tree-t=x"),
+                              ("--tree-k=1", "--tree-t=1", "--adaptive-t"),
                               ("--algorithm=zielonka", "--tree-k=1"),
                               ("--algorithm=lifting-sym", "--adaptive-t")]:
                 invalid(*arguments)
