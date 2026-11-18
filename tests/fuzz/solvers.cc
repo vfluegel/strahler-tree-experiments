@@ -56,9 +56,11 @@ Decoded decode(std::uint8_t const *data, std::size_t size) {
   game.t = (host >> 2U) % 3;
   game.text = "parity " + std::to_string(n - 1) + ";\n";
   for (unsigned v = 0; v < n; v++) {
-    game.text += std::to_string(v) + ' ' +
-                 std::to_string(bytes.next() % priorities) + ' ' +
-                 std::to_string(bytes.next() & 1U) + ' ';
+    // Separate reads: operand evaluation order differs between compilers.
+    unsigned const priority = bytes.next() % priorities;
+    unsigned const owner = bytes.next() & 1U;
+    game.text += std::to_string(v) + ' ' + std::to_string(priority) + ' ' +
+                 std::to_string(owner) + ' ';
     unsigned const edges = 1 + bytes.next() % degree;
     for (unsigned e = 0; e < edges; e++) {
       game.text += (e == 0 ? "" : ",") + std::to_string(bytes.next() % n);
