@@ -5,12 +5,55 @@ import json
 import os
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'jupyter-examples'))
 import family_benchmarks as family
+import fixed_pair_maps as fixed
+
+
+def test_fixed_reference_is_capped_cached_and_separate(monkeypatch):
+    fixed._reference_winners.cache_clear()
+    calls = []
+
+    def run(command, **options):
+        calls.append((json.loads(options['input']), options['timeout']))
+        return SimpleNamespace(returncode=0, stdout=json.dumps(
+            dict(outcome='solved', won_vertices=[[0], [1]])))
+
+    monkeypatch.setattr(fixed.subprocess, 'run', run)
+    for _ in range(2):
+        result = fixed.reference_winners('game.pg', 2, 0.01, 2)
+        assert result['outcome'] == 'solved' and 'seconds' in result
+    assert len(calls) == 1
+    request, timeout = calls[0]
+    assert request['backend'] == 'reference' and request['memory_gib'] == 2
+    assert timeout == 0.01
+    fixed._reference_winners.cache_clear()
+
+
+@pytest.mark.parametrize('changed', ['fixtures', 'jobs', 'lifting_backends', 'sidecar'])
+def test_fixed_resume_rejects_changed_conditions(tmp_path, monkeypatch, changed):
+    fixture = dict(file='game.pg', sha256='A')
+    provenance = dict(library_sha256='library', worker_sha256='worker',
+                      lifting_backends={'STRAHLER_AD_BACKEND': 'scalar'})
+    monkeypatch.setattr(fixed, 'manifest', lambda: [fixture])
+    monkeypatch.setattr(fixed, 'native_provenance', lambda: provenance)
+    monkeypatch.setattr(fixed, 'measure', lambda *args: dict(outcome='unsolved', seconds=0))
+    output = tmp_path / 'checkpoint.jsonl'
+    walk = lambda measured, n, backend: measured(n, backend, 1, 0)
+    fixed.run(walk, (4,), 60, 2, 1, output, ('PM',))
+    if changed == 'fixtures':
+        fixture['sha256'] = 'B'
+    elif changed == 'lifting_backends':
+        provenance['lifting_backends'] = {'STRAHLER_AD_BACKEND': 'packed'}
+    elif changed == 'sidecar':
+        output.with_suffix('.metadata.json').unlink()
+    with pytest.raises((AssertionError, ValueError)):
+        fixed.run(walk, (4,), 60, 2, 2 if changed == 'jobs' else 1, output, ('PM',))
 
 
 @pytest.fixture
@@ -163,6 +206,8 @@ def test_published_family_evidence_includes_all_cases_and_fixed_followups():
         assert len(document['rows']) == len(info['games']) * len(family.BACKENDS) * len(family.ORDERS)
         for game in info['games']:
             for backend in family.FIXED_BACKENDS:
+                if not backend.startswith('AD'):
+                    continue
                 cells = [r for r in document['fixed_rows']
                          if (r['game'], r['backend']) == (game['id'], backend)]
                 solved = {(r['k'], r['t']) for r in cells if r['outcome'] == 'solved'}

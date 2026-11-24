@@ -135,15 +135,21 @@ def test_map_inference_uses_the_bound_and_keeps_measured_limits():
     cells = maps.classify(rows, 5, 6)
     assert cells[3, 3][:2] == ('implied', '⇒')
     assert cells[4, 3][0] == 'dominated'  # The counterexample transition.
-    assert cells[4, 4][0] == 'limit' and 'guaranteed' in cells[4, 4][2]
+    assert cells[4, 4][0] == 'limit' and 'transferred' in cells[4, 4][2]
     assert cells[5, 4][:2] == ('implied', '⇒')
     assert cells[2, 6][0] == 'unknown'  # No inference to smaller k.
     assert maps.embedding_source({(1, 5)}, 4, 0) == (1, 5)  # A chain.
     assert maps.embedding_source({(3, 0)}, 1, 0) == (3, 0)
     assert rows[0]['outcome'] == 'solved' and len(rows) == 2
-    assert 'guaranteed by embedding, not timed' in maps.legend_svg()
+    assert 'transferred certificate(s), not run' in maps.legend_svg()
+    partial = dict(k=3, t=3, outcome='unsolved', unresolved=2)
+    # A historical STRPM run can miss an available certificate. Its measured
+    # partial answer takes precedence over the mathematical transfer marker.
+    assert maps.classify([*rows, partial], 5, 6)[3, 3][0] == 'failed'
     document = maps.recorded_maps()
     for n, backend in {(r['n'], r['backend']) for r in document['rows']}:
+        if not backend.startswith('AD'):
+            continue
         cells = [r for r in document['rows'] if (r['n'], r['backend']) == (n, backend)]
         solved = {(r['k'], r['t']) for r in cells if r['outcome'] == 'solved'}
         assert all(maps.embedding_source(solved, r['k'], r['t']) is None
@@ -773,10 +779,11 @@ def test_new_pm_recordings_identify_strahler_simd(monkeypatch):
 
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 @pytest.mark.parametrize('iterate', [False, True])
-def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterate):
+@pytest.mark.parametrize('order', ['table', 'monotone-tab'])
+def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterate, order):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg') as game:
         expected = ad_wins(strahler.decompose(game, 'zielonka'))
-        run = strahler.trace(game, algorithm, search='table', iter_shave=iterate)
+        run = strahler.trace(game, algorithm, search=order, iter_shave=iterate)
         assert run.result.complete and ad_wins(run.result) == expected
         check_document(run.result.data)
         visits = visited_pairs(run)
@@ -788,7 +795,7 @@ def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterat
                     at += 1
                 if event.get('phase') == 'shave_applied' and at + 1 < len(visits):
                     assert (visits[at + 1] == visits[at]) == any(event['result']['regions'])
-        pm = strahler.progress_measures(game, algorithm='strahler', search='table', iter_shave=iterate)
+        pm = strahler.progress_measures(game, algorithm='strahler', search=order, iter_shave=iterate)
         assert pm['rounds'][-1]['complete'] and pm_wins(pm) == expected
         assert run.result.data['parameters'][0]['H'] != run.result.data['parameters'][1]['H']
 
