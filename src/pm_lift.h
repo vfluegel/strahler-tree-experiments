@@ -35,6 +35,9 @@ typedef struct {
   PMParameters parameters;
   bool fixed;
   bool incremental;
+  /* Fixed Strahler hosts: repeat after productive shaving, stopping at a
+   * complete solution or a stable partial result. Default fixed runs once. */
+  bool repeat_fixed;
   /* Exhaust t=0..floor(log2 n) before increasing k. With incremental removal,
    * repeat a pair while it removes vertices. */
   bool lexicographic;

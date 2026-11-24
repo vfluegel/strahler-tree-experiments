@@ -272,3 +272,7 @@ jobs. The Linux Python test checks RSS across 1,000 repeated call batches.
 larger initial player height, then falls back to ratio order. It preserves
 the individual height caps and repeats a productive pair during iterative
 shaving. [Data and height sensitivity](../HOST-ORDER.md).
+
+For a fixed STRPM pair, `k=K, t=T, iter_shave=True, repeat_fixed=True` keeps
+the same hosts until shaving completes or stalls. Without `repeat_fixed`,
+the fixed PM API retains its single-round behavior.

@@ -154,7 +154,7 @@ Args pinned(std::string const &algorithm, unsigned k, unsigned t, bool iter) {
   return args;
 }
 
-// A larger host contains the smaller one, so it must not lose a solved game.
+// At fixed k, increasing t preserves host inclusion. Changing k does not.
 void fixed_hosts(Check const &check, unsigned k, unsigned t) {
   for (std::string const algorithm : {"lifting", "lifting-sym"}) {
     for (bool const iter : {false, true}) {
@@ -162,8 +162,6 @@ void fixed_hosts(Check const &check, unsigned k, unsigned t) {
       if (!check.lifting(args).complete) {
         continue;
       }
-      check.solved(check.lifting(pinned(algorithm, k + 1, t, iter)),
-                   "raising k from " + fuzz::join(args));
       check.solved(check.lifting(pinned(algorithm, k, t + 1, iter)),
                    "raising t from " + fuzz::join(args));
     }

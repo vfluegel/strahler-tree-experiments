@@ -1312,3 +1312,9 @@ in the `slow` suite. CI tests the native API and Python package on Ubuntu 24.04
 x86_64 and macOS 14 arm64 using Python 3.10. The shared wheel workflow builds
 with Python 3.10 for manylinux_2_28 x86_64 and macOS 11.0+ arm64, then tests the
 installed wheels with Python 3.12 on Ubuntu 24.04 and macOS 15.
+
+Fixed Strahler PM accepts `--repeat-fixed` together with `--k`, `--t` and
+`--iter-shave`. It repeats that original-game host pair while the residual
+shrinks, then returns complete or a stable partial result. The existing fixed
+API still runs one round by default. Notebook 08 uses this opt-in for its
+PM+iter fixed-pair measurements and records scalar/SIMD dispatch.

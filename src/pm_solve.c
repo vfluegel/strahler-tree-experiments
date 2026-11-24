@@ -47,6 +47,8 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
        1) ||
       ((options->start_k != 0 || options->start_t != 0) &&
        !options->lexicographic) ||
+      (options->repeat_fixed && (!options->fixed || !options->incremental ||
+                                 options->algorithm != PM_STRAHLER)) ||
       game->max_priority >= INT_MAX || !pg_subgame_is_total(game, active)) {
     pm_error(error, "invalid solver arguments");
     return false;
@@ -167,9 +169,13 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
     pm_result_destroy(&result[0]);
     pm_result_destroy(&result[1]);
     pg_set_destroy(&unresolved);
-    if (complete || options->fixed) {
+    if (complete || (options->fixed && (!options->repeat_fixed ||
+                                        before == pg_set_count(&remaining)))) {
       succeeded = true;
       break;
+    }
+    if (options->fixed) {
+      continue;
     }
     if (options->table) {
       if (!options->incremental || before == pg_set_count(&remaining)) {
