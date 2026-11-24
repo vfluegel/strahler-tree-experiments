@@ -13,8 +13,8 @@ always minimal. It does not depend on how far K increases or on h.
 
 Both AD and STRPM certificates transfer along this embedding. In particular,
 `(3,2) -> (4,4)` preserves every certificate at the same height, whereas
-`(3,2) -> (4,3)` has no such guarantee. This concerns solvability after lifting
-finishes, not runtime under a time or memory limit.
+`(3,2) -> (4,3)` has no such guarantee. This concerns available mathematical
+certificates. Discovering them is a separate property of a lifting procedure.
 
 ## Constructing the embedding
 
@@ -51,7 +51,7 @@ leaves either retain their next string or prefix it with `0`. Both operations
 preserve the bitstring order. Thus shared prefixes, strict branching order,
 and levels are preserved: this is an embedding of the whole tree.
 
-## Why it works for both solvers
+## How certificates transfer
 
 AD extends an embedding to the regular and lazy positions of its leafy host;
 valid labellings transfer as explained in
@@ -60,13 +60,32 @@ STRPM compares priority-truncated leaf labels. The embedding preserves those
 prefix comparisons, including strict progress, so its finite certificates
 transfer too. Apply the condition separately to each player's actual k and h.
 
-The guarantee also extends to fixed-pair iterative shaving. Restrict an old
+Certificate transfer also extends to fixed-pair iterative shaving. Restrict an old
 round's certificate to the new residual game. Opponent wins are disjoint from
 its dominion. Removing the player's own attractor cannot strand a remaining
 player-owned vertex: such a vertex has no edge into that removed attractor.
 Thus the restricted certificate still works, and its embedding still fits.
-The earliest old round with wins left uncovered supplies progress, so the new
-fixed-pair iteration cannot stall before covering the old result.
+The earliest old round with wins left uncovered supplies an available
+certificate. Thus a complete sequence of residual-game certificates and
+attractors exists at the new host too. Rediscovering it requires the lifting
+procedure to find the available bounded certificates.
+
+The native AD and corrected STRPM engines compute least valid labellings,
+so these embeddings guarantee completion whenever the source host completes.
+STRPM resets nonstrict tails to their first canonical completion; the earlier
+Oink-style kernel could miss an available measure. The
+[32-vertex regression](../examples/strpm-nonstrict-tail.pg) covers that fix.
+Green arrows show guaranteed completion inferred from an embedding, without
+a measured running time.
+
+`monotone-tab` uses prefixes generated offline from the size table and this
+bound, starting at the chain. Each prefix variant respects the chosen k and t
+caps. Global inclusion also holds after either player's height clamp; the
+player with the larger cap ensures that each step grows strictly.
+Runtime reads the saved prefix without testing embeddings. Productive shaving
+repeats the current pair. After the prefix, the ordinary ratio traversal tries
+every positive-t pair not yet visited, including candidates omitted by the
+monotone prefix. The inclusion guarantee covers the prefix.
 
 For a particular certificate with L occupied leaves and Strahler number at
 most K, the universality bound also suffices: `T >= floor(log2 L)`. Taking

@@ -43,8 +43,7 @@ STRPM represents them implicitly and benefits from its SIMD kernel. Graph
 structure, lifting and verification still decide the running time. Nor does a
 larger leaf count mean one host contains another: changing k can remove useful
 branching shapes, as the [checked counterexample](docs/incremental-t.md)
-shows. We therefore use sizes to choose what to try, never to infer a solver
-result.
+shows. Leaf count alone gives no solve guarantee.
 
 `--search=table` uses this bounded order, then continues in ratio order when
 larger parameters are needed. Heights beyond 1000 also use the ratio fallback.
@@ -53,6 +52,15 @@ their own height bounds remain intact. The order stays fixed while shaving
 shrinks the game. We keep the zero-budget pairs as well, including one-vertex
 games. The existing ratio and lexicographic modes remain available for direct
 comparisons.
+
+`--search=monotone-tab` reads a precomputed nested prefix. Offline generation
+starts from the chain and keeps a larger host when the [embedding bound](docs/host-monotonicity.md)
+proves inclusion: keep k and raise t, or raise k with T≥t+k−1. The table stores
+variants for each parameter cap, sharing 31 distinct prefixes.
+Runtime only looks up and reads the selected prefix. Both table modes then
+continue with the ordinary ratio traversal, skipping pairs already tried.
+The inclusion guarantee applies to the monotone prefix; ratio remains the
+usual unrestricted fallback.
 
 Regenerate with `python3 scripts/gen_host_order.py build/genstree`; add `--check`
 to check the saved CSV, analysis and native table against the generator.

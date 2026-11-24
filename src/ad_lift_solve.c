@@ -322,8 +322,7 @@ check_strahler_budget(Solver *solver, PGPlayer const player, size_t const k,
         table
             ? solver->options->monotone_table
                   ? parameter_monotone_init(queue, maximum, stats->t_full,
-                                            height, stats->player[0].k_full,
-                                            stats->player[1].k_full)
+                                            height)
                   : parameter_table_init(queue, maximum, stats->t_full, height)
             : parameter_queue_init(queue, maximum, stats->t_full);
     if (!initialized) {
@@ -353,7 +352,7 @@ check_strahler_budget(Solver *solver, PGPlayer const player, size_t const k,
       }
       if (skip) {
         queue->table_budget_skipped = true;
-        parameter_table_seek(queue, false);
+        parameter_table_advance(queue);
         continue;
       }
     } else if (ratio) {

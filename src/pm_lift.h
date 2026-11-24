@@ -43,7 +43,7 @@ typedef struct {
   bool lexicographic;
   bool ratio;
   bool table;
-  /* Table search restricted by the sufficient host embedding bound. */
+  /* Precomputed nested table prefix, then the ordinary ratio fallback. */
   bool monotone_table;
   /* Lexicographic start; zero k means the default 1. */
   size_t start_k;

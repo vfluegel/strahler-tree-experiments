@@ -361,7 +361,7 @@ def classify(rows, k_max, t_max):
         witness = embedding_source(solved, *at)
         if row is None:
             if witness is not None:
-                cells[at] = ('implied', '⇒', f'certificate(s) transferred from {witness}; native outcome unmeasured')
+                cells[at] = ('implied', '⇒', f'solve inferred from {witness}; not timed')
             else:
                 dominated = any(pair != at and pair[0] <= at[0] and pair[1] <= at[1] for pair in solved)
                 cells[at] = ('dominated', '', 'not run; cannot be a Pareto minimum; outcome unknown') if dominated else ('unknown', '', 'not run; outcome unknown')
@@ -445,7 +445,7 @@ def grid_svg(title, rows, k_max, t_max):
 
 def legend_svg():
     entries = [('solved', '★', 'confirmed Pareto minimum'), ('solved', '◇', 'observed nondominated solve'),
-               ('solved', '✓', 'measured solve'), ('implied', '⇒', 'transferred certificate(s), not run'),
+               ('solved', '✓', 'measured solve'), ('implied', '⇒', 'solve inferred by embedding, not timed'),
                ('failed', '✗', 'measured partial'), ('limit', 'T', 'resource limit'),
                ('dominated', '', 'dominated, not run'), ('unknown', '', 'not run')]
     parts, x = [], 4

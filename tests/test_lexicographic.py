@@ -141,7 +141,7 @@ def test_map_inference_uses_the_bound_and_keeps_measured_limits():
     assert maps.embedding_source({(1, 5)}, 4, 0) == (1, 5)  # A chain.
     assert maps.embedding_source({(3, 0)}, 1, 0) == (3, 0)
     assert rows[0]['outcome'] == 'solved' and len(rows) == 2
-    assert 'transferred certificate(s), not run' in maps.legend_svg()
+    assert 'solve inferred by embedding, not timed' in maps.legend_svg()
     partial = dict(k=3, t=3, outcome='unsolved', unresolved=2)
     # A historical STRPM run can miss an available certificate. Its measured
     # partial answer takes precedence over the mathematical transfer marker.

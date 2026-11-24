@@ -39,7 +39,7 @@ static inline size_t parameter_ratio(ParameterPair const parameters) {
 
 typedef struct {
   ParameterPair *heap;
-  bool *seen;
+  uint8_t *seen; /* Bit 0: queued; bit 1: selected for a solver attempt. */
   size_t count;
   size_t width;
   size_t k_max;
@@ -53,9 +53,8 @@ typedef struct {
   bool ordered_valid;
   bool table_budget_skipped;
   bool monotone_table;
-  bool terminal_emitted;
-  size_t player_cap[2];
-  ParameterPair anchor;
+  bool ordered_prefix;
+  uint64_t monotone_prefix;
 } ParameterQueue;
 
 static inline void parameter_queue_push(ParameterQueue *queue,
@@ -67,10 +66,10 @@ static inline void parameter_queue_push(ParameterQueue *queue,
     return;
   }
   size_t const key = parameters.k * queue->width + parameters.t;
-  if (queue->seen[key]) {
+  if ((queue->seen[key] & 1) != 0) {
     return;
   }
-  queue->seen[key] = true;
+  queue->seen[key] |= 1;
   size_t hole = queue->count++;
   while (hole != 0) {
     size_t const parent = (hole - 1) / 2;
@@ -140,7 +139,16 @@ static inline void parameter_queue_advance(ParameterQueue *queue) {
  * Keep ordered unchanged while shaving makes progress at this same pair. */
 static inline void parameter_table_next(ParameterQueue *queue) {
   queue->ordered_valid = true;
-  while (queue->band != nullptr && queue->table_at < queue->band->count) {
+  queue->ordered_prefix = false;
+  if (queue->monotone_table && queue->monotone_prefix != 0) {
+    unsigned const code = (unsigned)(queue->monotone_prefix & 63);
+    queue->monotone_prefix >>= 6;
+    queue->ordered = (ParameterPair){.k = code >> 3, .t = code & 7};
+    queue->ordered_prefix = true;
+    return;
+  }
+  while (!queue->monotone_table && queue->band != nullptr &&
+         queue->table_at < queue->band->count) {
     unsigned const code = queue->band->pairs[queue->table_at++];
     ParameterPair const pair = {.k = code >> 3, .t = code & 7};
     if (pair.k <= queue->k_max && pair.t <= queue->t_max) {
@@ -158,8 +166,11 @@ static inline void parameter_table_next(ParameterQueue *queue) {
   while (queue->count != 0) {
     ParameterPair const pair = queue->heap[0];
     parameter_queue_advance(queue);
-    if (queue->band == nullptr || pair.k > HOST_ORDER_MAX_K ||
-        pair.t > HOST_ORDER_MAX_T) {
+    bool const visited = (queue->seen[pair.k * queue->width + pair.t] & 2) != 0;
+    if (queue->monotone_table
+            ? !visited
+            : queue->band == nullptr || pair.k > HOST_ORDER_MAX_K ||
+                  pair.t > HOST_ORDER_MAX_T) {
       queue->ordered = pair;
       return;
     }
@@ -167,68 +178,12 @@ static inline void parameter_table_next(ParameterQueue *queue) {
   queue->ordered_valid = false;
 }
 
-/* Sufficient host embedding at one fixed height; k is already clamped. */
-static inline bool parameter_embeds(ParameterPair const from,
-                                    ParameterPair const to) {
-  if (from.k == 1 || from.t == 0) {
-    return true;
-  }
-  return to.k == from.k ? to.t >= from.t
-                        : to.k > from.k && to.t >= from.t + from.k - 1;
-}
-
-static inline ParameterPair parameter_clamped(ParameterPair pair,
-                                              size_t const cap) {
-  if (pair.k > cap) {
-    pair.k = cap;
-  }
-  if (pair.k == 1 || pair.t == 0) {
-    pair = (ParameterPair){.k = 1, .t = 0};
-  }
-  return pair;
-}
-
-static inline bool parameter_monotone_accepts(ParameterQueue const *queue,
-                                              ParameterPair const pair) {
-  bool larger = false;
-  for (size_t player = 0; player < 2; player++) {
-    size_t const cap = queue->player_cap[player];
-    ParameterPair const old = parameter_clamped(queue->anchor, cap);
-    ParameterPair const next = parameter_clamped(pair, cap);
-    ParameterPair const terminal = parameter_clamped(
-        (ParameterPair){.k = queue->k_max, .t = queue->t_max}, cap);
-    if (!parameter_embeds(old, next) || !parameter_embeds(next, terminal)) {
-      return false;
-    }
-    larger |= old.k != next.k || old.t != next.t;
-  }
-  return larger;
-}
-
-/* A skipped oversized host must not become the next inclusion anchor. */
-static inline void parameter_table_seek(ParameterQueue *queue,
-                                        bool const attempted) {
-  if (queue->monotone_table && attempted && queue->ordered_valid) {
-    queue->anchor = queue->ordered;
-  }
-  do {
-    parameter_table_next(queue);
-  } while (queue->ordered_valid && queue->monotone_table &&
-           !parameter_monotone_accepts(queue, queue->ordered));
-  if (queue->monotone_table && !queue->ordered_valid &&
-      !queue->terminal_emitted) {
-    ParameterPair const terminal = {.k = queue->k_max, .t = queue->t_max};
-    queue->ordered_valid = parameter_monotone_accepts(queue, terminal);
-    queue->ordered = terminal;
-  }
-  if (queue->monotone_table && queue->ordered_valid &&
-      queue->ordered.k == queue->k_max && queue->ordered.t == queue->t_max) {
-    queue->terminal_emitted = true;
-  }
-}
-
 static inline void parameter_table_advance(ParameterQueue *queue) {
-  parameter_table_seek(queue, true);
+  parameter_table_next(queue);
+  if (queue->ordered_valid) {
+    size_t const key = queue->ordered.k * queue->width + queue->ordered.t;
+    queue->seen[key] |= 2;
+  }
 }
 
 [[nodiscard]] static inline bool parameter_table_init(ParameterQueue *queue,
@@ -252,18 +207,24 @@ static inline void parameter_table_advance(ParameterQueue *queue) {
   return true;
 }
 
-[[nodiscard]] static inline bool
-parameter_monotone_init(ParameterQueue *queue, size_t const k_max,
-                        size_t const t_max, size_t const height,
-                        size_t const even_cap, size_t const odd_cap) {
+[[nodiscard]] static inline bool parameter_monotone_init(ParameterQueue *queue,
+                                                         size_t const k_max,
+                                                         size_t const t_max,
+                                                         size_t const height) {
   if (!parameter_table_init(queue, k_max, t_max, height)) {
     return false;
   }
   queue->monotone_table = true;
-  queue->player_cap[0] = even_cap;
-  queue->player_cap[1] = odd_cap;
-  queue->ordered = queue->anchor = (ParameterPair){.k = 1, .t = 0};
-  queue->ordered_valid = true;
+  queue->zero_k = k_max + 1;
+  queue->monotone_prefix =
+      8; /* Chain, also when height is outside the table. */
+  if (queue->band != nullptr) {
+    size_t const k = k_max < HOST_ORDER_MAX_K ? k_max : HOST_ORDER_MAX_K;
+    size_t const t = t_max < HOST_ORDER_MAX_T ? t_max : HOST_ORDER_MAX_T;
+    queue->monotone_prefix =
+        host_monotone_prefixes[queue->band->monotone[k - 1][t]];
+  }
+  parameter_table_advance(queue);
   return true;
 }
 

@@ -86,9 +86,7 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
     size_t const height = (size_t)(game->max_priority / 2 + 2);
     initialized =
         options->monotone_table
-            ? parameter_monotone_init(
-                  &queue, queue.k_max, queue.t_max, height,
-                  (size_t)((game->max_priority + 1) / 2 + 1), height)
+            ? parameter_monotone_init(&queue, queue.k_max, queue.t_max, height)
             : parameter_table_init(&queue, queue.k_max, queue.t_max, height);
   } else {
     queue.heap = calloc(slots, sizeof(queue.heap[0]));
