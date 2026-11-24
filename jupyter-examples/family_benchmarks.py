@@ -316,7 +316,9 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
     metadata = dict(family=family, timeout_seconds=seconds, memory_gib=memory_gib, jobs=jobs,
                     reference_timeout_seconds=seconds, memory_cap_enforced=sys.platform.startswith('linux'),
                     report_size_cap_gib=2, python_version=platform.python_version(),
-                    source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                    source_commit=subprocess.check_output(
+                        ['git', '-C', str(Path(__file__).resolve().parents[1]), 'rev-parse', 'HEAD'],
+                        text=True).strip(),
                     worker_sha256=sha256(__file__), ijson_version=ijson.__version__,
                     machine=f'{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs',
                     fixture_sha256={g['id']: g['sha256'] for g in info['games']},

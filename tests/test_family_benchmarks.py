@@ -135,6 +135,7 @@ def test_alternate_budget_cannot_delete_a_published_reference(case_request, tmp_
     fixture.write_bytes(Path(case_request['path']).read_bytes())
     game = dict(case_request['game'], id='toy', file=fixture.name, series='toy', parameter=1,
                 fixed_map=False)
+    monkeypatch.chdir(tmp_path)  # Meson also runs tests outside the checkout.
     monkeypatch.setattr(family, 'HERE', tmp_path)
     monkeypatch.setattr(family, 'manifest', lambda _: dict(games=[game]))
 
