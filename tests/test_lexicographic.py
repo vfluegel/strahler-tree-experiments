@@ -747,27 +747,42 @@ def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterat
 
 
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
-def test_table_budget_skips_keep_reaching_the_ratio_tail(algorithm):
+@pytest.mark.parametrize('iterate', [False, True])
+def test_table_budget_skips_keep_reaching_the_ratio_tail(algorithm, iterate):
     # Sixteen disjoint copies keep the unary host partial, while priority loops
     # give height seven and enough vertices to reach parameters outside 6x6.
     text = []
-    source = '0 2 0 3;1 2 1 2;2 0 1 1,4;3 0 0 3;4 3 1 3;'
-    for copy in range(32):
+    source = '0 3 1 9;1 2 1 4;2 0 1 1,2;3 1 1 2;4 0 1 3,4;5 2 1 9;6 1 1 4;7 0 1 5,6,7;8 1 1 7;9 0 1 8,9;'
+    for copy in range(16):
         for row in source.split(';'):
             if not row:
                 continue
             v, p, owner, edges = row.split()
-            offset = copy * 5
+            offset = copy * 10
             text.append(f"{int(v)+offset} {p} {owner} " + ','.join(str(int(e)+offset) for e in edges.split(',')) + ';')
     for priority in range(13):
         v = 160 + priority
         text.append(f'{v} {priority} 0 {v};')
     with strahler.Game.from_text('\n'.join(text)) as game:
-        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1)
+        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1,
+                             iter_shave=iterate)
         assert not run.result.complete and run.result.data['budget_exhausted']
         assert (1, 7) in visited_pairs(run)
         truth = ad_wins(strahler.decompose(game, 'zielonka'))
         assert all(won <= true for won, true in zip(ad_wins(run.result), truth))
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_table_budget_exhaustion_retains_the_last_real_attempt(algorithm):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg') as game:
+        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1,
+                             iter_shave=True)
+        data = run.result.data
+        assert not run.result.complete and data['budget_exhausted']
+        assert visited_pairs(run)[-1] == (3, 0)
+        assert len(visited_pairs(run)) == len(data['round_pairs']) == 6
+        assert data['parameters'][0]['K'] == 3
+        assert data['parameters'][1]['K'] == 2
 
 
 @pytest.mark.parametrize('solver', ['AD', 'AD-sym', 'PM'])

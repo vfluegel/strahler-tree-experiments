@@ -714,7 +714,13 @@ solve_with_options(PGGame const *game, PGSet const *domain,
     if (((options->ratio && queue->count == 0) ||
          (options->table && !queue->ordered_valid)) &&
         current.player[0].k == 0) {
-      *stats = current;
+      /* A pass that only skips oversized hosts did no lifting. Keep the
+       * parameters and accumulated work from the last real attempt. */
+      if (stats->iterations == 0) {
+        *stats = current;
+      } else {
+        stats->budget_exhausted |= current.budget_exhausted;
+      }
       succeeded = true;
       goto cleanup;
     }
@@ -811,6 +817,10 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       if (adaptive && pg_set_empty(&remaining)) {
         stats->adaptive_complete = true;
         stats->first_complete_t = stats->player[0].t;
+      } else if (adaptive && options->table && queue->table_budget_skipped) {
+        stats->budget_exhausted = true;
+        solve_error(error,
+                    "table search exhausted all hosts within the leaf limit");
       }
       succeeded = empty_residual(&remaining, result);
       goto cleanup;

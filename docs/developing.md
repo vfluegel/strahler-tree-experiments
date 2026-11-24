@@ -470,6 +470,9 @@ standard input. The default algorithm is attractor-decomposition lifting.
   than `N` leaves. The default is 1000000. With `--adaptive-t`, a later host
   limit stops the search with a warning and keeps the previous certificates
   as partial. A limit before both players have run is an error.
+  The legacy host counter saturates at `UINT_MAX`; finite limits at or above
+  that value conservatively reject saturated counts too. `SIZE_MAX` disables
+  the leaf limit and lets the process resource limits govern construction.
 - `--stats` prints statistics to standard error. Ordinary lifting reports each
   player's host and its size, rounds, vertex lifts, vertices left at the top,
   and the size and Strahler number of each decomposition. Zielonka adds
