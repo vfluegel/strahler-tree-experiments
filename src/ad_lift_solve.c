@@ -49,8 +49,8 @@ typedef struct {
 
 /* Lift, check, and materialize one player's run, replacing its outcome. */
 [[nodiscard]] static bool run_on_host(Solver *solver, ADLiftTree *host,
-                                       size_t const k, size_t const t,
-                                       size_t const arity) {
+                                      size_t const k, size_t const t,
+                                      size_t const arity) {
   PGPlayer const player = host->player;
   AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE, .player = player,
            .name = "host_built", .to = host->node_count, .host = host,

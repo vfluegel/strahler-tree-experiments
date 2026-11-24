@@ -342,7 +342,7 @@ done:
 }
 
 static void trace_host_node(Sym const *state, PGPlayer const player,
-                             size_t const node) {
+                            size_t const node) {
   if (state->trace != nullptr) {
     size_t storage[AD_PATH_CAPACITY];
     AD_TRACE(state->trace, .kind = AD_TRACE_PHASE, .player = player,

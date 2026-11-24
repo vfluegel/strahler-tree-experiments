@@ -107,8 +107,8 @@ static void path(FILE *stream, ADTracePath const value) {
 /* Walk native sibling links once: deriving each path independently by
  * searching siblings would be quadratic for a broad host. */
 static void host_nodes(FILE *stream, ADLiftTree const *host, size_t index,
-                        size_t storage[AD_PATH_CAPACITY], size_t depth,
-                        bool implicit, bool *first) {
+                       size_t storage[AD_PATH_CAPACITY], size_t depth,
+                       bool implicit, bool *first) {
   ADLiftNode const *node = host->nodes + index;
   fprintf(stream, "%s{\"path\":", *first ? "" : ",");
   *first = false;
@@ -131,8 +131,10 @@ static void host_nodes(FILE *stream, ADLiftTree const *host, size_t index,
  * are recorded rather than inferred from a pruned decomposition. */
 static void host_description(FILE *stream, ADTraceEvent const *event) {
   ADLiftTree const *host = event->host;
-  fprintf(stream, ",\"host\":{\"schema\":\"strahler-host/1\",\"complete\":%s,"
-                  "\"parameters\":{", event->host_implicit ? "false" : "true");
+  fprintf(stream,
+          ",\"host\":{\"schema\":\"strahler-host/1\",\"complete\":%s,"
+          "\"parameters\":{",
+          event->host_implicit ? "false" : "true");
   if (event->host_k != 0) {
     fprintf(stream, "\"k\":%zu,\"t\":%zu,\"h\":%zu", event->host_k,
             event->host_t, host->height + 1);
