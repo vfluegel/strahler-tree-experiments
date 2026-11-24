@@ -71,6 +71,8 @@ notebooks and using the views requires no network.
 The zip also includes the full `keiren/results.csv` and `KEIREN.md` column
 definitions. Notebook 07 reads the repository CSV in a checkout, the bundled
 copy in a release, or announces a Nester-only fallback if both are absent.
+The host-order analysis and its data are copied into the zip; notebook links
+are adjusted for that layout when packaging.
 
 For Colab or a single machine, each wheel is also attached to the release, e.g.
 `%pip install https://github.com/vfluegel/strahler-tree-experiments/releases/download/v<version>/strahler-<version>-py3-none-manylinux_2_28_x86_64.whl`.
