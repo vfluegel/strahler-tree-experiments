@@ -358,7 +358,52 @@ static void test_repeat_fixed(void) {
   pg_game_destroy(&game);
 }
 
+static void test_nonnested_hosts(void) {
+  struct {
+    char const *path;
+    size_t vertices;
+    size_t even[2];
+  } const cases[] = {
+      {"examples/ad-nonmonotone.pg", 70, {0, 0}},
+      {"examples/strpm-nonmonotone.pg", 44, {44, 22}},
+  };
+  size_t const pairs[][2] = {{3, 2}, {4, 3}};
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    FILE *input = fopen(cases[i].path, "r");
+    assert(input != nullptr);
+    PGGame game = read_game(input);
+    assert(fclose(input) == 0 && game.vertex_count == cases[i].vertices);
+    PGSet active = {0};
+    assert(pg_set_init(&active, game.vertex_count));
+    pg_set_fill(&active);
+    ADResult truth = {0};
+    ZielonkaError error = {0};
+    assert(
+        zielonka_decompose(&game, &active, game.max_priority, &truth, &error));
+    assert(pg_set_count(&truth.region[PG_EVEN]) == game.vertex_count);
+    assert(pg_set_empty(&truth.region[PG_ODD]));
+    for (size_t j = 0; j < sizeof(pairs) / sizeof(pairs[0]); j++) {
+      PMOptions const options = {
+          .algorithm = PM_STRAHLER,
+          .fixed = true,
+          .parameters = {.k = pairs[j][0], .t = pairs[j][1]},
+          .verify = true};
+      Collected result = solve(&game, &active, &options);
+      assert(result.calls == 1);
+      assert(pg_set_count(&result.won[PG_EVEN]) == cases[i].even[j]);
+      assert(pg_set_empty(&result.won[PG_ODD]));
+      assert(pg_set_count(&result.unresolved) ==
+             game.vertex_count - cases[i].even[j]);
+      destroy(&result);
+    }
+    ad_result_destroy(&truth);
+    pg_set_destroy(&active);
+    pg_game_destroy(&game);
+  }
+}
+
 int main(void) {
+  test_nonnested_hosts();
   test_repeat_fixed();
   test_ratio_queue();
   test_successors();
