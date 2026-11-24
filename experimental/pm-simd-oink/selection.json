@@ -1,0 +1,222 @@
+[
+  {
+    "case": "Nestern=3_compact",
+    "arm": "retry",
+    "median_wall": 0.00925545091740787,
+    "samples": [
+      {
+        "wall": 0.009046689956448972,
+        "rounds": 4,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      },
+      {
+        "wall": 0.009518033941276371,
+        "rounds": 4,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      },
+      {
+        "wall": 0.00925545091740787,
+        "rounds": 4,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      }
+    ]
+  },
+  {
+    "case": "Nestern=3_compact",
+    "arm": "advance",
+    "median_wall": 0.008125463966280222,
+    "samples": [
+      {
+        "wall": 0.017900959006510675,
+        "rounds": 3,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      },
+      {
+        "wall": 0.008125463966280222,
+        "rounds": 3,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      },
+      {
+        "wall": 0.008003931026905775,
+        "rounds": 3,
+        "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+      }
+    ]
+  },
+  {
+    "case": "Nestern=4_compact",
+    "arm": "retry",
+    "median_wall": 0.05934105394408107,
+    "samples": [
+      {
+        "wall": 0.05934105394408107,
+        "rounds": 6,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      },
+      {
+        "wall": 0.059278500033542514,
+        "rounds": 6,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      },
+      {
+        "wall": 0.059713822905905545,
+        "rounds": 6,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      }
+    ]
+  },
+  {
+    "case": "Nestern=4_compact",
+    "arm": "advance",
+    "median_wall": 0.0552292779320851,
+    "samples": [
+      {
+        "wall": 0.0552292779320851,
+        "rounds": 5,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      },
+      {
+        "wall": 0.05543537391349673,
+        "rounds": 5,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      },
+      {
+        "wall": 0.05497545294929296,
+        "rounds": 5,
+        "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+      }
+    ]
+  },
+  {
+    "case": "Nestern=3",
+    "arm": "retry",
+    "median_wall": 0.02497250703163445,
+    "samples": [
+      {
+        "wall": 0.02494200994260609,
+        "rounds": 5,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      },
+      {
+        "wall": 0.02497250703163445,
+        "rounds": 5,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      },
+      {
+        "wall": 0.025057740975171328,
+        "rounds": 5,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      }
+    ]
+  },
+  {
+    "case": "Nestern=3",
+    "arm": "advance",
+    "median_wall": 0.02296168904285878,
+    "samples": [
+      {
+        "wall": 0.022951986989937723,
+        "rounds": 4,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      },
+      {
+        "wall": 0.023204040015116334,
+        "rounds": 4,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      },
+      {
+        "wall": 0.02296168904285878,
+        "rounds": 4,
+        "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+      }
+    ]
+  },
+  {
+    "case": "FairScheduler2",
+    "arm": "retry",
+    "median_wall": 2.2600257109152153,
+    "samples": [
+      {
+        "wall": 2.263076522969641,
+        "rounds": 3,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      },
+      {
+        "wall": 2.2600257109152153,
+        "rounds": 3,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      },
+      {
+        "wall": 2.2591611720854416,
+        "rounds": 3,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      }
+    ]
+  },
+  {
+    "case": "FairScheduler2",
+    "arm": "advance",
+    "median_wall": 1.1436934799421579,
+    "samples": [
+      {
+        "wall": 1.1440864009782672,
+        "rounds": 2,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      },
+      {
+        "wall": 1.1436934799421579,
+        "rounds": 2,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      },
+      {
+        "wall": 1.1425488650565967,
+        "rounds": 2,
+        "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+      }
+    ]
+  },
+  {
+    "case": "cabp_swp.ehoa",
+    "arm": "retry",
+    "median_wall": 10.483800875023007,
+    "samples": [
+      {
+        "wall": 10.483800875023007,
+        "rounds": 14,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      },
+      {
+        "wall": 10.425987481023185,
+        "rounds": 14,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      },
+      {
+        "wall": 10.59738976706285,
+        "rounds": 14,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      }
+    ]
+  },
+  {
+    "case": "cabp_swp.ehoa",
+    "arm": "advance",
+    "median_wall": 7.254708803026006,
+    "samples": [
+      {
+        "wall": 7.254708803026006,
+        "rounds": 4,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      },
+      {
+        "wall": 7.250274396967143,
+        "rounds": 4,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      },
+      {
+        "wall": 7.260040168999694,
+        "rounds": 4,
+        "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+      }
+    ]
+  }
+]

@@ -48,6 +48,8 @@ typedef struct {
   bool lexicographic;
   /* ADAPTIVE: Oink integer-ratio order, starting at (1,1), skipping t=0. */
   bool ratio;
+  /* ADAPTIVE: size-ordered small hosts, followed by the ratio fallback. */
+  bool table;
   /* Lexicographic start; zero starts at 1. t is the first t. */
   size_t start_k;
   /* KARY: the arity, at least one. */
@@ -65,7 +67,7 @@ typedef struct {
   /* Attract and remove certified dominions between stabilized runs; reuse
    * the host while removal makes progress, then advance adaptive search. */
   bool iter_shave;
-  /* Algorithm 9; adaptive hosts require lexicographic or ratio search. */
+  /* Algorithm 9; adaptive hosts require an explicit search order. */
   bool symmetric;
   ADTrace *trace;
 } ADLiftOptions;

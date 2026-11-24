@@ -451,6 +451,15 @@ standard input. The default algorithm is attractor-decomposition lifting.
   For lexicographic AD or Strahler PM search, `--start-k=K --start-t=T` skips
   earlier pairs (default `(1,0)`, `K>=1` within the cap, `T` clamped to `t_max`);
   starting pairs are rejected with ratio search.
+- `--search=table` uses exact leaf counts for `k=1..6`, `t=0..6`, and
+  `h=1..1000`, ordered by `(leaves,k,t)`. Both players follow the order at their
+  larger initial height, with their individual k clamps. The remaining `t=0`
+  pairs precede the ordinary positive-t ratio fallback; tried table pairs are
+  skipped while their ratio neighbors are still expanded. Heights above 1000
+  go directly to the zero column and ratio order. The cursor stays at a pair
+  while shaving makes progress. AD preflights both hosts and skips individually
+  over-budget pairs so cheaper fallback hosts can still be tried. Start-pair
+  overrides are rejected. [Counts and analysis](../HOST-ORDER.md).
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.
@@ -461,6 +470,9 @@ standard input. The default algorithm is attractor-decomposition lifting.
   than `N` leaves. The default is 1000000. With `--adaptive-t`, a later host
   limit stops the search with a warning and keeps the previous certificates
   as partial. A limit before both players have run is an error.
+  The legacy host counter saturates at `UINT_MAX`; finite limits at or above
+  that value conservatively reject saturated counts too. `SIZE_MAX` disables
+  the leaf limit and lets the process resource limits govern construction.
 - `--stats` prints statistics to standard error. Ordinary lifting reports each
   player's host and its size, rounds, vertex lifts, vertices left at the top,
   and the size and Strahler number of each decomposition. Zielonka adds
@@ -823,7 +835,7 @@ Following the common header and `game`, the document contains, in order:
   as `--stats`: `H,K,t` for Strahler hosts, `H,arity` for k-ary hosts, and `H`
   for file hosts. Empty remaining games and recursive solvers have empty objects.
 - `round_pairs`: the final selected pair without shaving, or each shaving
-  round's pair; present with ratio search or an explicit lexicographic `start_k`.
+  round's pair; present with ratio/table search or an explicit lexicographic `start_k`.
 - `budget_exhausted`: true when an adaptive host exceeded the leaf limit;
   the returned parameters still describe the last hosts that actually ran.
 
@@ -1303,3 +1315,43 @@ in the `slow` suite. CI tests the native API and Python package on Ubuntu 24.04
 x86_64 and macOS 14 arm64 using Python 3.10. The shared wheel workflow builds
 with Python 3.10 for manylinux_2_28 x86_64 and macOS 11.0+ arm64, then tests the
 installed wheels with Python 3.12 on Ubuntu 24.04 and macOS 15.
+
+Fixed Strahler PM accepts `--repeat-fixed` together with `--k`, `--t` and
+`--iter-shave`. It repeats that original-game host pair while the residual
+shrinks, then returns complete or a stable partial result. The existing fixed
+API still runs one round by default. Notebook 08 uses this opt-in for its
+PM+iter fixed-pair measurements and records scalar/SIMD dispatch.
+
+The CABP and ordinary-ladder experiments share
+`jupyter-examples/family_benchmarks.py`. Check their pinned input hashes, graph
+counts and host bounds with `python scripts/gen_notebook_families.py --check`.
+Missing fixtures can be recovered by omitting `--check`; CABP conversion also
+needs `--knor PATH`, using the source revision pinned in its manifest.
+
+After installing `jupyter-examples/requirements-dev.txt` and building the CLI
+tools, collect a resumable first pass with:
+
+```sh
+python jupyter-examples/family_benchmarks.py run \
+  --family cabp --build-dir build --seconds 60 --memory-gib 2 --jobs 2
+python jupyter-examples/family_benchmarks.py run \
+  --family ladder --build-dir build --seconds 60 --memory-gib 2 --jobs 2
+```
+
+The native command writes JSON to a temporary file. `ijson` reads selected
+subtrees while skipping the game object, and winner sets become compact bitsets
+bound to the fixture hash. Independent Zielonka references run under separate
+limits; an unavailable reference does not turn a verified solver result into a
+failure. Each worker and its native child inherit the same per-process
+address-space limit; the supervisor kills their entire process group on timeout. Input, solving,
+verification, serialization, reduction and winner checking all count toward
+the case deadline. Reference setup has its own deadline. The recorded native
+command time still includes JSON output. Worker, source, executable and input
+hashes make the timing scope and implementation identifiable.
+
+Frontiers are independent for every equivalence relation, method and search
+order. Fixed maps skip only measured-dominated cells for finding Pareto minima;
+they do not infer solver outcomes across k. A timeout leaves the corresponding
+host's sufficiency unknown. Unexpected solver or verification errors stop the
+collector. Notebooks 09 and 10 read the bundled recordings offline, so ordinary
+execution does not repeat these measurements.

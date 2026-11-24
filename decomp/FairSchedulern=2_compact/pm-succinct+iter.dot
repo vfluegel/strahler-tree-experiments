@@ -42,18 +42,6 @@ digraph progress_measures {
   ordering=out;
   node [shape=box];
   label="round 2";
-  result [label="result (synthetic; partial)"];
-  result -> n1;
-  n1 [label="Even (partial)\nsuccinct bits=1 depth=7\nno non-top measures\nV={}"];
-  result -> n2;
-  n2 [label="Odd (partial)\nsuccinct bits=1 depth=8\nno non-top measures\nV={}"];
-  unresolved [style=dashed, label="Unresolved\nU={0,3,4,5,6,7,8,9,..., +5575 more}"];
-  result -> unresolved [style=dashed];
-}
-digraph progress_measures {
-  ordering=out;
-  node [shape=box];
-  label="round 3";
   result [label="result (synthetic)"];
   result -> n1;
   n1 [label="Even (complete)\nsuccinct bits=2 depth=7\np=4947802324991"];

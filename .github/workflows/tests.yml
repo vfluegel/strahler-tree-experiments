@@ -77,7 +77,9 @@ jobs:
           "$RUNNER_TEMP/actionlint" .github/workflows/*.yml
 
       - name: Check Python syntax
-        run: python3 -m py_compile src/convert_out.py scripts/compare_oink.py scripts/gen_decomp.py scripts/make_trees.py scripts/gen_keiren.py tests/test_gen_decomp.py tests/test_make_trees.py tests/test_gen_keiren.py tests/test_pg_game_property.py tests/test_pg_game_memory.py tests/test_cli.py tests/test_source_version.py ci/version.py tests/test_version.py
+        run: |
+          python3 -m py_compile src/convert_out.py scripts/compare_oink.py scripts/gen_decomp.py scripts/make_trees.py scripts/gen_keiren.py tests/test_gen_decomp.py tests/test_make_trees.py tests/test_gen_keiren.py tests/test_pg_game_property.py tests/test_pg_game_memory.py tests/test_cli.py tests/test_source_version.py ci/version.py tests/test_version.py scripts/gen_notebook_families.py jupyter-examples/family_benchmarks.py tests/test_family_benchmarks.py
+          python3 scripts/gen_notebook_families.py --check
 
   decomp:
     name: Tracked decompositions
@@ -412,7 +414,7 @@ jobs:
           python -c "import platform; assert platform.machine() == ('arm64' if platform.system() == 'Darwin' else 'x86_64')"
 
       - name: Install build and test tools
-        run: python -m pip install meson==1.8.5 meson-python ninja pytest anywidget traitlets nbclient nbformat ipykernel
+        run: python -m pip install meson==1.8.5 meson-python ninja pytest anywidget traitlets nbclient nbformat ipykernel 'ijson>=3.3,<4'
 
       - name: Install browser test tools
         if: runner.os == 'Linux'

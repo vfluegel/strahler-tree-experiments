@@ -1,0 +1,2292 @@
+{
+  "recorded_utc": "2026-11-24T10:05:10.904330+00:00",
+  "cpu": 3,
+  "phase": "cli",
+  "samples": 3,
+  "provenance": {
+    "current_head": "5edbead0fdc9eba8a1d8776d27cb460e9d8eed7c",
+    "oink_head": "85230b6d06307adbf6db6e474ec5fcf546b09400",
+    "compiler": "cc (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)",
+    "compile_flags": [
+      "-O3",
+      "-DNDEBUG",
+      "-I/home/gaperez/GIT-repos/strahler-tree-experiments/src",
+      "-I/home/gaperez/GIT-repos/strahler-tree-experiments/experimental/pm-simd-oink"
+    ],
+    "oink_kernel_sha256": "aad254089146277b1fd8c641d461cb2f787251c33e2cd80c5c18c8abc454e420",
+    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           39 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Core(TM) i3-8100T CPU @ 3.10GHz\nCPU family:                              6\nModel:                                   158\nThread(s) per core:                      1\nCore(s) per socket:                      4\nSocket(s):                               1\nStepping:                                11\nCPU(s) scaling MHz:                      49%\nCPU max MHz:                             3100.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                6199.99\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               128 KiB (4 instances)\nL1i cache:                               128 KiB (4 instances)\nL2 cache:                                1 MiB (4 instances)\nL3 cache:                                6 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Mitigation; Microcode\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             KVM: Mitigation: Split huge pages\nVulnerability L1tf:                      Mitigation; PTE Inversion; VMX conditional cache flushes, SMT disabled\nVulnerability Mds:                       Mitigation; Clear CPU buffers; SMT disabled\nVulnerability Meltdown:                  Mitigation; PTI\nVulnerability Mmio stale data:           Mitigation; Clear CPU buffers; SMT disabled\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; IBRS\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; IBRS; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Mitigation; Microcode\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+    "sources": {
+      "experimental/pm-simd-oink/oink_adapter.h": "f87bedf120b922118e18ee602dfbdd0ae460925d72740c0c669f4b1601d359fa",
+      "experimental/pm-simd-oink/oink_adapter.cpp": "a2dbd6d954a9e600fc64e38b7776608c270687c2101971747be44fdae0d628c2",
+      "experimental/pm-simd-oink/bench_lift.c": "000f515ff583c787442601f9b12b854aa9337ae4baba5a123e14c1b1f2fbde07",
+      "experimental/pm-simd-oink/bench_kernels.c": "021eca7f1bfd0965c67e592ce7b98a68e9c2d0d38b4aa43d634b5d09a840eeeb",
+      "experimental/pm-simd-oink/oink_backend.h": "4da067827c213336d0865e4a833714aee5ce2181331ba46ec86a700e3f640f2c"
+    }
+  },
+  "rows": [
+    {
+      "case": "Nestern=2_compact strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.003552292939275503,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0034610909642651677,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0033810510067269206,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.0034610909642651677,
+      "min_wall": 0.0033810510067269206,
+      "max_wall": 0.003552292939275503,
+      "lifts": 4784,
+      "attempts": 9048,
+      "even": 168,
+      "odd": 23,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "Nestern=2_compact strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.003535308060236275,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0034278540406376123,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.003440515953116119,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 4784,
+          "attempts": 9048,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.003440515953116119,
+      "min_wall": 0.0034278540406376123,
+      "max_wall": 0.003535308060236275,
+      "lifts": 4784,
+      "attempts": 9048,
+      "even": 168,
+      "odd": 23,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "Nestern=2_compact strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0055347910383716226,
+          "complete": true,
+          "solver_seconds": 0.00114,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.005553946015425026,
+          "complete": true,
+          "solver_seconds": 0.001147,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.005625666934065521,
+          "complete": true,
+          "solver_seconds": 0.001148,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.005553946015425026,
+      "min_wall": 0.0055347910383716226,
+      "max_wall": 0.005625666934065521,
+      "median_solver_seconds": 0.001147,
+      "min_solver_seconds": 0.00114,
+      "max_solver_seconds": 0.001148,
+      "even": 168,
+      "odd": 23,
+      "complete": true
+    },
+    {
+      "case": "Nestern=2_compact strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.004901356995105743,
+          "complete": true,
+          "solver_seconds": 0.000606,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.004944744985550642,
+          "complete": true,
+          "solver_seconds": 0.000615,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.004944490035995841,
+          "complete": true,
+          "solver_seconds": 0.000608,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.004944490035995841,
+      "min_wall": 0.004901356995105743,
+      "max_wall": 0.004944744985550642,
+      "median_solver_seconds": 0.000608,
+      "min_solver_seconds": 0.000606,
+      "max_solver_seconds": 0.000615,
+      "even": 168,
+      "odd": 23,
+      "complete": true
+    },
+    {
+      "case": "Nestern=2_compact succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0026936529902741313,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0026816020254045725,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0026009930297732353,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.0026816020254045725,
+      "min_wall": 0.0026009930297732353,
+      "max_wall": 0.0026936529902741313,
+      "lifts": 1891,
+      "attempts": 3755,
+      "even": 168,
+      "odd": 23,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "Nestern=2_compact succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0026388400001451373,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.002704711980186403,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.00287928304169327,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 1891,
+          "attempts": 3755,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.002704711980186403,
+      "min_wall": 0.0026388400001451373,
+      "max_wall": 0.00287928304169327,
+      "lifts": 1891,
+      "attempts": 3755,
+      "even": 168,
+      "odd": 23,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "Nestern=2_compact succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.004650481045246124,
+          "complete": true,
+          "solver_seconds": 0.000328,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.004733767942525446,
+          "complete": true,
+          "solver_seconds": 0.000328,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.0049685940612107515,
+          "complete": true,
+          "solver_seconds": 0.000339,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.004733767942525446,
+      "min_wall": 0.004650481045246124,
+      "max_wall": 0.0049685940612107515,
+      "median_solver_seconds": 0.000328,
+      "min_solver_seconds": 0.000328,
+      "max_solver_seconds": 0.000339,
+      "even": 168,
+      "odd": 23,
+      "complete": true
+    },
+    {
+      "case": "Nestern=2_compact succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.00476746098138392,
+          "complete": true,
+          "solver_seconds": 0.000361,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.004635893972590566,
+          "complete": true,
+          "solver_seconds": 0.000361,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        },
+        {
+          "wall": 0.004893240053206682,
+          "complete": true,
+          "solver_seconds": 0.000364,
+          "identity": "e5fcb8f2b2abc8a75078e6c87ce9593cc1786bcf6578a7470c0b033179611867",
+          "even": 168,
+          "odd": 23
+        }
+      ],
+      "median_wall": 0.00476746098138392,
+      "min_wall": 0.004635893972590566,
+      "max_wall": 0.004893240053206682,
+      "median_solver_seconds": 0.000361,
+      "min_solver_seconds": 0.000361,
+      "max_solver_seconds": 0.000364,
+      "even": 168,
+      "odd": 23,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3_compact strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.010651570977643132,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.010612467071041465,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.010608080076053739,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.010612467071041465,
+      "min_wall": 0.010608080076053739,
+      "max_wall": 0.010651570977643132,
+      "lifts": 36273,
+      "attempts": 59255,
+      "even": 1073,
+      "odd": 489,
+      "complete": true,
+      "rounds": 5
+    },
+    {
+      "case": "Nestern=3_compact strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.011283250991255045,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.011153366067446768,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.011096009984612465,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 36273,
+          "attempts": 59255,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.011153366067446768,
+      "min_wall": 0.011096009984612465,
+      "max_wall": 0.011283250991255045,
+      "lifts": 36273,
+      "attempts": 59255,
+      "even": 1073,
+      "odd": 489,
+      "complete": true,
+      "rounds": 5
+    },
+    {
+      "case": "Nestern=3_compact strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.015435889014042914,
+          "complete": true,
+          "solver_seconds": 0.007051,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.015429243096150458,
+          "complete": true,
+          "solver_seconds": 0.007013,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.015467575984075665,
+          "complete": true,
+          "solver_seconds": 0.00713,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.015435889014042914,
+      "min_wall": 0.015429243096150458,
+      "max_wall": 0.015467575984075665,
+      "median_solver_seconds": 0.007051,
+      "min_solver_seconds": 0.007013,
+      "max_solver_seconds": 0.00713,
+      "even": 1073,
+      "odd": 489,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3_compact strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.011961885029450059,
+          "complete": true,
+          "solver_seconds": 0.003644,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.011957671958953142,
+          "complete": true,
+          "solver_seconds": 0.003648,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.012000752962194383,
+          "complete": true,
+          "solver_seconds": 0.003649,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.011961885029450059,
+      "min_wall": 0.011957671958953142,
+      "max_wall": 0.012000752962194383,
+      "median_solver_seconds": 0.003648,
+      "min_solver_seconds": 0.003644,
+      "max_solver_seconds": 0.003649,
+      "even": 1073,
+      "odd": 489,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3_compact succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.009190250071696937,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.009223945904523134,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.00909099099226296,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.009190250071696937,
+      "min_wall": 0.00909099099226296,
+      "max_wall": 0.009223945904523134,
+      "lifts": 28545,
+      "attempts": 49881,
+      "even": 1073,
+      "odd": 489,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "Nestern=3_compact succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.009306199965067208,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.00924854096956551,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.009207219001837075,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 28545,
+          "attempts": 49881,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.00924854096956551,
+      "min_wall": 0.009207219001837075,
+      "max_wall": 0.009306199965067208,
+      "lifts": 28545,
+      "attempts": 49881,
+      "even": 1073,
+      "odd": 489,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "Nestern=3_compact succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.012313902960158885,
+          "complete": true,
+          "solver_seconds": 0.003896,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.01216880592983216,
+          "complete": true,
+          "solver_seconds": 0.003894,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.012214735965244472,
+          "complete": true,
+          "solver_seconds": 0.00394,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.012214735965244472,
+      "min_wall": 0.01216880592983216,
+      "max_wall": 0.012313902960158885,
+      "median_solver_seconds": 0.003896,
+      "min_solver_seconds": 0.003894,
+      "max_solver_seconds": 0.00394,
+      "even": 1073,
+      "odd": 489,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3_compact succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0128641570918262,
+          "complete": true,
+          "solver_seconds": 0.004375,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.012588483979925513,
+          "complete": true,
+          "solver_seconds": 0.004307,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        },
+        {
+          "wall": 0.012620783993043005,
+          "complete": true,
+          "solver_seconds": 0.004295,
+          "identity": "27608d9de997b14ef5c4a3d95cdb014607a45f9bc840dce392aac39e8dc1bc07",
+          "even": 1073,
+          "odd": 489
+        }
+      ],
+      "median_wall": 0.012620783993043005,
+      "min_wall": 0.012588483979925513,
+      "max_wall": 0.0128641570918262,
+      "median_solver_seconds": 0.004307,
+      "min_solver_seconds": 0.004295,
+      "max_solver_seconds": 0.004375,
+      "even": 1073,
+      "odd": 489,
+      "complete": true
+    },
+    {
+      "case": "Nestern=4_compact strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.1746084839105606,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.17455244506709278,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.17451482405886054,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.17455244506709278,
+      "min_wall": 0.17451482405886054,
+      "max_wall": 0.1746084839105606,
+      "lifts": 1289376,
+      "attempts": 1887136,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true,
+      "rounds": 7
+    },
+    {
+      "case": "Nestern=4_compact strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.15482393791899085,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.15494640090037137,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.15352471498772502,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 1289376,
+          "attempts": 1887136,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.15482393791899085,
+      "min_wall": 0.15352471498772502,
+      "max_wall": 0.15494640090037137,
+      "lifts": 1289376,
+      "attempts": 1887136,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true,
+      "rounds": 7
+    },
+    {
+      "case": "Nestern=4_compact strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.23564586008433253,
+          "complete": true,
+          "solver_seconds": 0.212382,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.23636173701379448,
+          "complete": true,
+          "solver_seconds": 0.21308,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.23606029199436307,
+          "complete": true,
+          "solver_seconds": 0.212304,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.23606029199436307,
+      "min_wall": 0.23564586008433253,
+      "max_wall": 0.23636173701379448,
+      "median_solver_seconds": 0.212382,
+      "min_solver_seconds": 0.212304,
+      "max_solver_seconds": 0.21308,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true
+    },
+    {
+      "case": "Nestern=4_compact strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.13301061396487057,
+          "complete": true,
+          "solver_seconds": 0.10932,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.13353903603274375,
+          "complete": true,
+          "solver_seconds": 0.110073,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.13305431103799492,
+          "complete": true,
+          "solver_seconds": 0.109744,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.13305431103799492,
+      "min_wall": 0.13301061396487057,
+      "max_wall": 0.13353903603274375,
+      "median_solver_seconds": 0.109744,
+      "min_solver_seconds": 0.10932,
+      "max_solver_seconds": 0.110073,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true
+    },
+    {
+      "case": "Nestern=4_compact succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.06057455891277641,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.060888511943630874,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.06052269204519689,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.06057455891277641,
+      "min_wall": 0.06052269204519689,
+      "max_wall": 0.060888511943630874,
+      "lifts": 350172,
+      "attempts": 539629,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true,
+      "rounds": 6
+    },
+    {
+      "case": "Nestern=4_compact succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.06084783701226115,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.06053160794544965,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.06135306798387319,
+          "complete": true,
+          "rounds": 6,
+          "lifts": 350172,
+          "attempts": 539629,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.06084783701226115,
+      "min_wall": 0.06053160794544965,
+      "max_wall": 0.06135306798387319,
+      "lifts": 350172,
+      "attempts": 539629,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true,
+      "rounds": 6
+    },
+    {
+      "case": "Nestern=4_compact succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.06997922307346016,
+          "complete": true,
+          "solver_seconds": 0.046682,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.07058548694476485,
+          "complete": true,
+          "solver_seconds": 0.046604,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.0706478520296514,
+          "complete": true,
+          "solver_seconds": 0.046864,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.07058548694476485,
+      "min_wall": 0.06997922307346016,
+      "max_wall": 0.0706478520296514,
+      "median_solver_seconds": 0.046682,
+      "min_solver_seconds": 0.046604,
+      "max_solver_seconds": 0.046864,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true
+    },
+    {
+      "case": "Nestern=4_compact succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.07188174105249345,
+          "complete": true,
+          "solver_seconds": 0.048557,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.07306580198928714,
+          "complete": true,
+          "solver_seconds": 0.049126,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        },
+        {
+          "wall": 0.07246202707756311,
+          "complete": true,
+          "solver_seconds": 0.048492,
+          "identity": "e9ba3b9a36356b80bd911b96dfbd9c8abf2f88cdc4b7cc6e9423c9af9b7f5301",
+          "even": 3674,
+          "odd": 3143
+        }
+      ],
+      "median_wall": 0.07246202707756311,
+      "min_wall": 0.07188174105249345,
+      "max_wall": 0.07306580198928714,
+      "median_solver_seconds": 0.048557,
+      "min_solver_seconds": 0.048492,
+      "max_solver_seconds": 0.049126,
+      "even": 3674,
+      "odd": 3143,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3 strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.06852331396657974,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.06856355001218617,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.06885518005583435,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.06856355001218617,
+      "min_wall": 0.06852331396657974,
+      "max_wall": 0.06885518005583435,
+      "lifts": 721314,
+      "attempts": 847507,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true,
+      "rounds": 7
+    },
+    {
+      "case": "Nestern=3 strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.05981606000568718,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.06016638793516904,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.05991327599622309,
+          "complete": true,
+          "rounds": 7,
+          "lifts": 721314,
+          "attempts": 847507,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.05991327599622309,
+      "min_wall": 0.05981606000568718,
+      "max_wall": 0.06016638793516904,
+      "lifts": 721314,
+      "attempts": 847507,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true,
+      "rounds": 7
+    },
+    {
+      "case": "Nestern=3 strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.09714275097940117,
+          "complete": true,
+          "solver_seconds": 0.084456,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.09664511494338512,
+          "complete": true,
+          "solver_seconds": 0.08381,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.09609780204482377,
+          "complete": true,
+          "solver_seconds": 0.083472,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.09664511494338512,
+      "min_wall": 0.09609780204482377,
+      "max_wall": 0.09714275097940117,
+      "median_solver_seconds": 0.08381,
+      "min_solver_seconds": 0.083472,
+      "max_solver_seconds": 0.084456,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3 strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.05380298709496856,
+          "complete": true,
+          "solver_seconds": 0.041203,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.0542467680061236,
+          "complete": true,
+          "solver_seconds": 0.041548,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.053852742072194815,
+          "complete": true,
+          "solver_seconds": 0.04121,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.053852742072194815,
+      "min_wall": 0.05380298709496856,
+      "max_wall": 0.0542467680061236,
+      "median_solver_seconds": 0.04121,
+      "min_solver_seconds": 0.041203,
+      "max_solver_seconds": 0.041548,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3 succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.025584180024452507,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.0262849839637056,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.042752002947963774,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.0262849839637056,
+      "min_wall": 0.025584180024452507,
+      "max_wall": 0.042752002947963774,
+      "lifts": 195595,
+      "attempts": 240781,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true,
+      "rounds": 5
+    },
+    {
+      "case": "Nestern=3 succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.025687403045594692,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.027281860006041825,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.025401516002602875,
+          "complete": true,
+          "rounds": 5,
+          "lifts": 195595,
+          "attempts": 240781,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.025687403045594692,
+      "min_wall": 0.025401516002602875,
+      "max_wall": 0.027281860006041825,
+      "lifts": 195595,
+      "attempts": 240781,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true,
+      "rounds": 5
+    },
+    {
+      "case": "Nestern=3 succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.030304473941214383,
+          "complete": true,
+          "solver_seconds": 0.017653,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.030960115022026002,
+          "complete": true,
+          "solver_seconds": 0.017621,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.030379198025912046,
+          "complete": true,
+          "solver_seconds": 0.017659,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.030379198025912046,
+      "min_wall": 0.030304473941214383,
+      "max_wall": 0.030960115022026002,
+      "median_solver_seconds": 0.017653,
+      "min_solver_seconds": 0.017621,
+      "max_solver_seconds": 0.017659,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true
+    },
+    {
+      "case": "Nestern=3 succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.06742543610744178,
+          "complete": true,
+          "solver_seconds": 0.054791,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.06881274492479861,
+          "complete": true,
+          "solver_seconds": 0.05593,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        },
+        {
+          "wall": 0.06800072302576154,
+          "complete": true,
+          "solver_seconds": 0.055268,
+          "identity": "022cf30ebe93a245b72b1cbf2e3dd3adc42641dd4bacc208cae41fb67be7fba7",
+          "even": 1993,
+          "odd": 1036
+        }
+      ],
+      "median_wall": 0.06800072302576154,
+      "min_wall": 0.06742543610744178,
+      "max_wall": 0.06881274492479861,
+      "median_solver_seconds": 0.055268,
+      "min_solver_seconds": 0.054791,
+      "max_solver_seconds": 0.05593,
+      "even": 1993,
+      "odd": 1036,
+      "complete": true
+    },
+    {
+      "case": "FairScheduler2 strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 13.581859701080248,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 13.692750343005173,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 13.573822224978358,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 13.581859701080248,
+      "min_wall": 13.573822224978358,
+      "max_wall": 13.692750343005173,
+      "lifts": 430650,
+      "attempts": 6861952,
+      "even": 5596,
+      "odd": 0,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "FairScheduler2 strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 15.928203686955385,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 15.886627612053417,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 15.922584421001375,
+          "complete": true,
+          "rounds": 4,
+          "lifts": 430650,
+          "attempts": 6861952,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 15.922584421001375,
+      "min_wall": 15.886627612053417,
+      "max_wall": 15.928203686955385,
+      "lifts": 430650,
+      "attempts": 6861952,
+      "even": 5596,
+      "odd": 0,
+      "complete": true,
+      "rounds": 4
+    },
+    {
+      "case": "FairScheduler2 strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 18.153476425097324,
+          "complete": true,
+          "solver_seconds": 18.127426,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 18.06580786698032,
+          "complete": true,
+          "solver_seconds": 18.0394,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 18.122326899087057,
+          "complete": true,
+          "solver_seconds": 18.095909,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 18.122326899087057,
+      "min_wall": 18.06580786698032,
+      "max_wall": 18.153476425097324,
+      "median_solver_seconds": 18.095909,
+      "min_solver_seconds": 18.0394,
+      "max_solver_seconds": 18.127426,
+      "even": 5596,
+      "odd": 0,
+      "complete": true
+    },
+    {
+      "case": "FairScheduler2 strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 10.216985812992789,
+          "complete": true,
+          "solver_seconds": 10.190303,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 10.207857172004879,
+          "complete": true,
+          "solver_seconds": 10.181908,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 10.238423374015838,
+          "complete": true,
+          "solver_seconds": 10.212194,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 10.216985812992789,
+      "min_wall": 10.207857172004879,
+      "max_wall": 10.238423374015838,
+      "median_solver_seconds": 10.190303,
+      "min_solver_seconds": 10.181908,
+      "max_solver_seconds": 10.212194,
+      "even": 5596,
+      "odd": 0,
+      "complete": true
+    },
+    {
+      "case": "FairScheduler2 succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 2.5884465689305216,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 2.5116569699021056,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 2.5124367229873314,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 2.5124367229873314,
+      "min_wall": 2.5116569699021056,
+      "max_wall": 2.5884465689305216,
+      "lifts": 118741,
+      "attempts": 2082315,
+      "even": 5596,
+      "odd": 0,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "FairScheduler2 succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 2.5148027789546177,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 2.5114924350054935,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 2.5157789631048217,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 118741,
+          "attempts": 2082315,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 2.5148027789546177,
+      "min_wall": 2.5114924350054935,
+      "max_wall": 2.5157789631048217,
+      "lifts": 118741,
+      "attempts": 2082315,
+      "even": 5596,
+      "odd": 0,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "FairScheduler2 succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 1.9083688029786572,
+          "complete": true,
+          "solver_seconds": 1.881676,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 1.942255274974741,
+          "complete": true,
+          "solver_seconds": 1.91631,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 1.9773797679226846,
+          "complete": true,
+          "solver_seconds": 1.951232,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 1.942255274974741,
+      "min_wall": 1.9083688029786572,
+      "max_wall": 1.9773797679226846,
+      "median_solver_seconds": 1.91631,
+      "min_solver_seconds": 1.881676,
+      "max_solver_seconds": 1.951232,
+      "even": 5596,
+      "odd": 0,
+      "complete": true
+    },
+    {
+      "case": "FairScheduler2 succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 12.278107311110944,
+          "complete": true,
+          "solver_seconds": 12.25206,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 14.138530691969208,
+          "complete": true,
+          "solver_seconds": 14.111575,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        },
+        {
+          "wall": 12.287636583903804,
+          "complete": true,
+          "solver_seconds": 12.261284,
+          "identity": "fbc7d74043cce8a0fffebed5eea7748f3ee6fea944184e6c268dd9655710c868",
+          "even": 5596,
+          "odd": 0
+        }
+      ],
+      "median_wall": 12.287636583903804,
+      "min_wall": 12.278107311110944,
+      "max_wall": 14.138530691969208,
+      "median_solver_seconds": 12.261284,
+      "min_solver_seconds": 12.25206,
+      "max_solver_seconds": 14.111575,
+      "even": 5596,
+      "odd": 0,
+      "complete": true
+    },
+    {
+      "case": "Button.tlsf.ehoa strahler",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.002021346939727664,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.001972327008843422,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.001968167955055833,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.001972327008843422,
+      "min_wall": 0.001968167955055833,
+      "max_wall": 0.002021346939727664,
+      "lifts": 65,
+      "attempts": 87,
+      "even": 4,
+      "odd": 3,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "Button.tlsf.ehoa strahler",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.002002541092224419,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0018841989804059267,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.002003720961511135,
+          "complete": true,
+          "rounds": 3,
+          "lifts": 65,
+          "attempts": 87,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.002002541092224419,
+      "min_wall": 0.0018841989804059267,
+      "max_wall": 0.002003720961511135,
+      "lifts": 65,
+      "attempts": 87,
+      "even": 4,
+      "odd": 3,
+      "complete": true,
+      "rounds": 3
+    },
+    {
+      "case": "Button.tlsf.ehoa strahler",
+      "arm": "oink-strpm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0037266380386427045,
+          "complete": true,
+          "solver_seconds": 3.7e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0037463270127773285,
+          "complete": true,
+          "solver_seconds": 3.8e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0038531740428879857,
+          "complete": true,
+          "solver_seconds": 3.7e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.0037463270127773285,
+      "min_wall": 0.0037266380386427045,
+      "max_wall": 0.0038531740428879857,
+      "median_solver_seconds": 3.7e-05,
+      "min_solver_seconds": 3.7e-05,
+      "max_solver_seconds": 3.8e-05,
+      "even": 4,
+      "odd": 3,
+      "complete": true
+    },
+    {
+      "case": "Button.tlsf.ehoa strahler",
+      "arm": "oink-strpm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0037149370182305574,
+          "complete": true,
+          "solver_seconds": 2.2e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0037632700987160206,
+          "complete": true,
+          "solver_seconds": 2.3e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0038994139758870006,
+          "complete": true,
+          "solver_seconds": 2.3e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.0037632700987160206,
+      "min_wall": 0.0037149370182305574,
+      "max_wall": 0.0038994139758870006,
+      "median_solver_seconds": 2.3e-05,
+      "min_solver_seconds": 2.2e-05,
+      "max_solver_seconds": 2.3e-05,
+      "even": 4,
+      "odd": 3,
+      "complete": true
+    },
+    {
+      "case": "Button.tlsf.ehoa succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0019519130000844598,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0019719969714060426,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0021925640758126974,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.0019719969714060426,
+      "min_wall": 0.0019519130000844598,
+      "max_wall": 0.0021925640758126974,
+      "lifts": 14,
+      "attempts": 29,
+      "even": 4,
+      "odd": 3,
+      "complete": true,
+      "rounds": 1
+    },
+    {
+      "case": "Button.tlsf.ehoa succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0020553439389914274,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.002015471924096346,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0019698230316862464,
+          "complete": true,
+          "rounds": 1,
+          "lifts": 14,
+          "attempts": 29,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.002015471924096346,
+      "min_wall": 0.0019698230316862464,
+      "max_wall": 0.0020553439389914274,
+      "lifts": 14,
+      "attempts": 29,
+      "even": 4,
+      "odd": 3,
+      "complete": true,
+      "rounds": 1
+    },
+    {
+      "case": "Button.tlsf.ehoa succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0038854399463161826,
+          "complete": true,
+          "solver_seconds": 2.7e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.003908133949153125,
+          "complete": true,
+          "solver_seconds": 2.6e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.003817853983491659,
+          "complete": true,
+          "solver_seconds": 2.5e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.0038854399463161826,
+      "min_wall": 0.003817853983491659,
+      "max_wall": 0.003908133949153125,
+      "median_solver_seconds": 2.6e-05,
+      "min_solver_seconds": 2.5e-05,
+      "max_solver_seconds": 2.7e-05,
+      "even": 4,
+      "odd": 3,
+      "complete": true
+    },
+    {
+      "case": "Button.tlsf.ehoa succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 0.0036990330554544926,
+          "complete": true,
+          "solver_seconds": 3.2e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.0038341329200193286,
+          "complete": true,
+          "solver_seconds": 3.3e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        },
+        {
+          "wall": 0.00380169996060431,
+          "complete": true,
+          "solver_seconds": 3.2e-05,
+          "identity": "df71a07b319d47e827e85bf6b220163df148b62a0b11ea2d653cb37ece4e686a",
+          "even": 4,
+          "odd": 3
+        }
+      ],
+      "median_wall": 0.00380169996060431,
+      "min_wall": 0.0036990330554544926,
+      "max_wall": 0.0038341329200193286,
+      "median_solver_seconds": 3.2e-05,
+      "min_solver_seconds": 3.2e-05,
+      "max_solver_seconds": 3.3e-05,
+      "even": 4,
+      "odd": 3,
+      "complete": true
+    },
+    {
+      "case": "cabp_swp.ehoa strahler",
+      "arm": "current-scalar",
+      "status": "timeout",
+      "timeout": 20.0,
+      "wall": 20.067066299030557
+    },
+    {
+      "case": "cabp_swp.ehoa strahler",
+      "arm": "current-both",
+      "status": "timeout",
+      "timeout": 20.0,
+      "wall": 20.078297368017957
+    },
+    {
+      "case": "cabp_swp.ehoa strahler",
+      "arm": "oink-strpm",
+      "status": "timeout",
+      "timeout": 20.0,
+      "wall": 20.03383152303286
+    },
+    {
+      "case": "cabp_swp.ehoa strahler",
+      "arm": "oink-strpm-simd",
+      "status": "timeout",
+      "timeout": 20.0,
+      "wall": 20.030071565066464
+    },
+    {
+      "case": "cabp_swp.ehoa succinct",
+      "arm": "current-scalar",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 10.391794385039248,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.535321008996107,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.346454249927774,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        }
+      ],
+      "median_wall": 10.391794385039248,
+      "min_wall": 10.346454249927774,
+      "max_wall": 10.535321008996107,
+      "lifts": 32635075,
+      "attempts": 59123470,
+      "even": 0,
+      "odd": 875281,
+      "complete": true,
+      "rounds": 14
+    },
+    {
+      "case": "cabp_swp.ehoa succinct",
+      "arm": "current-both",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 10.349539757939056,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.389669695054181,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.453397474018857,
+          "complete": true,
+          "rounds": 14,
+          "lifts": 32635075,
+          "attempts": 59123470,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        }
+      ],
+      "median_wall": 10.389669695054181,
+      "min_wall": 10.349539757939056,
+      "max_wall": 10.453397474018857,
+      "lifts": 32635075,
+      "attempts": 59123470,
+      "even": 0,
+      "odd": 875281,
+      "complete": true,
+      "rounds": 14
+    },
+    {
+      "case": "cabp_swp.ehoa succinct",
+      "arm": "oink-bsspm",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 6.777640904998407,
+          "complete": true,
+          "solver_seconds": 4.329744,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 6.692872419953346,
+          "complete": true,
+          "solver_seconds": 4.15238,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 6.699352898984216,
+          "complete": true,
+          "solver_seconds": 4.232593,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        }
+      ],
+      "median_wall": 6.699352898984216,
+      "min_wall": 6.692872419953346,
+      "max_wall": 6.777640904998407,
+      "median_solver_seconds": 4.232593,
+      "min_solver_seconds": 4.15238,
+      "max_solver_seconds": 4.329744,
+      "even": 0,
+      "odd": 875281,
+      "complete": true
+    },
+    {
+      "case": "cabp_swp.ehoa succinct",
+      "arm": "oink-sspm-simd",
+      "status": "ok",
+      "samples": [
+        {
+          "wall": 10.774648946942762,
+          "complete": true,
+          "solver_seconds": 8.271305,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.634288147091866,
+          "complete": true,
+          "solver_seconds": 8.17605,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        },
+        {
+          "wall": 10.649714346975088,
+          "complete": true,
+          "solver_seconds": 8.190743,
+          "identity": "19ded2a0e19ce85154f4508f7e62e756136633a2a2f9177197dbc474ee569153",
+          "even": 0,
+          "odd": 875281
+        }
+      ],
+      "median_wall": 10.649714346975088,
+      "min_wall": 10.634288147091866,
+      "max_wall": 10.774648946942762,
+      "median_solver_seconds": 8.190743,
+      "min_solver_seconds": 8.17605,
+      "max_solver_seconds": 8.271305,
+      "even": 0,
+      "odd": 875281,
+      "complete": true
+    }
+  ]
+}

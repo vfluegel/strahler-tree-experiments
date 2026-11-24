@@ -1,0 +1,101 @@
+{
+  "rows": 41895,
+  "maximum": 3557321882121489343,
+  "order_change_heights": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    21,
+    23,
+    24,
+    25,
+    26,
+    30,
+    41,
+    42,
+    45,
+    48,
+    57,
+    59,
+    60,
+    68,
+    71,
+    86,
+    113,
+    148,
+    158,
+    185,
+    194,
+    356,
+    446,
+    501,
+    558
+  ],
+  "csv_sha256": "89cf7bce322c75f01d9c1ae467e643ec3ae488eceaf0ad2da193e56ccb991bd4",
+  "source_sha256": "768d392600a3007657adaefa8da378e642e177fe60f947e3aaa895f3b2f23003",
+  "comparisons": {
+    "6": {
+      "ratio": {
+        "inversions": 372,
+        "unequal_pairs": 615,
+        "inversion_percent": 60.49
+      },
+      "lexicographic": {
+        "inversions": 143,
+        "unequal_pairs": 615,
+        "inversion_percent": 23.25
+      }
+    },
+    "10": {
+      "ratio": {
+        "inversions": 331,
+        "unequal_pairs": 615,
+        "inversion_percent": 53.82
+      },
+      "lexicographic": {
+        "inversions": 56,
+        "unequal_pairs": 615,
+        "inversion_percent": 9.11
+      }
+    },
+    "100": {
+      "ratio": {
+        "inversions": 303,
+        "unequal_pairs": 615,
+        "inversion_percent": 49.27
+      },
+      "lexicographic": {
+        "inversions": 12,
+        "unequal_pairs": 615,
+        "inversion_percent": 1.95
+      }
+    },
+    "1000": {
+      "ratio": {
+        "inversions": 294,
+        "unequal_pairs": 615,
+        "inversion_percent": 47.8
+      },
+      "lexicographic": {
+        "inversions": 3,
+        "unequal_pairs": 615,
+        "inversion_percent": 0.49
+      }
+    }
+  }
+}

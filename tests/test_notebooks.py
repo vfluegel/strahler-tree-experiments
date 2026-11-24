@@ -116,8 +116,8 @@ def test_freeze_rejects_errors_and_volatile_output(executor):
             executor.freeze_outputs(notebook, {})
 
 
-def test_eight_notebooks_and_version_mismatch(monkeypatch, capsys):
-    assert len(NOTEBOOKS) == 8
+def test_ten_notebooks_and_version_mismatch(monkeypatch, capsys):
+    assert len(NOTEBOOKS) == 10
     import importlib.metadata
     from types import SimpleNamespace
     monkeypatch.setitem(sys.modules, 'strahler', SimpleNamespace(version=lambda: '0.0.1'))
@@ -322,3 +322,21 @@ def test_nester_uses_untraced_solver_parameters(backend, monkeypatch, capsys):
     options = (dict(adaptive_t=True, tree_k=4, max_host_leaves=4096) if backend == 'lifting-adaptive'
                else dict(tree_k=1) if backend in ('lifting', 'lifting-sym') else {})
     assert calls == [('lifting' if backend == 'lifting-adaptive' else backend, options)]
+
+
+def test_nester_pm_selects_full_simd_strahler(monkeypatch, capsys):
+    import resource
+    import symmetric_lifting as experiment
+    import strahler
+    calls = []
+    def solve(game, **options):
+        calls.append((options, os.environ.get('STRAHLER_PM_BACKEND')))
+        return dict(rounds=[dict(complete=True, trees=[
+            dict(tree=None, parameters=dict(k=1, t=0, depth=3)),
+            dict(tree=None, parameters=dict(k=1, t=0, depth=3))])])
+    monkeypatch.setenv('STRAHLER_PM_BACKEND', 'scalar')
+    monkeypatch.setattr(strahler, 'progress_measures', solve)
+    monkeypatch.setattr(resource, 'setrlimit', lambda *args: None)
+    experiment._worker(dict(kind='nester', game='Nestern=1.gm.bz2', backend='pm-strahler'))
+    assert calls == [(dict(algorithm='strahler', k=1, t=0), 'simd')]
+    assert json.loads(capsys.readouterr().out)['outcome'] == 'complete'

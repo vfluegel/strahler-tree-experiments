@@ -3,56 +3,16 @@ iter-shave: rounds=1 shaved=59472
 succinct: round=1 result=partial unresolved=815809
 even: bits=1 depth=1 vertices=875281 lifts=2128574 attempts=3883721 non_top=0 top=875281 attracted=0
 odd: bits=1 depth=2 vertices=875281 lifts=2262114 attempts=4136892 non_top=16848 top=858433 attracted=42624
-iter-shave: rounds=2 shaved=63360
-succinct: round=2 result=partial unresolved=752449
-even: bits=1 depth=1 vertices=815809 lifts=2002768 attempts=3634591 non_top=0 top=815809 attracted=0
-odd: bits=1 depth=2 vertices=815809 lifts=2080386 attempts=3784048 non_top=49536 top=766273 attracted=13824
-iter-shave: rounds=3 shaved=29184
-succinct: round=3 result=partial unresolved=723265
-even: bits=1 depth=1 vertices=752449 lifts=1832701 attempts=3335364 non_top=0 top=752449 attracted=0
-odd: bits=1 depth=2 vertices=752449 lifts=1943874 attempts=3550968 non_top=16512 top=735937 attracted=12672
-iter-shave: rounds=4 shaved=29056
-succinct: round=4 result=partial unresolved=694209
-even: bits=1 depth=1 vertices=723265 lifts=1760043 attempts=3202468 non_top=0 top=723265 attracted=0
-odd: bits=1 depth=2 vertices=723265 lifts=1872834 attempts=3411652 non_top=11136 top=712129 attracted=17920
-iter-shave: rounds=5 shaved=64320
-succinct: round=5 result=partial unresolved=629889
-even: bits=1 depth=1 vertices=694209 lifts=1694896 attempts=3080385 non_top=0 top=694209 attracted=0
-odd: bits=1 depth=2 vertices=694209 lifts=1780802 attempts=3239932 non_top=29568 top=664641 attracted=34752
-iter-shave: rounds=6 shaved=102528
-succinct: round=6 result=partial unresolved=527361
-even: bits=1 depth=1 vertices=629889 lifts=1544679 attempts=2790429 non_top=0 top=629889 attracted=0
-odd: bits=1 depth=2 vertices=629889 lifts=1596322 attempts=2892572 non_top=48512 top=581377 attracted=54016
-iter-shave: rounds=7 shaved=72192
-succinct: round=7 result=partial unresolved=455169
-even: bits=1 depth=1 vertices=527361 lifts=1306039 attempts=2358311 non_top=0 top=527361 attracted=0
-odd: bits=1 depth=2 vertices=527361 lifts=1326818 attempts=2403240 non_top=53248 top=474113 attracted=18944
-iter-shave: rounds=8 shaved=46465
-succinct: round=8 result=partial unresolved=408704
-even: bits=1 depth=1 vertices=455169 lifts=1114239 attempts=2026789 non_top=0 top=455169 attracted=0
-odd: bits=1 depth=2 vertices=455169 lifts=1169506 attempts=2126170 non_top=17984 top=437185 attracted=28481
-iter-shave: rounds=9 shaved=92800
-succinct: round=9 result=partial unresolved=315904
-even: bits=1 depth=1 vertices=408704 lifts=1008365 attempts=1825973 non_top=0 top=408704 attracted=0
-odd: bits=1 depth=2 vertices=408704 lifts=1024640 attempts=1848314 non_top=44608 top=364096 attracted=48192
-iter-shave: rounds=10 shaved=132000
-succinct: round=10 result=partial unresolved=183904
-even: bits=1 depth=1 vertices=315904 lifts=790044 attempts=1412393 non_top=0 top=315904 attracted=0
-odd: bits=1 depth=2 vertices=315904 lifts=761568 attempts=1353609 non_top=68288 top=247616 attracted=63712
-iter-shave: rounds=11 shaved=94432
-succinct: round=11 result=partial unresolved=89472
-even: bits=1 depth=1 vertices=183904 lifts=475373 attempts=830957 non_top=0 top=183904 attracted=0
-odd: bits=1 depth=2 vertices=183904 lifts=419728 attempts=731768 non_top=67776 top=116128 attracted=26656
-iter-shave: rounds=12 shaved=40512
-succinct: round=12 result=partial unresolved=48960
-even: bits=1 depth=1 vertices=89472 lifts=226752 attempts=399295 non_top=0 top=89472 attracted=0
-odd: bits=1 depth=2 vertices=89472 lifts=213088 attempts=368176 non_top=22912 top=66560 attracted=17600
-iter-shave: rounds=13 shaved=35328
-succinct: round=13 result=partial unresolved=13632
-even: bits=1 depth=1 vertices=48960 lifts=127233 attempts=220743 non_top=0 top=48960 attracted=0
-odd: bits=1 depth=2 vertices=48960 lifts=107904 attempts=179112 non_top=22336 top=26624 attracted=12992
-iter-shave: rounds=14 shaved=13632
-succinct: round=14 result=complete unresolved=0
-even: bits=1 depth=1 vertices=13632 lifts=39929 attempts=60202 non_top=0 top=13632 attracted=0
-odd: bits=1 depth=2 vertices=13632 lifts=23856 attempts=35396 non_top=13632 top=0 attracted=0
+iter-shave: rounds=2 shaved=92544
+succinct: round=2 result=partial unresolved=723265
+even: bits=2 depth=1 vertices=815809 lifts=3332696 attempts=5946309 non_top=0 top=815809 attracted=0
+odd: bits=2 depth=2 vertices=815809 lifts=3047105 attempts=5347878 non_top=79872 top=735937 attracted=12672
+iter-shave: rounds=3 shaved=296768
+succinct: round=3 result=partial unresolved=426497
+even: bits=3 depth=1 vertices=723265 lifts=5041091 attempts=8734086 non_top=0 top=723265 attracted=0
+odd: bits=3 depth=2 vertices=723265 lifts=4376117 attempts=7520075 non_top=277792 top=445473 attracted=18976
+iter-shave: rounds=4 shaved=426497
+succinct: round=4 result=complete unresolved=0
+even: bits=4 depth=1 vertices=426497 lifts=5122254 attempts=8656480 non_top=0 top=426497 attracted=0
+odd: bits=4 depth=2 vertices=426497 lifts=1768441 attempts=3064799 non_top=426497 top=0 attracted=0
 start: vertex=0 winner=odd

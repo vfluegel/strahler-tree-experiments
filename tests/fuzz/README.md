@@ -9,11 +9,12 @@ Two libFuzzer targets exercise the public C API.
 
 For each decoded game, `solvers` checks that:
 
-- every AD backend returns the same JSON document as `scalar`, and every packed
-  PM backend returns the same document as native scalar;
+- every AD backend returns the same JSON document as `scalar`, and full SIMD
+  Strahler PM returns the same document as native scalar;
 - no solver certifies a win that Zielonka gives to the opponent;
 - on games of at most 8 vertices, every complete solver finds Zielonka's winners;
-- a fixed `(k,t)` host that solves a game still solves it after raising `k` or `t`.
+- at fixed `k`, a solved AD host remains solved after raising `t`; changing `k`
+  has no general inclusion guarantee (see `docs/incremental-t.md`).
 
 ## Run locally
 

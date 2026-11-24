@@ -16,6 +16,7 @@ __pycache__/
 *.gcov
 
 # Test artifacts
+.cache/
 tests/actual/
 keiren/*.lock
 

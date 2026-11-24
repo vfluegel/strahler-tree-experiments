@@ -55,7 +55,7 @@ with strahler.Game.from_text(text) as game:
     os.environ.pop('STRAHLER_AD_BACKEND')
     os.environ['STRAHLER_PM_BACKEND'] = 'scalar'
     expected = strahler.progress_measures(game, algorithm='strahler', k=3, t=2)
-    for backend in ('packed', 'lookup', 'compare', 'both'):
+    for backend in ('simd',):
         os.environ['STRAHLER_PM_BACKEND'] = backend
         assert strahler.progress_measures(game, algorithm='strahler', k=3, t=2) == expected
     os.environ.pop('STRAHLER_PM_BACKEND')

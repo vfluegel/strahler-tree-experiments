@@ -794,6 +794,34 @@ static void test_iter_shave(void) {
   }
 }
 
+static void test_table_budget_stats(void) {
+  FILE *input = fopen("tests/games/disagree_lifting_strahler.pg", "r");
+  PGGame game = {0};
+  PGParseError parse_error = {0};
+  assert(input != nullptr && pg_game_read(input, &game, &parse_error));
+  assert(fclose(input) == 0);
+  PGSet domain = full_domain(&game);
+  for (size_t symmetric = 0; symmetric < 2; symmetric++) {
+    ADLiftOptions options = options_for(AD_LIFT_HOST_ADAPTIVE, 0);
+    options.table = true;
+    options.iter_shave = true;
+    options.symmetric = symmetric != 0;
+    options.max_host_leaves = 1;
+    ADLiftSolveStats stats = {0};
+    ADResult result = solve(&game, &domain, &options, &stats);
+    assert(result.kind == AD_RESULT_PARTIAL && stats.budget_exhausted);
+    assert(stats.iterations == 6 && result.shave_count == 6);
+    assert(stats.player[PG_EVEN].k == 3 && stats.player[PG_ODD].k == 2);
+    assert(stats.player[PG_EVEN].t == 0 && stats.player[PG_ODD].t == 0);
+    assert(stats.vertices == game.vertex_count);
+    assert(stats.player[PG_EVEN].host_leaves == 1);
+    assert(stats.player[PG_ODD].host_leaves == 1);
+    ad_result_destroy(&result);
+  }
+  pg_set_destroy(&domain);
+  pg_game_destroy(&game);
+}
+
 static void test_kary_hosts(void) {
   PGGame game = parse(partial_game);
   PGSet domain = full_domain(&game);
@@ -913,6 +941,7 @@ int main(void) {
   test_exhaustive_search();
   test_incremental();
   test_iter_shave();
+  test_table_budget_stats();
   test_kary_hosts();
   test_tree_hosts();
   test_solver_inputs();

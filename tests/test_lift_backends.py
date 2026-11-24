@@ -65,7 +65,7 @@ def main():
             path.write_text(arena(rng, rng.randrange(64, 161)), encoding='utf-8')
             for tool, modes, backends in [
                 ('pg2adot', ad_modes, ('fused', 'packed', 'dense', 'queue', 'dirty', 'byte')),
-                ('pg2pmdot', pm_modes, ('packed', 'lookup', 'compare', 'both')),
+                ('pg2pmdot', pm_modes, ('simd',)),
             ]:
                 for flags in modes:
                     expected = run(baseline, tool, flags, path, 'scalar')

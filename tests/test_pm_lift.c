@@ -332,7 +332,34 @@ static void test_ratio_queue(void) {
   parameter_queue_destroy(&queue);
 }
 
+static void test_repeat_fixed(void) {
+  PGGame game = parse("0 1 0 2;1 0 0 2;2 0 0 2;3 3 0 4;4 0 1 0,4;");
+  PGSet active = {0};
+  assert(pg_set_init(&active, game.vertex_count));
+  pg_set_fill(&active);
+  PMOptions options = {.algorithm = PM_STRAHLER,
+                       .fixed = true,
+                       .parameters = {.k = 1, .t = 0},
+                       .incremental = true,
+                       .verify = true};
+  Collected once = solve(&game, &active, &options);
+  assert(once.calls == 1 && !pg_set_empty(&once.unresolved));
+  destroy(&once);
+  options.repeat_fixed = true;
+  Collected repeated = solve(&game, &active, &options);
+  assert(repeated.calls == 2 && pg_set_empty(&repeated.unresolved));
+  assert(pg_set_count(&repeated.won[PG_EVEN]) == game.vertex_count);
+  assert(pg_set_empty(&repeated.won[PG_ODD]));
+  destroy(&repeated);
+  options.incremental = false;
+  PMError error = {0};
+  assert(!pm_solve(&game, &active, &options, collect, nullptr, &error));
+  pg_set_destroy(&active);
+  pg_game_destroy(&game);
+}
+
 int main(void) {
+  test_repeat_fixed();
   test_ratio_queue();
   test_successors();
   test_partial_and_rejection();

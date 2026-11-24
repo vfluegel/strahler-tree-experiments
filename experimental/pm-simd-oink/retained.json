@@ -1,0 +1,136 @@
+{
+  "binary_sha256": "6d24ca218afb7039dec9b752f70f6557dcd28709859ff31813f79253bd67ef20",
+  "source_sha256": {
+    "src/pm_lift.c": "9f08176fc2701996997452d93489a497921d76d37d0c08cc6dfba330000db776",
+    "src/pm_solve.c": "679f1fd7fd0b50e5f54d6043da9430acf6656bae4929679bb73c8243ff685b77",
+    "src/sspm.c": "d07bd08a4820e2bd668dac3599469a378f902f5f68e01964e8f7e01138c5aee4",
+    "src/pm_tree_dot.c": "e676722b9d2df9e24586ba08d57347b43b65e5c95e8b3e138e69e6ac3a2a38eb"
+  },
+  "samples": 3,
+  "warmups": 1,
+  "cpu": [
+    3
+  ],
+  "rows": [
+    {
+      "case": "Nestern=3_compact",
+      "median_wall": 0.00769881799351424,
+      "median_cpu": 0.005918999999999999,
+      "rounds": 3,
+      "vertices": 1562,
+      "samples": [
+        {
+          "wall": 0.007813245058059692,
+          "cpu": 0.005974,
+          "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+        },
+        {
+          "wall": 0.00763001199811697,
+          "cpu": 0.005918999999999999,
+          "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+        },
+        {
+          "wall": 0.00769881799351424,
+          "cpu": 0.005887999999999999,
+          "winner_sha256": "96661683b2020a8711b0f96df1bb264d204374399e2545f9187e35c31b570773"
+        }
+      ]
+    },
+    {
+      "case": "Nestern=4_compact",
+      "median_wall": 0.054274056921713054,
+      "median_cpu": 0.051328000000000006,
+      "rounds": 5,
+      "vertices": 6817,
+      "samples": [
+        {
+          "wall": 0.054274056921713054,
+          "cpu": 0.051238000000000006,
+          "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+        },
+        {
+          "wall": 0.05499928502831608,
+          "cpu": 0.051629999999999995,
+          "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+        },
+        {
+          "wall": 0.05398143199272454,
+          "cpu": 0.051328000000000006,
+          "winner_sha256": "795216039a2673ba29906c181e503df61c4bf844ac1fb65b65b68e3b2c2c5dee"
+        }
+      ]
+    },
+    {
+      "case": "Nestern=3",
+      "median_wall": 0.022294546011835337,
+      "median_cpu": 0.02008399999999999,
+      "rounds": 4,
+      "vertices": 3029,
+      "samples": [
+        {
+          "wall": 0.02208398107904941,
+          "cpu": 0.02008399999999999,
+          "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+        },
+        {
+          "wall": 0.022294546011835337,
+          "cpu": 0.020065999999999952,
+          "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+        },
+        {
+          "wall": 0.022343575954437256,
+          "cpu": 0.020114,
+          "winner_sha256": "4a017f4eeedfed1aedc982707d244c8950bff85a9e51ae261a705a919615034a"
+        }
+      ]
+    },
+    {
+      "case": "FairScheduler2",
+      "median_wall": 1.1482154179830104,
+      "median_cpu": 1.138999,
+      "rounds": 2,
+      "vertices": 5596,
+      "samples": [
+        {
+          "wall": 1.1486531540285796,
+          "cpu": 1.1390869999999997,
+          "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+        },
+        {
+          "wall": 1.1482154179830104,
+          "cpu": 1.138999,
+          "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+        },
+        {
+          "wall": 1.1467390150064602,
+          "cpu": 1.1379820000000003,
+          "winner_sha256": "d18a39ae9a16e832a8ed5e118ca7675410dafa118e80379c7c3210e7d32cb9bc"
+        }
+      ]
+    },
+    {
+      "case": "cabp_swp.ehoa",
+      "median_wall": 7.089495647000149,
+      "median_cpu": 6.972848,
+      "rounds": 4,
+      "vertices": 875281,
+      "samples": [
+        {
+          "wall": 7.071614201995544,
+          "cpu": 6.9508540000000005,
+          "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+        },
+        {
+          "wall": 7.089495647000149,
+          "cpu": 6.972848,
+          "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+        },
+        {
+          "wall": 7.10445375693962,
+          "cpu": 6.985021000000003,
+          "winner_sha256": "c68e186cb47052cd70853a363edba0922a696ee54c41bbdb859798ca51db19cb"
+        }
+      ]
+    }
+  ]
+}

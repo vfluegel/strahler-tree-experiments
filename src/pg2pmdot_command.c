@@ -51,7 +51,9 @@ static void usage(FILE *out, char *argv[]) {
         "budget; may be partial\n"
         "  --iter-shave                                Remove dominions "
         "between runs (default: off)\n"
-        "  --search=lexicographic|ratio                Select exhaustive "
+        "  --repeat-fixed                              Repeat fixed STRPM "
+        "hosts until shaving stalls; requires --k, --t, --iter-shave\n"
+        "  --search=lexicographic|ratio|table          Select adaptive "
         "parameter order\n"
         "  --start-k=K --start-t=T                      First lexicographic "
         "pair (default: 1,0)\n"
@@ -179,6 +181,7 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     OPT_SEARCH,
     OPT_START_K,
     OPT_START_T,
+    OPT_REPEAT_FIXED,
     OPT_STATS,
     OPT_NO_VERIFY
   };
@@ -197,6 +200,7 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       {"t", required_argument, nullptr, OPT_T},
       {"bits", required_argument, nullptr, OPT_BITS},
       {"iter-shave", no_argument, nullptr, OPT_INCREMENTAL},
+      {"repeat-fixed", no_argument, nullptr, OPT_REPEAT_FIXED},
       {"search", required_argument, nullptr, OPT_SEARCH},
       {"start-k", required_argument, nullptr, OPT_START_K},
       {"start-t", required_argument, nullptr, OPT_START_T},
@@ -314,6 +318,9 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       solve_options.incremental = true;
       output.incremental = true;
       break;
+    case OPT_REPEAT_FIXED:
+      solve_options.repeat_fixed = true;
+      break;
     case OPT_START_K:
       if (!parse_size(parser.argument, &solve_options.start_k) ||
           solve_options.start_k == 0) {
@@ -328,12 +335,14 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       break;
     case OPT_SEARCH:
       if (strcmp(parser.argument, "lexicographic") != 0 &&
-          strcmp(parser.argument, "ratio") != 0) {
+          strcmp(parser.argument, "ratio") != 0 &&
+          strcmp(parser.argument, "table") != 0) {
         return cli_error_to(io->err, argv[0], "Invalid --search value");
       }
       solve_options.lexicographic =
           strcmp(parser.argument, "lexicographic") == 0;
       solve_options.ratio = strcmp(parser.argument, "ratio") == 0;
+      solve_options.table = strcmp(parser.argument, "table") == 0;
       break;
     case OPT_STATS:
       output.stats = true;
@@ -351,7 +360,15 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     goto invalid;
   }
   solve_options.fixed = k_given || bits_given;
-  if ((solve_options.lexicographic || solve_options.ratio) &&
+  if (solve_options.repeat_fixed &&
+      (!k_given || !t_given || !solve_options.incremental ||
+       solve_options.algorithm != PM_STRAHLER)) {
+    return cli_error_to(
+        io->err, argv[0],
+        "--repeat-fixed requires --k, --t and --iter-shave for Strahler PM");
+  }
+  if ((solve_options.lexicographic || solve_options.ratio ||
+       solve_options.table) &&
       (solve_options.fixed || solve_options.algorithm != PM_STRAHLER)) {
     return cli_error_to(io->err, argv[0],
                         "--search requires unfixed Strahler parameters");

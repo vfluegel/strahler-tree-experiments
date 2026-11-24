@@ -38,8 +38,8 @@ static Member *members_for(PMResult const *result, size_t *member_count) {
     return nullptr;
   }
   Member *members = malloc((count == 0 ? 1 : count) * sizeof(members[0]));
-  if (members == nullptr) {
-    return nullptr;
+  if (members == nullptr || count == 0) {
+    return members;
   }
   size_t index = 0;
   for (size_t order = 0; order < result->vertex_count; order++) {

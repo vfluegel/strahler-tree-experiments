@@ -1,0 +1,351 @@
+{
+  "source": "https://doi.org/10.6084/m9.figshare.6004130.v1",
+  "license": "CC0",
+  "representation": "max-parity PGSolver, without optional preprocessing or same-parity compression",
+  "original_figshare_file": 10792910,
+  "generator": "PGSolver laddergame (Friedmann), collected by Keiren",
+  "games": [
+    {
+      "id": "ladder-100",
+      "label": "ladder n=100",
+      "series": "laddergame",
+      "parameter": 100,
+      "file": "laddergame-100.gm.bz2",
+      "sha256": "ace39ecfb5fb143544581b37c0985485d5c180e2832f6dba5ce005b86409da8e",
+      "pg_sha256": "f6f69fe71bfdfd96c49c6a83bf92688782229a900dbe2dddd1e8df08746e5a66",
+      "original_member": "pgsolver/games/laddergame(100).gm.bz2",
+      "vertices": 200,
+      "edges": 400,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": true,
+      "fixed_t_max": 6,
+      "t_max": 7,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 944
+    },
+    {
+      "id": "ladder-200",
+      "label": "ladder n=200",
+      "series": "laddergame",
+      "parameter": 200,
+      "file": "laddergame-200.gm.bz2",
+      "sha256": "f091e5e247d09c9093eb33f22de257a08f0e31cf17f517395a85033283036634",
+      "pg_sha256": "539a654a87ff8ae7f2662cfa1921b6c6c1fe1f22bba4526f6ba3fd3f17939072",
+      "original_member": "pgsolver/games/laddergame(200).gm.bz2",
+      "vertices": 400,
+      "edges": 800,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 8,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 1689
+    },
+    {
+      "id": "ladder-500",
+      "label": "ladder n=500",
+      "series": "laddergame",
+      "parameter": 500,
+      "file": "laddergame-500.gm.bz2",
+      "sha256": "cb8ff0afabd28805ce6ab52bb6b497c2d8569ccadecdcfe4f44845407b5216c8",
+      "pg_sha256": "56a59aabe8e1bbcee3f6a8f60b434163ad802ef0100734daa5f96a50bdeb66d8",
+      "original_member": "pgsolver/games/laddergame(500).gm.bz2",
+      "vertices": 1000,
+      "edges": 2000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 9,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 4283
+    },
+    {
+      "id": "ladder-1000",
+      "label": "ladder n=1000",
+      "series": "laddergame",
+      "parameter": 1000,
+      "file": "laddergame-1000.gm.bz2",
+      "sha256": "ffe50add3eeed40858dbee7ebd017c214ec435c43f3b4a2d5ab47de71f667a33",
+      "pg_sha256": "3fa738491521254224ffae0768ecd2baa0a7162377f03c5d1f8b2cf88afa104d",
+      "original_member": "pgsolver/games/laddergame(1000).gm.bz2",
+      "vertices": 2000,
+      "edges": 4000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 10,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 9393
+    },
+    {
+      "id": "ladder-2000",
+      "label": "ladder n=2000",
+      "series": "laddergame",
+      "parameter": 2000,
+      "file": "laddergame-2000.gm.bz2",
+      "sha256": "d2a06f8c4dcf0c886ec3891238584ea6539b1125015585fd469fed073d5dcce2",
+      "pg_sha256": "d340e61528302d857d191ef2712e974da74ec809070fc1b897a75e9a08c531fa",
+      "original_member": "pgsolver/games/laddergame(2000).gm.bz2",
+      "vertices": 4000,
+      "edges": 8000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 11,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 18213
+    },
+    {
+      "id": "ladder-5000",
+      "label": "ladder n=5000",
+      "series": "laddergame",
+      "parameter": 5000,
+      "file": "laddergame-5000.gm.bz2",
+      "sha256": "2a1d73a6e2bacde5625fff04d35a6279b346c227602bba647c3f47f1702d01ae",
+      "pg_sha256": "0e4cd0c9a0d47abc0619d8e0915998e063693e8df72cab870fd38ca1372859ce",
+      "original_member": "pgsolver/games/laddergame(5000).gm.bz2",
+      "vertices": 10000,
+      "edges": 20000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 13,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 50725
+    },
+    {
+      "id": "ladder-10000",
+      "label": "ladder n=10000",
+      "series": "laddergame",
+      "parameter": 10000,
+      "file": "laddergame-10000.gm.bz2",
+      "sha256": "691ebf4da9152f86314f9993312581cceba5fd924699f379ee95e93c7cfa5b8e",
+      "pg_sha256": "a193f622f419e43eebb4fea5458b389fbc2ba66591c4bb8d5bb3727e290875ac",
+      "original_member": "pgsolver/games/laddergame(10000).gm.bz2",
+      "vertices": 20000,
+      "edges": 40000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 14,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 110395
+    },
+    {
+      "id": "ladder-20000",
+      "label": "ladder n=20000",
+      "series": "laddergame",
+      "parameter": 20000,
+      "file": "laddergame-20000.gm.bz2",
+      "sha256": "987acd2cefc92dcf9624821c7a9c049740e375b06f4c397ab29ffc379028b123",
+      "pg_sha256": "6ea2ca5dcf89eac80fc0aa3179858abee34a14350a09411b78200ec095252f67",
+      "original_member": "pgsolver/games/laddergame(20000).gm.bz2",
+      "vertices": 40000,
+      "edges": 80000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": false,
+      "fixed_t_max": 6,
+      "t_max": 15,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 210003
+    },
+    {
+      "id": "ladder-50000",
+      "label": "ladder n=50000",
+      "series": "laddergame",
+      "parameter": 50000,
+      "file": "laddergame-50000.gm.bz2",
+      "sha256": "710b8d4806ce465a7cfdb2d7a0fc7b74d5f16db4b3a3f607fe80c5f28c7da250",
+      "pg_sha256": "7f90a88579686e1ee13c3554262eece518277aac02cd5d0e90b1c09d7d0f86a7",
+      "original_member": "pgsolver/games/laddergame(50000).gm.bz2",
+      "vertices": 100000,
+      "edges": 200000,
+      "raw_priorities": [
+        0,
+        1
+      ],
+      "normalized_maximum": 1,
+      "dense_ids": true,
+      "fixed_map": true,
+      "fixed_t_max": 6,
+      "t_max": 16,
+      "AD_height": [
+        2,
+        1
+      ],
+      "PM_depth": [
+        1,
+        1
+      ],
+      "AD_k_max": [
+        2,
+        1
+      ],
+      "PM_k_max": [
+        2,
+        2
+      ],
+      "file_bytes": 474067
+    }
+  ]
+}

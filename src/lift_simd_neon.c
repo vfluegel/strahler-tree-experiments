@@ -76,42 +76,4 @@ unsigned lift_block_neon(int *keys, int const *edges, size_t const degree,
   return changed;
 }
 
-/*
- * Copyright 2017-2018 Tom van Dijk, Johannes Kepler University Linz
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/* PM kernels adapted from the pinned Oink artifact; see SIMD.md. */
-void lift_counts_neon(uint16_t const masks[8], uint16_t counts[8]) {
-  uint16x8_t const m = vld1q_u16(masks);
-  uint16x8_t const n = vpaddlq_u8(vcntq_u8(vreinterpretq_u8_u16(m)));
-  vst1q_u16(counts, vqsubq_u16(n, vdupq_n_u16(1)));
-}
-
-void lift_strings_neon(uint16_t const a[8], uint16_t const A[8],
-                       uint16_t const b[8], uint16_t const B[8], int out[8]) {
-  uint16x8_t const va = vld1q_u16(a), ma = vld1q_u16(A);
-  uint16x8_t const vb = vld1q_u16(b), mb = vld1q_u16(B);
-  uint16x8_t const delta = vorrq_u16(
-      vandq_u16(veorq_u16(va, vb), vandq_u16(ma, mb)), veorq_u16(ma, mb));
-  uint16x8_t const first = vandq_u16(delta, vsubq_u16(vdupq_n_u16(0), delta));
-  uint16x8_t const takes =
-      vorrq_u16(vandq_u16(va, ma), vmvnq_u16(vorrq_u16(ma, vb)));
-  uint16_t d[8], wins[8];
-  vst1q_u16(d, delta);
-  vst1q_u16(wins, vandq_u16(takes, first));
-  for (unsigned i = 0; i < 8; i++) {
-    out[i] = d[i] == 0 ? 0 : wins[i] != 0 ? 1 : -1;
-  }
-}
 #endif

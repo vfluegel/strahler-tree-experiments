@@ -1,9 +1,6 @@
 # round 1 bits=1
 even: 0,e,e,e,e,e,e|e,0,e,e,e,e,e|
 odd: 
-# round 2 bits=1
-even: 
-odd: 
-# round 3 bits=2
+# round 2 bits=2
 even: 00,e,e,e,e,e,e|e,e,0,e,0,e,e|e,e,e,0,0,e,e|e,e,00,e,e,e,e|e,e,e,00,e,e,e|e,0,1,e,e,e,e|e,0,e,0,e,e,e|e,0,0,e,e,e,e|e,e,0,0,e,e,e|e,e,01,e,e,e,e|e,0,e,e,0,e,e|e,01,e,e,e,e,e|e,00,e,e,e,e,e|e,0,e,e,e,0,e|e,0,e,e,e,e,0|e,e,0,1,e,e,e|e,e,0,e,e,0,e|e,0,e,e,1,e,e|e,0,e,1,e,e,e|e,e,10,e,e,e,e|
 odd: 

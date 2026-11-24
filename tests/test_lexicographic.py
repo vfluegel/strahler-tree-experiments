@@ -106,23 +106,62 @@ def test_pm_iter_repeats_productive_pairs_and_advances_only_when_stalled():
         assert pm_wins(data) == ad_wins(strahler.decompose(game, 'zielonka'))
 
 
-def test_fixed_pair_maps_are_recorded_and_inferred_along_host_inclusion():
+def test_fixed_pair_maps_distinguish_observations_from_open_predecessors():
     import fixed_pair_maps as maps
-
-    document = maps.recorded_maps()
-    least = {(s['n'], s['backend']): s['least'] for s in maps.smallest_pairs(document)}
-    assert least == {(4, 'AD-sym'): [(3, 1)], (4, 'AD-sym+iter'): [(2, 1)],
-                     (5, 'AD-sym'): [(3, 1)], (5, 'AD-sym+iter'): [(3, 1)]}
+    document = maps.recorded_maps(pm_path=None)
+    confirmed = {(r['n'], r['backend']): r['confirmed'] for r in maps.smallest_pairs(document)}
+    assert confirmed == {(4, 'AD-sym'): [(3, 1)], (4, 'AD-sym+iter'): [(2, 1)],
+                         (5, 'AD-sym'): [(3, 1)], (5, 'AD-sym+iter'): [(3, 1)]}
     rows = [dict(k=1, t=1, outcome='unsolved', unresolved=1, seconds=1),
             dict(k=2, t=1, outcome='solved', rounds=1, seconds=1),
             dict(k=1, t=2, outcome='timeout', timeout_seconds=600)]
     cells = maps.classify(rows, 3, 2)
-    assert cells[1, 0][0] == 'implied-failed' and cells[3, 2][0] == 'implied-solved'
-    assert cells[2, 1][1] == '\u2605' and cells[1, 2][1] == 'T'
-    assert cells[2, 0][0] == 'unknown'
-    assert maps.monotonicity_violations([
+    assert cells[1, 0][0] == 'unknown' and cells[3, 2][0] == 'dominated'
+    assert cells[2, 1][1] == '◇' and cells[1, 2][0] == 'limit'
+    rows += [dict(k=1, t=0, outcome='unsolved', unresolved=1, seconds=1),
+             dict(k=2, t=0, outcome='unsolved', unresolved=1, seconds=1)]
+    assert maps.classify(rows, 3, 2)[2, 1][1] == '★'
+    # A solved smaller k says nothing about a larger host's success.
+    assert not maps.monotonicity_violations([
         dict(n=1, backend='AD-sym', k=1, t=1, outcome='solved'),
         dict(n=1, backend='AD-sym', k=2, t=1, outcome='unsolved')])
+
+
+def test_minima_walk_does_not_prune_after_a_timeout(monkeypatch):
+    import fixed_pair_maps as maps
+    monkeypatch.setattr(maps, 'caps', lambda *args: (2, 2))
+    visits = []
+    def measure(n, backend, k, t):
+        visits.append((k, t))
+        return dict(outcome='timeout' if (k, t) == (1, 0) else
+                    'solved' if (k, t) == (2, 1) else 'unsolved')
+    maps.minima_walk(measure, 4, 'PM')
+    assert (1, 1) in visits and (1, 2) in visits
+    assert (2, 1) in visits and (2, 2) not in visits
+
+
+@pytest.mark.parametrize('damage', ['truncated', 'duplicate', 'mixed_limit', 'unchecked'])
+def test_pm_grid_publication_rejects_incomplete_or_mixed_evidence(damage):
+    import fixed_pair_maps as maps
+    document = json.loads(maps.PM_RESULTS.read_text())
+    assert len(maps.validate_pm_recording(document)) == 4
+    if damage == 'truncated':
+        document['rows'] = [r for r in document['rows'] if
+                            (r['n'], r['backend'], r['k'], r['t']) != (4, 'PM', 1, 0)]
+    elif damage == 'duplicate':
+        document['rows'].append(document['rows'][0])
+    elif damage == 'mixed_limit':
+        document['rows'][0]['timeout_seconds'] = 60
+    else:
+        document['rows'][0]['independent_winner_check'] = False
+    with pytest.raises(ValueError):
+        maps.validate_pm_recording(document)
+
+
+def test_fixed_maps_require_the_new_pm_recording(tmp_path):
+    import fixed_pair_maps as maps
+    with pytest.raises(FileNotFoundError):
+        maps.recorded_maps(pm_path=tmp_path / 'missing.json')
 
 
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
@@ -700,3 +739,117 @@ def test_pm_ratio_retries_productive_round_then_advances_after_a_stall():
             assert (sequence[index + 1] == sequence[index]) == (after < before)
             before = after
         assert pm_wins(document) == ad_wins(strahler.decompose(game, 'zielonka'))
+
+
+def test_new_pm_recordings_identify_strahler_simd(monkeypatch):
+    monkeypatch.setenv('STRAHLER_PM_BACKEND', 'scalar')
+    metadata = experiment._run_metadata(manifest()[:1])
+    assert metadata['pm_algorithm'] == 'strahler'
+    assert metadata['lifting_backends']['STRAHLER_PM_BACKEND'] == 'simd'
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterate):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg') as game:
+        expected = ad_wins(strahler.decompose(game, 'zielonka'))
+        run = strahler.trace(game, algorithm, search='table', iter_shave=iterate)
+        assert run.result.complete and ad_wins(run.result) == expected
+        check_document(run.result.data)
+        visits = visited_pairs(run)
+        assert visits[0] == (1, 0)
+        if iterate:
+            at = -1
+            for event in run.events:
+                if event.get('phase') == 't_raised':
+                    at += 1
+                if event.get('phase') == 'shave_applied' and at + 1 < len(visits):
+                    assert (visits[at + 1] == visits[at]) == any(event['result']['regions'])
+        pm = strahler.progress_measures(game, algorithm='strahler', search='table', iter_shave=iterate)
+        assert pm['rounds'][-1]['complete'] and pm_wins(pm) == expected
+        assert run.result.data['parameters'][0]['H'] != run.result.data['parameters'][1]['H']
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+def test_table_budget_skips_keep_reaching_the_ratio_tail(algorithm, iterate):
+    # Sixteen disjoint copies keep the unary host partial, while priority loops
+    # give height seven and enough vertices to reach parameters outside 6x6.
+    text = []
+    source = '0 3 1 9;1 2 1 4;2 0 1 1,2;3 1 1 2;4 0 1 3,4;5 2 1 9;6 1 1 4;7 0 1 5,6,7;8 1 1 7;9 0 1 8,9;'
+    for copy in range(16):
+        for row in source.split(';'):
+            if not row:
+                continue
+            v, p, owner, edges = row.split()
+            offset = copy * 10
+            text.append(f"{int(v)+offset} {p} {owner} " + ','.join(str(int(e)+offset) for e in edges.split(',')) + ';')
+    for priority in range(13):
+        v = 160 + priority
+        text.append(f'{v} {priority} 0 {v};')
+    with strahler.Game.from_text('\n'.join(text)) as game:
+        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1,
+                             iter_shave=iterate)
+        assert not run.result.complete and run.result.data['budget_exhausted']
+        assert (1, 7) in visited_pairs(run)
+        truth = ad_wins(strahler.decompose(game, 'zielonka'))
+        assert all(won <= true for won, true in zip(ad_wins(run.result), truth))
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_table_budget_exhaustion_retains_the_last_real_attempt(algorithm):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg') as game:
+        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1,
+                             iter_shave=True)
+        data = run.result.data
+        assert not run.result.complete and data['budget_exhausted']
+        assert visited_pairs(run)[-1] == (3, 0)
+        assert len(visited_pairs(run)) == len(data['round_pairs']) == 6
+        assert data['parameters'][0]['K'] == 3
+        assert data['parameters'][1]['K'] == 2
+
+
+@pytest.mark.parametrize('solver', ['AD', 'AD-sym', 'PM'])
+def test_table_search_handles_single_vertices_and_rejects_start_overrides(solver):
+    with strahler.Game.from_text('0 0 0 0;') as game:
+        solve = (lambda **kw: strahler.progress_measures(game, **kw)) if solver == 'PM' else (lambda **kw: strahler.decompose(game, 'lifting-sym' if solver == 'AD-sym' else 'lifting', **kw))
+        result = solve(search='table', iter_shave=True)
+        assert result['rounds'][-1]['complete'] if solver == 'PM' else result.complete
+        with pytest.raises(strahler.StrahlerError):
+            solve(search='table', start_k=2)
+
+
+def test_table_repeats_a_productive_unary_pair():
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        run = strahler.trace(game, 'lifting', search='table', iter_shave=True)
+        assert visited_pairs(run)[:2] == [(1, 0), (1, 0)]
+
+
+def test_fixed_pm_repeats_until_complete_without_changing_the_pair():
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/lifted_shape.pg') as game:
+        once = strahler.progress_measures(game, k=1, t=0, iter_shave=True)
+        repeated = strahler.progress_measures(game, k=1, t=0, iter_shave=True, repeat_fixed=True)
+        assert len(once['rounds']) == 1 and not once['rounds'][0]['complete']
+        assert len(repeated['rounds']) == 2 and repeated['rounds'][-1]['complete']
+        assert pm_wins(repeated) == ad_wins(strahler.decompose(game, 'zielonka'))
+        assert all(p['parameters']['k'] == 1 and p['parameters']['t'] == 0
+                   for r in repeated['rounds'] for p in r['trees'])
+
+
+def test_fixed_pm_stops_at_a_stable_partial_result():
+    text = (EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg').read_text()
+    text = text.replace('parity 9;', 'parity 11;') + '\n10 0 0 10;\n11 1 1 11;\n'
+    with strahler.Game.from_text(text) as game:
+        document = strahler.progress_measures(game, k=1, t=0, iter_shave=True, repeat_fixed=True)
+        assert len(document['rounds']) == 2 and not document['rounds'][-1]['complete']
+        assert document['rounds'][0]['unresolved'] == document['rounds'][1]['unresolved']
+        truth = ad_wins(strahler.decompose(game, 'zielonka'))
+        assert all(won <= true for won, true in zip(pm_wins(document), truth))
+
+
+@pytest.mark.parametrize('options', [dict(k=1, t=0), dict(iter_shave=True),
+    dict(algorithm='succinct', bits=1, iter_shave=True)])
+def test_repeat_fixed_requires_fixed_strahler_shaving(options):
+    with strahler.Game.from_text('0 0 0 0;') as game:
+        with pytest.raises(strahler.InputError, match='repeat-fixed'):
+            strahler.progress_measures(game, repeat_fixed=True, **options)

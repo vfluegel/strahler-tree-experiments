@@ -1,0 +1,1868 @@
+{
+  "recorded_utc": "2026-11-24T10:15:17.885412+00:00",
+  "cpu": 3,
+  "phase": "kernels",
+  "samples": 5,
+  "provenance": {
+    "current_head": "5edbead0fdc9eba8a1d8776d27cb460e9d8eed7c",
+    "oink_head": "85230b6d06307adbf6db6e474ec5fcf546b09400",
+    "compiler": "cc (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)",
+    "compile_flags": [
+      "-O3",
+      "-DNDEBUG",
+      "-I/home/gaperez/GIT-repos/strahler-tree-experiments/src",
+      "-I/home/gaperez/GIT-repos/strahler-tree-experiments/experimental/pm-simd-oink"
+    ],
+    "oink_kernel_sha256": "aad254089146277b1fd8c641d461cb2f787251c33e2cd80c5c18c8abc454e420",
+    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           39 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  4\nOn-line CPU(s) list:                     0-3\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Core(TM) i3-8100T CPU @ 3.10GHz\nCPU family:                              6\nModel:                                   158\nThread(s) per core:                      1\nCore(s) per socket:                      4\nSocket(s):                               1\nStepping:                                11\nCPU(s) scaling MHz:                      49%\nCPU max MHz:                             3100.0000\nCPU min MHz:                             800.0000\nBogoMIPS:                                6199.99\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb pti ssbd ibrs ibpb stibp tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm arat pln pts hwp hwp_notify hwp_act_window hwp_epp vnmi md_clear flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               128 KiB (4 instances)\nL1i cache:                               128 KiB (4 instances)\nL2 cache:                                1 MiB (4 instances)\nL3 cache:                                6 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-3\nVulnerability Gather data sampling:      Mitigation; Microcode\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             KVM: Mitigation: Split huge pages\nVulnerability L1tf:                      Mitigation; PTE Inversion; VMX conditional cache flushes, SMT disabled\nVulnerability Mds:                       Mitigation; Clear CPU buffers; SMT disabled\nVulnerability Meltdown:                  Mitigation; PTI\nVulnerability Mmio stale data:           Mitigation; Clear CPU buffers; SMT disabled\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Mitigation; IBRS\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; IBRS; IBPB conditional; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Mitigation; Microcode\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+    "sources": {
+      "experimental/pm-simd-oink/oink_adapter.h": "f87bedf120b922118e18ee602dfbdd0ae460925d72740c0c669f4b1601d359fa",
+      "experimental/pm-simd-oink/oink_adapter.cpp": "a2dbd6d954a9e600fc64e38b7776608c270687c2101971747be44fdae0d628c2",
+      "experimental/pm-simd-oink/bench_lift.c": "000f515ff583c787442601f9b12b854aa9337ae4baba5a123e14c1b1f2fbde07",
+      "experimental/pm-simd-oink/bench_kernels.c": "021eca7f1bfd0965c67e592ce7b98a68e9c2d0d38b4aa43d634b5d09a840eeeb",
+      "experimental/pm-simd-oink/oink_backend.h": "4da067827c213336d0865e4a833714aee5ce2181331ba46ec86a700e3f640f2c"
+    }
+  },
+  "rows": [
+    {
+      "case": "k=2 t=1 successor",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.029912818,
+          "ns_per_op": 14.2635,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.029962442,
+          "ns_per_op": 14.2872,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.029945688,
+          "ns_per_op": 14.2792,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.029922433,
+          "ns_per_op": 14.2681,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.029927571,
+          "ns_per_op": 14.2706,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.029927571,
+      "min_cpu": 0.029912818,
+      "max_cpu": 0.029962442,
+      "median_ns_per_op": 14.2706,
+      "min_ns_per_op": 14.2635,
+      "max_ns_per_op": 14.2872,
+      "digest": "000000000043f600",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 successor",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.062976013,
+          "ns_per_op": 30.0293,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.063328801,
+          "ns_per_op": 30.1975,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.063380747,
+          "ns_per_op": 30.2223,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.063371821,
+          "ns_per_op": 30.218,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.063356183,
+          "ns_per_op": 30.2106,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.063356183,
+      "min_cpu": 0.062976013,
+      "max_cpu": 0.063380747,
+      "median_ns_per_op": 30.2106,
+      "min_ns_per_op": 30.0293,
+      "max_ns_per_op": 30.2223,
+      "digest": "000000000043f600",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 successor",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.060172483,
+          "ns_per_op": 28.6925,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.060275935,
+          "ns_per_op": 28.7418,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.060361134,
+          "ns_per_op": 28.7824,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.060324761,
+          "ns_per_op": 28.7651,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.060343858,
+          "ns_per_op": 28.7742,
+          "operations": 2097152,
+          "digest": "000000000043f600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.060324761,
+      "min_cpu": 0.060172483,
+      "max_cpu": 0.060361134,
+      "median_ns_per_op": 28.7651,
+      "min_ns_per_op": 28.6925,
+      "max_ns_per_op": 28.7824,
+      "digest": "000000000043f600",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 successor",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.056594041,
+          "ns_per_op": 26.9861,
+          "operations": 2097152,
+          "digest": "000000000045f400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.056253847,
+          "ns_per_op": 26.8239,
+          "operations": 2097152,
+          "digest": "000000000045f400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.056270168,
+          "ns_per_op": 26.8317,
+          "operations": 2097152,
+          "digest": "000000000045f400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.056271912,
+          "ns_per_op": 26.8325,
+          "operations": 2097152,
+          "digest": "000000000045f400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.056309244,
+          "ns_per_op": 26.8503,
+          "operations": 2097152,
+          "digest": "000000000045f400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.056271912,
+      "min_cpu": 0.056253847,
+      "max_cpu": 0.056594041,
+      "median_ns_per_op": 26.8325,
+      "min_ns_per_op": 26.8239,
+      "max_ns_per_op": 26.9861,
+      "digest": "000000000045f400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 compare",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.016830404,
+          "ns_per_op": 8.0254,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.016796708,
+          "ns_per_op": 8.0093,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.016813673,
+          "ns_per_op": 8.0174,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.01675536,
+          "ns_per_op": 7.9896,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.016831315,
+          "ns_per_op": 8.0258,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        }
+      ],
+      "median_cpu": 0.016813673,
+      "min_cpu": 0.01675536,
+      "max_cpu": 0.016831315,
+      "median_ns_per_op": 8.0174,
+      "min_ns_per_op": 7.9896,
+      "max_ns_per_op": 8.0258,
+      "digest": "000000000031d800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 compare",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.017822326,
+          "ns_per_op": 8.4983,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.017813372,
+          "ns_per_op": 8.4941,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.017839868,
+          "ns_per_op": 8.5067,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.017899014,
+          "ns_per_op": 8.5349,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.017819318,
+          "ns_per_op": 8.4969,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        }
+      ],
+      "median_cpu": 0.017822326,
+      "min_cpu": 0.017813372,
+      "max_cpu": 0.017899014,
+      "median_ns_per_op": 8.4983,
+      "min_ns_per_op": 8.4941,
+      "max_ns_per_op": 8.5349,
+      "digest": "000000000031d800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 compare",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.034593137,
+          "ns_per_op": 16.4953,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.034600389,
+          "ns_per_op": 16.4988,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.034529235,
+          "ns_per_op": 16.4648,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.034661747,
+          "ns_per_op": 16.528,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.034645319,
+          "ns_per_op": 16.5202,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        }
+      ],
+      "median_cpu": 0.034600389,
+      "min_cpu": 0.034529235,
+      "max_cpu": 0.034661747,
+      "median_ns_per_op": 16.4988,
+      "min_ns_per_op": 16.4648,
+      "max_ns_per_op": 16.528,
+      "digest": "000000000031d800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=2 t=1 compare",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.021836028,
+          "ns_per_op": 10.4122,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.021879582,
+          "ns_per_op": 10.433,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.021773717,
+          "ns_per_op": 10.3825,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.021822594,
+          "ns_per_op": 10.4058,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        },
+        {
+          "cpu": 0.021875918,
+          "ns_per_op": 10.4313,
+          "operations": 2097152,
+          "digest": "000000000031d800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000031d800"
+        }
+      ],
+      "median_cpu": 0.021836028,
+      "min_cpu": 0.021773717,
+      "max_cpu": 0.021879582,
+      "median_ns_per_op": 10.4122,
+      "min_ns_per_op": 10.3825,
+      "max_ns_per_op": 10.433,
+      "digest": "000000000031d800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 successor",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.037855925,
+          "ns_per_op": 18.0511,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.037875315,
+          "ns_per_op": 18.0604,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.037909854,
+          "ns_per_op": 18.0768,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.037905524,
+          "ns_per_op": 18.0748,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.037841247,
+          "ns_per_op": 18.0441,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.037875315,
+      "min_cpu": 0.037841247,
+      "max_cpu": 0.037909854,
+      "median_ns_per_op": 18.0604,
+      "min_ns_per_op": 18.0441,
+      "max_ns_per_op": 18.0768,
+      "digest": "0000000000877400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 successor",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.076671185,
+          "ns_per_op": 36.5597,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.076741077,
+          "ns_per_op": 36.593,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.076886769,
+          "ns_per_op": 36.6625,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.076798289,
+          "ns_per_op": 36.6203,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.076726648,
+          "ns_per_op": 36.5861,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.076741077,
+      "min_cpu": 0.076671185,
+      "max_cpu": 0.076886769,
+      "median_ns_per_op": 36.593,
+      "min_ns_per_op": 36.5597,
+      "max_ns_per_op": 36.6625,
+      "digest": "0000000000877400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 successor",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.073686019,
+          "ns_per_op": 35.1362,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.073625703,
+          "ns_per_op": 35.1075,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.073858179,
+          "ns_per_op": 35.2183,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.073619936,
+          "ns_per_op": 35.1047,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.073771544,
+          "ns_per_op": 35.177,
+          "operations": 2097152,
+          "digest": "0000000000877400",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.073686019,
+      "min_cpu": 0.073619936,
+      "max_cpu": 0.073858179,
+      "median_ns_per_op": 35.1362,
+      "min_ns_per_op": 35.1047,
+      "max_ns_per_op": 35.2183,
+      "digest": "0000000000877400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 successor",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.065964569,
+          "ns_per_op": 31.4544,
+          "operations": 2097152,
+          "digest": "0000000000786600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.065880256,
+          "ns_per_op": 31.4142,
+          "operations": 2097152,
+          "digest": "0000000000786600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.065870336,
+          "ns_per_op": 31.4094,
+          "operations": 2097152,
+          "digest": "0000000000786600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.065998704,
+          "ns_per_op": 31.4706,
+          "operations": 2097152,
+          "digest": "0000000000786600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.066193462,
+          "ns_per_op": 31.5635,
+          "operations": 2097152,
+          "digest": "0000000000786600",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.065964569,
+      "min_cpu": 0.065870336,
+      "max_cpu": 0.066193462,
+      "median_ns_per_op": 31.4544,
+      "min_ns_per_op": 31.4094,
+      "max_ns_per_op": 31.5635,
+      "digest": "0000000000786600",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 compare",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.019942611,
+          "ns_per_op": 9.5094,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.019935361,
+          "ns_per_op": 9.5059,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.020334081,
+          "ns_per_op": 9.696,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.019912855,
+          "ns_per_op": 9.4952,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.019895361,
+          "ns_per_op": 9.4868,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        }
+      ],
+      "median_cpu": 0.019935361,
+      "min_cpu": 0.019895361,
+      "max_cpu": 0.020334081,
+      "median_ns_per_op": 9.5059,
+      "min_ns_per_op": 9.4868,
+      "max_ns_per_op": 9.696,
+      "digest": "000000000024f800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 compare",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.02279369,
+          "ns_per_op": 10.8689,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.022780755,
+          "ns_per_op": 10.8627,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.022824622,
+          "ns_per_op": 10.8836,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.022757428,
+          "ns_per_op": 10.8516,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.022775,
+          "ns_per_op": 10.86,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        }
+      ],
+      "median_cpu": 0.022780755,
+      "min_cpu": 0.022757428,
+      "max_cpu": 0.022824622,
+      "median_ns_per_op": 10.8627,
+      "min_ns_per_op": 10.8516,
+      "max_ns_per_op": 10.8836,
+      "digest": "000000000024f800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 compare",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.03601265,
+          "ns_per_op": 17.1722,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.036024012,
+          "ns_per_op": 17.1776,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.035929606,
+          "ns_per_op": 17.1326,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.03615149,
+          "ns_per_op": 17.2384,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.036049021,
+          "ns_per_op": 17.1895,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        }
+      ],
+      "median_cpu": 0.036024012,
+      "min_cpu": 0.035929606,
+      "max_cpu": 0.03615149,
+      "median_ns_per_op": 17.1776,
+      "min_ns_per_op": 17.1326,
+      "max_ns_per_op": 17.2384,
+      "digest": "000000000024f800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=3 t=2 compare",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.074185325,
+          "ns_per_op": 35.3743,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.073888687,
+          "ns_per_op": 35.2329,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.073844538,
+          "ns_per_op": 35.2118,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.074030972,
+          "ns_per_op": 35.3007,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        },
+        {
+          "cpu": 0.073961352,
+          "ns_per_op": 35.2675,
+          "operations": 2097152,
+          "digest": "000000000024f800",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "000000000024f800"
+        }
+      ],
+      "median_cpu": 0.073961352,
+      "min_cpu": 0.073844538,
+      "max_cpu": 0.074185325,
+      "median_ns_per_op": 35.2675,
+      "min_ns_per_op": 35.2118,
+      "max_ns_per_op": 35.3743,
+      "digest": "000000000024f800",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 successor",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.045061103,
+          "ns_per_op": 21.4868,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.045040585,
+          "ns_per_op": 21.477,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.045047551,
+          "ns_per_op": 21.4803,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.045066546,
+          "ns_per_op": 21.4894,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.045045734,
+          "ns_per_op": 21.4795,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.045047551,
+      "min_cpu": 0.045040585,
+      "max_cpu": 0.045066546,
+      "median_ns_per_op": 21.4803,
+      "min_ns_per_op": 21.477,
+      "max_ns_per_op": 21.4894,
+      "digest": "0000000000e78c00",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 successor",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.099421912,
+          "ns_per_op": 47.4081,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099290349,
+          "ns_per_op": 47.3453,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099412881,
+          "ns_per_op": 47.4038,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.0994627,
+          "ns_per_op": 47.4275,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099347774,
+          "ns_per_op": 47.3727,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.099412881,
+      "min_cpu": 0.099290349,
+      "max_cpu": 0.0994627,
+      "median_ns_per_op": 47.4038,
+      "min_ns_per_op": 47.3453,
+      "max_ns_per_op": 47.4275,
+      "digest": "0000000000e78c00",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 successor",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.099354477,
+          "ns_per_op": 47.3759,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099186834,
+          "ns_per_op": 47.296,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099135032,
+          "ns_per_op": 47.2713,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099246158,
+          "ns_per_op": 47.3243,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.099179646,
+          "ns_per_op": 47.2925,
+          "operations": 2097152,
+          "digest": "0000000000e78c00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.099186834,
+      "min_cpu": 0.099135032,
+      "max_cpu": 0.099354477,
+      "median_ns_per_op": 47.296,
+      "min_ns_per_op": 47.2713,
+      "max_ns_per_op": 47.3759,
+      "digest": "0000000000e78c00",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 successor",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.071953795,
+          "ns_per_op": 34.3102,
+          "operations": 2097152,
+          "digest": "0000000000d86200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.071649045,
+          "ns_per_op": 34.1649,
+          "operations": 2097152,
+          "digest": "0000000000d86200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.071618178,
+          "ns_per_op": 34.1502,
+          "operations": 2097152,
+          "digest": "0000000000d86200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.071571057,
+          "ns_per_op": 34.1277,
+          "operations": 2097152,
+          "digest": "0000000000d86200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.071633043,
+          "ns_per_op": 34.1573,
+          "operations": 2097152,
+          "digest": "0000000000d86200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.071633043,
+      "min_cpu": 0.071571057,
+      "max_cpu": 0.071953795,
+      "median_ns_per_op": 34.1573,
+      "min_ns_per_op": 34.1277,
+      "max_ns_per_op": 34.3102,
+      "digest": "0000000000d86200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 compare",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.022344989,
+          "ns_per_op": 10.6549,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.022385348,
+          "ns_per_op": 10.6742,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.022280397,
+          "ns_per_op": 10.6241,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.022349481,
+          "ns_per_op": 10.6571,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.022364269,
+          "ns_per_op": 10.6641,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        }
+      ],
+      "median_cpu": 0.022349481,
+      "min_cpu": 0.022280397,
+      "max_cpu": 0.022385348,
+      "median_ns_per_op": 10.6571,
+      "min_ns_per_op": 10.6241,
+      "max_ns_per_op": 10.6742,
+      "digest": "0000000000212200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 compare",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.026453269,
+          "ns_per_op": 12.6139,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.026427548,
+          "ns_per_op": 12.6016,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.026398855,
+          "ns_per_op": 12.588,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.026462893,
+          "ns_per_op": 12.6185,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.026497741,
+          "ns_per_op": 12.6351,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        }
+      ],
+      "median_cpu": 0.026453269,
+      "min_cpu": 0.026398855,
+      "max_cpu": 0.026497741,
+      "median_ns_per_op": 12.6139,
+      "min_ns_per_op": 12.588,
+      "max_ns_per_op": 12.6351,
+      "digest": "0000000000212200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 compare",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.039594623,
+          "ns_per_op": 18.8802,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.039606199,
+          "ns_per_op": 18.8857,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.03942022,
+          "ns_per_op": 18.797,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.039509955,
+          "ns_per_op": 18.8398,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.039525228,
+          "ns_per_op": 18.8471,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        }
+      ],
+      "median_cpu": 0.039525228,
+      "min_cpu": 0.03942022,
+      "max_cpu": 0.039606199,
+      "median_ns_per_op": 18.8471,
+      "min_ns_per_op": 18.797,
+      "max_ns_per_op": 18.8857,
+      "digest": "0000000000212200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=5 t=3 compare",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.077909867,
+          "ns_per_op": 37.1503,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.077831257,
+          "ns_per_op": 37.1128,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.077767312,
+          "ns_per_op": 37.0823,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.07771197,
+          "ns_per_op": 37.056,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        },
+        {
+          "cpu": 0.077886834,
+          "ns_per_op": 37.1393,
+          "operations": 2097152,
+          "digest": "0000000000212200",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000212200"
+        }
+      ],
+      "median_cpu": 0.077831257,
+      "min_cpu": 0.07771197,
+      "max_cpu": 0.077909867,
+      "median_ns_per_op": 37.1128,
+      "min_ns_per_op": 37.056,
+      "max_ns_per_op": 37.1503,
+      "digest": "0000000000212200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 successor",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.068874134,
+          "ns_per_op": 32.8417,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.068776986,
+          "ns_per_op": 32.7954,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.068853392,
+          "ns_per_op": 32.8319,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.068629856,
+          "ns_per_op": 32.7253,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.068653206,
+          "ns_per_op": 32.7364,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.068776986,
+      "min_cpu": 0.068629856,
+      "max_cpu": 0.068874134,
+      "median_ns_per_op": 32.7954,
+      "min_ns_per_op": 32.7253,
+      "max_ns_per_op": 32.8417,
+      "digest": "0000000001efe200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 successor",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.155657106,
+          "ns_per_op": 74.2231,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.155086801,
+          "ns_per_op": 73.9511,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.155532585,
+          "ns_per_op": 74.1637,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.155003774,
+          "ns_per_op": 73.9116,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.155582925,
+          "ns_per_op": 74.1877,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.155532585,
+      "min_cpu": 0.155003774,
+      "max_cpu": 0.155657106,
+      "median_ns_per_op": 74.1637,
+      "min_ns_per_op": 73.9116,
+      "max_ns_per_op": 74.2231,
+      "digest": "0000000001efe200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 successor",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.152639985,
+          "ns_per_op": 72.7844,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.153278539,
+          "ns_per_op": 73.0889,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.152585519,
+          "ns_per_op": 72.7584,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.153491168,
+          "ns_per_op": 73.1903,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.152418616,
+          "ns_per_op": 72.6789,
+          "operations": 2097152,
+          "digest": "0000000001efe200",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.152639985,
+      "min_cpu": 0.152418616,
+      "max_cpu": 0.153491168,
+      "median_ns_per_op": 72.7844,
+      "min_ns_per_op": 72.6789,
+      "max_ns_per_op": 73.1903,
+      "digest": "0000000001efe200",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 successor",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.085501345,
+          "ns_per_op": 40.7702,
+          "operations": 2097152,
+          "digest": "0000000006f3fa00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.08563531,
+          "ns_per_op": 40.8341,
+          "operations": 2097152,
+          "digest": "0000000006f3fa00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.085687301,
+          "ns_per_op": 40.8589,
+          "operations": 2097152,
+          "digest": "0000000006f3fa00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.085715499,
+          "ns_per_op": 40.8723,
+          "operations": 2097152,
+          "digest": "0000000006f3fa00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        },
+        {
+          "cpu": 0.085654216,
+          "ns_per_op": 40.8431,
+          "operations": 2097152,
+          "digest": "0000000006f3fa00",
+          "packed_bytes": 96,
+          "oink_bytes": 56
+        }
+      ],
+      "median_cpu": 0.085654216,
+      "min_cpu": 0.085501345,
+      "max_cpu": 0.085715499,
+      "median_ns_per_op": 40.8431,
+      "min_ns_per_op": 40.7702,
+      "max_ns_per_op": 40.8723,
+      "digest": "0000000006f3fa00",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 compare",
+      "arm": "native",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.021713184,
+          "ns_per_op": 10.3537,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.021737411,
+          "ns_per_op": 10.3652,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.02162036,
+          "ns_per_op": 10.3094,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.02169927,
+          "ns_per_op": 10.347,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.021662103,
+          "ns_per_op": 10.3293,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        }
+      ],
+      "median_cpu": 0.02169927,
+      "min_cpu": 0.02162036,
+      "max_cpu": 0.021737411,
+      "median_ns_per_op": 10.347,
+      "min_ns_per_op": 10.3094,
+      "max_ns_per_op": 10.3652,
+      "digest": "0000000000201400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 compare",
+      "arm": "packed",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.024462021,
+          "ns_per_op": 11.6644,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.024326958,
+          "ns_per_op": 11.6,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.024445652,
+          "ns_per_op": 11.6566,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.024382258,
+          "ns_per_op": 11.6264,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.024370017,
+          "ns_per_op": 11.6205,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        }
+      ],
+      "median_cpu": 0.024382258,
+      "min_cpu": 0.024326958,
+      "max_cpu": 0.024462021,
+      "median_ns_per_op": 11.6264,
+      "min_ns_per_op": 11.6,
+      "max_ns_per_op": 11.6644,
+      "digest": "0000000000201400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 compare",
+      "arm": "both",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.034822503,
+          "ns_per_op": 16.6047,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.034689864,
+          "ns_per_op": 16.5414,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.034786786,
+          "ns_per_op": 16.5876,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.034825885,
+          "ns_per_op": 16.6063,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.03485101,
+          "ns_per_op": 16.6183,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        }
+      ],
+      "median_cpu": 0.034822503,
+      "min_cpu": 0.034689864,
+      "max_cpu": 0.03485101,
+      "median_ns_per_op": 16.6047,
+      "min_ns_per_op": 16.5414,
+      "max_ns_per_op": 16.6183,
+      "digest": "0000000000201400",
+      "packed_bytes": 96
+    },
+    {
+      "case": "k=9 t=7 compare",
+      "arm": "oink-kernels",
+      "status": "ok",
+      "samples": [
+        {
+          "cpu": 0.074818094,
+          "ns_per_op": 35.676,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.074621661,
+          "ns_per_op": 35.5824,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.074867805,
+          "ns_per_op": 35.6998,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.074818451,
+          "ns_per_op": 35.6762,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        },
+        {
+          "cpu": 0.074772886,
+          "ns_per_op": 35.6545,
+          "operations": 2097152,
+          "digest": "0000000000201400",
+          "packed_bytes": 96,
+          "oink_bytes": 56,
+          "identity": "0000000000201400"
+        }
+      ],
+      "median_cpu": 0.074818094,
+      "min_cpu": 0.074621661,
+      "max_cpu": 0.074867805,
+      "median_ns_per_op": 35.676,
+      "min_ns_per_op": 35.5824,
+      "max_ns_per_op": 35.6998,
+      "digest": "0000000000201400",
+      "packed_bytes": 96
+    }
+  ]
+}

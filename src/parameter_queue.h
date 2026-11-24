@@ -29,6 +29,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "host_order_data.h"
+
 /* bits is used only by the existing PM default search. */
 typedef struct {
   size_t k;
@@ -48,10 +50,24 @@ typedef struct {
   size_t width;
   size_t k_max;
   size_t t_max;
+  /* Table mode's persistent cursor. The ratio heap still expands normally
+   * through prefix entries; its seen bitmap is never used to skip expansion. */
+  HostOrderBand const *band;
+  size_t table_at;
+  size_t zero_k;
+  ParameterPair ordered;
+  bool ordered_valid;
+  bool table_budget_skipped;
 } ParameterQueue;
 
 static inline void parameter_queue_push(ParameterQueue *queue,
                                         ParameterPair const parameters) {
+  /* The spare t columns also hold the original PM default's initial (1,1)
+   * when t_max is zero. Keep every key inside that allocated grid. */
+  if (parameters.k == 0 || parameters.k > queue->k_max || parameters.t == 0 ||
+      parameters.t >= queue->width) {
+    return;
+  }
   size_t const key = parameters.k * queue->width + parameters.t;
   if (queue->seen[key]) {
     return;
@@ -119,6 +135,59 @@ static inline void parameter_queue_advance(ParameterQueue *queue) {
   if (pair.t < queue->t_max) {
     parameter_queue_push(queue, (ParameterPair){.k = pair.k, .t = pair.t + 1});
   }
+}
+
+/* Select the next untried pair: size-ordered rectangle, remaining zero column,
+ * then the original positive-t ratio traversal, excluding the tried rectangle.
+ * Keep ordered unchanged while shaving makes progress at this same pair. */
+static inline void parameter_table_advance(ParameterQueue *queue) {
+  queue->ordered_valid = true;
+  while (queue->band != nullptr && queue->table_at < queue->band->count) {
+    unsigned const code = queue->band->pairs[queue->table_at++];
+    ParameterPair const pair = {.k = code >> 3, .t = code & 7};
+    if (pair.k <= queue->k_max && pair.t <= queue->t_max) {
+      queue->ordered = pair;
+      return;
+    }
+  }
+  while (queue->zero_k <= queue->k_max) {
+    size_t const k = queue->zero_k++;
+    if (queue->band == nullptr || k > HOST_ORDER_MAX_K) {
+      queue->ordered = (ParameterPair){.k = k, .t = 0};
+      return;
+    }
+  }
+  while (queue->count != 0) {
+    ParameterPair const pair = queue->heap[0];
+    parameter_queue_advance(queue);
+    if (queue->band == nullptr || pair.k > HOST_ORDER_MAX_K ||
+        pair.t > HOST_ORDER_MAX_T) {
+      queue->ordered = pair;
+      return;
+    }
+  }
+  queue->ordered_valid = false;
+}
+
+[[nodiscard]] static inline bool parameter_table_init(ParameterQueue *queue,
+                                                      size_t const k_max,
+                                                      size_t const t_max,
+                                                      size_t const height) {
+  if (!parameter_queue_init(queue, k_max, t_max)) {
+    return false;
+  }
+  if (height >= 1 && height <= HOST_ORDER_MAX_HEIGHT) {
+    for (size_t i = 0;
+         i < sizeof(host_order_bands) / sizeof(host_order_bands[0]); i++) {
+      if (host_order_bands[i].height > height) {
+        break;
+      }
+      queue->band = host_order_bands + i;
+    }
+  }
+  queue->zero_k = 1;
+  parameter_table_advance(queue);
+  return true;
 }
 
 static inline void parameter_queue_destroy(ParameterQueue *queue) {

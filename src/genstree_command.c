@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +45,8 @@ static void print_usage(FILE *out, char *argv[]) {
         "(required, T >= 0)\n"
         "  --count                                     Print only the leaf "
         "count (default: leaf labels)\n"
+        "  --count-table                               Exact CSV counts; "
+        "K,T,H are maxima\n"
         "  --leaf=L                                    Print the L-th leaf "
         "(1-based)\n"
         "  --dot                                       Print the tree in DOT "
@@ -136,6 +139,7 @@ int genstree_command(int argc, char *argv[], CLIIO *io) {
       {"log-leaves", required_argument, nullptr, 't'},
       {"height", required_argument, nullptr, 'h'},
       {"count", no_argument, nullptr, 'j'},
+      {"count-table", no_argument, nullptr, 'C'},
       {"leaf", required_argument, nullptr, 'l'},
       {"json", no_argument, nullptr, 'J'},
       {"dot", no_argument, nullptr, 'd'},
@@ -152,6 +156,7 @@ int genstree_command(int argc, char *argv[], CLIIO *io) {
   bool t_set = false;
   bool h_set = false;
   bool just_count = false;
+  bool count_table = false;
   bool print_dot = false;
   bool json = false;
 
@@ -171,6 +176,9 @@ int genstree_command(int argc, char *argv[], CLIIO *io) {
       break;
     case 'j':
       just_count = true;
+      break;
+    case 'C':
+      count_table = true;
       break;
     case 'J':
       json = true;
@@ -224,6 +232,35 @@ int genstree_command(int argc, char *argv[], CLIIO *io) {
   if (h < k) {
     return cli_error_to(io->err, argv[0],
                         "--height must be at least --strahler");
+  }
+
+  if (count_table) {
+    if (json || just_count || print_dot || leaf_number > 0 || p > 0) {
+      return cli_error_to(io->err, argv[0],
+                          "--count-table is a separate CSV output mode");
+    }
+    uint64_t *counts = nullptr;
+    errno = 0;
+    if (!stree_count_table(k, t, h, &counts)) {
+      fputs(errno == ERANGE ? "Exact leaf count exceeds uint64_t\n"
+                            : "Failed to allocate exact leaf-count table\n",
+            io->err);
+      return EXIT_FAILURE;
+    }
+    fputs("h,k,t,leaves\n", io->out);
+    for (int height = 1; height <= h; height++) {
+      for (int bound = 1; bound <= k && bound <= height; bound++) {
+        for (int budget = 0; budget <= t; budget++) {
+          size_t const at = ((size_t)height * ((size_t)k + 1) + (size_t)bound) *
+                                ((size_t)t + 1) +
+                            (size_t)budget;
+          fprintf(io->out, "%d,%d,%d,%" PRIu64 "\n", height, bound, budget,
+                  counts[at]);
+        }
+      }
+    }
+    free(counts);
+    return ferror(io->out) ? EXIT_FAILURE : EXIT_SUCCESS;
   }
 
   if (json && (just_count || print_dot || leaf_number > 0 || p > 0)) {

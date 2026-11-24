@@ -138,9 +138,9 @@ typedef enum {
   return HOST_OVER_BUDGET;
 }
 
-[[nodiscard]] static HostStatus run_strahler(Solver *solver,
-                                             PGPlayer const player,
-                                             size_t const k, size_t const t) {
+[[nodiscard]] static HostStatus
+check_strahler_budget(Solver *solver, PGPlayer const player, size_t const k,
+                      size_t const t, bool const report) {
   ADLiftPlayerStats *shape = solver->stats->player + player;
   size_t const height = shape->height;
   /* The priority bound keeps height small, and t < 64. */
@@ -160,9 +160,21 @@ typedef enum {
                    player_name(player), k, t, height,
                    leaves == UINT_MAX ? "at least " : "", leaves,
                    solver->options->max_host_leaves);
-    return over_budget(solver, message);
+    return report ? over_budget(solver, message) : HOST_OVER_BUDGET;
   }
 
+  return HOST_BUILT;
+}
+
+[[nodiscard]] static HostStatus run_strahler(Solver *solver,
+                                             PGPlayer const player,
+                                             size_t const k, size_t const t) {
+  HostStatus const budget = check_strahler_budget(solver, player, k, t, true);
+  if (budget != HOST_BUILT) {
+    return budget;
+  }
+  ADLiftPlayerStats *shape = solver->stats->player + player;
+  size_t const height = shape->height;
   char *stream = stree_leaf_stream((int)k, (int)t, (int)height);
   OrderedTreeNode *base = nullptr;
   OrderedTreeError parse_error = {0};
@@ -300,9 +312,14 @@ typedef enum {
   ADLiftSolveStats *stats = solver->stats;
   size_t const maximum = lexicographic_k_max(stats, solver->options->k);
   bool const ratio = solver->options->ratio;
+  bool const table = solver->options->table;
   ParameterQueue *queue = solver->queue;
-  if (ratio && queue->heap == nullptr &&
-      !parameter_queue_init(queue, maximum, stats->t_full)) {
+  size_t const height = stats->player[0].height > stats->player[1].height
+                            ? stats->player[0].height
+                            : stats->player[1].height;
+  if ((ratio || table) && queue->heap == nullptr &&
+      !(table ? parameter_table_init(queue, maximum, stats->t_full, height)
+              : parameter_queue_init(queue, maximum, stats->t_full))) {
     solve_error(solver->error, "failed to allocate parameter search");
     return false;
   }
@@ -310,12 +327,32 @@ typedef enum {
   size_t t = smaller(solver->options->t, stats->t_full);
   size_t previous_k = 0;
   bool ran[2] = {false, false};
-  while (ratio ? queue->count != 0 : k <= maximum) {
-    if (ratio) {
+  while (table   ? queue->ordered_valid
+         : ratio ? queue->count != 0
+                 : k <= maximum) {
+    if (table) {
+      k = queue->ordered.k;
+      t = queue->ordered.t;
+      bool skip = false;
+      for (size_t player = 0; player < 2; player++) {
+        HostStatus const status = check_strahler_budget(
+            solver, (PGPlayer)player, smaller(k, stats->player[player].k_full),
+            t, false);
+        if (status == HOST_FAILED) {
+          return false;
+        }
+        skip |= status == HOST_OVER_BUDGET;
+      }
+      if (skip) {
+        queue->table_budget_skipped = true;
+        parameter_table_advance(queue);
+        continue;
+      }
+    } else if (ratio) {
       k = queue->heap[0].k;
       t = queue->heap[0].t;
     }
-    if (ratio || k != previous_k) {
+    if (ratio || table || k != previous_k) {
       AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE,
                .name = "k_raised", .to = k);
       previous_k = k;
@@ -348,7 +385,9 @@ typedef enum {
     if (solver->options->iter_shave) {
       return true;
     }
-    if (ratio) {
+    if (table) {
+      parameter_table_advance(queue);
+    } else if (ratio) {
       parameter_queue_advance(queue);
     } else if (t < stats->t_full) {
       t++;
@@ -356,6 +395,11 @@ typedef enum {
       k++;
       t = 0;
     }
+  }
+  if (table && queue->table_budget_skipped) {
+    stats->budget_exhausted = true;
+    solve_error(solver->error,
+                "table search exhausted all hosts within the leaf limit");
   }
   return true;
 }
@@ -372,7 +416,8 @@ typedef enum {
  * The first t reaching the largest dominion seen is therefore the least t
  * that already found the whole winning region. */
 [[nodiscard]] static bool run_adaptive(Solver *solver) {
-  if (solver->options->lexicographic || solver->options->ratio) {
+  if (solver->options->lexicographic || solver->options->ratio ||
+      solver->options->table) {
     return run_exhaustive(solver);
   }
   ADLiftSolveStats *stats = solver->stats;
@@ -459,13 +504,16 @@ solve_once(PGGame const *game, PGSet const *domain, PGSet const *host_domain,
       result == nullptr || domain->bit_count != game->vertex_count ||
       options->mode > AD_LIFT_HOST_TREE ||
       (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE &&
-       !options->lexicographic && !options->ratio) ||
+       !options->lexicographic && !options->ratio && !options->table) ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||
       (options->incremental && options->mode != AD_LIFT_HOST_ADAPTIVE) ||
-      (options->lexicographic && options->ratio) ||
-      (options->ratio && (options->start_k != 0 || options->t != 0)) ||
+      ((unsigned)options->lexicographic + (unsigned)options->ratio +
+           (unsigned)options->table >
+       1) ||
+      ((options->ratio || options->table) &&
+       (options->start_k != 0 || options->t != 0)) ||
       (options->start_k != 0 && !options->lexicographic) ||
-      ((options->lexicographic || options->ratio) &&
+      ((options->lexicographic || options->ratio || options->table) &&
        (options->mode != AD_LIFT_HOST_ADAPTIVE || options->incremental)) ||
       (options->mode == AD_LIFT_HOST_STRAHLER && options->k == 0) ||
       (options->mode == AD_LIFT_HOST_KARY && options->arity == 0) ||
@@ -555,7 +603,7 @@ solve_once(PGGame const *game, PGSet const *domain, PGSet const *host_domain,
   }
 
   if (succeeded && options->symmetric && !options->lexicographic &&
-      !options->ratio) {
+      !options->ratio && !options->table) {
     ad_result_destroy(result);
     succeeded =
         ad_sym_solve_trace(game, domain, solver.hosts, options->verify, result,
@@ -663,8 +711,16 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       }
       goto cleanup;
     }
-    if (options->ratio && queue->count == 0 && current.player[0].k == 0) {
-      *stats = current;
+    if (((options->ratio && queue->count == 0) ||
+         (options->table && !queue->ordered_valid)) &&
+        current.player[0].k == 0) {
+      /* A pass that only skips oversized hosts did no lifting. Keep the
+       * parameters and accumulated work from the last real attempt. */
+      if (stats->iterations == 0) {
+        *stats = current;
+      } else {
+        stats->budget_exhausted |= current.budget_exhausted;
+      }
       succeeded = true;
       goto cleanup;
     }
@@ -748,8 +804,12 @@ solve_with_options(PGGame const *game, PGSet const *domain,
     if (adaptive && options->ratio && queue->count != 0 && !progress) {
       parameter_queue_advance(queue);
     }
+    if (adaptive && options->table && !progress) {
+      parameter_table_advance(queue);
+    }
     bool const last_host =
-        options->ratio
+        options->table ? !queue->ordered_valid
+        : options->ratio
             ? queue->count == 0
             : last_t && (!options->lexicographic ||
                          current_k >= lexicographic_k_max(stats, options->k));
@@ -757,11 +817,15 @@ solve_with_options(PGGame const *game, PGSet const *domain,
       if (adaptive && pg_set_empty(&remaining)) {
         stats->adaptive_complete = true;
         stats->first_complete_t = stats->player[0].t;
+      } else if (adaptive && options->table && queue->table_budget_skipped) {
+        stats->budget_exhausted = true;
+        solve_error(error,
+                    "table search exhausted all hosts within the leaf limit");
       }
       succeeded = empty_residual(&remaining, result);
       goto cleanup;
     }
-    if (adaptive && !options->ratio) {
+    if (adaptive && !options->ratio && !options->table) {
       /* Advance the private round cursor, preserving the caller's start. */
       round_options.t = progress ? stats->player[0].t
                         : options->lexicographic && last_t

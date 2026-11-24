@@ -11,14 +11,6 @@ LiftISA lift_isa(void) {
   return LIFT_PORTABLE;
 }
 
-bool lift_ssse3(void) {
-#if defined(__x86_64__) && (defined(__GNUC__) || defined(__clang__))
-  return __builtin_cpu_supports("ssse3") != 0;
-#else
-  return false;
-#endif
-}
-
 char const *lift_isa_name(LiftISA const isa) {
   return isa == LIFT_AVX2 ? "avx2" : isa == LIFT_NEON ? "neon" : "portable";
 }
