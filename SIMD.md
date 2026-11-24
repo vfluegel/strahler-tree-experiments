@@ -42,26 +42,93 @@ variants remain selectable. Public attractor counts retain the number of
 logical lazy-position tests; physical work is reported separately by the
 backend diagnostics.
 
-The PM packed backend is opt-in. One lane represents a component of one measure,
-rather than a vertex or an independent game. Eligible Strahler runs have
-`2 <= k <= 9`, `0 <= t <= 7`, and a depth below 32767. Other parameters, succinct
-measures and unencodable initialized labels use native scalar. Packed state stays
-in the lifting loop; native labels are materialized at the result boundary. A
-compact symbol cache retains the native successor's carry, refill, zero-budget
-and TOP-payload behavior. The verifier remains independent.
+PM supports Strahler and succinct progress measures. Strahler PM selects the
+full Oink-style vector kernel automatically on x86-64 (baseline SSE2) and
+AArch64 (NEON). Its 56-byte vertex record stores eight bitstrings, occupancy
+masks and levels directly; it has no scalar symbol cache. Non-leading-bit
+counts, the three-step parallel prefix scan, successor predicates, tail fill,
+and level/string comparisons run across the vector lanes. As in Oink, the
+carry on the one selected lane and graph/worklist traversal use scalar control.
+Conversion to flat labels happens only after lifting, for tree output and the
+independent verifier. Succinct PM keeps its scalar implementation.
 
-| `STRAHLER_PM_BACKEND` | Implementation |
-| --- | --- |
-| unset, `auto`, or `scalar` | Native scalar, the default |
-| `packed` | Packed reference |
-| `lookup` | Packed with nonleading-bit lookup (SSSE3) or NEON counts |
-| `compare` | Packed with first-discrepancy comparison |
-| `both` | Both packed optimizations |
+`STRAHLER_PM_BACKEND=scalar` selects the native reference. Unset, `auto`, and
+`simd` select the vector kernel when `2 <= k <= 9`, `t <= 7`, and
+`0 < depth < 32767`. The `k=1` case and wider hosts use the native fallback,
+as do unsupported architectures and optional allocation failures. SSE2 and
+NEON are baseline instructions on the supported wheel architectures, so this
+kernel needs no AVX2, SSSE3 or native compiler flags. The older partial packed
+backend and its `lookup`/`compare`/`both` switches have been removed.
+Notebooks 05, 07 and 08, and their PM workers, explicitly select `simd` and
+Strahler PM. SSPM remains available with `--algorithm=succinct`.
 
-Packed PM and byte AD remain opt-in because their end-to-end costs can exceed
-their savings. `STRAHLER_BACKEND_REPORT=1` reports actual dispatch, sweeps, sparse
-completion, dictionary capacity fallbacks, edge padding, and layout/dictionary
-CPU time on stderr. Collect these diagnostics separately from timed runs.
+The [full solver results](experimental/pm-simd-oink/cli.csv),
+[fixed-host comparisons](experimental/pm-simd-oink/fixed.csv), and
+[kernel measurements](experimental/pm-simd-oink/kernels.csv) retain the evidence.
+Full solves use the same canonical inputs and verify their winning partitions;
+fixed-host runs require matching labels, regions, lift counts and attempts.
+Oink was built both with and without native CPU flags; its full-solver table
+uses its default native build. Current C builds use portable release flags.
+The scalar C port already uses flat storage and short measures, so vectorizing
+eight component lanes can cost more than the scalar work it replaces.
+
+The histories explain the difference in coverage. Oink introduced its SIMD
+Strahler solver in `0199b48` (March 11), vectorized successor predicates and
+tail filling in `caeba09` (March 27), changed to contiguous per-vertex records
+in `a2a092b` (March 31), replaced the scalar prefix sum in `b4138e3` (April 2),
+and vectorized level comparison in `a61c3dd` (April 3). The October 19 C port,
+`9081ce8`, used the scalar `strpm.cpp` and `sspm.cpp` from `print-pms`; that
+snapshot already contained the separate SIMD implementations. November 11's
+`d5685b9` added selected count/string kernels while retaining scalar carry,
+refill, level traversal and reconstruction of its component cache. It was a
+partial port, rather than a snapshot predating Oink's vectorization.
+
+Full solves confirmed Oink's SIMD Strahler solver beats its scalar Strahler
+solver: 10.22 versus 18.12 seconds on FairScheduler. However, scalar succinct
+PM took 1.94 seconds in Oink and 2.51 seconds in the original C implementation;
+its SIMD counterpart took 12.29 seconds. Succinct PM also completed the
+875,281-vertex SYNTCOMP example where all Strahler variants exceeded 20 seconds.
+These are workload measurements, not a claim that one algorithm wins on every
+possible game.
+
+The scalar succinct C schedule advances its bit budget after each incomplete round,
+as Oink's bounded succinct solver does. Compared with retrying productive
+budgets, this improved all five measured cases. FairScheduler fell from
+2.26 to 1.14 seconds, and the SYNTCOMP example from 10.48 to 7.25 seconds.
+The [schedule comparison](experimental/pm-simd-oink/selection.csv) checks the
+complete winning partition with verification enabled. Each arm has one warm-up
+and three alternating samples on one pinned CPU. The fixed-host and kernel
+comparisons use five samples. Oink's extracted kernels additionally agreed
+with the native reference on 912,000 successors and 1,824,000 comparisons.
+The [succinct snapshot measurements](experimental/pm-simd-oink/retained.csv)
+record the earlier SSPM-only snapshot separately, with source and binary hashes in the
+corresponding JSON. Oink's scalar succinct solver remains slightly faster on
+the large SYNTCOMP example (6.70 versus 7.09 seconds), while that succinct C
+implementation wins on the other measured nontrivial cases.
+
+The [full-kernel Strahler measurements](experimental/pm-simd-oink/strpm-full-kernel.csv)
+compare the retained scalar reference with the new SIMD engine in the same
+portable release binary. The speedup column compares scalar STRPM to SIMD
+STRPM. SSPM uses a separate bit budget, not the Strahler `(k,t)` hosts. Every sample must produce exactly the same JSON,
+including host parameters, measure trees, certificates, lift counts and attempts.
+These are complete adaptive solves with iterative shaving, verification enabled,
+one warm-up and three alternating timed samples per arm, pinned to CPU 3.
+
+| Input | Scalar Strahler PM | Full SIMD Strahler PM | Speedup |
+| --- | ---: | ---: | ---: |
+| Compact Nester 3 | 0.01060 s | 0.01005 s | 1.05× |
+| Compact Nester 4 | 0.17443 s | 0.12232 s | 1.43× |
+| Plain Nester 3 | 0.06938 s | 0.05161 s | 1.34× |
+| FairScheduler 2 | 14.10519 s | 10.73145 s | 1.31× |
+
+`test_strpm_simd` checks 428,430 successors and 4,282,383 comparisons against
+native scalar, including negative cutoffs, t=0, unequal string lengths and the
+largest encodable hosts. The backend differential and fuzz checks compare the
+complete solver documents. The print-pms Oink oracle agrees on 506 games per
+algorithm (502 Strahler streams and 506 succinct streams; four upstream
+Strahler searches exhaust their bound, and one slow example per algorithm
+is skipped at three seconds). Earlier timings below and the Oink comparisons above
+remain historical evidence; they do not replace the new kernel measurements.
 
 `src/ad_batch.h` provides an opt-in native fixed-host backend for one to eight
 independent requests sharing a residual graph. Eight 16-bit lanes share edge
@@ -77,8 +144,8 @@ notebook's adaptive schedule. The original-game rejection regression is in
 ```sh
 meson setup build-simd-check --buildtype=debug -Dlenstree=disabled -Dwerror=true
 meson compile -C build-simd-check -j2
-meson test -C build-simd-check test_ad_reach test_ad_reach_alloc test_ad_batch test_pm_packed test_lift_backends --print-errorlogs
-STRAHLER_AD_BACKEND=scalar STRAHLER_PM_BACKEND=scalar meson test -C build-simd-check test_ad_lift test_ad_sym test_pm_lift --print-errorlogs
+meson test -C build-simd-check test_ad_reach test_ad_reach_alloc test_ad_batch test_strpm_simd test_lift_backends --print-errorlogs
+STRAHLER_AD_BACKEND=scalar meson test -C build-simd-check test_ad_lift test_ad_sym test_pm_lift --print-errorlogs
 python3 tests/test_lift_backends.py build-simd-check --cases 32
 meson setup build-simd --buildtype=release -Db_ndebug=true -Dlenstree=disabled
 meson compile -C build-simd -j2
@@ -100,7 +167,7 @@ The PM implementation retains its Apache-2.0 notices. The original SIMD PM
 artifact is pinned at
 [`85230b6d`](https://github.com/vfluegel/oink/tree/85230b6d06307adbf6db6e474ec5fcf546b09400).
 
-## Measurements
+## Archived November 11 measurements
 
 Measured on an Intel Core i3-8100T (four CPUs), Linux x86-64, GCC 15.3.1,
 `-O3`, with release assertions disabled and no native-CPU compiler flags.
@@ -128,11 +195,11 @@ shaving. The PM comparisons use fixed `(3,2)`, or `(2,1)` for FairScheduler 2,
 and can return partial results. They measure the packed backend's cost on the
 same host rather than a complete adaptive solve.
 
-Packed PM gives mixed results: `both` takes 0.037 s versus native 0.040 s on
+The removed packed PM experiment gave mixed results: `both` takes 0.037 s versus native 0.040 s on
 plain Nester 3, but 4.996 s versus 4.165 s on FairScheduler 2. Compact Nester 4
-is effectively flat (0.111 versus 0.110 s). These results support keeping native
-scalar as the default. Tiny CLI cases take about 1 ms and are dominated by
-startup. Byte AD takes 3.366 s on compact Nester 4, compared with
+is effectively flat (0.111 versus 0.110 s). These partial-kernel results
+predate the full Strahler SIMD port. Tiny CLI cases take about 1 ms and are
+dominated by startup. Byte AD takes 3.366 s on compact Nester 4, compared with
 1.660 s for fused scalar, so it also remains opt-in.
 
 [Conditional-batch results](experimental/lifting-simd-batch.csv) use the same
@@ -147,8 +214,8 @@ layout construction and closure costs on 8,192-vertex chains and mixed-degree
 graphs. The chain needs 8,192 pure dense sweeps. Sparse completion avoids that
 cost, although the fused queue remains faster on this fixture. Layout and byte
 dictionary construction can outweigh savings when a layout is used only once.
-The PM diagnostic ISA tag describes CPU capabilities; its packed kernels use
-SSSE3 or NEON as selected above.
+The archived PM diagnostic ISA tag describes CPU capabilities; those partial
+kernels used SSSE3 or NEON.
 
 The archived binary-host byte replay at `799a2db` reproduces all counts:
 

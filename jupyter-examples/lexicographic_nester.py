@@ -247,6 +247,7 @@ def worker(request):
             text = _native.call('decompose', handle, flags, len(flags),
                                 _native.Callback(), None)
         else:
+            os.environ['STRAHLER_PM_BACKEND'] = 'simd'
             flags = _native.options(None, dict(algorithm='strahler', **options))
             text = _native.call('progress_measures', handle, flags, len(flags))
         document = json.loads(text)
@@ -545,9 +546,10 @@ def _run_metadata(games):
     from strahler import _native
 
     return dict(search='lexicographic', version=strahler.version(),
+                pm_algorithm='strahler',
                 library_sha256=hashlib.sha256(Path(_native.library()._name).read_bytes()).hexdigest(),
-                lifting_backends={name: os.environ.get(name, 'auto') for name in
-                                  ('STRAHLER_AD_BACKEND', 'STRAHLER_PM_BACKEND')},
+                lifting_backends={'STRAHLER_AD_BACKEND': os.environ.get('STRAHLER_AD_BACKEND', 'auto'),
+                                  'STRAHLER_PM_BACKEND': 'simd'},
                 recorded_utc=datetime.now(timezone.utc).isoformat(timespec='seconds'),
                 machine=f'{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs',
                 memory_cap_enforced=sys.platform.startswith('linux'),

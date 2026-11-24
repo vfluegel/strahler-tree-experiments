@@ -1,0 +1,86 @@
+{
+  "baseline": "5edbead",
+  "oink": "85230b6d06307adbf6db6e474ec5fcf546b09400",
+  "oink_scalar_port_snapshot": "51c2640fe650fd18d9331cfe5133cf3605a98c31",
+  "kernel_validation": {
+    "successors": 912000,
+    "successor_mismatches": 0,
+    "comparisons": 1824000,
+    "compare_mismatches": 0
+  },
+  "kernel_validation_stderr": "",
+  "oink_builds": {
+    "build-oink": {
+      "sha256": "ad56fb4ed468f8c5b9e833564bd3794e5362bc67c350f11f5f9ee1b19ecf07f6",
+      "native": false
+    },
+    "build-oink-native": {
+      "sha256": "e1d10f90b73fd1872d4069298a41ba8ae16ac30a6c12746939e3c5d8c8c24f1d",
+      "native": true
+    }
+  },
+  "inputs": {
+    "Nestern=2_compact.pg": "cc6ef3b6a7c886231159eedbfc495f23c0d4b2da1d1ca55886e182c7630504e1",
+    "Nestern=3_compact.pg": "ad7093067ca47d738d589eaf17bfd964d8f0c093b9a55ca5136360c0cf464f31",
+    "Nestern=4_compact.pg": "eb618d60f7140aa28dd9d5376af2c3604007b8eacdf5aeb10e70c706315326a4",
+    "Nestern=3.pg": "e342b64b83979860dba30f95528e9469ca8b6720c429eeb22b40cbe54b230f15",
+    "FairScheduler2.pg": "d936f2ab68ab5526328b43b471a6ed035c04e58fe11ef49cf7c1e6758685ef2b",
+    "Button.tlsf.ehoa.pg": "92836d401192b2a393b195b614d0c97066e4602c04629b90093020d2e5278cc8",
+    "cabp_swp.ehoa.pg": "62c6bffd9139d89a870e079e9de623ab0753a615f7cdb7a7818fb264abc54dca"
+  },
+  "history": {
+    "0199b48": "commit 0199b48df765419f46f0d1eb70a10c97846242d2\nAuthor:     vanessaflugel <vanessa.fluegel@gmx.de>\nAuthorDate: Wed Mar 11 13:24:04 2026 +0100\nCommit:     vanessaflugel <vanessa.fluegel@gmx.de>\nCommitDate: Wed Mar 11 13:24:04 2026 +0100\n\n    New solver using SIMD\n",
+    "228af72": "commit 228af72f9c929ecbc241de381f03dc54c4f18708\nAuthor:     Claude <noreply@anthropic.com>\nAuthorDate: Wed Mar 18 12:12:24 2026 +0000\nCommit:     Claude <noreply@anthropic.com>\nCommitDate: Wed Mar 18 12:12:24 2026 +0000\n\n    Vectorize strpm_simd hot paths using std::experimental::simd\n    \n    Four targeted optimizations, all pure std::experimental::simd (no intrinsics):\n    \n    A. simd_popcount8 helper (strpm_simd.hpp): bit-parallel Hamming-weight\n       over all 8 uint8 lanes in 5 SIMD operations, replacing 8 scalar\n       std::popcount calls.\n    \n    B. prog_tmp \u2013 vectorize nlb_counts, eliminate nlb_before lambda:\n       simd_popcount8 computes all per-string NLB contributions at once;\n       the prefix-sum loop now does additions only.  nlb_before is derived\n       as nlb_counts - per_elem (mathematical identity for inclusive prefix\n       sums), removing the element-wise lambda entirely.\n    \n    C. prog_tmp \u2013 replace after_match/before_levels lambdas with direct\n       mask arithmetic: a static lane_indices constant [0..7] is compared\n       against match and lvls.size() to produce masks directly, avoiding\n       intermediate simd_uint8 temporaries that were immediately thresholded.\n    \n    D. compare \u2013 CSE + bit-isolation trick + shift:\n       - Factor out tmp_masks ^ best_masks into `diff`; use `diff << 1`\n         instead of `diff * 2`.\n       - Hoist `combined = shorter_string + first_length_difference` and\n         `relevant_xor = bit_xor & combined` (each computed 4\u00d7 before).\n       - Replace the per-lane countr_zero+shift lambda for first_bit_difference\n         with the two's-complement trick x & (0 - x), isolating the lowest\n         set bit across all lanes in 2 SIMD ops.\n    \n    All 224 test games pass (strpm-simd solver).\n    \n    https://claude.ai/code/session_01FhtQpfWLDw9qZLcxLaYDsr\n",
+    "caeba09": "commit caeba0998c6f621c5de687f1ee6034c14070497e\nAuthor:     Claude <noreply@anthropic.com>\nAuthorDate: Fri Mar 27 22:20:01 2026 +0000\nCommit:     Claude <noreply@anthropic.com>\nCommitDate: Fri Mar 27 22:20:01 2026 +0000\n\n    Optimize strpm_simd: narrow levels to int16_t, vectorize prog_tmp predicates\n    \n    Three AVX2-exploiting optimizations using std::experimental::simd only:\n    \n    1. Narrow level arrays from int (32-bit) to int16_t (16-bit), halving\n       cache footprint. All level values fit in [-1, h-2] where h < 32767\n       for real games (asserted). Flat arrays (pm_levels, tmp_levels,\n       best_levels) gain alignas(16) enabling single-register copy_from/copy_to.\n    \n    2. Vectorize per-lane stp/afa predicate computation in prog_tmp() using\n       simd<int16_t,8> comparisons (<=, ==) and stdx::where masked-assign,\n       replacing a scalar loop over active lanes.\n    \n    3. Vectorize tail-fill of tmp_levels in prog_tmp() using IOTA-based\n       simd<int16_t,8> blend with stdx::where, replacing a scalar while-loop.\n    \n    Benchmarks on 244 hard-benchmarks files (no preprocessing):\n    - 221/244 completed within 30s timeout (same for baseline)\n    - Total wall time: 202.7s vs 215.6s baseline (~6.3% overall speedup)\n    - Average per-file speedup: 1.06x, max: 1.43x on fast files\n    \n    https://claude.ai/code/session_01TcrZxXbBoxFhc6HKgiNBmP\n",
+    "a2a092b": "commit a2a092b9d2ea816490721eadbc17ea22922741f2\nAuthor:     Claude <noreply@anthropic.com>\nAuthorDate: Tue Mar 31 05:01:49 2026 +0000\nCommit:     Claude <noreply@anthropic.com>\nCommitDate: Tue Mar 31 05:01:49 2026 +0000\n\n    strpm_simd: replace SoA vectors with AoS NodePM struct for cache locality\n    \n    The four separate flat vectors (pm_bits, pm_masks, pm_levels, pm_nlanes)\n    were stored in four distinct heap regions, so each to_tmp()/from_tmp()\n    call in the lift() hot loop touched up to four independent cache lines.\n    \n    Replace them with a single std::vector<NodePM> where each 40-byte record\n    holds all four fields contiguously:\n    \n      struct NodePM {\n          uint8_t  bits[8];    // offset  0 \u2014 SIMD-ready uint8 array\n          uint8_t  masks[8];   // offset  8\n          int16_t  levels[8];  // offset 16 \u2014 SIMD-ready int16 array\n          uint8_t  nlanes;     // offset 32\n          uint8_t  _pad[7];    // offset 33 \u2014 sizeof == 40\n      };\n    \n    With 40 bytes per node, a to_tmp() call now accesses a single contiguous\n    memory region (\u22642 cache lines) instead of four, cutting cache-miss\n    pressure by up to 4\u00d7 for scattered graph traversals.\n    \n    All SIMD copy_from/copy_to calls remain compatible because bits[8] and\n    masks[8] are still contiguous; memcpy to/from levels[8] has no source-\n    alignment constraint.  The initialization loop is simplified to a single\n    std::fill(pm.begin(), pm.end(), init).\n    \n    Benchmark on hard-benchmarks/ (>10ms games, strpm-simd solver):\n      38/100 games \u22651.1\u00d7 faster, 61 neutral, 1 marginally slower.\n      Aggregate wall time: 325s \u2192 148s (2.2\u00d7 speedup).\n      Biggest wins: friedmannsubexp_50 18\u00d7, pdlbinsudoku7 9.6\u00d7,\n      pdlbinsudoku8 4.2\u00d7, towersofhanoi_10 2.8\u00d7.\n    \n    https://claude.ai/code/session_01RfNC75xb2JQ93tADbzSLGD\n",
+    "b4138e3": "commit b4138e3b7e040c0c31d760c044f9784ed7b68ace\nAuthor:     Claude <noreply@anthropic.com>\nAuthorDate: Thu Apr 2 05:21:34 2026 +0000\nCommit:     Claude <noreply@anthropic.com>\nCommitDate: Thu Apr 2 05:21:34 2026 +0000\n\n    Replace sequential NLB prefix sum with parallel scan using native SIMD intrinsics\n    \n    The inclusive prefix sum in prog_tmp previously used 7 sequential dependent\n    adds. This replaces it with a 3-step parallel scan (log2(8) steps) using\n    SSE2 byte-shift + add on x86, NEON vextq + add on ARM, with a fallback to\n    the sequential loop for other architectures.\n    \n    https://claude.ai/code/session_01B6w9wWo1EZu9oAiBC9Edu7\n",
+    "a61c3dd": "commit a61c3dd1fd041aa4d5ec55ba5283a3d21a3348c6\nAuthor:     Claude <noreply@anthropic.com>\nAuthorDate: Fri Apr 3 05:17:35 2026 +0000\nCommit:     Claude <noreply@anthropic.com>\nCommitDate: Fri Apr 3 05:17:35 2026 +0000\n\n    Vectorize compare() and promote levels to SIMD registers\n    \n    - Promote tmp_levels/best_levels from scalar uint16_t[8] arrays to\n      simd_u16x8 registers, eliminating redundant load/store round-trips\n      in to_tmp/from_tmp/to_best/from_best and prog_tmp predicate reload\n    - Vectorize compare() level loop: replace 8-iteration scalar loop with\n      SIMD predicate masks and find_first_set, reducing branch mispredicts\n    - Fix negative pindex bug: clamp to 0 with flag to force both_past when\n      pindex < 0, preventing uint16 wrap to 0xFFFF\n    - Fix countl_one narrowing: use uint16 countl_one minus 8 instead of\n      casting to uint8, staying in native lane width\n    - Simplify level arithmetic: remove redundant int\u2194uint16 double casts\n      where uint16 arithmetic suffices\n    \n    https://claude.ai/code/session_01B6w9wWo1EZu9oAiBC9Edu7\n",
+    "7961e62": "commit 7961e62420488ae3d7aac478310ac9dd0d21a929\nAuthor:     gaperez64 <gaperez64@gmail.com>\nAuthorDate: Mon Jul 20 20:50:37 2026 +0200\nCommit:     gaperez64 <gaperez64@gmail.com>\nCommitDate: Mon Jul 20 20:50:37 2026 +0200\n\n    strpm-simd: guard (k,t) overflow and fall back to tangle learning\n    \n    The SIMD encoding can only represent a bounded parameter region (bitstrings\n    are hard-capped at 8 bits => t <= 7; there are 8 SIMD lanes with nlanes = k-1\n    => k <= 9). The (k,t) search previously pushed candidates up to\n    floor_log2(nodecount) with no guard, so any sufficiently large game that was\n    not solved at small (k,t) would silently overflow the encoding and could\n    produce wrong results.\n    \n    Cap the search at the representable region and, if the game is still unsolved\n    once those parameters are exhausted, hand the remaining subgame to a complete\n    solver (tangle learning). Because vertices solved by strpm-simd are already in\n    the shared oink.disabled bitset (ALWAYS_RESET == 0), TLSolver::run naturally\n    operates only on the remainder \u2014 no state marshaling needed.\n    \n    Adds a small Solver::solveRemainderWith(id) helper that constructs and runs\n    another registered solver on the same Oink/Game.\n    \n    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n",
+    "872be94": "commit 872be945bc925166acca901c6ee797f405c38060\nAuthor:     gaperez64 <gaperez64@gmail.com>\nAuthorDate: Mon Jul 20 20:59:56 2026 +0200\nCommit:     gaperez64 <gaperez64@gmail.com>\nCommitDate: Mon Jul 20 20:59:56 2026 +0200\n\n    strpm: small-buffer-optimize measure storage (no per-node heap)\n    \n    The scalar solver stored progress measures as vector<vector<bool>> /\n    vector<vector<int>> \u2014 two heap allocations per node, reached by pointer\n    chasing, and copied whole in to_tmp/from_tmp/to_best. Since a measure's length\n    is bounded by ~k-1+t (well within 16 for the SIMD-representable range and most\n    games), switch bits/levels to boost::container::small_vector with inline\n    capacity 16. Common (small) measures now need no heap and the tmp/best/test\n    working copies are cheap fixed-size copies; larger measures spill to the heap\n    transparently. Bits move from the bit-packed vector<bool> proxy to plain uint8.\n    \n    Measured on the scalar strpm solver (release, -march=native), cumulative with\n    the prior prog_tmp allocation fix:\n      TwoCounters10: 13.14s (baseline) -> 10.84s (B1) -> 9.95s (-24% total)\n      TwoCounters12: 30.24s (baseline) -> 26.35s (B1) -> 22.84s (-24% total)\n    All 224 tests/ games verify; debug build (asserts) clean.\n    \n    Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n"
+  },
+  "methodology": {
+    "full_solvers": "Same priority/ID-sorted canonical games, no preprocessing, sequential workers, iterative removal. Verification enabled. Each complete winning partition agrees across arms.",
+    "fixed_hosts": "Same C worklist, fixed host and both players on the full game; verification outside timed lifting. Non-TOP labels, TOP flags, regions, lifts and attempts agree. TOP payload bytes are representation dependent.",
+    "kernel_adapter": "Oink methods extracted verbatim, class name changed; C ABI loads/stores between calls. Generic -O3, no -march=native. This is not the original register-retaining whole Oink lifting loop.",
+    "selection": "Same cleaned scalar C code, retry productive budgets versus advance budget after every incomplete round. Verify complete winners. One warm-up plus three alternating samples. No threshold selected from a microbenchmark.",
+    "diagnostic_sources": "/tmp/strahler-pm-before-20261124/experimental/pm-simd-oink",
+    "cpu": "Intel Core i3-8100T; Linux x86_64; CPU 3; GCC 15.3.1; C release -O3 -DNDEBUG, portable baseline"
+  },
+  "oracle": {
+    "source_commit": "51c2640fe650fd18d9331cfe5133cf3605a98c31",
+    "other_modules_commit": "85230b6d06307adbf6db6e474ec5fcf546b09400",
+    "note": "Both scalar print-pms translation units are rebuilt with scripts/oink-print-pms.patch; other executed modules are identical between these commits.",
+    "sha256": "36d09507a65560df51de7b6d360123e1bd515b9a90114dd16c36c923a503bae7",
+    "seed": 0,
+    "algorithms": {
+      "strahler": {
+        "games": 506,
+        "mismatches": 0,
+        "streams": 502,
+        "partial_oracles": 4,
+        "slow_examples_skipped": 1
+      },
+      "succinct": {
+        "games": 506,
+        "mismatches": 0,
+        "streams": 506,
+        "partial_oracles": 0,
+        "slow_examples_skipped": 1
+      }
+    }
+  },
+  "full_strpm_kernel": {
+    "upstream": "85230b6d06307adbf6db6e474ec5fcf546b09400",
+    "source": "src/strpm_simd.c",
+    "layout_bytes": 56,
+    "k_max": 9,
+    "t_max": 7,
+    "successors": 428430,
+    "comparisons": 4282383,
+    "mismatches": 0,
+    "default": "SIMD on SSE2/NEON within the encoding bounds; native scalar fallback otherwise",
+    "notebooks": "05, 07 and 08 explicitly select SIMD Strahler PM",
+    "measurements": "strpm-full-kernel.json",
+    "method": "One warm-up and three alternating samples on CPU 3; same portable release executable, complete adaptive solves with iterative shaving and verification. Exact JSON, all measure trees and counters agree."
+  }
+}

@@ -286,3 +286,9 @@ explicit tests in `slow`, following PR #30 and adding both PM algorithms on
 `cabp_swp.ehoa.pg` and `FairSchedulern=2_compact.gm`. `test_json_alloc` injects each allocation
 failure into metrics, measure-tree construction and prefix-tree parsing and
 checks cleanup and write-error propagation. No new Python dependencies are used.
+
+The full Strahler PM SIMD kernel is checked by `test_strpm_simd` against the
+native reference across 428,430 successors and over four million comparisons.
+`STRAHLER_PM_BACKEND=scalar` selects the reference; `simd` and the default
+select the SSE2/NEON kernel inside its encoding bounds. Wider hosts use the
+native fallback. The previous partial packed backend has been removed.

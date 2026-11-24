@@ -1,0 +1,223 @@
+{
+  "binary_sha256": "0098c431816e7f18ea33d139efe9d6bc067308e724e68c2e44a475e38cf2ac35",
+  "source_sha256": {
+    "src/pm_lift.c": "fb3f761af86bd5b79c76257898f83fb9ec68d596290dd9e6c8c2439584ecc3a6",
+    "src/pm_solve.c": "f235305c9d0e89b1c56848dd73a58d6218a4a6a0fed1d28b39849dde13b3bb70",
+    "src/strpm.c": "6423089cbd0eab41b56b5a417993c873397148fa07e813cf027240ef9649e486",
+    "src/strpm_simd.c": "29dcaeff4ebbebba1bacfa93954b5ae0f0f668446055703cd3c950573faa5750",
+    "src/strpm_simd.h": "23fa953156a171bd708165cb12bbdc4749aae7f521f28e5cfadad15375bfc93c",
+    "src/pm_tree_dot.c": "68190300c599253e0a3a7a03a2e9f24975c7dff2ce04a6cd1d3ec4b613c42aa8"
+  },
+  "samples": 3,
+  "warmups": 1,
+  "cpu": [
+    3
+  ],
+  "rows": [
+    {
+      "case": "Nestern=3_compact",
+      "backend": "scalar",
+      "median_wall": 0.010604399023577571,
+      "median_cpu": 0.008528999999999995,
+      "rounds": 5,
+      "vertices": 1562,
+      "document_sha256": "a217246a5746203c3d3ca1871d5da771fd6156c65937f5c9b01672c2fba5b177",
+      "samples": [
+        {
+          "wall": 0.010571070946753025,
+          "cpu": 0.008519
+        },
+        {
+          "wall": 0.010618494008667767,
+          "cpu": 0.008533000000000002
+        },
+        {
+          "wall": 0.010604399023577571,
+          "cpu": 0.008528999999999995
+        }
+      ]
+    },
+    {
+      "case": "Nestern=3_compact",
+      "backend": "simd",
+      "median_wall": 0.010052916943095624,
+      "median_cpu": 0.007913,
+      "rounds": 5,
+      "vertices": 1562,
+      "document_sha256": "a217246a5746203c3d3ca1871d5da771fd6156c65937f5c9b01672c2fba5b177",
+      "samples": [
+        {
+          "wall": 0.010052916943095624,
+          "cpu": 0.007813000000000002
+        },
+        {
+          "wall": 0.01012516301125288,
+          "cpu": 0.007913999999999997
+        },
+        {
+          "wall": 0.00991476804483682,
+          "cpu": 0.007913
+        }
+      ]
+    },
+    {
+      "case": "Nestern=4_compact",
+      "backend": "scalar",
+      "median_wall": 0.1744324320461601,
+      "median_cpu": 0.170261,
+      "rounds": 7,
+      "vertices": 6817,
+      "document_sha256": "aadff48e7e9908919d08a5719aeb521b254063dd19f706a292468eb797d4005c",
+      "samples": [
+        {
+          "wall": 0.17442006804049015,
+          "cpu": 0.16962699999999997
+        },
+        {
+          "wall": 0.1744324320461601,
+          "cpu": 0.170261
+        },
+        {
+          "wall": 0.17888105008751154,
+          "cpu": 0.1729619999999998
+        }
+      ]
+    },
+    {
+      "case": "Nestern=4_compact",
+      "backend": "simd",
+      "median_wall": 0.12232233001850545,
+      "median_cpu": 0.11832799999999993,
+      "rounds": 7,
+      "vertices": 6817,
+      "document_sha256": "aadff48e7e9908919d08a5719aeb521b254063dd19f706a292468eb797d4005c",
+      "samples": [
+        {
+          "wall": 0.12232233001850545,
+          "cpu": 0.11815
+        },
+        {
+          "wall": 0.12222233507782221,
+          "cpu": 0.11832799999999993
+        },
+        {
+          "wall": 0.12415437796153128,
+          "cpu": 0.11999000000000014
+        }
+      ]
+    },
+    {
+      "case": "Nestern=3",
+      "backend": "scalar",
+      "median_wall": 0.06938087800517678,
+      "median_cpu": 0.06580399999999983,
+      "rounds": 7,
+      "vertices": 3029,
+      "document_sha256": "9efa7d1a271c2030552704f8b3926f46530c169fef46c82ed251714f1ee5d0a6",
+      "samples": [
+        {
+          "wall": 0.06994185107760131,
+          "cpu": 0.06580399999999983
+        },
+        {
+          "wall": 0.06938087800517678,
+          "cpu": 0.06595200000000016
+        },
+        {
+          "wall": 0.06805393798276782,
+          "cpu": 0.06485199999999985
+        }
+      ]
+    },
+    {
+      "case": "Nestern=3",
+      "backend": "simd",
+      "median_wall": 0.05161085701547563,
+      "median_cpu": 0.04853999999999978,
+      "rounds": 7,
+      "vertices": 3029,
+      "document_sha256": "9efa7d1a271c2030552704f8b3926f46530c169fef46c82ed251714f1ee5d0a6",
+      "samples": [
+        {
+          "wall": 0.051547907991334796,
+          "cpu": 0.04834400000000003
+        },
+        {
+          "wall": 0.05185997404623777,
+          "cpu": 0.048556000000000016
+        },
+        {
+          "wall": 0.05161085701547563,
+          "cpu": 0.04853999999999978
+        }
+      ]
+    },
+    {
+      "case": "FairScheduler2",
+      "backend": "scalar",
+      "median_wall": 14.105190897011198,
+      "median_cpu": 13.988618000000006,
+      "rounds": 4,
+      "vertices": 5596,
+      "document_sha256": "d5f1ecdb40398189cd061a8e7d98d9142291e08e73a98fe848034fc82ecedc5c",
+      "samples": [
+        {
+          "wall": 14.101020482019521,
+          "cpu": 13.961038000000004
+        },
+        {
+          "wall": 14.105190897011198,
+          "cpu": 13.988618000000006
+        },
+        {
+          "wall": 14.281786607927643,
+          "cpu": 14.076782999999997
+        }
+      ]
+    },
+    {
+      "case": "FairScheduler2",
+      "backend": "simd",
+      "median_wall": 10.73145460197702,
+      "median_cpu": 10.648510000000002,
+      "rounds": 4,
+      "vertices": 5596,
+      "document_sha256": "d5f1ecdb40398189cd061a8e7d98d9142291e08e73a98fe848034fc82ecedc5c",
+      "samples": [
+        {
+          "wall": 10.731016223900951,
+          "cpu": 10.648510000000002
+        },
+        {
+          "wall": 10.73145460197702,
+          "cpu": 10.648201
+        },
+        {
+          "wall": 10.968713107984513,
+          "cpu": 10.803083999999998
+        }
+      ]
+    }
+  ],
+  "algorithm": "strahler",
+  "flags": [
+    "--algorithm=strahler",
+    "--iter-shave",
+    "--format=json",
+    "--stats"
+  ],
+  "backend_environment": "STRAHLER_PM_BACKEND",
+  "order": "One warm-up per arm, then three samples; reverse scalar/simd arm order each repetition",
+  "compiler": "cc (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)",
+  "build_flags": [
+    "-O3",
+    "-DNDEBUG"
+  ],
+  "inputs": {
+    "Nestern=3_compact": "ad7093067ca47d738d589eaf17bfd964d8f0c093b9a55ca5136360c0cf464f31",
+    "Nestern=4_compact": "eb618d60f7140aa28dd9d5376af2c3604007b8eacdf5aeb10e70c706315326a4",
+    "Nestern=3": "e342b64b83979860dba30f95528e9469ca8b6720c429eeb22b40cbe54b230f15",
+    "FairScheduler2": "d936f2ab68ab5526328b43b471a6ed035c04e58fe11ef49cf7c1e6758685ef2b"
+  },
+  "validation": "Exact JSON equality including every round, measure tree, certificate, parameters, lifts and attempts; verify stays enabled"
+}

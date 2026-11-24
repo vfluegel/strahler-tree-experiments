@@ -186,7 +186,8 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
         parameter_queue_push(
             &queue, (PMParameters){.k = parameters.k, .t = parameters.t + 1});
       }
-    } else if (!options->incremental || before == pg_set_count(&remaining)) {
+    } else {
+      /* Oink advances the succinct bit budget after every incomplete round. */
       if (parameters.bits >= max_bits) {
         pm_error(error, "bit budget exhausted before covering the game");
         goto cleanup;

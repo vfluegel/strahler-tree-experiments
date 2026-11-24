@@ -78,7 +78,9 @@ python3 scripts/make_trees.py --backends zielonka,lifting-adaptive+iter --out tr
 
 [DECOMP.md](DECOMP.md) has example trees for every backend.
 
-[SIMD.md](SIMD.md) describes portable lifting dispatch, scalar controls and benchmarks.
+[SIMD.md](SIMD.md) describes AD dispatch, full SIMD Strahler PM, scalar controls
+and benchmarks. Both Strahler PM and succinct PM are available; notebook PM runs
+use SIMD Strahler PM.
 [KEIREN.md](KEIREN.md) records static metrics for Jeroen Keiren's parity game benchmarks.
 [ALGOS.md](ALGOS.md) explains how each method builds its trees and how to
 read the metrics. See [docs/](docs/) for research notes and

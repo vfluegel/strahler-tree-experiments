@@ -3,6 +3,7 @@
 import bz2
 import csv
 import json
+import os
 from math import log10
 from pathlib import Path
 import subprocess
@@ -212,6 +213,7 @@ def _worker(request):
     for k, t in attempts:
         try:
             if backend == 'pm-strahler':
+                os.environ['STRAHLER_PM_BACKEND'] = 'simd'
                 document = strahler.progress_measures(game, algorithm='strahler', k=k, t=t)
                 result = document['rounds'][-1]
                 numbers = [_strahler(p['tree']) for p in result['trees']]

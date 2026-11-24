@@ -74,7 +74,7 @@ def main():
                               ('scalar', 'fused', 'packed', 'dense', 'queue', 'dirty', 'byte')))
             pm_pair = ['--k=2', '--t=1'] if name == 'FairScheduler2' else ['--k=3', '--t=2']
             cases.append((name, 'pg2pmdot', ['--algorithm=strahler', *pm_pair],
-                          ('scalar', 'packed', 'lookup', 'compare', 'both')))
+                          ('scalar', 'simd')))
         for name, tool, flags, backends in cases:
             rows = {backend: [] for backend in backends}
             expected = None

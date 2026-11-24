@@ -1,0 +1,11 @@
+case,arm,median_wall
+Nestern=3_compact,retry,0.00925545091740787
+Nestern=3_compact,advance,0.008125463966280222
+Nestern=4_compact,retry,0.05934105394408107
+Nestern=4_compact,advance,0.0552292779320851
+Nestern=3,retry,0.02497250703163445
+Nestern=3,advance,0.02296168904285878
+FairScheduler2,retry,2.2600257109152153
+FairScheduler2,advance,1.1436934799421579
+cabp_swp.ehoa,retry,10.483800875023007
+cabp_swp.ehoa,advance,7.254708803026006

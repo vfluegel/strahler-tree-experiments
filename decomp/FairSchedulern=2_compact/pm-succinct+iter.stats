@@ -3,12 +3,8 @@ iter-shave: rounds=1 shaved=13
 succinct: round=1 result=partial unresolved=5583
 even: bits=1 depth=7 vertices=5596 lifts=16672 attempts=300040 non_top=13 top=5583 attracted=0
 odd: bits=1 depth=8 vertices=5583 lifts=31025 attempts=569971 non_top=0 top=5583 attracted=0
-iter-shave: rounds=2 shaved=0
-succinct: round=2 result=partial unresolved=5583
-even: bits=1 depth=7 vertices=5583 lifts=16666 attempts=298919 non_top=0 top=5583 attracted=0
-odd: bits=1 depth=8 vertices=5583 lifts=31025 attempts=569971 non_top=0 top=5583 attracted=0
-iter-shave: rounds=3 shaved=5583
-succinct: round=3 result=complete unresolved=0
+iter-shave: rounds=2 shaved=5583
+succinct: round=2 result=complete unresolved=0
 even: bits=2 depth=7 vertices=5583 lifts=23353 attempts=343414 non_top=5583 top=0 attracted=0
 odd: bits=2 depth=8 vertices=0 lifts=0 attempts=0 non_top=0 top=0 attracted=0
 start: vertex=0 winner=even

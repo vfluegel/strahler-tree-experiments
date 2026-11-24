@@ -700,3 +700,10 @@ def test_pm_ratio_retries_productive_round_then_advances_after_a_stall():
             assert (sequence[index + 1] == sequence[index]) == (after < before)
             before = after
         assert pm_wins(document) == ad_wins(strahler.decompose(game, 'zielonka'))
+
+
+def test_new_pm_recordings_identify_strahler_simd(monkeypatch):
+    monkeypatch.setenv('STRAHLER_PM_BACKEND', 'scalar')
+    metadata = experiment._run_metadata(manifest()[:1])
+    assert metadata['pm_algorithm'] == 'strahler'
+    assert metadata['lifting_backends']['STRAHLER_PM_BACKEND'] == 'simd'

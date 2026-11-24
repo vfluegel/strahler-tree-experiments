@@ -187,8 +187,8 @@ ad_tree_dot_dep = declare_dependency(
 
 pm_lift_lib = static_library(
   'pm_lift',
-  ['src/pm_lift.c', 'src/pm_solve.c', 'src/strpm.c', 'src/sspm.c', 'src/pm_packed.c'],
-  dependencies : [pg_attractor_dep, json_utils_dep, lift_simd_dep],
+  ['src/pm_lift.c', 'src/pm_solve.c', 'src/strpm.c', 'src/sspm.c', 'src/strpm_simd.c'],
+  dependencies : [pg_attractor_dep, json_utils_dep],
 )
 pm_lift_dep = declare_dependency(
   dependencies : pg_attractor_dep,
@@ -1634,7 +1634,7 @@ api_alloc_sources = files('src/cli_version.c', 'src/cli_commands.c',
   'src/ad_tree.c', 'src/ad_tree_json.c', 'src/ad_trace.c', 'src/zielonka.c',
   'src/ad_lift_tree.c', 'src/ad_lift.c', 'src/ad_lift_solve.c', 'src/ad_sym.c', 'src/ad_reach.c',
   'src/ad_tree_dot.c', 'src/pg_dot.c', 'src/pm_lift.c', 'src/pm_solve.c',
-  'src/strpm.c', 'src/sspm.c', 'src/pm_packed.c', 'src/pm_tree_dot.c')
+  'src/strpm.c', 'src/sspm.c', 'src/strpm_simd.c', 'src/pm_tree_dot.c')
 api_alloc_test = executable('test_strahler_alloc',
   ['tests/test_strahler_alloc.c', strahler_sources, api_alloc_sources, lift_simd_sources, version_header],
   include_directories : source_includes,
@@ -1670,9 +1670,9 @@ endif
 test_ad_reach_exe = executable('test_ad_reach', ['tests/test_ad_reach.c', 'tests/reference_attractor.c'], dependencies : ad_lift_dep, c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L'])
 test('test_ad_reach', test_ad_reach_exe, timeout : 120)
 
-test_pm_packed_exe = executable('test_pm_packed', 'tests/test_pm_packed.c', dependencies : [pm_lift_dep, lift_simd_dep], c_args : ['-UNDEBUG'])
-test('test_pm_packed', test_pm_packed_exe)
-foreach backend : ['scalar', 'packed', 'lookup', 'compare', 'both']
+test_strpm_simd_exe = executable('test_strpm_simd', 'tests/test_strpm_simd.c', dependencies : [pm_lift_dep, lift_simd_dep], c_args : ['-UNDEBUG'])
+test('test_strpm_simd', test_strpm_simd_exe)
+foreach backend : ['scalar', 'simd']
   test('test_pm_lift_' + backend, test_pm_lift_exe, env : ['STRAHLER_PM_BACKEND=' + backend], workdir : meson.project_source_root())
 endforeach
 

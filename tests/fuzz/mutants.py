@@ -30,7 +30,7 @@ def main():
     survivors = []
     with tempfile.TemporaryDirectory(prefix='strahler-mutants-') as directory:
         source = Path(directory) / 'source'
-        shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns('build*', '.git', '.venv'))
+        shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns('build*', '.git', '.venv', '.cache', '.mesonpy-*'))
         build = Path(directory) / 'build'
         # The copy has no Git metadata to derive a version from.
         subprocess.run(['meson', 'setup', str(build), str(source), '--buildtype=debug',

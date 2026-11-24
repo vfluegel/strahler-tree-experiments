@@ -72,8 +72,7 @@ Decoded decode(std::uint8_t const *data, std::size_t size) {
 
 std::vector<std::string> const ad_backends = {
     "fused", "packed", "dense", "queue", "queue1", "dirty", "dirty1", "byte"};
-std::vector<std::string> const pm_backends = {"packed", "lookup", "compare",
-                                              "both"};
+std::vector<std::string> const pm_backends = {"simd"};
 
 class Check {
 public:
