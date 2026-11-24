@@ -293,7 +293,7 @@ bool pm_lift(PGGame const *game, PGSet const *active,
   if (algorithm == PM_STRAHLER &&
       (backend == nullptr || strcmp(backend, "scalar") != 0) &&
       strpm_simd_eligible(depth, parameters.k, parameters.t) &&
-      count <= SIZE_MAX / sizeof(*packed)) {
+      count != 0 && count <= SIZE_MAX / sizeof(*packed)) {
     packed = malloc(count * sizeof(*packed));
     bool encodable = packed != nullptr;
     for (size_t v = 0; encodable && v < count; v++) {
