@@ -59,6 +59,7 @@ static void check_monotone(size_t const even_height, size_t const odd_height,
   bool visited[10][10] = {{false}};
   size_t previous[2] = {0};
   size_t count = 0, prefix_count = 0;
+  ParameterPair previous_pair = {.k = 1, .t = 0};
   bool fallback = false;
   while (queue.ordered_valid) {
     ParameterPair const pair = queue.ordered;
@@ -70,12 +71,18 @@ static void check_monotone(size_t const even_height, size_t const odd_height,
       for (size_t player = 0; player < 2; player++) {
         size_t const h = player == 0 ? even_height : odd_height;
         size_t const k = pair.k < h ? pair.k : h;
+        size_t const old_k = previous_pair.k < h ? previous_pair.k : h;
+        assert(old_k == 1 || previous_pair.t == 0 ||
+               (k == old_k && pair.t >= previous_pair.t) ||
+               (k > old_k && pair.t >= previous_pair.t + old_k - 1));
         unsigned const leaves = stree_count_leaves((int)k, (int)pair.t, (int)h);
         assert(leaves >= previous[player]);
         larger |= leaves > previous[player];
         previous[player] = leaves;
       }
-      assert(larger && ++prefix_count <= 7);
+      prefix_count++;
+      assert(larger && prefix_count <= 7);
+      previous_pair = pair;
     } else {
       fallback = true;
       while (ratio.count != 0 && visited[ratio.heap[0].k][ratio.heap[0].t]) {
