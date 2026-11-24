@@ -202,6 +202,18 @@ class PngTests(unittest.TestCase):
 
 
 class DecompTests(unittest.TestCase):
+    def test_fixed_host_fixtures_are_discovered_but_not_in_the_gallery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            examples = root / "examples"
+            examples.mkdir()
+            regular = examples / "ordinary.pg"
+            regular.write_text("parity 0;\n0 0 0 0;\n")
+            for name in decomp.FIXED_HOST_EXAMPLES:
+                (examples / name).write_text(regular.read_text())
+            self.assertEqual(len(decomp.discover_games([examples])), 3)
+            self.assertEqual(decomp.gallery_games(root), [regular])
+
     def test_content_discovery_and_metadata(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
