@@ -136,16 +136,27 @@ def test_native_host_lessons_and_default_nester_comparison(monkeypatch):
     assert lifting.index('from host_lessons') < lifting.index('from otj22')
     nester = notebooks['08-lexicographic-adaptive-nester.ipynb']
     assert 'RUN_NESTER2_TRACE = False' in '\n'.join(''.join(c['source']) for c in nester['cells'])
-    # Default lesson never collects the large trace or edits recorded results.
+    rendered = next(c['outputs'] for c in nester['cells'] if c['id']=='host-nester2-compare')
+    assert 'unknown' not in json.dumps(rendered)
+    # Default lesson streams final occupancy without collecting the timeline.
     def reject(*args, **kwargs):
-        raise AssertionError('Default Nester-2 comparison must remain untraced')
+        raise AssertionError('Default Nester-2 comparison must not collect the timeline')
     monkeypatch.setattr(strahler, 'trace', reject)
-    game, results, hosts = host_lessons.nester2_comparison()
+    game, results, states = host_lessons.nester2_comparison()
     try:
         assert (len(game.vertices), len(game.edges)) == (365,479)
         assert results[1,0].unresolved and results[2,1].complete
-        assert hosts[1,0][0].metrics['strahler']==1
-        assert hosts[2,1][0].metrics['strahler']==2
+        assert states[1,0].hosts[0].metrics['strahler']==1
+        assert states[2,1].hosts[0].metrics['strahler']==2
+        from strahler.widgets import HostView
+        for state in states.values():
+            assert not hasattr(state, 'events')
+            for player in range(2):
+                assert set(state.raw_labels[player]) == set(game.vertices)
+                host = HostView(state.hosts[player], labels=state.raw_labels[player])
+                assert 'unknown' not in host._static_svg()
+                assert all(p['caption'] != 'unknown' for n in host.data['nodes'] for p in n['parts'])
+                host.close()
     finally:
         game.close()
 

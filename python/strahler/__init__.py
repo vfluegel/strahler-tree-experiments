@@ -19,7 +19,7 @@ from ._replay import Replay
 from ._host import HostSnapshot
 
 __all__ = ['Game', 'Node', 'Result', 'Trace', 'State', 'HostSnapshot', 'CheckResult', 'Violation', 'Condition',
-           'StrahlerError', 'InputError', 'decompose', 'trace', 'check',
+           'StrahlerError', 'InputError', 'decompose', 'trace', 'trace_snapshot', 'check',
            'progress_measures', 'genstree', 'pms_tree', 'materialize_partial',
            'version']
 
@@ -340,6 +340,40 @@ def trace(game, algorithm=None, *, args=None, **options):
         error.events = events
         raise
     return Trace(game, events, Result(text))
+
+
+def trace_snapshot(game, algorithm=None, *, args=None, **options):
+    """Return (Result, final State), streaming events without a stored timeline.
+
+    Native tracing still runs, including its event budget. Only replay state,
+    raw labels and complete hosts are retained; use trace() for navigation.
+    Both players are required. Truncation raises StrahlerError and does not
+    claim a complete snapshot or retain an event prefix.
+    """
+    flags = _native.options(args, options, algorithm)
+    if any(flag in (b'--player=even', b'--player=odd') for flag in flags):
+        raise ValueError("trace_snapshot requires player='both'")
+    replay, errors, last = Replay(), [], None
+
+    @_native.Callback
+    def collect(context, line, length):
+        nonlocal last
+        try:
+            event = json.loads(_native.C.string_at(line, length))
+            replay.apply(event)
+            last = event
+            return 1
+        except BaseException as error:
+            errors.append(error)
+            return 0
+
+    try:
+        text = _native.call('decompose', game._pointer(), flags, len(flags), collect, None)
+    except StrahlerError:
+        if errors:
+            raise errors[0]
+        raise
+    return Result(text), State(replay, last, last['step'])
 
 
 def progress_measures(game, *, args=None, **options):

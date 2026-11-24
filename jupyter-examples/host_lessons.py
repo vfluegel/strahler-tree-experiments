@@ -4,7 +4,7 @@ import bz2
 from pathlib import Path
 
 import strahler
-from strahler.widgets import HostView, Stepper
+from strahler.widgets import Stepper
 
 CHAIN = '''parity 3;
 0 2 0 0 "h";
@@ -16,21 +16,18 @@ BRANCH = CHAIN.replace('parity 3;', 'parity 4;') + '4 0 1 4,3 "b";\n'
 
 
 def nester2_comparison():
-    """Current untraced results; no benchmark timing or stored frontier edits."""
+    """Stream final host occupancy, discarding the large native event timeline."""
     path = Path(__file__).resolve().parent / 'nester/Nestern=2.gm.bz2'
     game = strahler.Game.from_text(bz2.open(path, 'rt').read())
-    results, hosts = {}, {}
+    results, states = {}, {}
     for k, t in ((1, 0), (2, 1)):
-        result = strahler.decompose(game, 'lifting', tree_k=k, tree_t=t)
+        result, state = strahler.trace_snapshot(
+            game, 'lifting', tree_k=k, tree_t=t, trace_limit=150000)
         results[k, t] = result
-        pair = []
-        for player, p in enumerate(result.data['parameters']):
-            host = strahler.HostSnapshot.from_tree(strahler.genstree(p['K'], p['H'], p['t']),
-                         player=player, root_bound=2 * (p['H'] - 1) + player)
-            pair.append(host)
+        states[k, t] = state
+        for player in range(2):
             assert strahler.check(game, result.trees[player], player, result.regions[player]).ok
-        hosts[k, t] = tuple(pair)
-    return game, results, hosts
+    return game, results, states
 
 
 def interesting_lifts(run):

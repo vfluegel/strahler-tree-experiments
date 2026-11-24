@@ -190,7 +190,10 @@ separate meaning.
 
 Notebook 08's default Nester-2 lesson runs fixed ordinary AD at `(1,0)` and
 `(2,1)` without preprocessing or same-parity compression and shows current-run
-host/candidate comparisons. Its full native trace (bounded by `trace_limit`)
+host/candidate comparisons with actual final fibre occupancy. It streams native
+events into final host/label snapshots and discards the timeline. Empty fibres
+show zero occupants; TOP stays outside that player's certificate. Its full
+native timeline (bounded by `trace_limit`)
 is opt-in via `RUN_NESTER2_TRACE`; suggested sibling-crossing and predecessor
 invalidation events are located programmatically. Bundled fixtures, helper
 code, inline JavaScript and static SVG/HTML keep all these examples offline.

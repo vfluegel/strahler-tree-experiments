@@ -153,6 +153,16 @@ exceeding it raises `StrahlerError`, with the observed prefix (ending in
 `truncated`) attached as `error.events`. It never reports a truncated run as
 complete.
 
+`result, state = trace_snapshot(game, 'lifting', tree_k=2, tree_t=1,
+trace_limit=150000)` streams the same native trace into its final replay state
+without retaining the event timeline or checkpoints. It returns exact
+`state.hosts` and `state.raw_labels`, including empty host branches and TOP
+occupancy. Native tracing and its event budget still apply; truncation raises
+`StrahlerError` without returning a completed snapshot or retaining a prefix.
+Use `trace()` when forward/backward navigation is needed. Notebook 08 uses
+these final snapshots to show Nester-2 occupancy without loading its full
+100k-event timeline by default.
+
 ## Check a candidate
 
 `check(game, tree, player, subgame=None, compress=False)` accepts a `Node`,

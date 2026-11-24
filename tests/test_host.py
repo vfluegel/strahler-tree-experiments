@@ -161,3 +161,35 @@ def test_lazy_symmetric_prefix_and_epoch_seek():
         assert len(later.nodes) == len(early.nodes) + 1
         assert later.epoch == early.epoch
         assert run.state(-1).trees == run.result.trees
+
+
+@pytest.mark.parametrize('algorithm,options', [
+    ('lifting', dict(kary=2)), ('lifting', dict(search='lexicographic', iter_shave=True)),
+    ('lifting-sym', dict(kary=2)), ('zielonka', {}), ('zielonka-sym', {})])
+def test_streamed_snapshot_matches_collected_final_state(algorithm, options, monkeypatch):
+    with strahler.Game.from_text(BRANCH) as game:
+        run = strahler.trace(game, algorithm, **options)
+        expected = run.state(-1)
+        def reject(*args, **kwargs):
+            raise AssertionError('Streaming snapshots must not create a collected Trace')
+        monkeypatch.setattr(strahler.Trace, '__init__', reject)
+        result, state = strahler.trace_snapshot(game, algorithm, **options)
+        assert result.to_json() == run.result.to_json()
+        assert state.index == len(run) - 1
+        assert state.trees == expected.trees and state.shaves == expected.shaves
+        assert state.hosts == expected.hosts and state.raw_labels == expected.raw_labels
+        assert not hasattr(state, 'events')
+
+
+def test_streamed_snapshot_preserves_limits_and_callback_errors(monkeypatch):
+    from strahler._replay import Replay
+    with strahler.Game.from_text(BRANCH) as game:
+        with pytest.raises(strahler.StrahlerError):
+            strahler.trace_snapshot(game, 'lifting', kary=2, trace_limit=1)
+        with pytest.raises(ValueError, match='both'):
+            strahler.trace_snapshot(game, player='even')
+        def reject(*args, **kwargs):
+            raise RuntimeError('replay failed')
+        monkeypatch.setattr(Replay, 'apply', reject)
+        with pytest.raises(RuntimeError, match='replay failed'):
+            strahler.trace_snapshot(game, 'lifting', kary=2)
