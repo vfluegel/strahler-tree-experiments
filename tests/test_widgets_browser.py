@@ -13,7 +13,7 @@ except ImportError:
 from otj22 import hk
 
 ROOT = Path(__file__).resolve().parents[1]
-FIELDS = ('kind', 'data', 'hovered', 'highlights', 'outlines', 'selected', 'mode', 'next_kind', 'edges', 'hovered_path', 'owner_styles')
+FIELDS = ('kind', 'data', 'hovered', 'highlights', 'outlines', 'selected', 'mode', 'next_kind', 'edges', 'hovered_path', 'hovered_position', 'owner_styles')
 
 
 @pytest.fixture(scope='module')
@@ -124,6 +124,71 @@ def test_game_render_and_selection(page, text):
         page.keyboard.press('Enter')
         page.evaluate('window.pending')
         assert view.selected == game.vertices[0]
+
+
+@pytest.mark.parametrize('width', [390, 1280])
+def test_host_group_flat_selection_and_teaching_cursor(page, width):
+    from strahler.widgets import GameView, HostView
+    from test_host import BRANCH
+    page.set_viewport_size(dict(width=width, height=1000))
+    with strahler.Game.from_text(BRANCH) as game:
+        run = strahler.trace(game, 'lifting', kary=2)
+        state = run.state(-1)
+        graph = GameView(game)
+        host = HostView(state.hosts[0], graph, labels=state.raw_labels[0])
+        mount(page, graph, host)
+        assert page.locator('[data-host-path]').count() == 3
+        assert page.locator('[data-host-position]').count() == 9
+        assert page.locator('[data-flat-position]').count() == 9
+        assert 'Strahler = 2' in page.locator('#widget-1').inner_text()
+        page.locator('#widget-0 [data-vertex="4"]').click()
+        page.evaluate('window.pending')
+        assert host.selected == graph.selected == 4
+        assert page.locator('[data-flat-position="5"] rect').get_attribute('stroke') == '#dc2626'
+        assert page.locator('[data-host-position="3"] rect').get_attribute('opacity') == '0.32'
+        page.locator('[data-host-position="4"]').click()
+        page.evaluate('window.pending')
+        page.get_by_role('button', name='Select vertex 3', exact=True).click()
+        page.evaluate('window.pending')
+        assert host.selected == graph.selected == 3
+        assert page.locator('[data-flat-position="4"] rect').get_attribute('stroke') == '#dc2626'
+        labels = dict(host.labels)
+        page.get_by_role('button', name='Next compatible position', exact=True).click()
+        page.evaluate('window.pending')
+        assert host.teaching_position == 7
+        assert host.labels == labels and run.state(-1).raw_labels[0] == labels
+        page.get_by_label('Teaching priority').fill('2')
+        page.get_by_label('Teaching priority').press('Tab')
+        page.evaluate('window.pending')
+        page.get_by_role('button', name='Next compatible position', exact=True).click()
+        page.evaluate('window.pending')
+        assert host.teaching_position == 8 and host.labels == labels
+        page.locator('[data-flat-position="4"]').focus()
+        page.keyboard.press('Enter')
+        page.evaluate('window.pending')
+        assert host.part_index == 4
+
+
+def test_host_core_hover_and_lift_inspector(page):
+    from strahler.widgets import Stepper
+    from test_host import BRANCH
+    with strahler.Game.from_text(BRANCH) as game:
+        stepper = Stepper(strahler.trace(game, 'lifting', kary=2))
+        h = next(i for i,e in enumerate(stepper.run.events)
+                 if e['event']=='lift' and e['player']==0 and e['vertex']==4 and e['from']==2)
+        stepper.seek(h)
+        mount(page, stepper.controls, stepper.game_view, stepper.host_views[0])
+        assert 'An opponent edge violates' in page.locator('#widget-0').inner_text()
+        group = page.locator('#widget-2 [data-host-path="[0]"]')
+        group.hover(position=dict(x=20, y=20))
+        page.evaluate('window.pending')
+        assert page.locator('[data-flat-position="2"] rect').get_attribute('stroke') == '#c026d3'
+        assert page.locator('[data-flat-position="4"] rect').get_attribute('stroke') != '#c026d3'
+        page.get_by_role('button', name='Next lift', exact=True).click()
+        page.evaluate('window.pending')
+        assert stepper.controls.data['inspector']['kind'] == 'S'
+        assert 'outside R' in page.locator('#widget-0').inner_text()
+        assert stepper.controls.data['inspector']['edges'] == [[4, 4]]
 
 
 def nodes(root):

@@ -341,6 +341,17 @@ done:
   return index;
 }
 
+static void trace_host_node(Sym const *state, PGPlayer const player,
+                             size_t const node) {
+  if (state->trace != nullptr) {
+    size_t storage[AD_PATH_CAPACITY];
+    AD_TRACE(state->trace, .kind = AD_TRACE_PHASE, .player = player,
+             .name = "host_node",
+             .path = ad_trace_host_path(state->tree + player, node, storage),
+             .h = state->tree[player].nodes[node].level);
+  }
+}
+
 [[nodiscard]] static bool first_child(Sym *state, PGPlayer const player,
                                       size_t const node, size_t *child) {
   ADLiftTree *tree = state->tree + player;
@@ -351,6 +362,7 @@ done:
       return false;
     }
     tree->nodes[node].first_child = *child;
+    trace_host_node(state, player, *child);
   }
   return true;
 }
@@ -367,6 +379,7 @@ done:
       return false;
     }
     tree->nodes[node].next_sibling = *sibling;
+    trace_host_node(state, player, *sibling);
   }
   return true;
 }
@@ -712,7 +725,9 @@ sym_solve_trace(PGGame const *game, PGSet const *domain,
       goto failure;
     }
     AD_TRACE(trace, .kind = AD_TRACE_PHASE, .player = (PGPlayer)player,
-             .name = "labels_reset");
+             .name = "labels_reset", .host = hosts == nullptr ? tree : nullptr,
+             .host_implicit = true, .priority_game = game, .subgame = domain,
+             .host_arity = state.arity);
     for (size_t vertex = pg_set_next(domain, 0); vertex != SIZE_MAX;
          vertex = pg_set_next(domain, vertex + 1)) {
       state.labels[player][vertex] =

@@ -212,7 +212,7 @@ for Definition 1.
 
 Install `strahler[notebooks]` to enable the optional `strahler.widgets` module.
 Ordinary `import strahler` does not import anywidget, traitlets, or Jupyter.
-The seven notebooks and checkout/release setup commands are in
+The eight notebooks and checkout/release setup commands are in
 [jupyter-examples](../jupyter-examples/README.md).
 
 ```python
@@ -228,6 +228,47 @@ print(stepper.verify(stepper.state.event['player']))
 ```
 
 `TreeView` also accepts `genstree` and progress-measure prefix-tree JSON.
+
+`HostView(state.hosts[player], game_view, labels=state.raw_labels[player])`
+shows the available AD search space separately from the occupied candidate.
+Each outlined group is one underlying recursive node, with its bound, actual
+subtree Strahler number, H/T/S occupancy, and exact core interval `[H,S)`.
+S is outside its own core; root S is TOP (unresolved, excluded from the
+certificate). Disabled T at bound zero remains in the allocated order.
+Strahler, leaves, nodes and height count the underlying tree before adding
+the three positions per node. Requested `(k,t,h)` is reported separately;
+parameter `h` counts levels including the root, while node `h` is a priority bound.
+
+The linked flat strip uses native indices. Selecting a game vertex highlights
+its actual label and next compatible destination and dims positions rejected
+by its normalized priority. Click a part to list/select occupants. Teaching
+priority and **Next compatible position** only move a demonstration cursor;
+actual labels change when the trace advances. Focus collapsed subtrees or
+use **Find position** to navigate large hosts without rendering all positions.
+`max_nodes` and `strip_window` bound the visible geometry; collapsed groups
+retain exact subtree metrics and intervals. Host-only views without labels
+mark occupancy unknown. `HostSnapshot.from_tree(genstree(k,h,t), root_bound=d)`
+adapts a native generated tree without generating universal trees in JavaScript.
+
+`Stepper.host_views` contains both players' hosts. **Next lift**, **Next round**,
+**Back**, the seek slider and **Next lift for selected vertex** preserve
+checkpointed navigation. `next_lift(vertex, player=None)` uses indexed external
+IDs. The lift inspector independently recomputes the failed H threshold or
+lazy reach-through-safe attractor from the common **pre-round** labelling,
+including opponent exits from the safe set. It distinguishes the failure
+from priority pruning to the destination and highlights concrete blocking
+edges and L/A/R sets. Symmetric recursive updates explain their own subgame
+operation; provisional separator labels need final certification.
+
+`State.hosts` shares immutable descriptions by player/host epoch;
+`State.raw_labels` retains raw paths and root TOP independently of materialized
+certificates. New traces extend existing phase records with optional versioned
+`strahler-host/1` metadata. Old recordings remain replayable and explicitly show
+complete hosts as unavailable. Symmetric Zielonka shows only its allocated
+prefix, marking implicit positions and provisional indices. All views have
+offline static SVG/HTML fallbacks; no CDN or additional browser application
+is used. Notebook 04 teaches the tiny chain and branching examples; Notebook
+08 compares Nester-2 with a bounded, opt-in native trace explorer.
 `mode='squares'|'tree'` selects nested squares or node links. Squares put S in
 a full-height right column, with H above T and the children below, from left
 to right. Regions grow with their vertex counts; empty regions keep a labelled

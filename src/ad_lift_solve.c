@@ -48,10 +48,14 @@ typedef struct {
 } Solver;
 
 /* Lift, check, and materialize one player's run, replacing its outcome. */
-[[nodiscard]] static bool run_on_host(Solver *solver, ADLiftTree *host) {
+[[nodiscard]] static bool run_on_host(Solver *solver, ADLiftTree *host,
+                                       size_t const k, size_t const t,
+                                       size_t const arity) {
   PGPlayer const player = host->player;
   AD_TRACE(solver->options->trace, .kind = AD_TRACE_PHASE, .player = player,
-           .name = "host_built", .to = host->node_count);
+           .name = "host_built", .to = host->node_count, .host = host,
+           .priority_game = solver->game, .subgame = solver->domain,
+           .host_k = k, .host_t = t, .host_arity = arity);
   ADLiftPlayerStats *stats = solver->stats->player + player;
   if (solver->options->symmetric) {
     stats->host_nodes = host->node_count;
@@ -181,7 +185,7 @@ typedef enum {
         build_error.message[0] == '\0' ? "" : ": ", build_error.message);
     return HOST_FAILED;
   }
-  bool const ran = run_on_host(solver, &host);
+  bool const ran = run_on_host(solver, &host, k, t, 0);
   ad_lift_tree_destroy(&host);
   if (!ran) {
     return HOST_FAILED;
@@ -216,7 +220,7 @@ typedef enum {
                 player_name(player), arity, build_error.message);
     return HOST_FAILED;
   }
-  bool const ran = run_on_host(solver, &host);
+  bool const ran = run_on_host(solver, &host, 0, 0, arity);
   ad_lift_tree_destroy(&host);
   if (!ran) {
     return HOST_FAILED;
@@ -243,7 +247,7 @@ typedef enum {
                 build_error.message);
     return false;
   }
-  bool const ran = run_on_host(solver, &host);
+  bool const ran = run_on_host(solver, &host, 0, 0, 0);
   ad_lift_tree_destroy(&host);
   return ran;
 }

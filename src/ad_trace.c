@@ -104,6 +104,59 @@ static void path(FILE *stream, ADTracePath const value) {
   fputc(']', stream);
 }
 
+/* Walk native sibling links once: deriving each path independently by
+ * searching siblings would be quadratic for a broad host. */
+static void host_nodes(FILE *stream, ADLiftTree const *host, size_t index,
+                        size_t storage[AD_PATH_CAPACITY], size_t depth,
+                        bool implicit, bool *first) {
+  ADLiftNode const *node = host->nodes + index;
+  fprintf(stream, "%s{\"path\":", *first ? "" : ",");
+  *first = false;
+  path(stream, (ADTracePath){storage, depth});
+  fprintf(stream, ",\"h\":%" PRIu64, node->level);
+  if (!implicit) {
+    fprintf(stream, ",\"positions\":[%zu,%zu,%zu]", node->regular,
+            node->minus_inf, node->after);
+  }
+  fputc('}', stream);
+  size_t child_index = 0;
+  for (size_t child = node->first_child; child != SIZE_MAX;
+       child = host->nodes[child].next_sibling) {
+    storage[depth] = child_index++;
+    host_nodes(stream, host, child, storage, depth + 1, implicit, first);
+  }
+}
+
+/* Serialized only by a trace writer, once per host epoch. Native ordinals
+ * are recorded rather than inferred from a pruned decomposition. */
+static void host_description(FILE *stream, ADTraceEvent const *event) {
+  ADLiftTree const *host = event->host;
+  fprintf(stream, ",\"host\":{\"schema\":\"strahler-host/1\",\"complete\":%s,"
+                  "\"parameters\":{", event->host_implicit ? "false" : "true");
+  if (event->host_k != 0) {
+    fprintf(stream, "\"k\":%zu,\"t\":%zu,\"h\":%zu", event->host_k,
+            event->host_t, host->height + 1);
+  } else if (event->host_arity != 0) {
+    fprintf(stream, "\"arity\":%zu", event->host_arity);
+  }
+  fputs("},\"nodes\":[", stream);
+  bool first = true;
+  size_t storage[AD_PATH_CAPACITY];
+  host_nodes(stream, host, 0, storage, 0, event->host_implicit, &first);
+  fputs("],\"active\":", stream);
+  json_set(&(JSONWriter){stream, event->priority_game}, event->subgame);
+  fputs(",\"priorities\":[", stream);
+  first = true;
+  for (size_t vertex = pg_set_next(event->subgame, 0); vertex != SIZE_MAX;
+       vertex = pg_set_next(event->subgame, vertex + 1)) {
+    PGVertex const *v = event->priority_game->vertices + vertex;
+    fprintf(stream, "%s[%" PRIu64 ",%" PRIu64 "]", first ? "" : ",",
+            v->external_id, v->priority);
+    first = false;
+  }
+  fputs("]}", stream);
+}
+
 static bool deliver_line(ADTraceJSON *writer, ADTraceJSON *copy,
                          char *const *line, size_t const *length,
                          bool written) {
@@ -256,6 +309,12 @@ bool ad_trace_json_event(void *context, ADTraceEvent const *event) {
     json_string(stream, event->name);
     fprintf(stream, ",\"value\":%zu,\"vertices\":", event->to);
     json_set(&(JSONWriter){stream, writer->game}, event->vertices);
+    if (event->host != nullptr) {
+      host_description(stream, event);
+    }
+    if (event->name != nullptr && strcmp(event->name, "host_node") == 0) {
+      fprintf(stream, ",\"h\":%" PRIu64, event->h);
+    }
     if (event->result != nullptr) {
       fputs(",\"result\":", stream);
       if (!ad_json_result(&(JSONWriter){stream, writer->game}, event->result,

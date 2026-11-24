@@ -27,12 +27,27 @@ class TraceCursor:
         self.kinds = {}
         self.calls = []
         self.ticks = []
+        self.lifts = {}
+        self.lift_rounds = {}
+        round_numbers, first_lifts = [1, 1], [None, None]
         parents = []
         for i, event in enumerate(run.events):
             kind = event['event']
             if i % max(1, len(run) // 400) == 0 or kind == 'check':
                 self.ticks.append(dict(index=i, kind=kind))
             self.kinds.setdefault(kind, []).append(i)
+            player = event.get('player', 0)
+            if kind == 'phase' and event['phase'] == 'labels_reset':
+                round_numbers[player], first_lifts[player] = 1, None
+            elif kind == 'lift':
+                self.lifts.setdefault((player, event['vertex']), []).append(i)
+                if first_lifts[player] is None:
+                    # A labels write immediately precedes the first lift.
+                    first_lifts[player] = i - 2
+                self.lift_rounds[i] = first_lifts[player], round_numbers[player]
+            elif kind == 'round_end':
+                round_numbers[player] += 1
+                first_lifts[player] = None
             if kind == 'call':
                 self.calls.append(dict(index=i, parent=parents[-1] if parents else None,
                                        depth=len(parents), event=event))
@@ -88,6 +103,112 @@ class TraceCursor:
         indices = self.kinds.get(kind, [])
         pos = bisect_right(indices, self.index)
         return indices[pos] if pos < len(indices) else self.index
+
+    def next_lift_index(self, vertex, player=None):
+        indices = (self.lifts.get((player, vertex), []) if player is not None else
+                   sorted(self.lifts.get((0, vertex), []) + self.lifts.get((1, vertex), [])))
+        pos = bisect_right(indices, self.index)
+        return indices[pos] if pos < len(indices) else self.index
+
+    def explain_lift(self, index=None):
+        """Recompute one failed constraint against the common pre-round labels.
+
+        No explanation or per-vertex snapshot is computed during indexing.
+        Symmetric writes deliberately have their own operation semantics.
+        """
+        index = self.index if index is None else index
+        event = self.run.events[index]
+        kind = event['event']
+        if kind in ('move', 'set') or (kind == 'labels' and self.run.events[0]['algorithm'].endswith('-sym')):
+            return dict(kind='symmetric', reason='Recursive cross-update in the current subgame; provisional separator labels. '
+                        'This operation is not a next-compatible short lift. Final short lifts and verification certify bounded hosts.',
+                        subgame=list(self.subgame), operation=event)
+        if kind != 'lift':
+            return None
+        before, round_number = self.lift_rounds[index]
+        state = self.run.state(before)
+        player, vertex = event['player'], event['vertex']
+        host = state.hosts[player]
+        if host is None or not host.complete:
+            return dict(kind='unavailable', reason='Complete native host metadata unavailable in this recording; exact lift explanation unavailable.')
+        labels = {v: host.index(path, part) for v, (path, part, h) in state.raw_labels[player].items()}
+        source, destination = event['from'], event['to']
+        if labels.get(vertex) != source:
+            raise ValueError('Lift source disagrees with pre-round labels')
+        active = set(host.active)
+        game = self.run.game
+        position = host.positions[source]
+        successors = set(game.successors[vertex]) & active
+        result = dict(kind=position.part, player=player, vertex=vertex, owner=game.owner[vertex],
+                      original_priority=game.priority[vertex], priority=host.priority_map[vertex],
+                      epoch=host.epoch, round=round_number, before=before,
+                      source=dict(index=source, path=list(position.path), part=position.part, name=position.name),
+                      destination=dict(index=destination, path=event['path'], part=event['part'],
+                                       name=host.positions[destination].name),
+                      skipped=list(range(source + 1, min(destination, source + 65))),
+                      skipped_count=destination - source - 1,
+                      next=host.next_compatible_position(source, host.priority_map[vertex]),
+                      applied=[self.run.events[i]['vertex'] for i in range(before + 1, index)
+                               if self.run.events[i]['event'] == 'lift' and self.run.events[i]['player'] == player])
+        pending = []
+        for j in range(index + 1, len(self.run)):
+            e = self.run.events[j]
+            if e.get('player') != player:
+                continue
+            if e['event'] == 'round_end' or (e['event'] == 'phase' and e['phase'] == 'labels_reset'):
+                break
+            if e['event'] == 'lift':
+                pending.append(e['vertex'])
+        result['pending'] = pending
+        if position.part == 'H':
+            threshold = host.by_path[position.path].positions[2]
+            allowed = {v for v in successors if labels[v] < threshold}
+            failed = successors - allowed
+            valid = bool(allowed) if game.owner[vertex] == player else not failed
+            result.update(threshold=threshold, allowed=sorted(allowed),
+                          edges=[[vertex, w] for w in sorted(failed)], valid=valid,
+                          reason=(f'All active successors fail μ(w) < {threshold} (the after boundary).'
+                                  if game.owner[vertex] == player else
+                                  f'An opponent edge violates μ(w) < {threshold} (the after boundary).') +
+                                 ' Earlier labels outside this core are allowed.')
+        else:
+            target = {v for v in active if labels[v] < source}
+            safe = {v for v in active if labels[v] <= source}
+            reached = set(target)
+            while True:
+                added = set()
+                for v in safe - reached:
+                    outgoing = set(game.successors[v]) & active
+                    if (bool(outgoing & reached) if game.owner[v] == player else outgoing <= reached):
+                        added.add(v)
+                if not added:
+                    break
+                reached |= added
+            outside = successors - reached
+            escape = successors - safe
+            result.update(target=sorted(target), safe=sorted(safe), reached=sorted(reached),
+                          avoidance=sorted(safe - reached), valid=vertex in reached,
+                          edges=[[vertex, w] for w in sorted(outside)], escape=sorted(escape),
+                          reason=('Opponent can choose a successor outside R' +
+                                  (' (including an exit from safe A).' if escape else ', preventing forced progress to L.')
+                                  if game.owner[vertex] != player else
+                                  'No active successor can force the earlier target L through safe A.') +
+                                 ' R is the reach-through-safe attractor; opponent exits are retained.')
+            # Compare the independently recomputed sets with the native pass.
+            result['native_match'] = None
+            for j in range(before, -1, -1):
+                e = self.run.events[j]
+                if e.get('player') != player:
+                    continue
+                if e['event'] == 'round_end' or (e['event'] == 'phase' and e['phase'] == 'labels_reset'):
+                    break
+                if (e['event'] == 'attractor' and set(e.get('safe', ())) == safe
+                        and set(e['target']) == target):
+                    result['native_match'] = set(e['vertices']) == reached
+                    break
+        result['destination_reason'] = (f"Position {destination} is the first strictly later position accepting normalized priority "
+                                        f"{result['priority']}; {result['skipped_count']} incompatible position(s) skipped.")
+        return result
 
     @property
     def subgame(self):

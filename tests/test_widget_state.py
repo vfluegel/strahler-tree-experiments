@@ -184,6 +184,40 @@ def test_base_import_does_not_import_widgets():
                    check=True, env=os.environ.copy())
 
 
+def test_lazy_inspector_preserves_opponent_exit_from_safe():
+    with strahler.Game.from_text('10 2 0 10;20 0 1 10,30;30 0 0 30;') as game:
+        run = strahler.trace(game, 'lifting', kary=2)
+        metadata = next(e['host'] for e in run.events if 'host' in e)
+        events = [run.events[0], dict(event='phase', phase='host_built', host=metadata),
+                  dict(event='phase', phase='labels_reset'),
+                  dict(event='labels', vertex=10, path=[], part='H', h=2),
+                  dict(event='labels', vertex=20, path=[], part='T', h=2),
+                  dict(event='labels', vertex=30, path=[0], part='H', h=0),
+                  dict(event='labels', vertex=20, path=[0], part='H', h=0),
+                  dict(event='lift', vertex=20, path=[0], part='H', h=0, **{'from':1,'to':2})]
+        for i,e in enumerate(events[1:],1):
+            e.update(step=i, player=0)
+            e.setdefault('path', [])
+        cursor = TraceCursor(strahler.Trace(game,events,run.result))
+        cursor.seek(-1)
+        explanation = cursor.explain_lift()
+        assert explanation['safe'] == [10,20] and explanation['target'] == [10]
+        assert explanation['reached'] == [10] and not explanation['valid']
+        assert explanation['escape'] == [30] and explanation['edges'] == [[20,30]]
+
+
+def test_host_labels_do_not_cross_epoch_boundaries():
+    with strahler.Game.from_text(hk(2)) as game:
+        run = strahler.trace(game, 'lifting', search='lexicographic')
+        epochs = [i for i,e in enumerate(run.events) if 'host' in e and e['player']==0]
+        assert epochs
+        for epoch, index in enumerate(epochs, 1):
+            state = run.state(index)
+            assert state.hosts[0].epoch == epoch and not state.raw_labels[0]
+        for index in reversed(epochs):
+            assert run.state(index).hosts[0].epoch == epochs.index(index)+1
+
+
 def test_iterative_checkpoint_context():
     with strahler.Game.from_file(ROOT / 'tests/games/iter_shave.pg') as game:
         run = strahler.trace(game, 'lifting', tree_k=1, iter_shave=True)

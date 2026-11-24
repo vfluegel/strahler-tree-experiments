@@ -49,6 +49,14 @@ typedef struct {
   size_t children;
   bool valid;
   ADResult const *result;
+  /* Optional, versioned metadata on an existing phase. Borrowed like sets.
+   * Null in untraced runs and on ordinary label/lift events. */
+  ADLiftTree const *host;
+  PGGame const *priority_game;
+  size_t host_k;
+  size_t host_t;
+  size_t host_arity;
+  bool host_implicit;
 } ADTraceEvent;
 
 typedef struct {

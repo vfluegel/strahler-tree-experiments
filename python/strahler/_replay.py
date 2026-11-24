@@ -1,5 +1,7 @@
 """Replay borrowed-set and label events without using result trees as state."""
 
+from ._host import HostSnapshot
+
 
 def vertices(node, side=True):
     if node is None:
@@ -16,6 +18,8 @@ class Replay:
         self.levels = [{}, {}]
         self.shaves = []
         self.step = 0
+        self.hosts = [None, None]
+        self.host_epochs = [0, 0]
 
     def tree(self, player, root=(), domain=None, candidate=False):
         if self.labels[player] is None:
@@ -78,6 +82,15 @@ class Replay:
         player = event.get('player', 0)
         path = tuple(event.get('path', ()))
         if kind == 'phase':
+            if 'host' in event:
+                self.host_epochs[player] += 1
+                self.hosts[player] = HostSnapshot.from_metadata(
+                    event['host'], player, self.host_epochs[player])
+                # Labels of an earlier epoch cannot be interpreted in this
+                # host, even if some printed child paths happen to coincide.
+                self.labels[player], self.levels[player] = {}, {}
+            elif event['phase'] == 'host_node' and self.hosts[player] is not None:
+                self.hosts[player] = self.hosts[player].extend(path, event['h'])
             if event['phase'] == 'labels_reset':
                 self.labels[player] = {}
                 self.levels[player] = {}
@@ -91,6 +104,7 @@ class Replay:
                 self.nodes = [{}, {}]
                 self.labels = [None, None]
                 self.levels = [{}, {}]
+                self.hosts = [None, None]
         elif kind == 'set':
             self.labels[player] = None
             node = self.nodes[player].setdefault(

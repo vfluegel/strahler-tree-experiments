@@ -15,7 +15,7 @@ from nbclient import NotebookClient
 from jupyter_client import KernelManager
 from jupyter_client.kernelspec import KernelSpecManager
 
-from strahler.widgets import GameView, TreeView, _controls_html, _ascii
+from strahler.widgets import GameView, TreeView, HostView, _controls_html, _ascii
 
 EXAMPLES = Path(__file__).resolve().parents[1] / 'jupyter-examples'
 WIDGET_MIME = 'application/vnd.jupyter.widget-view+json'
@@ -39,6 +39,8 @@ def widget_html(model_id, states):
         return GameView._static_svg(SimpleNamespace(**state))
     if kind == 'tree':
         return TreeView._static_svg(SimpleNamespace(**state))
+    if kind == 'host':
+        return HostView._static_svg(SimpleNamespace(**state))
     if kind == 'controls':
         return _controls_html(state['data'])
     if state.get('_model_name') == 'OutputModel':

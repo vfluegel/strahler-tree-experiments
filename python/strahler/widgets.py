@@ -8,20 +8,22 @@ from html import escape
 import json
 from math import ceil, cos, hypot, isfinite, pi, sin, sqrt
 import re
+from textwrap import wrap
 import warnings
 from xml.etree import ElementTree as ET
 
 try:
     import anywidget
     import traitlets as t
-    from ipywidgets import VBox, HBox, Layout
+    from ipywidgets import VBox, HBox, Layout, HTML as WidgetHTML
 except ImportError as error:
     raise ImportError('Notebook views need: pip install "strahler[notebooks]"') from error
 
-from . import Node
+from . import Node, HostSnapshot
+from ._host import path_name
 from ._widget_state import TraceCursor
 
-__all__ = ['GameView', 'TreeView', 'Stepper']
+__all__ = ['GameView', 'TreeView', 'HostView', 'Stepper']
 
 # A regular, point-up pentagon with the same 40-pixel height as the square.
 _PENTAGON_RADIUS = 40 / (1 + cos(pi / 5))
@@ -60,6 +62,8 @@ _CSS = """
 .strahler pre { white-space: pre-wrap; max-height: 240px; overflow: auto; }
 .strahler .current { background: #fef08a; } .strahler .badge { padding: 6px; border-left: 5px solid #b45309; }
 .strahler .ok { border-color: #15803d; } .strahler .timeline { width: 100%; height: 36px; }
+.strahler .host-scroll { overflow-x: auto; } .strahler .host-scroll svg { max-width: none; }
+.strahler .host-note { color: #475569; } .strahler details { margin: 8px 0; }
 """
 
 _ESM = r"""
@@ -85,6 +89,7 @@ function svgElement(tag, attrs, parent) {
 function interactive(e, label, action) {
   e.setAttribute('tabindex', '0'); e.setAttribute('role', 'button');
   e.setAttribute('aria-label', label);
+  e.setAttribute('data-control',label);
   e.onclick = event => { event.stopPropagation(); action(); };
   e.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); action(); } };
 }
@@ -212,6 +217,90 @@ function tree(model, el) {
   }
   return () => painters.forEach(paint => paint());
 }
+function host(model, el) {
+  const d=model.get('data'), painters=[];
+  element('strong',d.title,el); element('p',d.summary,el); element('p',d.note,el).className='host-note';
+  if(!d.nodes.length) return ()=>{};
+  const send=(command,extra={})=>model.send({command,...extra});
+  const bar=element('div',null,el), priority=element('input',null,bar);
+  priority.type='number'; priority.min=0; priority.value=d.priority??0; priority.style.width='65px';
+  priority.setAttribute('aria-label','Teaching priority'); priority.setAttribute('data-control','Teaching priority'); priority.onchange=()=>send('priority',{priority:Number(priority.value)});
+  element('button','Next compatible position',bar).onclick=()=>send('compatible');
+  element('button','Reset teaching cursor',bar).onclick=()=>send('reset_teaching');
+  const search=element('input',null,bar);search.type='number';search.min=0;search.max=d.total-1;search.style.width='75px';
+  search.setAttribute('aria-label','Find flat position');
+  search.setAttribute('data-control','Find flat position');
+  element('button','Find position',bar).onclick=()=>send('position',{index:Number(search.value)});
+  if(d.focus.length)element('button','Show root',bar).onclick=()=>send('focus',{path:[]});
+  element('p',d.cursor_note,el);
+  const hover=(group,path,index,occupants)=>{
+    const enter=()=>{model.set('hovered_path',path);model.set('hovered_position',index);model.set('hovered',occupants);model.save_changes();};
+    const leave=()=>{model.set('hovered_path',null);model.set('hovered_position',null);model.set('hovered',[]);model.save_changes();};
+    group.onpointerover=e=>{e.stopPropagation();enter();};
+    group.onpointerout=e=>{e.stopPropagation();if(!group.contains(e.relatedTarget))leave();};
+    group.onfocus=enter;group.onblur=leave;
+  };
+  const paint=(rect,path,index,current,next,occupants)=>{
+    painters.push(()=>{
+      const hp=model.get('hovered_path'), fibre=model.get('hovered_position');
+      const hot=(model.get('hovered')||[]).some(v=>occupants.includes(v)) || (fibre!==null&&fibre!==undefined?index===fibre:
+        hp!==null&&hp!==undefined&&(index===null?JSON.stringify(hp)===JSON.stringify(path):
+          d.intervals.some(n=>JSON.stringify(n.path)===JSON.stringify(hp)&&index>=n.core[0]&&index<n.core[1])));
+      rect.setAttribute('stroke',hot?'#c026d3':current?'#dc2626':next?'#2563eb':'#64748b');
+      rect.setAttribute('stroke-width',hot||current||next?3:1);
+    });
+  };
+  const scroll=element('div',null,el); scroll.className='host-scroll';
+  const svg=svgElement('svg',{viewBox:`0 0 ${d.extent[0]} ${d.extent[1]}`,width:d.extent[0],height:d.extent[1],role:'group','aria-label':d.title},scroll);
+  for(const n of d.nodes) if(n.parent_xy)svgElement('line',{x1:n.parent_xy[0],y1:n.parent_xy[1],x2:n.box[0]+126,y2:n.box[1],stroke:'#94a3b8'},svg);
+  for(const n of d.nodes) {
+    const [x,y,w,h]=n.box, g=svgElement('g',{'data-host-path':JSON.stringify(n.path)},svg);
+    const border=svgElement('rect',{x,y,width:w,height:h,rx:6,fill:'#fff',stroke:'#64748b'},g);
+    paint(border,n.path,null,false,false,n.vertices);
+    svgElement('text',{x:x+8,y:y+18},g).textContent=n.label;
+    svgElement('text',{x:x+8,y:y+34},g).textContent=n.interval;
+    svgElement('title',{},g).textContent=n.description;
+    hover(g,n.path,null,n.vertices);
+    interactive(g,'Focus host node '+n.label,()=>send('focus',{path:n.path}));
+    for(const p of n.parts) {
+      const part=svgElement('g',{'data-host-position':p.index},g),[px,py,pw,ph]=p.box;
+      const rect=svgElement('rect',{x:px,y:py,width:pw,height:ph,fill:p.fill,stroke:'#64748b',opacity:p.compatible?1:.32,'stroke-dasharray':p.part==='S'?'4 3':'none',class:'host-part-'+p.part},part);
+      svgElement('text',{x:px+5,y:py+16},part).textContent=p.label;
+      svgElement('text',{x:px+5,y:py+31},part).textContent=p.caption;
+      svgElement('title',{},part).textContent=p.description;
+      hover(part,n.path,p.index,p.occupants);
+      interactive(part,'Inspect '+p.label,()=>send('part',{index:p.index}));
+      paint(rect,n.path,p.index,p.current,p.next,p.occupants);
+    }
+    if(n.collapsed)svgElement('text',{x:x+8,y:y+98},g).textContent=n.collapsed;
+  }
+  element('strong','Flattened host (lifting order)',el);
+  const flatScroll=element('div',null,el);flatScroll.className='host-scroll';
+  const flat=svgElement('svg',{viewBox:`0 0 ${d.flat_extent[0]} ${d.flat_extent[1]}`,width:d.flat_extent[0],height:d.flat_extent[1],role:'group','aria-label':'Flattened host (lifting order)'},flatScroll);
+  for(const p of d.strip) {
+    const g=svgElement('g',{'data-flat-position':p.index},flat),[x,y,w,h]=p.box;
+    const r=svgElement('rect',{x,y,width:w,height:h,fill:p.fill,opacity:p.compatible?1:.32,stroke:'#64748b','stroke-dasharray':p.part==='S'?'4 3':'none'},g);
+    svgElement('text',{x:x+5,y:y+17},g).textContent=p.index+' '+p.name;
+    svgElement('text',{x:x+5,y:y+34},g).textContent=p.status;
+    svgElement('title',{},g).textContent=p.description;
+    hover(g,p.path,p.index,p.occupants); interactive(g,'Inspect position '+p.index+' '+p.name,()=>send('part',{index:p.index}));
+    paint(r,p.path,p.index,p.current,p.next,p.occupants);
+  }
+  for(const interval of d.brackets) {
+    svgElement('path',{d:interval.d,fill:'none',stroke:interval.side?'#c2410c':'#475569','stroke-dasharray':interval.side?'4 3':'none'},flat);
+    svgElement('text',{x:interval.x,y:interval.y},flat).textContent=interval.label;
+  }
+  element('p',d.window_note,el);
+  if(d.part) {
+    element('p',d.part.description,el);
+    for(const id of d.part.occupants)element('button','Select vertex '+id,el).onclick=()=>send('vertex',{vertex:id});
+  }
+  const focal=d.nodes.find(n=>n.parts.some(p=>p.current)) || d.nodes[0];
+  scroll.scrollLeft=Math.max(0,focal.box[0]+126-(scroll.clientWidth||600)/2);
+  const slot=d.strip.findIndex(p=>p.index===d.focus_index);
+  flatScroll.scrollLeft=Math.max(0,8+Math.max(0,slot)*106-(flatScroll.clientWidth||600)/2+53);
+  return ()=>painters.forEach(p=>p());
+}
 function controls(model, el) {
   const d = model.get('data');
   const send = (command, extra={}) => model.send({command,...extra});
@@ -223,9 +312,10 @@ function controls(model, el) {
   kinds.value = model.get('next_kind');
   kinds.onchange = () => { model.set('next_kind', kinds.value); model.save_changes(); };
   element('button','Next event of kind',el).onclick = () => send('next',{kind:kinds.value});
-  for (const kind of ['call','return','check']) if(d.kinds.includes(kind)) {
-    element('button','Next '+kind,el).onclick=()=>send('next',{kind});
+  for (const kind of ['call','return','check','lift','round_end']) if(d.kinds.includes(kind)) {
+    element('button',kind==='round_end'?'Next round':'Next '+kind,el).onclick=()=>send('next',{kind});
   }
+  if(d.kinds.includes('lift')) element('button','Next lift for selected vertex',el).onclick=()=>send('next_selected');
   const slider = element('input',null,el); slider.type='range'; slider.min=0; slider.max=d.length-1; slider.value=d.index;
   slider.style.width='100%'; slider.setAttribute('aria-label','Trace position');
   slider.onchange=()=>send('seek',{index:Number(slider.value)});
@@ -240,6 +330,18 @@ function controls(model, el) {
   }
   svgElement('line',{x1:1000*d.index/Math.max(1,d.length-1),x2:1000*d.index/Math.max(1,d.length-1),y1:0,y2:32,stroke:'#dc2626','stroke-width':3},timeline);
   element('strong',`${d.index} / ${d.length-1}: ${d.event.event}`,el);
+  if(d.inspector) {
+    const i=d.inspector, box=element('div',null,el);
+    element('strong','Lift inspector — pre-round state',box);
+    if(i.vertex!==undefined) element('p',`${i.player===0?'Even':'Odd'} · vertex ${i.vertex} · owner ${i.owner===0?'Even':'Odd'} · priority ${i.original_priority} (normalized ${i.priority}) · host epoch ${i.epoch} · round ${i.round}`,box);
+    if(i.source) element('p',`${i.source.index} ${i.source.name} → ${i.destination.index} ${i.destination.name}`,box);
+    element('p','Why move? '+i.reason,box);
+    if(i.edges?.length) element('p','Blocking edges: '+i.edges.map(([a,b])=>`${a} → ${b}`).join(', '),box);
+    if(i.destination_reason) element('p','Why there? '+i.destination_reason,box);
+    if(i.target) element('p',`L={${i.target}}; A={${i.safe}}; R={${i.reached}}. Lifted vertex is outside R.`,box);
+    if(i.applied) element('p',`Already moved: {${i.applied}}. Showing: ${i.vertex}. Pending invalid vertices: {${i.pending}}. All checks use pre-round step ${i.before}.`,box);
+    if(i.avoidance) {const detail=element('details',null,box);element('summary','Avoidance obstruction',detail);element('p',`A \\ R={${i.avoidance}}. Opponent can retain a successor outside R; a player-owned vertex has no successor in R. Exits from A also prevent safe progress.`,detail);}
+  }
   element('pre',JSON.stringify(d.event,null,2),el);
   element('strong','Call stack',el);
   element('pre',d.stack.join('\n') || '(outside recursive calls)',el);
@@ -263,12 +365,12 @@ export default { render({model,el}) {
     const active=focused?focused.getAttribute(attribute):null;
     el.replaceChildren();
     const kind=model.get('kind');
-    if(kind==='game')paint=game(model,el);else if(kind==='tree')paint=tree(model,el);else { controls(model,el); paint=()=>{}; }
+    if(kind==='game')paint=game(model,el);else if(kind==='tree')paint=tree(model,el);else if(kind==='host')paint=host(model,el);else { controls(model,el); paint=()=>{}; }
     paint();
     if(active!==null){const node=Array.from(el.querySelectorAll(`[${attribute}]`)).find(e=>e.getAttribute(attribute)===active);if(node)node.focus();}
   };
   const fields=model.get('kind')==='tree'?['data','mode','edges','outlines']:['data','outlines'];
-  const paintFields=['hovered','hovered_path','selected'];
+  const paintFields=['hovered','hovered_path','hovered_position','selected'];
   // Game legends also change when highlight layers change.
   const highlights=()=>{if(model.get('kind')==='game')draw();else paint();};
   const repaint=()=>paint();
@@ -450,6 +552,7 @@ class _View(anywidget.AnyWidget):
     mode = t.Enum(['squares', 'tree', 'boxes'], default_value='squares').tag(sync=True)
     edges = t.Bool(True).tag(sync=True)
     hovered_path = t.Any(allow_none=True).tag(sync=True)
+    hovered_position = t.Any(allow_none=True).tag(sync=True)
     owner_styles = t.Dict(_OWNER_STYLES).tag(sync=True)
     next_kind = t.Unicode('call').tag(sync=True)
 
@@ -469,9 +572,9 @@ class _View(anywidget.AnyWidget):
         if bundle is None:
             return None
         data = bundle[0] if isinstance(bundle, tuple) else bundle
-        if self.kind in ('game', 'tree'):
+        if self.kind in ('game', 'tree', 'host'):
             data.update({'image/svg+xml': self._static_svg(),
-                         'text/plain': 'Parity game' if self.kind == 'game' else 'Ordered tree'})
+                         'text/plain': {'game': 'Parity game', 'tree': 'Ordered tree', 'host': 'AD search host'}[self.kind]})
         return bundle
 
 
@@ -692,6 +795,313 @@ class TreeView(_View):
                 _svg(svg, 'text', dict(x=5, y=self.data['extent']['squares'][1]-8), 'Square: Even · Pentagon: Odd')
         return _ascii(ET.tostring(svg, encoding='unicode'))
 
+class HostView(_View):
+    """Underlying host groups and a linked, windowed native position order.
+
+    Pass State.hosts[player], or a native genstree document with root_bound.
+    ``labels`` maps external vertex IDs to (path, part, bound). ``selected``
+    is a vertex ID, shared with GameView. Teaching traversal never edits labels.
+    Collapsed subtrees retain exact metrics and intervals; click to focus.
+    """
+
+    def __init__(self, host=None, game_view=None, *, labels=None, player=0,
+                 root_bound=None, max_nodes=24, strip_window=24, **kwargs):
+        if max_nodes < 2 or strip_window < 3:
+            raise ValueError('Host windows must contain at least 2 nodes and 3 positions')
+        self.game_view, self._links = game_view, []
+        self.player = player
+        self.max_nodes, self.strip_window = max_nodes, strip_window
+        self.host = (host if host is None or isinstance(host, HostSnapshot) else
+                     HostSnapshot.from_tree(host, player=player, root_bound=root_bound))
+        self.labels = dict(labels or {})
+        _check_vertex_ids(self.labels)
+        self.occupancy_known = labels is not None
+        self.focus = ()
+        self.part_index = None
+        self.teaching_priority = None
+        self.teaching_position = None
+        super().__init__(kind='host', **kwargs)
+        self.on_msg(self._message)
+        self.observe(self._refresh, names='selected')
+        if game_view is not None:
+            self._links.append(t.link((game_view, 'selected'), (self, 'selected')))
+            self._links.append(t.link((game_view, 'hovered'), (self, 'hovered')))
+        self._refresh()
+
+    def update(self, host, labels):
+        if self.host is None or host is None or (self.host.player, self.host.epoch) != (host.player, host.epoch):
+            self.focus, self.part_index = (), None
+            self.teaching_position = None
+        self.host, self.labels = host, dict(labels)
+        _check_vertex_ids(self.labels)
+        self.occupancy_known = True
+        self._refresh()
+
+    def _refresh(self, change=None):
+        host = self.host
+        title = ('Even', 'Odd')[host.player if host is not None else self.player] + ' — Underlying host + associated positions (available search space)'
+        if host is None:
+            self.data = dict(title=title,
+                             summary='Complete host unavailable', nodes=[],
+                             note='This recording has no complete-host metadata. The current AD candidate shows occupied labels only; unused branches and native indices are unavailable.')
+            return
+        label = self.labels.get(self.selected)
+        actual = host.index(*label[:2]) if label is not None and tuple(label[0]) in host.by_path else None
+        priority = self.teaching_priority
+        if priority is None:
+            priority = host.priority_map.get(self.selected)
+        cursor = self.teaching_position if self.teaching_position is not None else actual
+        next_position = host.next_compatible_position(cursor, priority) if cursor is not None and priority is not None else None
+        occupants = {}
+        for v, (path, part, h) in self.labels.items():
+            if tuple(path) in host.by_path:
+                occupants.setdefault(host.index(path, part), []).append(v)
+        children = host.children
+        focus = self.focus if self.focus in host.by_path else ()
+        shown, collapsed = [], set()
+
+        def choose(path, allowance):
+            shown.append(path)
+            descendants = children[path]
+            if len(descendants) >= allowance:
+                if descendants:
+                    collapsed.add(path)
+                return
+            remaining = allowance - 1
+            for i, child in enumerate(descendants):
+                budget = max(1, remaining // (len(descendants) - i))
+                choose(child, budget)
+                remaining -= budget
+
+        choose(focus, self.max_nodes)
+        # Geometry counts only visible nodes; collapsed nodes summarize their
+        # entire subtree, retaining exact native intervals and Strahler values.
+        shown_set, coordinates = set(shown), {}
+        leaf = 0
+
+        def place(path, depth):
+            nonlocal leaf
+            descendants = [p for p in children[path] if p in shown_set]
+            if descendants:
+                x = sum(place(p, depth + 1) for p in descendants) / len(descendants)
+            else:
+                x = 10 + leaf * 270
+                leaf += 1
+            coordinates[path] = x, 8 + depth * 140
+            return x
+
+        place(focus, 0)
+
+        def part_data(position):
+            p = position
+            ids = sorted(occupants.get(p.index, ()))
+            disabled = p.part == 'T' and p.h == 0
+            compatible = not disabled and (priority is None or p.accepts(priority))
+            status = ('disabled' if disabled else 'current' if p.index == actual else
+                      'teaching cursor' if p.index == self.teaching_position else 'next' if p.index == next_position else f'{len(ids)} vertices')
+            accepts = ('all priorities' if p.name == 'TOP' else f'p = {p.h}' if p.part == 'H' else
+                       'no nonnegative priority' if disabled else f'p ≤ {p.h + (1 if p.part == "S" else -1)}')
+            description = f'{p.index} {p.name}: {accepts}; ' + (f'occupants {ids}.' if self.occupancy_known else 'occupancy unknown.')
+            if p.part == 'S':
+                description += ' Outside its own core.'
+            if p.name == 'TOP':
+                description += ' Unresolved for this player; excluded from the certified AD. TOP is always valid, not a winning certificate.'
+            return dict(index=p.index, path=list(p.path), part=p.part, name=p.name,
+                        label=p.name, caption='disabled' if disabled else f'{len(ids)} ' + ('vertex' if len(ids) == 1 else 'vertices') if self.occupancy_known else 'unknown',
+                        occupants=ids, compatible=compatible, current=p.index == actual,
+                        next=p.index == next_position, fill='#e2e8f0' if disabled else _PART_COLOURS[p.part],
+                        status=status if self.occupancy_known or disabled else 'unknown', description=description)
+
+        nodes = []
+        for path in shown:
+            n = host.by_path[path]
+            x, y = coordinates[path]
+            parts = []
+            for i, position in enumerate(n.positions):
+                part = part_data(host.positions[position])
+                part['box'] = [x + 5 + i * 81, y + 43, 81, 40]
+                parts.append(part)
+            parent_xy = None
+            if path != focus:
+                px, py = coordinates[path[:-1]]
+                parent_xy = [px + 126, py + 108]
+            a, b = n.core
+            collapsed_label = (f'Expand: {n.nodes} nodes, {n.leaves} leaves; [{a},{b + 1})' if path in collapsed else '')
+            vertices = sorted(v for index, ids in occupants.items() if a <= index < b for v in ids)
+            nodes.append(dict(path=list(path), box=[x, y, 252, 108], parent_xy=parent_xy, parts=parts,
+                              core=list(n.core), vertices=vertices, collapsed=collapsed_label,
+                              label=f'{path_name(path)} · bound {n.h} · Str={n.strahler}',
+                              interval=f'core [{a},{b}) · core + S [{a},{b + 1})',
+                              description=f'One underlying node; H/T/S are associated positions. S lies outside its core. Subtree: {n.nodes} nodes, {n.leaves} leaves, Strahler {n.strahler}.'))
+        center = self.part_index if self.part_index is not None else cursor if cursor is not None else 0
+        start = max(0, min(center - self.strip_window // 2, len(host.positions) - self.strip_window))
+        end = min(len(host.positions), start + self.strip_window)
+        strip = []
+        for i, p in enumerate(host.positions[start:end]):
+            part = part_data(p)
+            part['box'] = [8 + i * 106, 8, 102, 48]
+            strip.append(part)
+        # Brackets are clipped to the window, their labels retain exact bounds.
+        bracket_nodes = [host.nodes[0]]
+        if len(host.nodes) <= 6:
+            bracket_nodes = list(host.nodes)
+        elif center < len(host.positions):
+            path = host.positions[center].path
+            if path:
+                bracket_nodes.append(host.by_path[path])
+        brackets = []
+        for row, n in enumerate(bracket_nodes):
+            for side in (False, True):
+                a, b = n.core
+                b += side
+                if a >= end or b <= start:
+                    continue
+                x, right = 8 + max(0, a-start)*106, 8 + min(end-start, b-start)*106 - 4
+                y = 68 + row*42 + int(side)*18
+                brackets.append(dict(d=f'M {x} {y-4} V {y} H {right} V {y-4}', x=x, y=y+13,
+                                     side=side, label=f'{path_name(n.path)} core' + (' + S' if side else '') + f' [{a},{b})'))
+        m = host.metrics
+        prefix = '' if host.complete else 'Allocated prefix only: '
+        summary = prefix + f"{m['nodes']} underlying nodes; {m['leaves']} leaves; height = {m['height']}; Strahler = {m['strahler']}; {m['positions']} allocated label positions."
+        if host.parameters:
+            summary += ' Requested parameters: ' + ', '.join(f'{k}={v}' for k, v in host.parameters) + '.'
+        note = ('Groups count underlying nodes, not core boundaries. H is regular; T precedes children; dashed S is outside its core. Root S = TOP. '
+                'Red: actual label. Blue: next compatible position. Grey: incompatible or disabled. Core intervals describe raw labels, not automatically traps or dominions.')
+        if not host.complete:
+            note += ' Implicit remainder unallocated: displayed indices/metrics refer only to this known prefix. Global next positions are unavailable.'
+        if not self.occupancy_known:
+            note += ' Occupancy was not recorded in this host-only view; unknown counts do not mean empty fibres.'
+        cursor_note = f'Host epoch {host.epoch}. '
+        cursor_note += (f'Selected vertex {self.selected}: actual position {actual}; normalized priority {host.priority_map.get(self.selected)}. ' if actual is not None else 'Select a game vertex to follow its actual label. ')
+        cursor_note += f'Teaching cursor: {cursor}; priority {priority}; next {next_position}. Teaching controls do not change replay state.'
+        self.data = dict(title=title,
+                         summary=summary, note=note, cursor_note=cursor_note, nodes=nodes, strip=strip,
+                         extent=[max(280, leaf*270), max(n['box'][1] for n in nodes)+118],
+                         flat_extent=[max(300, len(strip)*106+16), 80 + 42*len(bracket_nodes)], brackets=brackets,
+                         intervals=[dict(path=list(path), core=list(host.by_path[path].core))
+                                    for path in sorted(shown_set | {host.positions[center].path})],
+                         total=len(host.positions), priority=priority, focus=list(focus), focus_index=center,
+                         window_note=f'Positions [{start},{end}) of {len(host.positions)}. Use Find position to inspect a different window.',
+                         part=part_data(host.positions[self.part_index]) if self.part_index is not None else None)
+
+    def _message(self, widget, content, buffers):
+        if self.host is None:
+            return
+        command = content.get('command')
+        if command == 'priority':
+            priority = content['priority']
+            if not isinstance(priority, int) or priority < 0:
+                return
+            self.teaching_priority, self.teaching_position = priority, None
+        elif command == 'compatible':
+            priority = self.data['priority'] if self.data['priority'] is not None else 0
+            label = self.labels.get(self.selected)
+            actual = self.host.index(*label[:2]) if label else -1
+            cursor = self.teaching_position if self.teaching_position is not None else actual
+            destination = self.host.next_compatible_position(cursor, priority)
+            if destination is not None:
+                self.teaching_position = destination
+        elif command == 'reset_teaching':
+            self.teaching_position, self.teaching_priority = None, None
+        elif command in ('part', 'position'):
+            i = content['index']
+            if not isinstance(i, int) or not 0 <= i < len(self.host.positions):
+                return
+            self.part_index = i
+            if command == 'position':
+                self.focus = self.host.positions[i].path
+        elif command == 'focus':
+            path = tuple(content['path'])
+            if path in self.host.by_path:
+                self.focus = path
+        elif command == 'vertex' and content['vertex'] in self.labels:
+            self.selected = content['vertex']
+        self._refresh()
+
+    def close(self):
+        for link in getattr(self, '_links', []):
+            link.unlink()
+        self._links = []
+        super().close()
+
+    def _static_svg(self):
+        d = self.data
+        if not d['nodes']:
+            svg = _svg_root(720, 100, d['title'])
+            _svg(svg, 'text', dict(x=8, y=24), d['summary'])
+            _svg(svg, 'text', dict(x=8, y=48), 'Occupied candidate only; unused host branches unavailable.')
+            return _ascii(ET.tostring(svg, encoding='unicode'))
+        # Same Python geometry and text as live JS; SVG has no external assets.
+        width = max(800, d['extent'][0], d['flat_extent'][0])
+        lines = [line for text in (d['title'], d['summary'], d['note'], d['cursor_note'])
+                 for line in wrap(text, max(30, int(width / 7)))]
+        header = 20 + 17 * len(lines)
+        height = header + d['extent'][1] + d['flat_extent'][1] + 85
+        svg = _svg_root(width, height, d['title'])
+        for i, text in enumerate(lines):
+            _svg(svg, 'text', dict(x=8, y=20 + i*17), text)
+        grouped = _svg(svg, 'g', dict(transform=f'translate(0 {header})'))
+        for n in d['nodes']:
+            if n['parent_xy']:
+                x, y = n['parent_xy']
+                _svg(grouped, 'line', dict(x1=x, y1=y, x2=n['box'][0]+126, y2=n['box'][1], stroke='#94a3b8'))
+        for n in d['nodes']:
+            x, y, w, h = n['box']
+            group = _svg(grouped, 'g', {'data-host-path': json.dumps(n['path'], separators=(',', ':'))})
+            hot = _host_hovered(self, n['path'], None, n['vertices'])
+            _svg(group, 'rect', dict(x=x, y=y, width=w, height=h, rx=6, fill='#fff',
+                                    stroke='#c026d3' if hot else '#64748b', **{'stroke-width': 3 if hot else 1}))
+            _svg(group, 'text', dict(x=x+8, y=y+18), n['label'])
+            _svg(group, 'text', dict(x=x+8, y=y+34), n['interval'])
+            _svg(group, 'title', text=n['description'])
+            for p in n['parts']:
+                _host_svg_part(group, p, 'data-host-position', self)
+            if n['collapsed']:
+                _svg(group, 'text', dict(x=x+8, y=y+98), n['collapsed'])
+        offset = header + d['extent'][1] + 24
+        _svg(svg, 'text', dict(x=8, y=offset), 'Flattened host (lifting order)')
+        flat = _svg(svg, 'g', dict(transform=f'translate(0 {offset+8})'))
+        for p in d['strip']:
+            _host_svg_part(flat, p, 'data-flat-position', self)
+        for b in d['brackets']:
+            _svg(flat, 'path', dict(d=b['d'], fill='none', stroke='#c2410c' if b['side'] else '#475569',
+                                  **{'stroke-dasharray': '4 3' if b['side'] else 'none'}))
+            _svg(flat, 'text', dict(x=b['x'], y=b['y']), b['label'])
+        _svg(svg, 'text', dict(x=8, y=height-24), 'Dashed S: outside own core. TOP: unresolved. Strahler counts underlying branching only.')
+        _svg(svg, 'text', dict(x=8, y=height-8), d['window_note'])
+        return _ascii(ET.tostring(svg, encoding='unicode'))
+
+
+def _host_hovered(view, path, index, vertices):
+    if set(view.hovered) & set(vertices):
+        return True
+    fibre = getattr(view, 'hovered_position', None)
+    if fibre is not None:
+        return fibre == index
+    if view.hovered_path is None:
+        return False
+    if index is None:
+        return view.hovered_path == path
+    return any(n['path'] == view.hovered_path and n['core'][0] <= index < n['core'][1]
+               for n in view.data['intervals'])
+
+
+def _host_svg_part(parent, p, attribute, view):
+    group = _svg(parent, 'g', {attribute: p['index']})
+    x, y, w, h = p['box']
+    hot = _host_hovered(view, p['path'], p['index'], p['occupants'])
+    _svg(group, 'rect', dict(x=x, y=y, width=w, height=h, fill=p['fill'],
+                           opacity=1 if p['compatible'] else .32,
+                           stroke='#c026d3' if hot else '#dc2626' if p['current'] else '#2563eb' if p['next'] else '#64748b',
+                           **{'stroke-width': 3 if hot or p['current'] or p['next'] else 1,
+                              'stroke-dasharray': '4 3' if p['part'] == 'S' else 'none'}))
+    strip = attribute == 'data-flat-position'
+    _svg(group, 'text', dict(x=x+5, y=y+(17 if strip else 16)),
+         f"{p['index']} {p['name']}" if strip else p['label'])
+    _svg(group, 'text', dict(x=x+5, y=y+(34 if strip else 31)), p['status'] if strip else p['caption'])
+    _svg(group, 'title', text=p['description'])
+
+
 _PLAIN = [
     'McNZEven(G, h, ε, ω)  [McNZOdd exchanges players]',
     'If G is empty, return ∅ (paper base: h=0 before priority normalization)',
@@ -730,7 +1140,7 @@ _MEMORY = [
 _LIFTING = [
     'Build the Strahler host for each player',
     'Initialize the least priority-compatible H/T/S labels',
-    'Short-lift an unstable vertex to its next valid label',
+    'Check one common round-start labelling; move invalid vertices to the next compatible position',
     'End the round; repeat until labels stabilize',
     'Adaptive host: raise t and repeat if needed',
     'Iterative shaving: attract certified winners; restart on the remaining game (after preprocessing and earlier shaving rounds)',
@@ -742,6 +1152,23 @@ def _controls_html(data):
     def paragraph(text):
         return '<p>' + escape(text) + '</p>'
     html = paragraph(f"{data['index']} / {data['length']-1}: {data['event']['event']}")
+    inspector = data.get('inspector')
+    if inspector:
+        html += paragraph('Lift inspector — pre-round state')
+        if 'vertex' in inspector:
+            i = inspector
+            html += paragraph(f"{'Even' if i['player'] == 0 else 'Odd'} · vertex {i['vertex']} · owner {i['owner']} · "
+                              f"priority {i['original_priority']} (normalized {i['priority']}) · host epoch {i['epoch']} · round {i['round']}")
+            html += paragraph(f"{i['source']['index']} {i['source']['name']} → {i['destination']['index']} {i['destination']['name']}")
+        html += paragraph('Why move? ' + inspector['reason'])
+        if inspector.get('edges'):
+            html += paragraph('Blocking edges: ' + ', '.join(f'{a} → {b}' for a,b in inspector['edges']))
+        if 'destination_reason' in inspector:
+            html += paragraph('Why there? ' + inspector['destination_reason'])
+        if 'target' in inspector:
+            html += paragraph(f"L={inspector['target']}; A={inspector['safe']}; R={inspector['reached']}; avoidance A \\ R={inspector['avoidance']}.")
+        if 'applied' in inspector:
+            html += paragraph(f"Already moved: {inspector['applied']}. Showing: {inspector['vertex']}. Pending invalid vertices: {inspector['pending']}. All checks use pre-round step {inspector['before']}.")
     for badge in data['badges']:
         claim = badge['claim']
         player = 'Even' if badge['player'] == 0 else 'Odd'
@@ -771,17 +1198,36 @@ class Stepper(VBox):
         self.cursor = TraceCursor(run, checkpoint_interval)
         self.game_view = GameView(run.game, coordinates)
         self.tree_views = tuple(TreeView(game_view=self.game_view) for _ in range(2))
+        self.host_views = (tuple(HostView(game_view=self.game_view, player=p) for p in range(2))
+                           if run.events[0]['algorithm'] != 'zielonka' else ())
         self.controls = _View(kind='controls')
         self.controls.next_kind = 'call' if 'call' in self.cursor.kinds else 'lift'
         self.controls.on_msg(self._message)
-        super().__init__(children=[self.controls, self.game_view, HBox(self.tree_views,
-                         layout=Layout(overflow='auto'))], **kwargs)
+        self.game_view.observe(self._select_vertex, names='selected')
+        candidates = [VBox([WidgetHTML(value=f'<strong>{name}: Current AD candidate / verified AD certificate</strong>'), view])
+                      for name, view in zip(('Even', 'Odd'), self.tree_views)]
+        panels = [self.controls, self.game_view, *self.host_views,
+                  WidgetHTML(value='<p>Candidate paths may be pruned and renumbered. Links use vertex occupants; host and candidate paths are not equated. Core/trap conditions are relative to the current arena.</p>'),
+                  HBox(candidates, layout=Layout(overflow='auto'))]
+        super().__init__(children=panels, **kwargs)
         self.seek(0)
+
+    def _select_vertex(self, change):
+        """Map by occupants, since materialization may renumber child paths."""
+        for view in self.tree_views:
+            def locate(node):
+                if node is None:
+                    return None
+                if any(change['new'] in node[p] for p in 'HTS'):
+                    return node['path']
+                return next((path for c in node['children'] if (path := locate(c)) is not None), None)
+            view.selected = locate(view.data)
 
     def _repr_mimebundle_(self, **kwargs):
         bundle = super()._repr_mimebundle_(**kwargs)
         bundle['text/plain'] = f"Step {self.index}: {self.state.event['event']}"
         bundle['text/html'] = (_controls_html(self.controls.data) + self.game_view._static_svg() +
+                               ''.join(view._static_svg() for view in self.host_views) +
                                ''.join(view._static_svg() for view in self.tree_views))
         return bundle
 
@@ -791,6 +1237,8 @@ class Stepper(VBox):
 
     def seek(self, index):
         self.state = self.cursor.seek(index)
+        for player, host_view in enumerate(self.host_views):
+            host_view.update(self.state.hosts[player], self.state.raw_labels[player])
         self.badges = [self.cursor.badge(p) for p in range(2)]
         self.game_view.outlines = []
         backend = self.run.events[0]['algorithm']
@@ -804,6 +1252,7 @@ class Stepper(VBox):
             verdict = self.cursor.verify(player)
             self.game_view.show_check(verdict, player)
             view.show_check(verdict, player, self.cursor.candidate_path(player))
+        self._select_vertex(dict(new=self.game_view.selected))
         self.game_view.highlights = []
         self.game_view.highlight(self.cursor.subgame, '#dbeafe', 'current subgame')
         colours = {'G_i': '#dbeafe', 'A_i': '#bbf7d0', 'H_i': '#fef08a', "U′_i": '#fed7aa', 'side attractor': '#e9d5ff'}
@@ -821,6 +1270,20 @@ class Stepper(VBox):
             frames.append(f"{procedure}{player}(G={event['subgame']}, h={event['h']}, ε={event['paths'][0]}, ω={event['paths'][1]})")
         event = self.state.event
         kind = event['event']
+        inspector = self.cursor.explain_lift()
+        if inspector and 'source' in inspector:
+            if 'target' in inspector:
+                for name, field, colour in [('safe A', 'safe', '#dcfce7'), ('earlier target L', 'target', '#fef08a'),
+                                             ('reached R', 'reached', '#bfdbfe'), ('avoidance A minus R', 'avoidance', '#ffedd5')]:
+                    self.game_view.highlight(inspector[field], colour, name)
+            self.game_view.outlines += [dict(player=inspector['player'], name='Failed lift constraint', colour='#dc2626',
+                violations=[dict(path=[], vertex=inspector['vertex'], edge=edge, condition='LIFT') for edge in inspector['edges']])]
+        else:
+            player = event.get('player', 0)
+            if self.state.hosts[player] is not None:
+                for part in 'HTS':
+                    self.game_view.highlight([v for v, label in self.state.raw_labels[player].items() if label[1] == part],
+                                             _PART_COLOURS[part], f'{("Even", "Odd")[player]} {part} positions')
         code = _MEMORY if memory else _PLAIN
         if backend == 'lifting-sym':
             code = list(_MEMORY)
@@ -853,7 +1316,7 @@ class Stepper(VBox):
             note += ' Entry correction: allow the higher player’s S fibre (root S = TOP), and remove the escaping attractor before recursion; see docs/symmetric.md.'
         self.controls.data = dict(index=self.index, length=len(self.run), event=event,
                                   stack=frames, badges=self.badges, kinds=list(self.cursor.kinds),
-                                  pseudocode=code, line=line, ticks=self.cursor.ticks, note=note)
+                                  pseudocode=code, line=line, ticks=self.cursor.ticks, note=note, inspector=inspector)
         return self.state
 
     def step(self):
@@ -868,6 +1331,15 @@ class Stepper(VBox):
     def end(self):
         return self.seek(len(self.run) - 1)
 
+    def next_lift(self, vertex=None, player=None):
+        """Jump using the pre-indexed lifts for an external vertex ID/player."""
+        if vertex is None:
+            return self.next('lift')
+        return self.seek(self.cursor.next_lift_index(vertex, player))
+
+    def next_round(self):
+        return self.next('round_end')
+
     def verify(self, player):
         return self.cursor.verify(player)
 
@@ -877,6 +1349,8 @@ class Stepper(VBox):
             self.seek(content['index'])
         elif command == 'next':
             self.next(content['kind'])
+        elif command == 'next_selected' and self.game_view.selected is not None:
+            self.next_lift(self.game_view.selected)
         elif command in ('step', 'back', 'end'):
             getattr(self, command)()
 

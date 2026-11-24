@@ -16,8 +16,9 @@ import weakref
 from . import _native
 from ._native import InputError, StrahlerError
 from ._replay import Replay
+from ._host import HostSnapshot
 
-__all__ = ['Game', 'Node', 'Result', 'Trace', 'State', 'CheckResult', 'Violation', 'Condition',
+__all__ = ['Game', 'Node', 'Result', 'Trace', 'State', 'HostSnapshot', 'CheckResult', 'Violation', 'Condition',
            'StrahlerError', 'InputError', 'decompose', 'trace', 'check',
            'progress_measures', 'genstree', 'pms_tree', 'materialize_partial',
            'version']
@@ -249,6 +250,8 @@ class State:
         self.trees = tuple(Node.from_dict(replay.materialized(p) if event['event'] == 'result'
                                          else replay.tree(p)) for p in range(2))
         self.shaves = deepcopy(replay.shaves)
+        self.hosts = tuple(replay.hosts)
+        self.raw_labels = tuple(dict(labels or {}) for labels in self._replay.labels)
 
     def candidate(self, player, path=(), subgame=None):
         """Materialize a check candidate, preserving empty label-based roots."""

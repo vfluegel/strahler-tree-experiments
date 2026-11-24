@@ -38,6 +38,59 @@ def test_inline_esm_syntax(tmp_path):
     subprocess.run([node, '--check', str(source)], check=True, capture_output=True, text=True)
 
 
+def test_host_geometry_and_text_match_static_svg(tmp_path):
+    node = shutil.which('node')
+    if not node:
+        if os.environ.get('CI'):
+            pytest.fail('Node is required in CI')
+        pytest.skip('node is not installed')
+    import strahler
+    from strahler.widgets import HostView
+    view = HostView(strahler.HostSnapshot.from_tree(strahler.genstree(2, 2, 1)), labels={
+        10: ((), 'T', 2), 20: ((0,), 'H', 0)}, selected=10)
+    view.hovered_path = [0]
+    source = tmp_path / 'widgets.mjs'
+    source.write_text(frontend(), encoding='utf-8')
+    fields = ('kind', 'data', 'hovered', 'hovered_path', 'hovered_position', 'selected')
+    state = {field:getattr(view, field) for field in fields}
+    runner = tmp_path / 'host.mjs'
+    runner.write_text('''
+import renderer from './widgets.mjs';
+class Element {
+ constructor(tag){this.tag=tag;this.attrs={};this.children=[];this.style={};this.classList={add(){}};}
+ setAttribute(k,v){this.attrs[k]=String(v);} append(e){this.children.push(e);}
+ replaceChildren(){this.children=[];} contains(){return false;}
+ set textContent(t){this.text=String(t);} get textContent(){return this.text??'';}
+}
+globalThis.document={createElement:tag=>new Element(tag),createElementNS:(_,tag)=>new Element(tag)};
+const state=JSON.parse(process.argv[2]),el=new Element('div'),out=[];
+renderer.render({model:{model_id:'host',get:k=>state[k],on(){}},el});
+function visit(e){
+ const key=e.attrs['data-host-position']!==undefined?'data-host-position':'data-flat-position';
+ if(e.attrs[key]!==undefined)out.push([key,e.attrs[key],e.children.filter(c=>['rect','text'].includes(c.tag)).map(c=>[c.tag,c.attrs,c.textContent])]);
+ e.children.forEach(visit);
+}
+visit(el);console.log(JSON.stringify(out));
+''', encoding='utf-8')
+    result = subprocess.run([node, str(runner), json.dumps(state)], check=True, capture_output=True, text=True)
+    actual = json.loads(result.stdout)
+    expected = []
+    for group in ET.fromstring(view._static_svg()).iter():
+        key = next((k for k in ('data-host-position', 'data-flat-position') if k in group.attrib), None)
+        if key:
+            expected.append([key, group.get(key), [[e.tag.split('}')[-1], e.attrib, ''.join(e.itertext())]
+                            for e in group if e.tag.split('}')[-1] in ('rect','text')]])
+    for a,b in zip(expected,actual,strict=True):
+        assert a[:2] == b[:2]
+        for left,right in zip(a[2],b[2],strict=True):
+            assert left[0] == right[0] and left[2] == right[2]
+            for key in ('x','y','width','height','opacity','stroke-width'):
+                if key in left[1]:
+                    assert float(left[1][key]) == pytest.approx(float(right[1][key]))
+            for key in ('fill','stroke','stroke-dasharray'):
+                assert left[1].get(key) == right[1].get(key)
+
+
 @pytest.mark.parametrize('kind,edges', [('game', True), ('squares', True), ('squares', False), ('tree', True)])
 @pytest.mark.parametrize('fixture', ['fig1', 'h4', 'dense', 'violations', 'symmetric-violations'])
 def test_svg_geometry_matches_frontend(tmp_path, kind, fixture, edges):

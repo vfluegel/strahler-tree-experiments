@@ -168,7 +168,35 @@ closure documented in `docs/symmetric.md`; the notebook and widget identify
 that difference from printed pseudocode. Pseudocode highlighting maps recorded
 events to abbreviated semantic blocks; it does not identify exact C lines.
 
-## Tests
+## Linked host lessons
+
+Notebook 04 starts with native chain and branching traces. `HostView` groups
+H/T/S by genuine underlying node and links those positions to the flattened
+lifting order and game selection. S lies outside its own `[H,S)` core; root S
+is TOP, meaning unresolved. Strahler counts underlying branching only, before
+augmentation. Actual metrics and requested `(k,t,h)` are displayed separately.
+The current AD/certificate can prune empty branches and renumber child paths;
+links use vertex occupants rather than assuming its paths equal host paths.
+
+Use **Next lift**, **Next round**, back/seek, and **Next lift for selected
+vertex** for actual replay. The lift inspector uses the shared pre-round state
+and shows the failed H check or the exact lazy L/A/R reach-through-safe check.
+**Next compatible position** and its priority selector are teaching controls:
+they never change replay labels. Click host cells for occupants, focus a
+collapsed subtree, or search the windowed flat strip by native position index.
+Old traces explicitly report unavailable complete hosts. Symmetric Zielonka
+marks its known prefix and implicit remainder. PM prefix trees retain their
+separate meaning.
+
+Notebook 08's default Nester-2 lesson runs fixed ordinary AD at `(1,0)` and
+`(2,1)` without preprocessing or same-parity compression and shows current-run
+host/candidate comparisons. Its full native trace (bounded by `trace_limit`)
+is opt-in via `RUN_NESTER2_TRACE`; suggested sibling-crossing and predecessor
+invalidation events are located programmatically. Bundled fixtures, helper
+code, inline JavaScript and static SVG/HTML keep all these examples offline.
+Recorded benchmark budgets, timings and frontiers are independent of this lesson.
+
+## Running the tests
 
 With the checkout venv activated and package installed, select the registered
 Meson tests (use the same build for all checks):

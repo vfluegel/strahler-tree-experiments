@@ -997,6 +997,32 @@ labels. Other phases are `host_built` (node count in `value`), `t_raised` (t in
 `value`), `dominion_certified`, `iteration_done` (result and iteration index),
 and `shave_applied` (certified result and shave index). Replayers retain the
 certified trees when a shave is applied, then continue with the remaining game.
+
+New writers optionally extend `host_built` with a `host` object, schema
+`strahler-host/1`, without changing the enclosing `strahler-trace/1` event
+alphabet or the fixed-host event budget. It contains `complete`, `parameters`
+(known requested `k,t,h` or `arity`), `active` external vertex IDs, normalized
+`priorities` as `[external_id, priority]` pairs, and preorder `nodes` containing
+`path`, priority bound `h`, and native `[H,T,S]` position indices. The root's
+S index denotes TOP. A new description starts a player-specific host epoch,
+including adaptive attempts and iterative residual domains. File hosts are
+self-contained. Unknown optional fields can be ignored by older readers;
+new readers never infer absent full-host metadata from occupied prefixes.
+
+Symmetric Zielonka instead attaches `complete:false` metadata to the existing
+`labels_reset`, then emits small `phase:"host_node"` deltas with `path` and `h`
+when implicit children become allocated. These deltas do not serialize the
+whole prefix repeatedly or force the implicit full tree into memory. Prefix
+ordinals are explicitly provisional, not global next-compatible destinations.
+Fixed-host symmetric lifting reuses the complete `host_built` description.
+All metadata construction/serialization remains behind the observer branch;
+untraced solves do no host serialization or per-lift explanation work.
+
+Python `State.hosts` shares immutable snapshots across checkpoints and
+`State.raw_labels` exposes label fibres independently of candidate pruning.
+Lift explanations reconstruct the state before the first label/lift pair of
+the entire round, not immediately before one lift; validity-pass attractor
+sets are compared with an independent reach-through-safe computation on demand.
 `tests/trace_replay.py` implements these rules without reading result trees
 into its state, and compares its state with every final result.
 

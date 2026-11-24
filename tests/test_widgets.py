@@ -15,6 +15,46 @@ NS = {'s': 'http://www.w3.org/2000/svg'}
 WIDGET_MIME = 'application/vnd.jupyter.widget-view+json'
 
 
+def test_host_static_grouping_and_candidate_mapping():
+    from strahler.widgets import HostView
+    from test_host import BRANCH
+    with strahler.Game.from_text(BRANCH) as game:
+        stepper = Stepper(strahler.trace(game, 'lifting', kary=2))
+        stepper.end()
+        host = stepper.host_views[0]
+        stepper.game_view.selected = 4
+        svg = ET.fromstring(host._static_svg())
+        assert len(svg.findall('.//s:g[@data-host-path]', NS)) == 3
+        assert len(svg.findall('.//s:g[@data-host-position]', NS)) == 9
+        assert len(svg.findall('.//s:g[@data-flat-position]', NS)) == 9
+        assert 'Strahler = 2' in ''.join(svg.itertext())
+        assert 'disabled' in ''.join(svg.itertext())
+        assert host.selected == 4 and stepper.tree_views[0].selected == [1]
+        actual = host._static_svg()
+        labels = dict(host.labels)
+        host._message(host, dict(command='compatible'), [])
+        assert host.labels == labels and actual != host._static_svg()
+        host._message(host, dict(command='compatible'), [])
+        assert host.teaching_position == host.host.positions[-1].index
+        host._message(host, dict(command='compatible'), [])
+        assert host.teaching_position == host.host.positions[-1].index  # Stay at the end.
+        legacy = HostView()
+        assert 'unavailable' in legacy._static_svg()
+
+
+def test_host_windowing_preserves_metrics_and_focused_intervals():
+    from strahler.widgets import HostView
+    host = strahler.HostSnapshot.from_tree(strahler.genstree(2, 6, 1))
+    view = HostView(host, max_nodes=8, strip_window=9)
+    assert len(view.data['nodes']) <= 8 and len(view.data['strip']) == 9
+    assert any(n['collapsed'] for n in view.data['nodes'])
+    assert host.metrics['nodes'] == 92 and host.metrics['positions'] == 276
+    view._message(view, dict(command='position', index=150), [])
+    assert 150 in [p['index'] for p in view.data['strip']]
+    assert view.focus == host.positions[150].path
+    assert view.data['total'] == 276
+
+
 def bundle(view):
     result = view._repr_mimebundle_()
     return result[0] if isinstance(result, tuple) else result
@@ -75,7 +115,7 @@ def test_stepper_static_fallback_and_call_tree():
         data = bundle(view)
         assert WIDGET_MIME in data
         html = ET.fromstring('<div>' + data['text/html'] + '</div>')
-        assert len(html.findall('s:svg', NS)) == 3
+        assert len(html.findall('s:svg', NS)) == 5
         text = ''.join(html.itertext())
         assert f'{view.index} / {len(view.run)-1}: check' in text
         for badge in view.badges:

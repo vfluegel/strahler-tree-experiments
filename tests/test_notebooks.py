@@ -84,7 +84,7 @@ def test_save_is_deterministic_without_a_kernel(executor, tmp_path, monkeypatch)
     data = saved.cells[0].outputs[0].data
     assert executor.WIDGET_MIME not in data
     html = data['text/html']
-    assert html.count('<svg') == 4
+    assert html.count('<svg') == 6
     for text in ('&lt;a&amp;b&gt;', '&lt;captured&gt;', 'k: 4', '&lt;input&gt;', 'algorithm claim:', 'Independent:'):
         assert text in html
     executor.execute_notebook(path, kernels)
@@ -126,6 +126,28 @@ def test_eight_notebooks_and_version_mismatch(monkeypatch, capsys):
     with pytest.raises(RuntimeError, match='version mismatch'):
         exec(compile(setup, str(NOTEBOOKS[0]), 'exec'), {})
     assert not capsys.readouterr().out
+
+
+def test_native_host_lessons_and_default_nester_comparison(monkeypatch):
+    import strahler
+    import host_lessons
+    notebooks = {p.name: json.loads(p.read_text()) for p in NOTEBOOKS}
+    lifting = '\n'.join(''.join(c['source']) for c in notebooks['04-step-through-lifting.ipynb']['cells'])
+    assert lifting.index('from host_lessons') < lifting.index('from otj22')
+    nester = notebooks['08-lexicographic-adaptive-nester.ipynb']
+    assert 'RUN_NESTER2_TRACE = False' in '\n'.join(''.join(c['source']) for c in nester['cells'])
+    # Default lesson never collects the large trace or edits recorded results.
+    def reject(*args, **kwargs):
+        raise AssertionError('Default Nester-2 comparison must remain untraced')
+    monkeypatch.setattr(strahler, 'trace', reject)
+    game, results, hosts = host_lessons.nester2_comparison()
+    try:
+        assert (len(game.vertices), len(game.edges)) == (365,479)
+        assert results[1,0].unresolved and results[2,1].complete
+        assert hosts[1,0][0].metrics['strahler']==1
+        assert hosts[2,1][0].metrics['strahler']==2
+    finally:
+        game.close()
 
 
 @pytest.mark.parametrize('path', NOTEBOOKS, ids=lambda path: path.name)
