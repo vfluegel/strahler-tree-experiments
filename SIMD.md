@@ -59,7 +59,7 @@ as do unsupported architectures and optional allocation failures. SSE2 and
 NEON are baseline instructions on the supported wheel architectures, so this
 kernel needs no AVX2, SSSE3 or native compiler flags. The older partial packed
 backend and its `lookup`/`compare`/`both` switches have been removed.
-Notebooks 05, 07 and 08, and their PM workers, explicitly select `simd` and
+Notebooks 05 and 07–11, and their PM workers, explicitly select `simd` and
 Strahler PM. SSPM remains available with `--algorithm=succinct`.
 
 The [full solver results](experimental/pm-simd-oink/cli.csv),
@@ -83,9 +83,9 @@ snapshot already contained the separate SIMD implementations. November 11's
 refill, level traversal and reconstruction of its component cache. It was a
 partial port, rather than a snapshot predating Oink's vectorization.
 
-Full solves confirmed Oink's SIMD Strahler solver beats its scalar Strahler
-solver: 10.22 versus 18.12 seconds on FairScheduler. However, scalar succinct
-PM took 1.94 seconds in Oink and 2.51 seconds in the original C implementation;
+Before the bounded STRPM correction, full solves showed Oink's SIMD Strahler
+solver beating its scalar Strahler solver: 10.22 versus 18.12 seconds on
+FairScheduler. However, scalar succinct PM took 1.94 seconds in Oink and 2.51 seconds in the original C implementation;
 its SIMD counterpart took 12.29 seconds. Succinct PM also completed the
 875,281-vertex SYNTCOMP example where all Strahler variants exceeded 20 seconds.
 These are workload measurements, not a claim that one algorithm wins on every
@@ -106,29 +106,32 @@ corresponding JSON. Oink's scalar succinct solver remains slightly faster on
 the large SYNTCOMP example (6.70 versus 7.09 seconds), while that succinct C
 implementation wins on the other measured nontrivial cases.
 
-The [full-kernel Strahler measurements](experimental/pm-simd-oink/strpm-full-kernel.csv)
-compare the retained scalar reference with the new SIMD engine in the same
-portable release binary. The speedup column compares scalar STRPM to SIMD
-STRPM. SSPM uses a separate bit budget, not the Strahler `(k,t)` hosts. Every sample must produce exactly the same JSON,
-including host parameters, measure trees, certificates, lift counts and attempts.
-These are complete adaptive solves with iterative shaving, verification enabled,
+The [corrected-kernel measurements](experimental/pm-simd-oink/strpm-canonical-kernel.csv)
+compare scalar STRPM with full SIMD STRPM in the same portable release binary.
+Every sample produces identical JSON, including parameters, trees, certificates,
+lift counts and attempts, and matches the independently recorded winning partition.
+These are complete adaptive solves with iterative shaving and verification,
 one warm-up and three alternating timed samples per arm, pinned to CPU 3.
 
-| Input | Scalar Strahler PM | Full SIMD Strahler PM | Speedup |
+| Input | Scalar STRPM | SIMD STRPM | Scalar/SIMD |
 | --- | ---: | ---: | ---: |
-| Compact Nester 3 | 0.01060 s | 0.01005 s | 1.05× |
-| Compact Nester 4 | 0.17443 s | 0.12232 s | 1.43× |
-| Plain Nester 3 | 0.06938 s | 0.05161 s | 1.34× |
-| FairScheduler 2 | 14.10519 s | 10.73145 s | 1.31× |
+| Compact Nester 3 | 0.00997 s | 0.00931 s | 1.07× |
+| Compact Nester 4 | 0.11862 s | 0.08793 s | 1.35× |
+| Plain Nester 3 | 0.04502 s | 0.03557 s | 1.27× |
+| FairScheduler 2 | 0.13158 s | 0.13172 s | 1.00× |
 
-`test_strpm_simd` checks 428,430 successors and 4,282,383 comparisons against
-native scalar, including negative cutoffs, t=0, unequal string lengths and the
-largest encodable hosts. The backend differential and fuzz checks compare the
-complete solver documents. The print-pms Oink oracle agrees on 506 games per
-algorithm (502 Strahler streams and 506 succinct streams; four upstream
-Strahler searches exhaust their bound, and one slow example per algorithm
-is skipped at three seconds). Earlier timings below and the Oink comparisons above
-remain historical evidence; they do not replace the new kernel measurements.
+SIMD improves these Nester runs; the FairScheduler arms are effectively tied.
+The bounded-lift fix reduces FairScheduler from four shaving rounds to two.
+The earlier [full-kernel recording](experimental/pm-simd-oink/strpm-full-kernel.csv)
+and Oink timings above used the old nonstrict lift. SSPM has its own bit budget;
+its historical measurements remain separate from these STRPM comparisons.
+
+Native differential tests cover successors, nonstrict canonical completions and
+comparisons, including negative cutoffs, t=0, unequal string lengths and the
+largest encodable hosts. An independent generated-leaf oracle checks least
+bounded measures. Backend and fuzz checks compare complete scalar/SIMD solver
+documents. The Oink oracle checks STRPM winner soundness and completed winning
+partitions; SSPM retains exact stream and budget checks.
 
 `src/ad_batch.h` provides an opt-in native fixed-host backend for one to eight
 independent requests sharing a residual graph. Eight 16-bit lanes share edge
@@ -151,6 +154,9 @@ meson setup build-simd --buildtype=release -Db_ndebug=true -Dlenstree=disabled
 meson compile -C build-simd -j2
 python3 scripts/benchmark_lifting.py build-simd --samples 3 --output /tmp/lifting-timings.json
 bzip2 -dc 'jupyter-examples/nester/Nestern=3_compact.gm.bz2' > /tmp/nester3.gm
+STRAHLER_PM_BACKEND=scalar build-simd/pg2pmdot --algorithm=strahler --iter-shave --format=json --stats /tmp/nester3.gm > /tmp/nester3-scalar.json
+STRAHLER_PM_BACKEND=simd build-simd/pg2pmdot --algorithm=strahler --iter-shave --format=json --stats /tmp/nester3.gm > /tmp/nester3-simd.json
+cmp /tmp/nester3-scalar.json /tmp/nester3-simd.json
 build-simd/test_ad_batch /tmp/nester3.gm
 build-simd/test_ad_reach --benchmark
 ```
