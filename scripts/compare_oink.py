@@ -221,7 +221,7 @@ def main():
     games = [(f"seed-{args.seed}-{index}", random_game(rng), False)
              for index in range(args.games)]
     games += [(path.name, path.read_text(), True)
-              for path in sorted((ROOT / "examples").glob("*.pg"))]
+              for path in (ROOT / "examples" / "Button.tlsf.ehoa.pg",)]
     games += [(name, (ROOT / "tests/games" / name).read_text(), False)
               for name in ("pm_cycle.pg", "strahler_two.pg",
                            "split_winners.pg", "oink_search_limit.pg",

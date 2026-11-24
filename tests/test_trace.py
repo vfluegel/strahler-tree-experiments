@@ -14,12 +14,13 @@ import tempfile
 import time
 
 from otj22 import hk
+from game_cases import EXAMPLES, REGRESSIONS
 from test_pg_game_property import generated_games
 from trace_replay import Replay, check_input, vertices
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from gen_decomp import BACKENDS, discover_games
+from gen_decomp import BACKENDS
 from find_disagreements import Node, game_text, parse_dot, random_game
 
 SLOW_PAIRS = {(game, backend + suffix)
@@ -308,7 +309,7 @@ def examples(binary, checker, directory, backend_name):
             continue
         if backend.name != backend_name:
             continue
-        for game in discover_games([ROOT / 'examples']):
+        for game in (ROOT / 'examples' / name for name in EXAMPLES):
             name = f'{game.name}/{backend.name}'
             if (game.name, backend.name) in SLOW_PAIRS:
                 print(f'delegated to slow suite: {name}', flush=True)
@@ -363,10 +364,10 @@ def main():
                     for pre in ((), ('--initial-shave=loops', '--compress'))
                     for iteration in ((), ('--iter-shave',))]
 
-            paths = ([ROOT / 'tests/games'] if mode == 'games' else [])
             games = ([ROOT / 'tests/games' / name for name in
                       ('strahler_two.pg', 'split_winners.pg', 'iter_shave.pg')]
-                     if mode in ('hosts', 'host-errors') else discover_games(paths))
+                     if mode in ('hosts', 'host-errors') else
+                     [ROOT / 'tests/games' / name for name in REGRESSIONS] if mode == 'games' else [])
             rng = random.Random(685789)
             for case in range(24 if mode in ('property', 'corpus') else 0):
                 game = directory / f'random-{case}.pg'

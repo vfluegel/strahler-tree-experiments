@@ -92,10 +92,9 @@ BACKENDS = tuple(
 MAX_SET_ITEMS = 8
 # Per-game label overrides belong here if a DOT approaches 2 MB.
 GAME_LABELS = {}
-# These examples exercise fixed (k,t) runs, covered by native regression tests.
-# Universal-host renderings would not show their distinguishing behavior.
-FIXED_HOST_EXAMPLES = {"ad-nonmonotone.pg", "strpm-nonmonotone.pg",
-                       "strpm-nonstrict-tail.pg"}
+# The saved gallery is maintained manually; new inputs do not expand it.
+GALLERY_GAMES = ("Button.tlsf.ehoa.pg", "FairSchedulern=2_compact.gm",
+                 "cabp_swp.ehoa.pg")
 # Local release runs exceeded 60 s for each pair, with and without preprocessing.
 SKIP_RUNS = {
     ("cabp_swp.ehoa.pg", "lifting-adaptive"): 60,
@@ -137,8 +136,7 @@ def discover_games(paths):
 
 
 def gallery_games(root):
-    return [game for game in discover_games([root / "examples"])
-            if game.name not in FIXED_HOST_EXAMPLES]
+    return [root / "examples" / name for name in GALLERY_GAMES]
 
 
 def game_records(stream, chunk_size):

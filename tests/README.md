@@ -74,7 +74,10 @@ Meson builds the C unit tests and runs the command-line regression cases.
   literal standard input or an `@file` input source.
 - `run-regression.sh` regenerates or checks the complete golden suite.
 - `run-with-input.sh` supplies a file on standard input for smoke tests.
-- `games/` contains parser and solver fixtures.
+- `games/` contains parser and solver fixtures. `game_cases.py` explicitly
+  selects serialization, trace and API smoke inputs. New reference games do
+  not automatically join this matrix; add a focused regression when needed.
+  The saved decomposition gallery is regenerated manually.
 - The two `examples/*-nonmonotone.pg` games have fixed-host AD and STRPM
   regressions at `(3,2)` and `(4,3)`, including scalar and SIMD PM. Research
   tests also check the constructive cross-k host embedding bound.
@@ -210,7 +213,7 @@ fixes below.
 ### Live Oink oracle
 
 `scripts/compare_oink.py` uses only Python's standard library. It checks 500
-random games per algorithm by default (seed 0), the quick `examples/*.pg`,
+random games per algorithm by default (seed 0), the small Button example,
 and small regression fixtures. Each command has a timeout; only slow examples
 may be skipped. Failures save a `.pg` reproducer and transcripts under
 `build/oink-failures/` (overridable with `--failures-dir`). Scratch files follow

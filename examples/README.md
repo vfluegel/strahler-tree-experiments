@@ -11,8 +11,8 @@ give the following numbers of certified vertices:
 Uncertified vertices remain unresolved. Increasing `k` changes the host's
 branching structure, so increasing both parameters need not preserve a solve.
 The STRPM result holds for both scalar and SIMD kernels.
-These fixed-host fixtures are tested directly and excluded from the default
-decomposition gallery.
+These fixed-host fixtures are tested directly. Adding a game here does not
+expand CI or the saved decomposition gallery.
 
 The AD construction is explained in [incremental-t.md](../docs/incremental-t.md).
 The PM game encodes the same 16-leaf obstruction through strict prefix

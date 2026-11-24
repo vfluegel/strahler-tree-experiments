@@ -14,8 +14,9 @@ import strahler
 from strahler import _native
 from trace_replay import Replay
 from otj22 import hk
-from test_json import SLOW, example_options
-from gen_decomp import BACKENDS, discover_games, player_stats
+from test_json import SLOW
+from game_cases import EXAMPLES as EXAMPLE_NAMES
+from gen_decomp import BACKENDS, player_stats
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get('STRAHLER_BUILD_DIR', ROOT / 'build'))
@@ -32,13 +33,13 @@ def as_dict(node):
 
 EXAMPLES = [pytest.param(path, backend, id=f'{path.name}/{backend.name}',
                          marks=pytest.mark.slow if (path.name, backend.name) in SLOW else ())
-            for path in discover_games([ROOT / 'examples']) for backend in BACKENDS]
+            for path in (ROOT / 'examples' / name for name in EXAMPLE_NAMES) for backend in BACKENDS]
 
 
 @pytest.mark.parametrize('path,backend', EXAMPLES)
 def test_examples_match_cli_bytes(path, backend):
     text = path.read_text()
-    options = example_options(backend, path)
+    options = list(backend.options)
     flags = ['--format=json', *options]
     expected = cli(backend.binary, flags, text)
     with strahler.Game.from_text(text) as game:

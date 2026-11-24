@@ -15,7 +15,8 @@ from threading import Thread
 
 from json_check import document
 from test_trace import ROOT, SLOW_PAIRS
-from gen_decomp import (BACKENDS, Backend, FIXED_HOST_EXAMPLES, discover_games,
+from game_cases import EXAMPLES, REGRESSIONS
+from gen_decomp import (BACKENDS, Backend,
                         game_info, tree_metrics)
 
 # These additional PM runs already exceed DECOMP's ordinary budget.
@@ -210,16 +211,8 @@ def check_measure_prefixes(build, value):
             compare_prefix(tree, dot.stdout)
 
 
-def example_options(backend, game):
-    options = list(backend.options)
-    if game.name in FIXED_HOST_EXAMPLES and backend.name.startswith('pm-strahler'):
-        # These fixtures test fixed hosts, rather than unrestricted searches.
-        options += ['--k=3', '--t=2']
-    return options
-
-
 def check_game(build, backend, game, directory, priority="compact"):
-    options = [*example_options(backend, game), f'--priority-mode={priority}']
+    options = [*backend.options, f'--priority-mode={priority}']
     if game.name == 'cabp_swp.ehoa.pg' and backend.name in ('pm-strahler+iter', 'pm-strahler+pre+iter'):
         options += ['--k=1', '--t=1']
     binary = build / backend.binary
@@ -360,7 +353,8 @@ def main():
         globals()[mode](build)
         return
     backend = next(b for b in BACKENDS if b.name == sys.argv[3])
-    games = discover_games([ROOT / ('examples' if mode == 'examples' else 'tests/games')])
+    games = [ROOT / 'examples' / name for name in EXAMPLES] if mode == 'examples' else [
+        ROOT / 'tests/games' / name for name in REGRESSIONS]
     if mode in ('slow', 'trace'):
         games = [next(p for p in [ROOT / 'examples' / sys.argv[4], ROOT / 'tests/games' / sys.argv[4]] if p.is_file())]
     with tempfile.TemporaryDirectory(dir=build) as temp:
