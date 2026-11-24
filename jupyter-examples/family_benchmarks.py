@@ -1,4 +1,4 @@
-"""Bounded CLI experiments and offline displays for the CABP and ladder notebooks."""
+"""Bounded CLI experiments and offline displays for protocol and ladder families."""
 
 import argparse
 import bz2
@@ -25,6 +25,7 @@ from lexicographic_nester import BACKENDS, bounds, winner_digest
 
 HERE = Path(__file__).resolve().parent
 ORDERS = ('lexicographic', 'ratio', 'table')
+SUPPORTED_ORDERS = (*ORDERS, 'monotone-tab')
 FIXED_BACKENDS = ('AD-sym', 'AD-sym+iter', 'PM', 'PM+iter')
 _lock = threading.Lock()
 
@@ -38,7 +39,13 @@ def sha256(path):
 
 
 def manifest(family):
-    document = json.loads((HERE / family / 'manifest.json').read_text())
+    name = 'plain-manifest.json' if family == 'nester' else 'manifest.json'
+    document = json.loads((HERE / family / name).read_text())
+    if family == 'nester':
+        document['games'] = [dict(g, id=f"Nester-{g['n']}", label=f"Nester-{g['n']}",
+                                  series='nester', parameter=g['n'], dense_ids=True,
+                                  fixed_map=g['n'] in (4, 5), fixed_t_max=min(6, g['t_max']),
+                                  fixed_k_max=6) for g in document['games']]
     for game in document['games']:
         assert sha256(HERE / family / game['file']) == game['sha256']
         expected = bounds(game['vertices'], game['normalized_maximum'])
@@ -158,19 +165,50 @@ def reduce_report(path, backend, game, reference=None, save_reference=None):
                 add_vertices(won[player], result['shaved'], count)
                 add_vertices(won[player], result['attracted'], count)
     else:
-        complete = next(items('complete'))
-        parameters = next(items('parameters'))
-        for prefix in ('regions.item', 'initial_won.item', 'shaves.item.attracted.item'):
-            for index, vertices in enumerate(items(prefix)):
-                add_vertices(won[index % 2], vertices, count)
-        add_vertices(unresolved, items('unresolved.item'), count)
-        rounds = 1 + sum(1 for _ in items('shaves.item.attracted'))
-        metrics = next(items('metrics'))
+        wanted = {'complete', 'parameters', 'regions.item', 'initial_won.item',
+                  'shaves.item.attracted.item', 'unresolved.item', 'metrics'}
         if save_reference is not None:
-            try:
-                shape = [small_shape(tree) for tree in items('trees.item')]
-            except ValueError:
-                shape = None
+            wanted.add('trees.item')
+        indices = {key: 0 for key in ('regions.item', 'initial_won.item', 'shaves.item.attracted.item')}
+        shapes, shape_valid = [], True
+        rounds = 1
+        builder, selected = None, None
+        with Path(path).open('rb') as stream:
+            for prefix, event, value in ijson.parse(stream, use_float=True):
+                if builder is not None:
+                    builder.event(event, value)
+                    if prefix != selected or event not in ('end_array', 'end_map'):
+                        continue
+                    prefix, value = selected, builder.value
+                    builder = None
+                elif prefix not in wanted:
+                    continue
+                elif event in ('start_array', 'start_map'):
+                    builder, selected = ijson.common.ObjectBuilder(), prefix
+                    builder.event(event, value)
+                    continue
+                elif event not in ('boolean', 'number', 'null'):
+                    continue
+                if prefix in indices:
+                    index = indices[prefix]
+                    add_vertices(won[index % 2], value, count)
+                    indices[prefix] += 1
+                    if prefix == 'shaves.item.attracted.item' and index % 2:
+                        rounds += 1
+                elif prefix == 'unresolved.item':
+                    add_vertices(unresolved, (value,), count)
+                elif prefix == 'complete':
+                    complete = value
+                elif prefix == 'parameters':
+                    parameters = value
+                elif prefix == 'metrics':
+                    metrics = value
+                elif prefix == 'trees.item':
+                    try:
+                        shapes.append(small_shape(value))
+                    except ValueError:
+                        shape_valid = False
+        shape = shapes if save_reference is not None and shape_valid else None
     expected = load_winners(reference, game) if reference is not None else None
     check_partition(won, unresolved, count, expected)
     left = sum(byte.bit_count() for byte in unresolved)
@@ -203,7 +241,7 @@ def worker(request):
     pm = backend.startswith('PM')
     binary = Path(request['build_dir']) / ('pg2pmdot' if pm else 'pg2adot')
     command = [str(binary), '--format=json', '--stats']
-    command += ['--algorithm=' + ('strahler' if pm else 'zielonka' if backend == 'reference'
+    command += ['--algorithm=' + ('strahler' if pm else request.get('reference_algorithm', 'zielonka') if backend == 'reference'
                                   else 'lifting-sym' if backend.startswith('AD-sym') else 'lifting')]
     if not pm and backend != 'reference':
         command += ['--max-host-leaves=' + str(2 * sys.maxsize + 1)]
@@ -301,12 +339,16 @@ def measured_grid(measured, k_max, t_max, hints=()):
         rows[pair] = measured(*pair)
 
 
-def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
+def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None, *,
+        orders=ORDERS, fixed=True):
     """Resume independent order/method/relation frontiers and declared fixed maps."""
     import ijson
 
     if seconds <= 0 or memory_gib < 1 or jobs < 1:
         raise ValueError('Use positive time, memory and worker limits')
+    if not orders or len(set(orders)) != len(orders) or not set(orders) <= set(SUPPORTED_ORDERS):
+        raise ValueError('Choose distinct supported search orders')
+    fixed_backends = FIXED_BACKENDS if fixed else ()
     info = manifest(family)
     directory = HERE / family
     output = Path(output) if output else directory / f'results-{seconds:g}s.json'
@@ -314,6 +356,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
     cache.mkdir(parents=True, exist_ok=True)
     build_dir = Path(build_dir).resolve()
     metadata = dict(family=family, timeout_seconds=seconds, memory_gib=memory_gib, jobs=jobs,
+                    reference_algorithm=info.get('reference_algorithm', 'zielonka'),
                     reference_timeout_seconds=seconds, memory_cap_enforced=sys.platform.startswith('linux'),
                     report_size_cap_gib=2, python_version=platform.python_version(),
                     source_commit=subprocess.check_output(
@@ -325,12 +368,15 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
                     binary_sha256={name: sha256(build_dir / name) for name in ('pg2adot', 'pg2pmdot')},
                     version=subprocess.check_output([str(build_dir / 'pg2adot'), '--version'], text=True).strip(),
                     pm_algorithm='strahler', requested_pm_backend='simd',
+                    lifting_backends={'STRAHLER_AD_BACKEND': os.environ.get('STRAHLER_AD_BACKEND', 'auto'),
+                                      'STRAHLER_PM_BACKEND': 'simd'},
                     timing='End-to-end worker: decompress, parse, native solve/verification, JSON output/reduction and winner checks; reference measured separately.',
-                    orders=list(ORDERS), backends=list(BACKENDS), fixed_backends=list(FIXED_BACKENDS))
+                    orders=list(orders), backends=list(BACKENDS), fixed_backends=list(fixed_backends),
+                    strpm_kernel='canonical-prefix')
     if output.exists():
         document = json.loads(output.read_text())
         for key in ('timeout_seconds', 'memory_gib', 'jobs', 'reference_timeout_seconds',
-                    'worker_sha256', 'fixture_sha256', 'binary_sha256', 'ijson_version', 'python_version'):
+                    'worker_sha256', 'fixture_sha256', 'binary_sha256', 'ijson_version', 'python_version', 'lifting_backends', 'orders', 'fixed_backends', 'strpm_kernel'):
             assert document[key] == metadata[key], f'Resume mismatch: {key}'
     else:
         document = dict(metadata, recorded_utc=datetime.now(timezone.utc).isoformat(timespec='seconds'),
@@ -361,6 +407,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
             pending = Path(temporary) / 'winners.gz'
             request = dict(game=game, path=str((directory / game['file']).resolve()),
                            backend='reference', build_dir=str(build_dir), memory_gib=memory_gib,
+                           reference_algorithm=metadata['reference_algorithm'],
                            cache=str(cache), save_reference=str(pending))
             result = dict(game=game['id'], **measure(request, seconds))
             if result['outcome'] == 'solved':
@@ -428,15 +475,16 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
 
     with ThreadPoolExecutor(jobs) as pool:
         futures = [pool.submit(frontier, series, backend, order)
-                   for order in ORDERS for series in sorted({g['series'] for g in info['games']})
+                   for order in orders for series in sorted({g['series'] for g in info['games']})
                    for backend in BACKENDS]
         finish(futures)
         futures = []
         for game in info['games']:
             if not game.get('fixed_map'):
                 continue
-            for backend in FIXED_BACKENDS:
-                k_max = max(game['PM_k_max'] if backend.startswith('PM') else game['AD_k_max'])
+            for backend in fixed_backends:
+                k_max = min(max(game['PM_k_max'] if backend.startswith('PM') else game['AD_k_max']),
+                            game.get('fixed_k_max', sys.maxsize))
                 t_max = game['fixed_t_max']
                 futures.append(pool.submit(measured_grid,
                                            lambda k, t, g=game, b=backend: measured(g, b, pair=(k, t)),
@@ -445,7 +493,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
         # A small declared box may contain no plain-PM solve. A separate
         # targeted rerun supplies fixed-host evidence without claiming minima.
         for game in info['games']:
-            if not game.get('fixed_map') or any(r['game'] == game['id'] and r['backend'] == 'PM' and
+            if not fixed_backends or not game.get('fixed_map') or any(r['game'] == game['id'] and r['backend'] == 'PM' and
                                                r['outcome'] == 'solved' for r in fixed.values()):
                 continue
             candidates = [r for r in rows.values() if (r['game'], r['backend'], r['outcome']) ==
@@ -480,8 +528,13 @@ def recorded(family, path=None):
     directory = HERE / family
     document = json.loads((Path(path) if path else directory / 'results-60s.json').read_text())
     assert document['complete'] and document['pm_algorithm'] == 'strahler'
+    assert document.get('reference_algorithm', 'zielonka') == info.get('reference_algorithm', 'zielonka')
     assert document['fixture_sha256'] == {g['id']: g['sha256'] for g in info['games']}
-    expected = {(g['id'], b, o) for g in info['games'] for b in BACKENDS for o in ORDERS}
+    orders = document.get('orders', ORDERS)
+    fixed_backends = document.get('fixed_backends', FIXED_BACKENDS)
+    assert set(orders) <= set(SUPPORTED_ORDERS) and len(set(orders)) == len(orders)
+    assert set(fixed_backends) <= set(FIXED_BACKENDS)
+    expected = {(g['id'], b, o) for g in info['games'] for b in BACKENDS for o in orders}
     assert {(r['game'], r['backend'], r['order']) for r in document['rows']} == expected
     assert len(document['rows']) == len(expected)
     assert len(document['references']) == len(info['games'])
@@ -492,7 +545,7 @@ def recorded(family, path=None):
         for row in group:
             validate_fixed_row(row, games_by_id[row['game']], rectangle)
     by_key = {(r['game'], r['backend'], r['order']): r for r in document['rows']}
-    for order in ORDERS:
+    for order in orders:
         for backend in BACKENDS:
             for series in {g['series'] for g in info['games']}:
                 stopped = None
@@ -529,9 +582,10 @@ def recorded(family, path=None):
                 assert sum(row['won']) + row['unresolved'] == game['vertices']
                 if row.get('backend', '').startswith('PM'):
                     assert sum(row['dispatch'].values()) > 0
-        for backend in FIXED_BACKENDS if game.get('fixed_map') else ():
+        for backend in fixed_backends if game.get('fixed_map') else ():
             cells = [r for r in document['fixed_rows'] if (r['game'], r['backend']) == (game['id'], backend)]
-            k_max = max(game['PM_k_max'] if backend.startswith('PM') else game['AD_k_max'])
+            k_max = min(max(game['PM_k_max'] if backend.startswith('PM') else game['AD_k_max']),
+                        game.get('fixed_k_max', sys.maxsize))
             measured_pairs = {(r['k'], r['t']) for r in cells}
             assert len(measured_pairs) == len(cells)
             solved = [p for p in measured_pairs if next(r for r in cells if (r['k'], r['t']) == p)['outcome'] == 'solved']
@@ -587,12 +641,14 @@ def shape_html(shape):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('worker', 'run', 'check'))
-    parser.add_argument('--family', choices=('cabp', 'ladder'))
+    parser.add_argument('--family', choices=('cabp', 'ladder', 'recursiveladder', 'nester'))
     parser.add_argument('--build-dir', type=Path, default=Path('build'))
     parser.add_argument('--output', type=Path)
     parser.add_argument('--seconds', type=float, default=60)
     parser.add_argument('--memory-gib', type=int, default=2)
     parser.add_argument('--jobs', type=int, default=2)
+    parser.add_argument('--orders', choices=SUPPORTED_ORDERS, nargs='+', default=list(ORDERS))
+    parser.add_argument('--no-fixed', action='store_true')
     args = parser.parse_args()
     if args.command == 'worker':
         worker(json.load(sys.stdin))
@@ -600,7 +656,8 @@ def main():
         if args.family is None:
             parser.error('--family is required')
         if args.command == 'run':
-            run(args.family, args.build_dir, args.seconds, args.memory_gib, args.jobs, args.output)
+            run(args.family, args.build_dir, args.seconds, args.memory_gib, args.jobs, args.output,
+                orders=args.orders, fixed=not args.no_fixed)
         else:
             recorded(args.family, args.output)
 

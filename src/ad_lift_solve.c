@@ -317,11 +317,18 @@ check_strahler_budget(Solver *solver, PGPlayer const player, size_t const k,
   size_t const height = stats->player[0].height > stats->player[1].height
                             ? stats->player[0].height
                             : stats->player[1].height;
-  if ((ratio || table) && queue->heap == nullptr &&
-      !(table ? parameter_table_init(queue, maximum, stats->t_full, height)
-              : parameter_queue_init(queue, maximum, stats->t_full))) {
-    solve_error(solver->error, "failed to allocate parameter search");
-    return false;
+  if ((ratio || table) && queue->heap == nullptr) {
+    bool const initialized =
+        table
+            ? solver->options->monotone_table
+                  ? parameter_monotone_init(queue, maximum, stats->t_full,
+                                            height)
+                  : parameter_table_init(queue, maximum, stats->t_full, height)
+            : parameter_queue_init(queue, maximum, stats->t_full);
+    if (!initialized) {
+      solve_error(solver->error, "failed to allocate parameter search");
+      return false;
+    }
   }
   size_t k = solver->options->start_k == 0 ? 1 : solver->options->start_k;
   size_t t = smaller(solver->options->t, stats->t_full);
@@ -503,6 +510,7 @@ solve_once(PGGame const *game, PGSet const *domain, PGSet const *host_domain,
   if (game == nullptr || domain == nullptr || options == nullptr ||
       result == nullptr || domain->bit_count != game->vertex_count ||
       options->mode > AD_LIFT_HOST_TREE ||
+      (options->monotone_table && !options->table) ||
       (options->symmetric && options->mode == AD_LIFT_HOST_ADAPTIVE &&
        !options->lexicographic && !options->ratio && !options->table) ||
       options->schedule > AD_LIFT_SCHEDULE_SINGLE ||

@@ -92,6 +92,9 @@ BACKENDS = tuple(
 MAX_SET_ITEMS = 8
 # Per-game label overrides belong here if a DOT approaches 2 MB.
 GAME_LABELS = {}
+# The saved gallery is maintained manually; new inputs do not expand it.
+GALLERY_GAMES = ("Button.tlsf.ehoa.pg", "FairSchedulern=2_compact.gm",
+                 "cabp_swp.ehoa.pg")
 # Local release runs exceeded 60 s for each pair, with and without preprocessing.
 SKIP_RUNS = {
     ("cabp_swp.ehoa.pg", "lifting-adaptive"): 60,
@@ -130,6 +133,10 @@ def discover_games(paths):
     if len(stems) != len(set(stems)):
         raise ValueError("games must have unique stems for output directories")
     return games
+
+
+def gallery_games(root):
+    return [root / "examples" / name for name in GALLERY_GAMES]
 
 
 def game_records(stream, chunk_size):
@@ -491,7 +498,7 @@ def generate(root, destination, build_dir, timeout, limit):
         "## Inventory\n",
     ]
     disagreements = []
-    for game in discover_games([root / "examples"]):
+    for game in gallery_games(root):
         vertices, edges, priorities, maximum = game_info(game)
         print(f"{game.relative_to(root)} ({vertices} vertices)", flush=True)
         folder = destination / "decomp" / game.stem

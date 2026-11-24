@@ -1,0 +1,35 @@
+"""Explicit CI inputs; adding reference games does not grow the test matrix."""
+
+EXAMPLES = ("Button.tlsf.ehoa.pg",)
+
+REGRESSIONS = (
+    'compress.pg',
+    'disagree_lifting_leaves.pg',
+    'disagree_lifting_strahler.pg',
+    'disagree_odd_strahler.pg',
+    'disagree_shape.pg',
+    'disagree_zielonka_height.pg',
+    'even_loop.pg',
+    'incomplete.pg',
+    'iter_shave.pg',
+    'lifted_shape.pg',
+    'odd_loop.pg',
+    'oink_disabled.pg',
+    'oink_search_limit.pg',
+    'ordered_two_children.pg',
+    'otj22-fig1.gm',
+    'pm_cycle.pg',
+    'priority_gap.pg',
+    'priority_gap_start.pg',
+    'shave_loops.pg',
+    'shave_partial.pg',
+    'shave_single.pg',
+    'shave_wcwc.pg',
+    'sparse.pg',
+    'split_winners.pg',
+    'strahler_two.pg',
+    'thesis_f4.pg',
+    'thesis_f8.pg',
+    'thesis_h4.pg',
+    'thesis_h8.pg',
+)

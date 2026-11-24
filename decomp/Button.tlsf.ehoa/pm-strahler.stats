@@ -1,5 +1,5 @@
 outcome: complete
-strahler: round=3 result=complete unresolved=0
-even: k=2 t=2 depth=1 vertices=7 lifts=21 attempts=41 non_top=4 top=3 attracted=0
-odd: k=2 t=2 depth=2 vertices=7 lifts=39 attempts=51 non_top=3 top=4 attracted=0
+strahler: round=2 result=complete unresolved=0
+even: k=2 t=1 depth=1 vertices=7 lifts=9 attempts=21 non_top=4 top=3 attracted=0
+odd: k=2 t=1 depth=2 vertices=7 lifts=20 attempts=31 non_top=3 top=4 attracted=0
 start: vertex=0 winner=even

@@ -3,17 +3,17 @@ digraph progress_measures {
   node [shape=box];
   result [label="result (synthetic)"];
   result -> n1;
-  n1 [label="Even (complete)\nstrahler k=2 t=2 depth=1\np=3"];
-  n1 -> n2 [label="000"];
+  n1 [label="Even (complete)\nstrahler k=2 t=1 depth=1\np=3"];
+  n1 -> n2 [label="00"];
   n2 [label="\nV={0,2,3,6}"];
   result -> n3;
-  n3 [label="Odd (complete)\nstrahler k=2 t=2 depth=2\np=4"];
+  n3 [label="Odd (complete)\nstrahler k=2 t=1 depth=2\np=4"];
   n3 -> n4 [label=""];
   n4 [label="p=0"];
   n4 -> n5 [label="00"];
   n5 [label="\nV={5}"];
-  n4 -> n6 [label="001"];
+  n4 -> n6 [label="0"];
   n6 [label="\nV={4}"];
-  n4 -> n7 [label="0"];
+  n4 -> n7 [label="01"];
   n7 [label="\nV={1}"];
 }

@@ -202,6 +202,18 @@ class PngTests(unittest.TestCase):
 
 
 class DecompTests(unittest.TestCase):
+    def test_new_examples_do_not_expand_the_saved_gallery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            examples = root / "examples"
+            examples.mkdir()
+            for name in (*decomp.GALLERY_GAMES, "new-reference.pg"):
+                (examples / name).write_text("parity 0;\n0 0 0 0;\n")
+            self.assertEqual(len(decomp.discover_games([examples])),
+                             len(decomp.GALLERY_GAMES) + 1)
+            self.assertEqual([p.name for p in decomp.gallery_games(root)],
+                             list(decomp.GALLERY_GAMES))
+
     def test_content_discovery_and_metadata(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -451,7 +463,8 @@ class DecompTests(unittest.TestCase):
                          "build the CLI tools to run the integration check")
     def test_determinism_and_stale_files(self):
         with (tempfile.TemporaryDirectory() as directory,
-              redirect_stdout(io.StringIO())):
+              redirect_stdout(io.StringIO()),
+              patch.object(decomp, "GALLERY_GAMES", ("small.gm", "all-shaved.pg"))):
             root = Path(directory) / "repo"
             (root / "examples").mkdir(parents=True)
             shutil.copyfile(ROOT / "examples/Button.tlsf.ehoa.pg",

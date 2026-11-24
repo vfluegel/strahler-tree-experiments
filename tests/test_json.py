@@ -15,7 +15,9 @@ from threading import Thread
 
 from json_check import document
 from test_trace import ROOT, SLOW_PAIRS
-from gen_decomp import BACKENDS, Backend, discover_games, game_info, tree_metrics
+from game_cases import EXAMPLES, REGRESSIONS
+from gen_decomp import (BACKENDS, Backend,
+                        game_info, tree_metrics)
 
 # These additional PM runs already exceed DECOMP's ordinary budget.
 SLOW = SLOW_PAIRS | {(game, backend + suffix)
@@ -351,7 +353,8 @@ def main():
         globals()[mode](build)
         return
     backend = next(b for b in BACKENDS if b.name == sys.argv[3])
-    games = discover_games([ROOT / ('examples' if mode == 'examples' else 'tests/games')])
+    games = [ROOT / 'examples' / name for name in EXAMPLES] if mode == 'examples' else [
+        ROOT / 'tests/games' / name for name in REGRESSIONS]
     if mode in ('slow', 'trace'):
         games = [next(p for p in [ROOT / 'examples' / sys.argv[4], ROOT / 'tests/games' / sys.argv[4]] if p.is_file())]
     with tempfile.TemporaryDirectory(dir=build) as temp:

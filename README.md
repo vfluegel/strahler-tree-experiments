@@ -1,14 +1,18 @@
 # Strahler tree experiments
 
-Command-line tools for building Strahler trees and computing attractor
-decompositions and progress measures of parity games, based on
+Tools for generating Strahler trees and computing attractor decompositions
+and progress measures of parity games, based on
 [The Strahler Number of a Parity Game](https://arxiv.org/pdf/2003.08627).
 
 ## Build
 
-Build with Meson 1.4+, Ninja, a C23 compiler (Clang 18+, GCC 14+, or recent
-Apple Clang), and a C++20 compiler. Boost enables `lenstree`; Graphviz renders
-DOT and enables DOT syntax tests. On macOS: `brew install boost graphviz meson ninja`.
+You need Meson 1.4+, Ninja, a C23 compiler (Clang 18+, GCC 14+, or recent
+Apple Clang), and a C++20 compiler. Install Boost to build `lenstree` and
+Graphviz to render DOT files. On macOS:
+
+```sh
+brew install boost graphviz meson ninja
+```
 
 ```sh
 meson setup build
@@ -16,76 +20,79 @@ meson compile -C build
 meson test -C build --print-errorlogs
 ```
 
-Executables go in `build/`. Release binaries for `linux-x86_64` and
-`macos-arm64` are attached to [GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases).
-
-To release, push a tag such as `v0.4.0`; no version file edits are needed.
-Builds take their version from Git tags. See [developing](docs/developing.md#releases)
-for source archives and version overrides.
-
-## Python and notebooks
-
-Download `strahler-notebooks-<version>.zip` from
-[GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases)
-for Python wheels on Linux x86_64 and macOS Apple silicon (11.0+), plus
-installation instructions for pip and uv. The zip includes everything in
-`jupyter-examples/` at the release tag. The [notebook index](jupyter-examples/README.md)
-describes the examples in this checkout.
-Wheels are also available separately on each release; they are not published
-to PyPI. See [python/README.md](python/README.md) for the
-Python API and installation from a checkout (Python 3.10+).
+The binaries are written to `build/`. Prebuilt binaries for Linux x86_64 and
+macOS arm64 are available from [GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases).
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| `genstree` | Generate a Strahler tree, count its leaves, or print DOT/JSON. |
-| `lenstree` | Count leaves or look up a leaf with the Boost-based implementation. |
-| `pms2dot` | Convert progress-measure branches from standard input to a DOT/JSON prefix tree. |
-| `pgfilt` | Check a PGSolver game from standard input; print statistics or normalize it. |
-| `pg2adot` | Compute and verify attractor decompositions; write DOT/JSON. |
-| `pg2pmdot` | Compute Strahler or succinct progress measures; write DOT/JSON or leaf streams. |
-| `str-tree` | Check p-level successors in a compiled-in example tree. |
+| `genstree` | Generate Strahler trees as leaf labels, DOT, or JSON; count or select leaves. |
+| `lenstree` | Count leaves or select a leaf using the Boost-based implementation. |
+| `pms2dot` | Read progress-measure branches from standard input and draw their prefix tree as DOT or JSON. |
+| `pgfilt` | Read a PGSolver game from standard input, check it, and print statistics or normalized text. |
+| `pg2adot` | Compute and verify attractor decompositions; output DOT or JSON. |
+| `pg2pmdot` | Compute Strahler or succinct progress measures; output DOT, JSON, or leaf streams. |
+| `str-tree` | Check p-level successors in the example tree compiled into the binary. |
 
-`pg2adot` and `pg2pmdot` read a PGSolver file. Use `-` or omit the filename to
-read standard input:
+Run these examples from the repository root. They use a small game from
+[tests/games/](tests/games/):
 
 ```sh
-./build/pg2adot --algorithm=lifting --adaptive-t game.pg > decomposition.dot
-./build/pg2adot --algorithm=zielonka --initial-shave=all --compress game.pg > decomposition.dot
-./build/pg2pmdot --algorithm=strahler --initial-shave=all --compress game.pg > measures.dot
-./build/pg2adot --adaptive-t --iter-shave game.pg > decomposition.dot
-./build/pg2pmdot --algorithm=succinct --labels=sets game.pg > measures.dot
-./build/pg2adot --format=json game.pg > decomposition.json
-./build/pg2pmdot --format=json game.pg > measures.json
-./build/genstree --strahler=2 --height=3 --log-leaves=1 --json > tree.json
-printf '0,e|1,e|\n' | ./build/pms2dot --format=json > prefix.json
+./build/pgfilt < tests/games/strahler_two.pg
+./build/pg2adot --adaptive-t tests/games/strahler_two.pg > decomposition.dot
 dot -Tsvg decomposition.dot > decomposition.svg
+./build/pg2adot --algorithm=zielonka --format=json tests/games/strahler_two.pg > decomposition.json
+./build/pg2pmdot --algorithm=strahler tests/games/strahler_two.pg > measures.dot
+./build/pg2pmdot --algorithm=succinct --format=json tests/games/strahler_two.pg > measures.json
 ```
 
-`--initial-shave=all` removes simple dominions before solving. `--compress` merges
-consecutive distinct priorities of the same parity. Sample games are in
-[tests/games/](tests/games/).
+Both solvers accept `-` or no filename to read standard input. Add
+`--initial-shave=all` to remove simple dominions before solving, `--iter-shave`
+to remove solved regions between lifting runs, or `--compress` to merge
+consecutive distinct priorities of the same parity. Each binary's `--help`
+lists its options.
 
-Generate trees for a new benchmark with `scripts/make_trees.py`. It scans files
-or directories recursively and writes trees, run statistics, per-tree `.metrics`
-files and `summary.csv` to `trees/`; PNGs are included when Graphviz is available.
-Choose backends by their DECOMP.md names with `--backends` (default: all):
+To generate a tree, count its leaves, or inspect the compiled example:
 
 ```sh
-python3 scripts/make_trees.py --backends zielonka,lifting-adaptive+iter --out trees benchmark/
+./build/genstree --strahler=2 --height=3 --log-leaves=1 --dot > tree.dot
+./build/genstree --strahler=2 --height=3 --log-leaves=1 --json > tree.json
+./build/lenstree --strahler=2 --height=3 --log-leaves=1
+printf '0,e|1,e|\n' | ./build/pms2dot > prefix.dot
+./build/str-tree --index=0 --p-level=3
 ```
 
-[DECOMP.md](DECOMP.md) has example trees for every backend.
+For a batch of games, `scripts/make_trees.py` writes trees, run statistics,
+per-tree `.metrics` files, and `summary.csv`. It scans directories recursively
+and also creates PNGs when Graphviz is installed:
 
-[SIMD.md](SIMD.md) describes AD dispatch, full SIMD Strahler PM, scalar controls
-and benchmarks. Both Strahler PM and succinct PM are available; notebook PM runs
-use SIMD Strahler PM.
-[KEIREN.md](KEIREN.md) records static metrics for Jeroen Keiren's parity game benchmarks.
-[ALGOS.md](ALGOS.md) explains how each method builds its trees and how to
-read the metrics. See [docs/](docs/) for research notes and
-[docs/developing.md](docs/developing.md) for detailed command behavior,
-tree notation, and development instructions.
+```sh
+python3 scripts/make_trees.py --backends zielonka,lifting-adaptive+iter --out trees tests/games/strahler_two.pg
+```
+
+## Python and notebooks
+
+The [Jupyter notebooks](jupyter-examples/README.md) show how to build games,
+compare solvers, inspect trees, and step through lifting. Start with
+[01-quickstart](jupyter-examples/01-quickstart.ipynb).
+
+Download `strahler-notebooks-<version>.zip` from
+[GitHub releases](https://github.com/vfluegel/strahler-tree-experiments/releases)
+for the notebooks, Python wheels, and pip/uv installation instructions. Wheels
+support Python 3.10+ on Linux x86_64 and macOS Apple silicon (11.0+). They are
+also available separately on each release; they are not published to PyPI.
+See the [Python README](python/README.md) for the API and installation from a checkout.
+
+## Further reading
+
+- [Example decompositions](DECOMP.md) for every solver backend.
+- [Algorithms and metrics](ALGOS.md), including how to read the output trees.
+- [SIMD implementations and benchmarks](SIMD.md).
+- [Host search orders](HOST-ORDER.md), including `--search=table`.
+- [Keiren benchmark metrics](KEIREN.md).
+- [Command reference and development guide](docs/developing.md), including tree notation and [releases](docs/developing.md#releases).
+- [Research notes](docs/).
 
 ## License
 
@@ -101,7 +108,3 @@ shared modules and tests, with the exception below.
 in `504081d`). Copyright 2017-2018 Tom van Dijk, Johannes Kepler University Linz.
 Ported to C23 and modified for tree output, these files remain Apache-2.0;
 see [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0).
-
-Adaptive AD lifting and Strahler PM also accept `--search=table`: small hosts
-are tried by their exact size, followed by ratio search. See the two-minute
-[host-order analysis](HOST-ORDER.md) and its reproducible CSV.

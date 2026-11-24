@@ -131,8 +131,10 @@ library filename uses ABI version 0. CI checks the derived version against the t
 
 ## Regenerating example trees
 
-[DECOMP.md](../DECOMP.md) lists the trees for every PGSolver game in
-`examples/` and reports differences in their shapes. [ALGOS.md](../ALGOS.md)
+[DECOMP.md](../DECOMP.md) lists a manually maintained gallery of example
+results and reports differences in their shapes. CI does not regenerate it.
+Adding a reference game does not expand the solver test matrix: its smoke
+inputs are listed explicitly in `tests/game_cases.py`. [ALGOS.md](../ALGOS.md)
 explains the algorithms and metrics. Edit ALGOS.md directly.
 
 DOT/PNG trees, progress-measure leaf streams, run statistics with timings
@@ -176,12 +178,11 @@ stale pictures require Graphviz; `--dot PATH` selects its executable, with
 pictures before updating outputs, so a rendering failure leaves the checked-in
 files untouched.
 
-`--check` reruns the tools and reports missing, changed or obsolete outputs
+The manual `--check` command reruns the tools and reports missing, changed or obsolete outputs
 without writing files or rendering pictures. It exits 0 when everything is
 current and non-zero otherwise. It checks PNG integrity and the stored DOT hash;
-different Graphviz versions may render the same DOT differently. CI checks
-freshness on PRs and non-main pushes, and refreshes generated files on pushes
-to `main`.
+different Graphviz versions may render the same DOT differently. Gallery
+regeneration and freshness checks are manual.
 
 For new benchmarks, use `python3 scripts/make_trees.py GAME_OR_DIR...`.
 It uses the same backend names, limits and metrics, but ignores the examples'
@@ -460,6 +461,11 @@ standard input. The default algorithm is attractor-decomposition lifting.
   while shaving makes progress. AD preflights both hosts and skips individually
   over-budget pairs so cheaper fallback hosts can still be tried. Start-pair
   overrides are rejected. [Counts and analysis](../HOST-ORDER.md).
+- `--search=monotone-tab` reads a nested prefix generated offline from that
+  size order and the [host embedding bound](host-monotonicity.md). Prefix
+  variants respect the parameter caps. After the prefix, the ordinary ratio
+  traversal tries every remaining positive-t pair, including pairs omitted
+  from the prefix. Productive shaving repeats its current pair.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.

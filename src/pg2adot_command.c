@@ -64,7 +64,7 @@ static void usage(FILE *out, char *argv[]) {
           "complete; --tree-k caps K\n"
           "  --adaptive-t=incremental                    Reuse certified "
           "opponent wins as TOP\n"
-          "  --search=lexicographic|ratio|table          Select adaptive "
+          "  --search=lexicographic|ratio|table|monotone-tab  Select adaptive "
           "parameter order\n"
           "  --start-k=K                                 First lexicographic K "
           "(default: 1)\n"
@@ -272,9 +272,10 @@ static void write_lifting_stats(CLIIO *io, ADLiftSolveStats const *stats,
   }
   if (options->lexicographic || options->ratio || options->table) {
     fprintf(io->err, "lifting: search=%s budget_exhausted=%s\n",
-            options->table   ? "table"
-            : options->ratio ? "ratio"
-                             : "lexicographic",
+            options->monotone_table ? "monotone-tab"
+            : options->table        ? "table"
+            : options->ratio        ? "ratio"
+                                    : "lexicographic",
             stats->budget_exhausted ? "yes" : "no");
   } else if (options->mode == AD_LIFT_HOST_ADAPTIVE) {
     fputs("lifting: first_complete_t=", io->err);
@@ -533,13 +534,17 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
     case OPTION_SEARCH:
       if (strcmp(parser.argument, "lexicographic") != 0 &&
           strcmp(parser.argument, "ratio") != 0 &&
-          strcmp(parser.argument, "table") != 0) {
+          strcmp(parser.argument, "table") != 0 &&
+          strcmp(parser.argument, "monotone-tab") != 0) {
         return cli_error_to(io->err, argv[0], "Invalid --search value");
       }
       lift_options.lexicographic =
           strcmp(parser.argument, "lexicographic") == 0;
       lift_options.ratio = strcmp(parser.argument, "ratio") == 0;
-      lift_options.table = strcmp(parser.argument, "table") == 0;
+      lift_options.monotone_table =
+          strcmp(parser.argument, "monotone-tab") == 0;
+      lift_options.table =
+          strcmp(parser.argument, "table") == 0 || lift_options.monotone_table;
       break;
     case OPTION_KARY:
       if (!parse_size(parser.argument, &arity) || arity == 0) {
@@ -875,9 +880,10 @@ int pg2adot_command(int argc, char *argv[], CLIIO *io) {
         fputs("Ratio search: partial (no admissible pair)\n", io->err);
       } else {
         fprintf(io->err, "%s search: %s at (K,t)=(%zu,%zu)\n",
-                lift_options.table   ? "Table"
-                : lift_options.ratio ? "Ratio"
-                                     : "Lexicographic",
+                lift_options.monotone_table ? "Monotone-tab"
+                : lift_options.table        ? "Table"
+                : lift_options.ratio        ? "Ratio"
+                                            : "Lexicographic",
                 lift_stats.adaptive_complete ? "complete" : "partial",
                 even_k > odd_k ? even_k : odd_k, lift_stats.player[PG_EVEN].t);
       }

@@ -822,6 +822,47 @@ static void test_table_budget_stats(void) {
   pg_game_destroy(&game);
 }
 
+static void test_nonnested_hosts(void) {
+  struct {
+    char const *path;
+    size_t vertices;
+    size_t even[2];
+  } const cases[] = {
+      {"examples/ad-nonmonotone.pg", 70, {70, 0}},
+      {"examples/strpm-nonmonotone.pg", 44, {44, 44}},
+  };
+  size_t const pairs[][2] = {{3, 2}, {4, 3}};
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    FILE *input = fopen(cases[i].path, "r");
+    PGGame game = {0};
+    PGParseError parse_error = {0};
+    assert(input != nullptr && pg_game_read(input, &game, &parse_error));
+    assert(fclose(input) == 0 && game.vertex_count == cases[i].vertices);
+    PGSet domain = full_domain(&game);
+    ADResult truth = {0};
+    ZielonkaError error = {0};
+    assert(
+        zielonka_decompose(&game, &domain, game.max_priority, &truth, &error));
+    expect_regions(&truth, game.vertex_count, 0);
+    for (size_t j = 0; j < sizeof(pairs) / sizeof(pairs[0]); j++) {
+      ADLiftOptions options = options_for(AD_LIFT_HOST_STRAHLER, pairs[j][0]);
+      options.fixed_t = true;
+      options.t = pairs[j][1];
+      ADResult result = solve(&game, &domain, &options, nullptr);
+      assert(pg_set_count(&result.region[PG_EVEN]) == cases[i].even[j]);
+      assert(pg_set_empty(&result.region[PG_ODD]));
+      assert(pg_set_count(&result.unresolved) ==
+             game.vertex_count - cases[i].even[j]);
+      assert((result.kind == AD_RESULT_COMPLETE) ==
+             (cases[i].even[j] == game.vertex_count));
+      ad_result_destroy(&result);
+    }
+    ad_result_destroy(&truth);
+    pg_set_destroy(&domain);
+    pg_game_destroy(&game);
+  }
+}
+
 static void test_kary_hosts(void) {
   PGGame game = parse(partial_game);
   PGSet domain = full_domain(&game);
@@ -942,6 +983,7 @@ int main(void) {
   test_incremental();
   test_iter_shave();
   test_table_budget_stats();
+  test_nonnested_hosts();
   test_kary_hosts();
   test_tree_hosts();
   test_solver_inputs();

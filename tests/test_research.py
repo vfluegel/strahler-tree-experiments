@@ -12,9 +12,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from find_disagreements import Runner, differences, parse_dot, read_game, shrink, random_game
+from find_disagreements import Runner, differences, embeds, parse_dot, read_game, shrink, random_game
 from incremental_t import (Host, compact, experiment, host_labels,
-                           leaf_stream, lift, materialize, nonnested_example, utree)
+                           embed_larger_k, leaf_stream, lift, materialize,
+                           nonnested_example, utree)
 
 BINARY = Path(sys.argv.pop(1)).resolve() if len(sys.argv) > 1 else ROOT / 'build/pg2adot'
 
@@ -96,6 +97,46 @@ class ResearchTests(unittest.TestCase):
                 path.write_text(leaf_stream(utree(k, t, 4)))
                 nodes, _ = self.runner.run(game, extra=(f'--tree-file={path}',))
                 self.assertEqual(len(nodes[0].region) if nodes[0] else 0, expected)
+
+    def test_cross_k_embedding_of_native_hosts(self):
+        def native_leaves(k, t, h):
+            result = subprocess.run(
+                [*self.runner.prefix, str(BINARY.parent / 'genstree'),
+                 f'--strahler={k}', f'--log-leaves={t}', f'--height={h}', '--json'],
+                capture_output=True, text=True, check=True, timeout=90)
+            def visit(node, path=()):
+                if not node['children']:
+                    yield path
+                for child in node['children']:
+                    yield from visit(child['node'], path + (child['label'],))
+            return list(visit(json.loads(result.stdout)['tree']))
+
+        # Check actual generated labels, including t=0, k=1, k'=h, and jumps
+        # across several k values. Consecutive leaves also test all prefixes.
+        for h in range(2, 6):
+            for k in range(1, h):
+                for t in range(3):
+                    source = native_leaves(k, t, h)
+                    for target_k in range(k + 1, h + 1):
+                        target = native_leaves(target_k, t + k - 1, h)
+                        index = {leaf: i for i, leaf in enumerate(target)}
+                        mapped = [embed_larger_k(leaf, target_k) for leaf in source]
+                        with self.subTest(h=h, k=k, t=t, target_k=target_k):
+                            self.assertTrue(all(leaf in index for leaf in mapped))
+                            self.assertEqual(sorted(index[leaf] for leaf in mapped),
+                                             [index[leaf] for leaf in mapped])
+                            for left, right, a, b in zip(source, source[1:], mapped, mapped[1:]):
+                                for depth in range(h):
+                                    self.assertEqual(left[:depth] == right[:depth],
+                                                     a[:depth] == b[:depth])
+
+    def test_cross_k_bound_is_sharp_at_full_height(self):
+        for h in range(3, 7):
+            for k in range(2, h):
+                for t in (1, 2):
+                    with self.subTest(h=h, k=k, t=t):
+                        self.assertFalse(embeds(utree(k, t, h),
+                                                utree(h, t + k - 2, h)))
 
     def test_adjoints_do_not_preserve_validity(self):
         old = Host(((),), 0, 2)

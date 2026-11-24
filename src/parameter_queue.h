@@ -30,13 +30,7 @@
 #include <stdlib.h>
 
 #include "host_order_data.h"
-
-/* bits is used only by the existing PM default search. */
-typedef struct {
-  size_t k;
-  size_t t;
-  size_t bits;
-} ParameterPair;
+#include "parameter_pair.h"
 
 static inline size_t parameter_ratio(ParameterPair const parameters) {
   return parameters.k > parameters.t ? parameters.k / parameters.t
@@ -45,7 +39,7 @@ static inline size_t parameter_ratio(ParameterPair const parameters) {
 
 typedef struct {
   ParameterPair *heap;
-  bool *seen;
+  uint8_t *seen; /* Bit 0: queued; bit 1: selected for a solver attempt. */
   size_t count;
   size_t width;
   size_t k_max;
@@ -58,6 +52,9 @@ typedef struct {
   ParameterPair ordered;
   bool ordered_valid;
   bool table_budget_skipped;
+  bool monotone_table;
+  bool ordered_prefix;
+  uint64_t monotone_prefix;
 } ParameterQueue;
 
 static inline void parameter_queue_push(ParameterQueue *queue,
@@ -69,10 +66,10 @@ static inline void parameter_queue_push(ParameterQueue *queue,
     return;
   }
   size_t const key = parameters.k * queue->width + parameters.t;
-  if (queue->seen[key]) {
+  if ((queue->seen[key] & 1) != 0) {
     return;
   }
-  queue->seen[key] = true;
+  queue->seen[key] |= 1;
   size_t hole = queue->count++;
   while (hole != 0) {
     size_t const parent = (hole - 1) / 2;
@@ -140,9 +137,18 @@ static inline void parameter_queue_advance(ParameterQueue *queue) {
 /* Select the next untried pair: size-ordered rectangle, remaining zero column,
  * then the original positive-t ratio traversal, excluding the tried rectangle.
  * Keep ordered unchanged while shaving makes progress at this same pair. */
-static inline void parameter_table_advance(ParameterQueue *queue) {
+static inline void parameter_table_next(ParameterQueue *queue) {
   queue->ordered_valid = true;
-  while (queue->band != nullptr && queue->table_at < queue->band->count) {
+  queue->ordered_prefix = false;
+  if (queue->monotone_table && queue->monotone_prefix != 0) {
+    unsigned const code = (unsigned)(queue->monotone_prefix & 63);
+    queue->monotone_prefix >>= 6;
+    queue->ordered = (ParameterPair){.k = code >> 3, .t = code & 7};
+    queue->ordered_prefix = true;
+    return;
+  }
+  while (!queue->monotone_table && queue->band != nullptr &&
+         queue->table_at < queue->band->count) {
     unsigned const code = queue->band->pairs[queue->table_at++];
     ParameterPair const pair = {.k = code >> 3, .t = code & 7};
     if (pair.k <= queue->k_max && pair.t <= queue->t_max) {
@@ -160,13 +166,24 @@ static inline void parameter_table_advance(ParameterQueue *queue) {
   while (queue->count != 0) {
     ParameterPair const pair = queue->heap[0];
     parameter_queue_advance(queue);
-    if (queue->band == nullptr || pair.k > HOST_ORDER_MAX_K ||
-        pair.t > HOST_ORDER_MAX_T) {
+    bool const visited = (queue->seen[pair.k * queue->width + pair.t] & 2) != 0;
+    if (queue->monotone_table
+            ? !visited
+            : queue->band == nullptr || pair.k > HOST_ORDER_MAX_K ||
+                  pair.t > HOST_ORDER_MAX_T) {
       queue->ordered = pair;
       return;
     }
   }
   queue->ordered_valid = false;
+}
+
+static inline void parameter_table_advance(ParameterQueue *queue) {
+  parameter_table_next(queue);
+  if (queue->ordered_valid) {
+    size_t const key = queue->ordered.k * queue->width + queue->ordered.t;
+    queue->seen[key] |= 2;
+  }
 }
 
 [[nodiscard]] static inline bool parameter_table_init(ParameterQueue *queue,
@@ -186,6 +203,27 @@ static inline void parameter_table_advance(ParameterQueue *queue) {
     }
   }
   queue->zero_k = 1;
+  parameter_table_advance(queue);
+  return true;
+}
+
+[[nodiscard]] static inline bool parameter_monotone_init(ParameterQueue *queue,
+                                                         size_t const k_max,
+                                                         size_t const t_max,
+                                                         size_t const height) {
+  if (!parameter_table_init(queue, k_max, t_max, height)) {
+    return false;
+  }
+  queue->monotone_table = true;
+  queue->zero_k = k_max + 1;
+  queue->monotone_prefix =
+      8; /* Chain, also when height is outside the table. */
+  if (queue->band != nullptr) {
+    size_t const k = k_max < HOST_ORDER_MAX_K ? k_max : HOST_ORDER_MAX_K;
+    size_t const t = t_max < HOST_ORDER_MAX_T ? t_max : HOST_ORDER_MAX_T;
+    queue->monotone_prefix =
+        host_monotone_prefixes[queue->band->monotone[k - 1][t]];
+  }
   parameter_table_advance(queue);
   return true;
 }

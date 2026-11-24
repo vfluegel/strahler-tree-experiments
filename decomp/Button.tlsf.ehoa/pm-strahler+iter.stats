@@ -3,12 +3,8 @@ iter-shave: rounds=1 shaved=4
 strahler: round=1 result=partial unresolved=3
 even: k=1 t=1 depth=1 vertices=7 lifts=3 attempts=12 non_top=4 top=3 attracted=0
 odd: k=1 t=1 depth=2 vertices=3 lifts=3 attempts=6 non_top=0 top=3 attracted=0
-iter-shave: rounds=2 shaved=0
-strahler: round=2 result=partial unresolved=3
+iter-shave: rounds=2 shaved=3
+strahler: round=2 result=complete unresolved=0
 even: k=2 t=1 depth=1 vertices=3 lifts=9 attempts=11 non_top=0 top=3 attracted=0
-odd: k=2 t=1 depth=2 vertices=3 lifts=15 attempts=18 non_top=0 top=3 attracted=0
-iter-shave: rounds=3 shaved=3
-strahler: round=3 result=complete unresolved=0
-even: k=2 t=2 depth=1 vertices=3 lifts=21 attempts=23 non_top=0 top=3 attracted=0
-odd: k=2 t=2 depth=2 vertices=3 lifts=14 attempts=17 non_top=3 top=0 attracted=0
+odd: k=2 t=1 depth=2 vertices=3 lifts=8 attempts=11 non_top=3 top=0 attracted=0
 start: vertex=0 winner=even

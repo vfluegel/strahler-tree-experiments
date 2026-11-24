@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "parameter_queue.h"
 #include "pg_preprocess.h"
 #include "pm_internal.h"
 #include "zielonka.h"
@@ -299,11 +300,12 @@ static void test_lifo_order(void) {
   assert(pm_lift(&game, &active, PM_STRAHLER, (PMParameters){.k = 2, .t = 1},
                  PG_EVEN, &result, &error));
   assert(pm_verify(&game, &active, &result, &error));
-  /* FIFO leaves vertex 3 at 00 on level 1 instead of Oink's 10. */
+  /* Nonstrict lifts reset the tail to 00 rather than copying Oink's 10.
+   * The least fixed point no longer depends on the worklist order. */
   PMMeasure const *measure = &result.measure[3];
   assert(!measure->top && measure->length == 2);
   assert(measure->levels[0] == 1 && measure->levels[1] == 1);
-  assert(measure->bits[0] == 1 && measure->bits[1] == 0);
+  assert(measure->bits[0] == 0 && measure->bits[1] == 0);
   pm_result_destroy(&result);
   pg_set_destroy(&active);
   pg_game_destroy(&game);
@@ -358,7 +360,99 @@ static void test_repeat_fixed(void) {
   pg_game_destroy(&game);
 }
 
+static void test_nonnested_hosts(void) {
+  struct {
+    char const *path;
+    size_t vertices;
+    size_t even[2];
+  } const cases[] = {
+      {"examples/ad-nonmonotone.pg", 70, {0, 0}},
+      {"examples/strpm-nonmonotone.pg", 44, {44, 22}},
+  };
+  size_t const pairs[][2] = {{3, 2}, {4, 3}};
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    FILE *input = fopen(cases[i].path, "r");
+    assert(input != nullptr);
+    PGGame game = read_game(input);
+    assert(fclose(input) == 0 && game.vertex_count == cases[i].vertices);
+    PGSet active = {0};
+    assert(pg_set_init(&active, game.vertex_count));
+    pg_set_fill(&active);
+    ADResult truth = {0};
+    ZielonkaError error = {0};
+    assert(
+        zielonka_decompose(&game, &active, game.max_priority, &truth, &error));
+    assert(pg_set_count(&truth.region[PG_EVEN]) == game.vertex_count);
+    assert(pg_set_empty(&truth.region[PG_ODD]));
+    for (size_t j = 0; j < sizeof(pairs) / sizeof(pairs[0]); j++) {
+      PMOptions const options = {
+          .algorithm = PM_STRAHLER,
+          .fixed = true,
+          .parameters = {.k = pairs[j][0], .t = pairs[j][1]},
+          .verify = true};
+      Collected result = solve(&game, &active, &options);
+      assert(result.calls == 1);
+      assert(pg_set_count(&result.won[PG_EVEN]) == cases[i].even[j]);
+      assert(pg_set_empty(&result.won[PG_ODD]));
+      assert(pg_set_count(&result.unresolved) ==
+             game.vertex_count - cases[i].even[j]);
+      destroy(&result);
+    }
+    ad_result_destroy(&truth);
+    pg_set_destroy(&active);
+    pg_game_destroy(&game);
+  }
+}
+
+static void test_nonstrict_tail(void) {
+  FILE *input = fopen("examples/strpm-nonstrict-tail.pg", "r");
+  assert(input != nullptr);
+  PGGame game = read_game(input);
+  assert(fclose(input) == 0 && game.vertex_count == 32);
+  PGSet active = {0};
+  assert(pg_set_init(&active, game.vertex_count));
+  pg_set_fill(&active);
+  PMError error = {0};
+  for (size_t t = 1; t <= 2; t++) {
+    for (PGPlayer player = PG_EVEN; player <= PG_ODD; player++) {
+      PMResult result = {0};
+      assert(pm_lift(&game, &active, PM_STRAHLER,
+                     (PMParameters){.k = 2, .t = t}, player, &result, &error));
+      assert(pm_verify(&game, &active, &result, &error));
+      for (size_t v = 0; v < 32; v++) {
+        assert(pg_set_contains(&result.region, v) ==
+               (player == PG_EVEN ? v < 31 : v == 31));
+        if ((player == PG_EVEN && v >= 22 && v <= 30) ||
+            (player == PG_ODD && v == 31)) {
+          PMMeasure const *m = &result.measure[v];
+          assert(!m->top && m->length == (int)t + 1);
+          for (int i = 0; i < m->length; i++) {
+            assert(m->bits[i] == 0);
+            assert(m->levels[i] == (player == PG_EVEN ? 1 : 0));
+          }
+        }
+      }
+      pm_result_destroy(&result);
+    }
+    PMOptions const options = {.algorithm = PM_STRAHLER,
+                               .fixed = true,
+                               .parameters = {.k = 2, .t = t},
+                               .incremental = true,
+                               .repeat_fixed = true,
+                               .verify = true};
+    Collected result = solve(&game, &active, &options);
+    assert(result.calls == 1 && pg_set_empty(&result.unresolved));
+    assert(pg_set_count(&result.won[PG_EVEN]) == 31);
+    assert(pg_set_count(&result.won[PG_ODD]) == 1);
+    destroy(&result);
+  }
+  pg_set_destroy(&active);
+  pg_game_destroy(&game);
+}
+
 int main(void) {
+  test_nonstrict_tail();
+  test_nonnested_hosts();
   test_repeat_fixed();
   test_ratio_queue();
   test_successors();

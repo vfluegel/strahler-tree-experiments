@@ -175,6 +175,32 @@ static inline void make_top(Label *m) {
   inactive(m);
 }
 
+static inline void truncate(Label *m, int const cutoff, int const k,
+                            int const t) {
+  if (top(*m)) {
+    return;
+  }
+  Vec const keep = cutoff < 0 ? splat(0)
+                              : (Vec)(lanes < splat(m->count)) &
+                                    (Vec)(m->levels <= splat((unsigned)cutoff));
+  unsigned const retained = (unsigned)(last(keep) + 1);
+  if (retained == (unsigned)k - 1) {
+    return;
+  }
+  unsigned const used = prefix(popcount(m->masks & keep))[7] - retained;
+  Vec const fill =
+      (Vec)(lanes >= splat(retained)) & (Vec)(lanes < splat((unsigned)k - 1));
+  Vec const head = (Vec)(lanes == splat(retained));
+  m->bits &= keep;
+  m->masks = choose(keep, m->masks,
+                    choose(head, splat((1U << ((unsigned)t - used + 1)) - 1),
+                           fill & splat(1)));
+  m->levels =
+      choose(fill, splat((unsigned)(cutoff + 1) - retained) + lanes, m->levels);
+  m->count = (unsigned)k - 1;
+  inactive(m);
+}
+
 static inline void successor(Label *m, int const cutoff, int const depth,
                              int const k, int const t) {
   if (top(*m)) {
@@ -298,6 +324,12 @@ void strpm_simd_successor(STRPMVector *m, int const cutoff, int const depth,
   successor(&label, cutoff, depth, k, t);
   save(m, label);
 }
+void strpm_simd_truncate(STRPMVector *m, int const cutoff, int const k,
+                         int const t) {
+  Label label = load(m);
+  truncate(&label, cutoff, k, t);
+  save(m, label);
+}
 int strpm_simd_compare(STRPMVector const *a, STRPMVector const *b,
                        int const cutoff) {
   return compare(load(a), load(b), cutoff);
@@ -347,11 +379,21 @@ bool strpm_simd_lift(PGGame const *game, PGSet const *active, PMResult *result,
   if (compare(best, current, cutoff) <= 0) {
     return false;
   }
+  if (!strict) {
+    truncate(&best, cutoff, k, t);
+  }
   save(measures + vertex, best);
   result->lifts++;
   return true;
 }
 #else
+void strpm_simd_truncate(STRPMVector *m, int cutoff, int k, int t) {
+  (void)m;
+  (void)cutoff;
+  (void)k;
+  (void)t;
+  assert(false);
+}
 void strpm_simd_successor(STRPMVector *m, int cutoff, int depth, int k, int t) {
   (void)m;
   (void)cutoff;

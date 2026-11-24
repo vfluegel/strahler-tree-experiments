@@ -8,6 +8,7 @@ fi
 repo_root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 python3 - "$repo_root" "$@" <<'PY'
 from pathlib import Path
+import json
 import re
 import sys
 from zipfile import ZIP_DEFLATED, ZipFile
@@ -25,11 +26,35 @@ requirements = (notebooks / 'requirements.txt').read_text()
 output.mkdir(parents=True, exist_ok=True)
 name = f'strahler-notebooks-{version}'
 archive = output / f'{name}.zip'
+shared = ('keiren/results.csv', 'KEIREN.md', 'HOST-ORDER.md', 'docs/incremental-t.md', 'docs/host-monotonicity.md',
+          'experimental/host-order/sizes.csv', 'experimental/host-order/summary.json',
+          'scripts/incremental_t.py', 'scripts/find_disagreements.py',
+          'examples/README.md', 'examples/ad-nonmonotone.pg', 'examples/strpm-nonmonotone.pg',
+          'examples/strpm-nonstrict-tail.pg')
 with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
     for path in sorted(notebooks.rglob('*')):
         if path.is_file() and path != notebooks / 'requirements.txt':
-            bundle.write(path, f'{name}/{path.relative_to(notebooks)}')
-    for path in ('keiren/results.csv', 'KEIREN.md'):
+            destination = f'{name}/{path.relative_to(notebooks)}'
+            if path.suffix == '.ipynb':
+                document = json.loads(path.read_text(encoding='utf-8'))
+                changed = False
+                for cell in document.get('cells', []):
+                    if cell['cell_type'] != 'markdown':
+                        continue
+                    source = ''.join(cell['source'])
+                    rewritten = source
+                    for asset in shared:
+                        rewritten = re.sub(r'\]\(\.\./' + re.escape(asset) + r'(?=[)#])',
+                                           '](' + asset, rewritten)
+                    if rewritten != source:
+                        cell['source'] = (rewritten.splitlines(keepends=True)
+                                          if isinstance(cell['source'], list) else rewritten)
+                        changed = True
+                if changed:
+                    bundle.writestr(destination, json.dumps(document, indent=1, ensure_ascii=False) + '\n')
+                    continue
+            bundle.write(path, destination)
+    for path in shared:
         bundle.write(root / path, f'{name}/{path}')
     bundle.writestr(f'{name}/requirements.txt',
                     f'--find-links ./wheels\n--only-binary strahler\n'

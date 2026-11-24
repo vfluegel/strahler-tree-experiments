@@ -58,7 +58,7 @@ digraph progress_measures {
   n19 -> n20 [label=""];
   n20 [label="p=1"];
   n20 -> n21 [label=""];
-  n21 [label="\nV={122,124,126,131,133,138,153,159,..., +501 more}"];
+  n21 [label="\nV={122,124,126,131,133,138,153,159,..., +519 more}"];
   n17 -> n22 [label="0"];
   n22 [label="p=4947802324981"];
   n22 -> n23 [label=""];
@@ -66,7 +66,7 @@ digraph progress_measures {
   n23 -> n24 [label=""];
   n24 [label="p=1"];
   n24 -> n25 [label=""];
-  n25 [label="\nV={841,848,945,951,1050,1064,1074,1141,..., +98 more}"];
+  n25 [label="\nV={841,848,945,951,1050,1074,1834,1841,..., +80 more}"];
   n17 -> n26 [label="01"];
   n26 [label="p=4947802324981"];
   n26 -> n27 [label=""];

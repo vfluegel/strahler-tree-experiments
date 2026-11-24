@@ -50,7 +50,72 @@ static void check(size_t const height, size_t const k_max, size_t const t_max,
   parameter_queue_destroy(&order);
 }
 
+static void check_monotone(size_t const even_height, size_t const odd_height,
+                           size_t const k_max, size_t const t_max) {
+  size_t const height = even_height > odd_height ? even_height : odd_height;
+  ParameterQueue queue = {0}, ratio = {0};
+  assert(parameter_monotone_init(&queue, k_max, t_max, height));
+  assert(parameter_queue_init(&ratio, k_max, t_max));
+  bool visited[10][10] = {{false}};
+  size_t previous[2] = {0};
+  size_t count = 0, prefix_count = 0;
+  ParameterPair previous_pair = {.k = 1, .t = 0};
+  bool fallback = false;
+  while (queue.ordered_valid) {
+    ParameterPair const pair = queue.ordered;
+    assert(pair.k <= k_max && pair.t <= t_max);
+    assert(!visited[pair.k][pair.t]);
+    if (queue.ordered_prefix) {
+      assert(!fallback);
+      bool larger = false;
+      for (size_t player = 0; player < 2; player++) {
+        size_t const h = player == 0 ? even_height : odd_height;
+        size_t const k = pair.k < h ? pair.k : h;
+        size_t const old_k = previous_pair.k < h ? previous_pair.k : h;
+        assert(old_k == 1 || previous_pair.t == 0 ||
+               (k == old_k && pair.t >= previous_pair.t) ||
+               (k > old_k && pair.t >= previous_pair.t + old_k - 1));
+        unsigned const leaves = stree_count_leaves((int)k, (int)pair.t, (int)h);
+        assert(leaves >= previous[player]);
+        larger |= leaves > previous[player];
+        previous[player] = leaves;
+      }
+      prefix_count++;
+      assert(larger && prefix_count <= 7);
+      previous_pair = pair;
+    } else {
+      fallback = true;
+      while (ratio.count != 0 && visited[ratio.heap[0].k][ratio.heap[0].t]) {
+        parameter_queue_advance(&ratio);
+      }
+      assert(ratio.count != 0);
+      assert(pair.k == ratio.heap[0].k && pair.t == ratio.heap[0].t);
+      parameter_queue_advance(&ratio);
+    }
+    visited[pair.k][pair.t] = true;
+    count++;
+    parameter_table_advance(&queue);
+  }
+  assert(count == 1 + k_max * t_max);
+  assert(visited[1][0]);
+  for (size_t k = 1; k <= k_max; k++) {
+    for (size_t t = 1; t <= t_max; t++) {
+      assert(visited[k][t]);
+    }
+  }
+  parameter_queue_destroy(&ratio);
+  parameter_queue_destroy(&queue);
+}
+
 int main(void) {
+  for (size_t h = 1; h <= 7; h++) {
+    for (size_t k = 1; k <= h; k++) {
+      for (size_t t = 0; t <= 6; t++) {
+        check_monotone(h, h == 1 ? 1 : h - 1, k, t);
+      }
+    }
+  }
+  check_monotone(1001, 1000, 3, 2);
   uint64_t *counts = nullptr;
   assert(stree_count_table(6, 6, 1000, &counts));
   size_t const heights[] = {1,   2,   3,   6,   7,    10,  100,

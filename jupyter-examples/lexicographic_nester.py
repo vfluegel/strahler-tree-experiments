@@ -577,8 +577,8 @@ def run_all(seconds=30, memory_gib=2, output=RESULTS, *, backends=BACKENDS,
         for key, value in settings.items():
             assert document[key] == value
         assert document.get('stop_after_n') == stop_after_n
-        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
-            assert document[key] == metadata[key]
+        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced', 'lifting_backends'):
+            assert document.get(key) == metadata.get(key)
     else:
         document = dict(metadata, **settings)
     rows = {(r['n'], r['backend']): r for r in document['rows']}
@@ -671,8 +671,8 @@ def run_frontiers(seconds=600, memory_gib=2, output=None, baseline_path=None, jo
         assert document.get('mode') == mode and document.get('max_n') == max_n
         for key, value in settings.items():
             assert document[key] == value
-        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced'):
-            assert document[key] == metadata[key]
+        for key in ('search', 'version', 'library_sha256', 'fixtures', 'memory_cap_enforced', 'lifting_backends'):
+            assert document.get(key) == metadata.get(key)
     else:
         document = dict(metadata, **settings, frontiers={}, complete=False, cases=0)
     rows = {(r['n'], r['backend']): r for r in document['rows']}

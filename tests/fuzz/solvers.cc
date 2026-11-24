@@ -48,7 +48,10 @@ Decoded decode(std::uint8_t const *data, std::size_t size) {
   Decoded game;
   unsigned const shape = bytes.next();
   game.small = shape < 192U;
-  unsigned const n = game.small ? 1 + shape % 8 : 9 + shape % 32;
+  // Larger domains exercise the symmetric rank path (threshold 64).
+  unsigned const n = game.small     ? 1 + shape % 8
+                     : shape < 224U ? 9 + shape % 32
+                                    : 64 + shape % 17;
   unsigned const priorities = 2 + bytes.next() % 7;
   unsigned const degree = 1 + bytes.next() % 6;
   unsigned const host = bytes.next();
@@ -219,8 +222,17 @@ extern "C" int LLVMFuzzerTestOneInput(std::uint8_t const *data,
   Check const check(game, std::move(truth));
   fixed_hosts(check, decoded.k, decoded.t);
   for (unsigned const k : {2U, 3U}) {
-    check.progress(
-        {"--k=" + std::to_string(k), "--t=" + std::to_string(decoded.t)});
+    if (check
+            .progress({"--k=" + std::to_string(k),
+                       "--t=" + std::to_string(decoded.t)})
+            .complete) {
+      check.solved(check.progress({"--k=" + std::to_string(k),
+                                   "--t=" + std::to_string(decoded.t + 1)}),
+                   "PM raising t");
+      check.solved(check.progress({"--k=" + std::to_string(k + 1),
+                                   "--t=" + std::to_string(decoded.t + k - 1)}),
+                   "PM cross-k host embedding");
+    }
   }
   if (decoded.small) {
     universal_solvers(check, game);

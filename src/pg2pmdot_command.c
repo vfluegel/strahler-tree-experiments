@@ -53,7 +53,7 @@ static void usage(FILE *out, char *argv[]) {
         "between runs (default: off)\n"
         "  --repeat-fixed                              Repeat fixed STRPM "
         "hosts until shaving stalls; requires --k, --t, --iter-shave\n"
-        "  --search=lexicographic|ratio|table          Select adaptive "
+        "  --search=lexicographic|ratio|table|monotone-tab  Select adaptive "
         "parameter order\n"
         "  --start-k=K --start-t=T                      First lexicographic "
         "pair (default: 1,0)\n"
@@ -336,13 +336,17 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     case OPT_SEARCH:
       if (strcmp(parser.argument, "lexicographic") != 0 &&
           strcmp(parser.argument, "ratio") != 0 &&
-          strcmp(parser.argument, "table") != 0) {
+          strcmp(parser.argument, "table") != 0 &&
+          strcmp(parser.argument, "monotone-tab") != 0) {
         return cli_error_to(io->err, argv[0], "Invalid --search value");
       }
       solve_options.lexicographic =
           strcmp(parser.argument, "lexicographic") == 0;
       solve_options.ratio = strcmp(parser.argument, "ratio") == 0;
-      solve_options.table = strcmp(parser.argument, "table") == 0;
+      solve_options.monotone_table =
+          strcmp(parser.argument, "monotone-tab") == 0;
+      solve_options.table =
+          strcmp(parser.argument, "table") == 0 || solve_options.monotone_table;
       break;
     case OPT_STATS:
       output.stats = true;

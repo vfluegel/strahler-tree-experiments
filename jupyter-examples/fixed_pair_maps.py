@@ -30,6 +30,7 @@ MAPPED_GAMES = (4, 5)
 GREEN, RED = '#0ca30c', '#d03b3b'
 CELL, GAP = 24, 2
 _write_lock = threading.Lock()
+_reference_lock = threading.Lock()
 
 
 def winning_sets(document, backend):
@@ -58,23 +59,37 @@ def native_provenance():
                 recorded_utc=datetime.now(timezone.utc).isoformat(timespec='seconds'),
                 machine=f'{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs',
                 pm_algorithm='strahler', requested_pm_backend='simd',
+                lifting_backends={'STRAHLER_AD_BACKEND': os.environ.get('STRAHLER_AD_BACKEND', 'auto'),
+                                  'STRAHLER_PM_BACKEND': 'simd'},
                 verification=True)
 
 
+def reference_winners(path, vertices, seconds, memory_gib):
+    # Serialize first calls as lru_cache alone permits duplicate native solves.
+    with _reference_lock:
+        return _reference_winners(path, vertices, seconds, memory_gib)
+
+
 @lru_cache(maxsize=32)
-def reference_winners(path):
-    from strahler import _native
-    path = Path(path)
-    raw = bz2.decompress(path.read_bytes()) if path.suffix == '.bz2' else path.read_bytes()
-    handle = _native.call('game_parse', raw, len(raw), handle=True)
+def _reference_winners(path, vertices, seconds, memory_gib):
+    request = dict(path=path, vertices=vertices, backend='reference',
+                   options={}, memory_gib=memory_gib)
+    started = perf_counter()
     try:
-        flags = _native.options(None, {}, 'zielonka')
-        document = json.loads(_native.call('decompose', handle, flags, len(flags),
-                                           _native.Callback(), None))
-        assert document['complete']
-        return winning_sets(document, 'AD')
-    finally:
-        _native.library().strahler_game_free(handle)
+        process = subprocess.run([sys.executable, str(Path(__file__).resolve()), 'worker'],
+                                 input=json.dumps(request), text=True, capture_output=True,
+                                 timeout=seconds)
+        if process.returncode:
+            memory = 'MemoryError' in process.stderr or 'MemoryAllocationError' in process.stderr
+            if not memory:
+                raise RuntimeError(process.stderr[-400:])
+            result = dict(outcome='memory')
+        else:
+            result = json.loads(process.stdout)
+            assert result['outcome'] == 'solved'
+    except subprocess.TimeoutExpired:
+        result = dict(outcome='timeout')
+    return dict(result, seconds=round(perf_counter() - started, 3))
 
 
 def worker(request):
@@ -106,7 +121,8 @@ def worker(request):
             options['tree_k'] = options.pop('k')
             options['tree_t'] = options.pop('t')
         options['max_host_leaves'] = 2 * sys.maxsize + 1
-        flags = _native.options(None, options, 'lifting-sym' if backend.startswith('AD-sym') else 'lifting')
+        flags = _native.options(None, options, 'zielonka' if backend == 'reference' else
+                                'lifting-sym' if backend.startswith('AD-sym') else 'lifting')
     try:
         if pm:
             document = json.loads(_native.call('progress_measures', handle, flags, len(flags)))
@@ -143,7 +159,8 @@ def worker(request):
 def measure_game(path, vertices, backend, options, seconds, memory_gib):
     """Native certificates plus independent original-game winner checks."""
     path = str(Path(path).resolve())
-    truth = reference_winners(path)
+    reference = reference_winners(path, vertices, seconds, memory_gib)
+    truth = [set(w) for w in reference['won_vertices']] if reference['outcome'] == 'solved' else None
     request = dict(path=path, vertices=vertices, backend=backend,
                    options=options, memory_gib=memory_gib)
     started = perf_counter()
@@ -154,10 +171,11 @@ def measure_game(path, vertices, backend, options, seconds, memory_gib):
         if process.returncode == 0:
             result = json.loads(process.stdout)
             won = [set(w) for w in result.pop('won_vertices')]
-            assert all(w <= expected for w, expected in zip(won, truth))
-            if result['outcome'] == 'solved':
-                assert won == truth
-            result['independent_winner_check'] = True
+            if truth is not None:
+                assert all(w <= expected for w, expected in zip(won, truth))
+                if result['outcome'] == 'solved':
+                    assert won == truth
+            result['independent_winner_check'] = truth is not None
             result['dispatch'] = {name: process.stderr.count(f'PM strahler backend {name}')
                                   for name in ('simd', 'scalar')} if backend.startswith('PM') else None
         else:
@@ -168,7 +186,9 @@ def measure_game(path, vertices, backend, options, seconds, memory_gib):
     except subprocess.TimeoutExpired:
         result = dict(outcome='timeout')
     return dict(seconds=round(perf_counter() - started, 3),
-                timeout_seconds=seconds, memory_gib=memory_gib, **result)
+                timeout_seconds=seconds, memory_gib=memory_gib,
+                reference_outcome=reference['outcome'], reference_seconds=reference['seconds'],
+                **result)
 
 
 def measure(n, backend, k, t, seconds, memory_gib):
@@ -229,9 +249,12 @@ def run(walk, games, seconds, memory_gib, jobs, output, backends=PM_BACKENDS):
                     fixed_pm_policy={b: 'repeat-until-stalled' if b.endswith('+iter') else 'one round' for b in backends})
     if metadata_path.exists():
         previous = json.loads(metadata_path.read_text())
-        for key in ('library_sha256', 'worker_sha256', 'backends', 'games', 'timeout_seconds', 'memory_gib'):
+        for key in ('library_sha256', 'worker_sha256', 'backends', 'games', 'timeout_seconds',
+                    'memory_gib', 'jobs', 'fixtures', 'rectangle', 'fixed_pm_policy', 'lifting_backends'):
             assert metadata[key] == previous[key], f'Resume mismatch: {key}'
     else:
+        if output.exists() and output.stat().st_size:
+            raise ValueError('Cannot resume a checkpoint without its metadata sidecar')
         metadata_path.write_text(json.dumps(metadata, indent=2)+'\n')
     if output.exists():
         rows = {(r['n'], r['backend'], r['k'], r['t']): r
@@ -316,17 +339,32 @@ def pareto(rows):
     return candidates, [pair for pair in candidates if not missing[pair]], missing
 
 
+def embedding_source(solved, k, t):
+    """A source for mathematical certificate transfer at fixed height.
+
+    Zero-budget and k=1 hosts are chains. Otherwise use fixed-k inclusion or
+    the t+k-1 bound proved in docs/host-monotonicity.md.
+    """
+    return next(((a, b) for a, b in sorted(solved) if
+                 a == 1 or b == 0 or
+                 (k == a and t >= b) or (k > a and t >= b + a - 1)), None)
+
+
 def classify(rows, k_max, t_max):
-    """Only measured solves/partials are colored as answers; no across-k inference."""
+    """Keep measured outcomes and distinguish embedding-guaranteed solves."""
     measured = {(r['k'], r['t']): r for r in rows}
     solved = {at for at, r in measured.items() if r['outcome'] == 'solved'}
     candidates, confirmed, _ = pareto(rows)
     cells = {}
     for at in ((k, t) for k in range(1, k_max + 1) for t in range(t_max + 1)):
         row = measured.get(at)
+        witness = embedding_source(solved, *at)
         if row is None:
-            dominated = any(pair != at and pair[0] <= at[0] and pair[1] <= at[1] for pair in solved)
-            cells[at] = ('dominated', '', 'not run; cannot be a Pareto minimum') if dominated else ('unknown', '', 'not run; outcome unknown')
+            if witness is not None:
+                cells[at] = ('implied', '⇒', f'solve inferred from {witness}; not timed')
+            else:
+                dominated = any(pair != at and pair[0] <= at[0] and pair[1] <= at[1] for pair in solved)
+                cells[at] = ('dominated', '', 'not run; cannot be a Pareto minimum; outcome unknown') if dominated else ('unknown', '', 'not run; outcome unknown')
         elif row['outcome'] == 'solved':
             mark = '★' if at in confirmed else '◇' if at in candidates else '✓'
             cells[at] = ('solved', mark, f"solved in {row['seconds']:.1f} s, {row['rounds']} round(s)" +
@@ -334,7 +372,9 @@ def classify(rows, k_max, t_max):
         elif row['outcome'] == 'unsolved':
             cells[at] = ('failed', '✗', f"stabilized with {row['unresolved']} vertices unresolved")
         elif row['outcome'] in ('timeout', 'memory', 'output limit'):
-            cells[at] = ('limit', {'timeout': 'T', 'memory': 'M', 'output limit': 'O'}[row['outcome']], 'resource limit; host sufficiency unknown')
+            tip = ('resource limit; transferred certificate(s) exist from ' + str(witness)
+                   if witness is not None else 'resource limit; host sufficiency unknown')
+            cells[at] = ('limit', {'timeout': 'T', 'memory': 'M', 'output limit': 'O'}[row['outcome']], tip)
         else:
             cells[at] = ('unknown', '!', row.get('detail', 'solver error'))
     return cells
@@ -352,6 +392,9 @@ def _glyph(x, y, glyph):
         return f'<polygon points="{x},{y-8} {x+7},{y} {x},{y+8} {x-7},{y}" {line}/>'
     if glyph == '✓':
         return f'<polyline points="{x - 5},{y} {x - 1.5},{y + 4} {x + 5.5},{y - 4.5}" {line}/>'
+    if glyph == '⇒':
+        return (f'<path d="M{x - 7} {y - 3}H{x + 3}M{x - 7} {y + 3}H{x + 3}'
+                f'M{x + 1} {y - 7}L{x + 8} {y}L{x + 1} {y + 7}" {line}/>')
     if glyph == '✗':
         return (f'<path d="M{x - 4.5} {y - 4.5}L{x + 4.5} {y + 4.5}'
                 f'M{x + 4.5} {y - 4.5}L{x - 4.5} {y + 4.5}" {line}/>')
@@ -362,7 +405,7 @@ def _glyph(x, y, glyph):
 
 
 def _square(x, y, state, glyph, tip=''):
-    fill, opacity = {'solved': (GREEN, 1), 'failed': (RED, 1),
+    fill, opacity = {'solved': (GREEN, 1), 'implied': (GREEN, .72), 'failed': (RED, 1),
                      'dominated': ('#94a3b8', .35), 'limit': ('#b45309', 1),
                      'unknown': ('none', 1)}[state]
     stroke = ' stroke="#94a3b8"' if state == 'unknown' else ''
@@ -402,8 +445,8 @@ def grid_svg(title, rows, k_max, t_max):
 
 def legend_svg():
     entries = [('solved', '★', 'confirmed Pareto minimum'), ('solved', '◇', 'observed nondominated solve'),
-               ('solved', '✓', 'measured solve'), ('failed', '✗', 'measured partial'),
-               ('limit', 'T', 'resource limit: unknown'),
+               ('solved', '✓', 'measured solve'), ('implied', '⇒', 'solve inferred by embedding, not timed'),
+               ('failed', '✗', 'measured partial'), ('limit', 'T', 'resource limit'),
                ('dominated', '', 'dominated, not run'), ('unknown', '', 'not run')]
     parts, x = [], 4
     for state, glyph, label in entries:
@@ -478,7 +521,7 @@ def validate_pm_recording(document):
         require(not missing, f'{n} {backend}: missing undominated cells {missing}')
         candidates, confirmed, open_pairs = pareto(cells)
         coverage.append(dict(n=n, backend=backend, measured=len(cells),
-                             dominated_not_run=sum(s[0] == 'dominated' for s in states.values()),
+                             dominated_not_run=sum(s[0] in ('dominated', 'implied') for s in states.values()),
                              observed_candidates=candidates, confirmed_minima=confirmed,
                              open_predecessors={str(p): v for p, v in open_pairs.items() if v}))
     return coverage

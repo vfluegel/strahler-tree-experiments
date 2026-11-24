@@ -15,7 +15,8 @@ from strahler import _native
 from trace_replay import Replay
 from otj22 import hk
 from test_json import SLOW
-from gen_decomp import BACKENDS, discover_games, player_stats
+from game_cases import EXAMPLES as EXAMPLE_NAMES
+from gen_decomp import BACKENDS, player_stats
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get('STRAHLER_BUILD_DIR', ROOT / 'build'))
@@ -32,33 +33,34 @@ def as_dict(node):
 
 EXAMPLES = [pytest.param(path, backend, id=f'{path.name}/{backend.name}',
                          marks=pytest.mark.slow if (path.name, backend.name) in SLOW else ())
-            for path in discover_games([ROOT / 'examples']) for backend in BACKENDS]
+            for path in (ROOT / 'examples' / name for name in EXAMPLE_NAMES) for backend in BACKENDS]
 
 
 @pytest.mark.parametrize('path,backend', EXAMPLES)
 def test_examples_match_cli_bytes(path, backend):
     text = path.read_text()
-    flags = ['--format=json', *backend.options]
+    options = list(backend.options)
+    flags = ['--format=json', *options]
     expected = cli(backend.binary, flags, text)
     with strahler.Game.from_text(text) as game:
         if expected.returncode:
             with pytest.raises(strahler.StrahlerError) as failure:
                 if backend.binary == 'pg2adot':
-                    strahler.decompose(game, args=backend.options)
+                    strahler.decompose(game, args=options)
                 else:
-                    strahler.progress_measures(game, args=backend.options)
+                    strahler.progress_measures(game, args=options)
             assert failure.value.status == expected.returncode
             return
         if backend.binary == 'pg2adot':
-            result = strahler.decompose(game, args=backend.options)
+            result = strahler.decompose(game, args=options)
             assert result.to_json() == expected.stdout
             for p in range(2):
                 assert strahler.check(game, result.trees[p], p, result.regions[p],
                                       compress='--compress' in backend.options).ok
         else:
-            args = _native.options(backend.options, {})
+            args = _native.options(options, {})
             assert _native.call('progress_measures', game._pointer(), args, len(args)) == expected.stdout
-            assert strahler.progress_measures(game, args=backend.options) == json.loads(expected.stdout)
+            assert strahler.progress_measures(game, args=options) == json.loads(expected.stdout)
 
 
 @pytest.mark.parametrize('args', [(), ('--tree-k=1',), ('--kary=1',),

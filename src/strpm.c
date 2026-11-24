@@ -38,13 +38,42 @@ static int distinct(PMMeasure const *measure, int const begin, int const end) {
   return count;
 }
 
+void strpm_truncate(PMMeasure *measure, int const pindex, int const k,
+                    int const t) {
+  if (measure->top || k == 1) {
+    return;
+  }
+  int retained = 0;
+  while (retained < measure->length && measure->levels[retained] <= pindex) {
+    retained++;
+  }
+  int const strings = distinct(measure, 0, retained);
+  int const remaining = k - 1 - strings;
+  measure->length = retained;
+  if (remaining == 0) {
+    return;
+  }
+  /* Choose the first canonical leaf with this prefix. Erasing the suffix
+   * alone would leave the fixed-k leaf domain. Spend the remaining bit budget
+   * on its first zero string, then add the other required leading zeros. */
+  int const first_length = t - (retained - strings) + 1;
+  for (int i = 0; i < first_length; i++) {
+    measure->bits[measure->length] = 0;
+    measure->levels[measure->length++] = pindex + 1;
+  }
+  for (int i = 1; i < remaining; i++) {
+    measure->bits[measure->length] = 0;
+    measure->levels[measure->length++] = pindex + 1 + i;
+  }
+}
+
 void strpm_successor(PMMeasure *measure, int const pindex, int const depth,
                      int const k, int const t) {
   if (measure->top) {
     return;
   }
-  if (measure->length == 0) {
-    /* The zero-budget tree has a single all-empty leaf. */
+  if (measure->length == 0 || pindex < 0) {
+    /* No strictly greater prefix exists at the empty cutoff. */
     measure->top = true;
     return;
   }
