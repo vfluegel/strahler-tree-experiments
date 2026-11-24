@@ -2,5 +2,5 @@ outcome: complete
 preprocess: residual=5583 shaved_even=13 shaved_odd=0 single=0 loops=13 wcwc=0
 strahler: round=3 result=complete unresolved=0
 even: k=2 t=2 depth=5 vertices=5583 lifts=7776 attempts=88384 non_top=5583 top=0 attracted=0
-odd: k=2 t=2 depth=6 vertices=5583 lifts=90277 attempts=1688198 non_top=0 top=5583 attracted=0
+odd: k=2 t=2 depth=6 vertices=5583 lifts=90294 attempts=1688242 non_top=0 top=5583 attracted=0
 start: vertex=0 winner=even

@@ -3,7 +3,4 @@ even: 0|
 odd: 
 # round 2 k=2 t=1
 even: 
-odd: 
-# round 3 k=2 t=2
-even: 
-odd: e,0|e,001|e,00|
+odd: e,01|e,0|e,00|

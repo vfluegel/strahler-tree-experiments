@@ -16,29 +16,17 @@ digraph progress_measures {
   ordering=out;
   node [shape=box];
   label="round 2";
-  result [label="result (synthetic; partial)"];
-  result -> n1;
-  n1 [label="Even (partial)\nstrahler k=2 t=1 depth=1\nno non-top measures\nV={}"];
-  result -> n2;
-  n2 [label="Odd (partial)\nstrahler k=2 t=1 depth=2\nno non-top measures\nV={}"];
-  unresolved [style=dashed, label="Unresolved\nU={1,4,5}"];
-  result -> unresolved [style=dashed];
-}
-digraph progress_measures {
-  ordering=out;
-  node [shape=box];
-  label="round 3";
   result [label="result (synthetic)"];
   result -> n1;
-  n1 [label="Even (complete)\nstrahler k=2 t=2 depth=1\nno non-top measures\nV={}"];
+  n1 [label="Even (complete)\nstrahler k=2 t=1 depth=1\nno non-top measures\nV={}"];
   result -> n2;
-  n2 [label="Odd (complete)\nstrahler k=2 t=2 depth=2\np=4"];
+  n2 [label="Odd (complete)\nstrahler k=2 t=1 depth=2\np=4"];
   n2 -> n3 [label=""];
   n3 [label="p=0"];
   n3 -> n4 [label="00"];
   n4 [label="\nV={5}"];
-  n3 -> n5 [label="001"];
+  n3 -> n5 [label="0"];
   n5 [label="\nV={4}"];
-  n3 -> n6 [label="0"];
+  n3 -> n6 [label="01"];
   n6 [label="\nV={1}"];
 }

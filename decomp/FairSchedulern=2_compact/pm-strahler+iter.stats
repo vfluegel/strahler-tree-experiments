@@ -3,16 +3,8 @@ iter-shave: rounds=1 shaved=13
 strahler: round=1 result=partial unresolved=5583
 even: k=1 t=1 depth=7 vertices=5596 lifts=5588 attempts=134325 non_top=8 top=5588 attracted=5
 odd: k=1 t=1 depth=8 vertices=5583 lifts=5583 attempts=133204 non_top=0 top=5583 attracted=0
-iter-shave: rounds=2 shaved=0
-strahler: round=2 result=partial unresolved=5583
-even: k=2 t=1 depth=7 vertices=5583 lifts=23638 attempts=317886 non_top=0 top=5583 attracted=0
-odd: k=2 t=1 depth=8 vertices=5583 lifts=82439 attempts=1581524 non_top=0 top=5583 attracted=0
-iter-shave: rounds=3 shaved=0
-strahler: round=3 result=partial unresolved=5583
-even: k=2 t=2 depth=7 vertices=5583 lifts=35482 attempts=372939 non_top=0 top=5583 attracted=0
-odd: k=2 t=2 depth=8 vertices=5583 lifts=178695 attempts=3452641 non_top=0 top=5583 attracted=0
-iter-shave: rounds=4 shaved=5583
-strahler: round=4 result=complete unresolved=0
-even: k=3 t=2 depth=7 vertices=5583 lifts=99225 attempts=869433 non_top=5583 top=0 attracted=0
-odd: k=3 t=2 depth=8 vertices=0 lifts=0 attempts=0 non_top=0 top=0 attracted=0
+iter-shave: rounds=2 shaved=5583
+strahler: round=2 result=complete unresolved=0
+even: k=2 t=1 depth=7 vertices=5583 lifts=14831 attempts=216116 non_top=5583 top=0 attracted=0
+odd: k=2 t=1 depth=8 vertices=0 lifts=0 attempts=0 non_top=0 top=0 attracted=0
 start: vertex=0 winner=even
