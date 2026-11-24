@@ -15,7 +15,8 @@ from threading import Thread
 
 from json_check import document
 from test_trace import ROOT, SLOW_PAIRS
-from gen_decomp import BACKENDS, Backend, discover_games, game_info, tree_metrics
+from gen_decomp import (BACKENDS, Backend, FIXED_HOST_EXAMPLES, discover_games,
+                        game_info, tree_metrics)
 
 # These additional PM runs already exceed DECOMP's ordinary budget.
 SLOW = SLOW_PAIRS | {(game, backend + suffix)
@@ -209,8 +210,16 @@ def check_measure_prefixes(build, value):
             compare_prefix(tree, dot.stdout)
 
 
+def example_options(backend, game):
+    options = list(backend.options)
+    if game.name in FIXED_HOST_EXAMPLES and backend.name.startswith('pm-strahler'):
+        # These fixtures test fixed hosts, rather than unrestricted searches.
+        options += ['--k=3', '--t=2']
+    return options
+
+
 def check_game(build, backend, game, directory, priority="compact"):
-    options = [*backend.options, f'--priority-mode={priority}']
+    options = [*example_options(backend, game), f'--priority-mode={priority}']
     if game.name == 'cabp_swp.ehoa.pg' and backend.name in ('pm-strahler+iter', 'pm-strahler+pre+iter'):
         options += ['--k=1', '--t=1']
     binary = build / backend.binary
