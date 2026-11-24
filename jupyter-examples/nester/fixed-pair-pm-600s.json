@@ -1,0 +1,5492 @@
+{
+ "version": "0.4.2.dev38+g4ca678e.dirty",
+ "library_sha256": "7363c063b3f404a3aba19b2be940c9de2895151cb5e99e0e0110a62325a4f371",
+ "worker_sha256": "4b464e6de4bc93e0b8b4dd3d47bb38fb6e6a3769776fbd44f164bee290a2047c",
+ "recorded_utc": "2026-11-24T12:12:14+00:00",
+ "machine": "Linux x86_64, 4 CPUs",
+ "pm_algorithm": "strahler",
+ "requested_pm_backend": "simd",
+ "verification": true,
+ "backends": [
+  "PM",
+  "PM+iter"
+ ],
+ "games": [
+  4,
+  5
+ ],
+ "timeout_seconds": 600.0,
+ "memory_gib": 2,
+ "jobs": 2,
+ "rectangle": {
+  "k_max": 6,
+  "t_max": 6
+ },
+ "fixtures": {
+  "Nestern=1.gm.bz2": "ce112b3d91f31d27229904bde845fb724b325a03ea15e16a4200971f906d20e2",
+  "Nestern=2.gm.bz2": "0cceac6c5c286d82a9558e48e026272f528311c82b5c601decda4515deae5190",
+  "Nestern=3.gm.bz2": "13593a9d5de50cdb5cf6deb948cc9b92fb39de0765592a1fba4e8242edae6fd3",
+  "Nestern=4.gm.bz2": "5ed4fb7c98447ca8699f30dcd31d51fe8a53cd0d0b7eacdaed5b0775d7e10933",
+  "Nestern=5.gm.bz2": "f91b10b722e7a62a0ca37be836ef09530b941951951937a6eb294feb887d65f1",
+  "Nestern=6.gm.bz2": "0f4fab008559614a8e3d663bf525752ca70a62929cae538a637131595f9b68b9",
+  "Nestern=7.gm.bz2": "b4ffa8d2e1c3e294a9b1fbb46d61a72501d3c95235b817f5f0347a0293cc27ae"
+ },
+ "fixed_pm_policy": {
+  "PM": "one round",
+  "PM+iter": "repeat-until-stalled"
+ },
+ "source_snapshot_commit": "fb28a31546f1f0dfa3251cd97fdd8aa9301869be",
+ "native_sources_sha256": {
+  "src/ad_batch.c": "ff53a645a0d9eb9f6da077e85b5fcfc9328fbe447c000fe3cf0a6cb25df8babb",
+  "src/ad_batch.h": "60dfdb6af27297ffa2a9cc34ba90f227d8e33eb1281d26f12328e2aa7b1731c5",
+  "src/ad_lift.c": "ab3dd4a0a17bdcbc04983e5177db3ede4bb558de88f15647abd40acea77098db",
+  "src/ad_lift.h": "b929b8bffbb9c49b3813a00a6a0358aa36a488ec93df35bd8ff538c2f16bfea4",
+  "src/ad_lift_solve.c": "db47c6961a003b4235e4344419d32fc2c5f814434959d6e65f55a46410e18e75",
+  "src/ad_lift_solve.h": "55eb261a23b6d67e349d57d1aed660cd3a4003608e2d76ff372f6f201c5f2717",
+  "src/ad_lift_tree.c": "2f2ea79a5346b148433eb4af7c0034c87f31ebb4f3f02cb8863490a1cce024cc",
+  "src/ad_lift_tree.h": "d529a2e9866a8e48411f434ad0cbc19eb8ccd3e7494ea27471fb80550b324ba8",
+  "src/ad_reach.c": "9a97457c86a46f921394b598f44cb32cac150648f9b6b3d1b5b7064c848bb27e",
+  "src/ad_reach.h": "a7d5e707699a6d02b507132c4cbd41cf7004bcbdbb1f5db171913daf19b08ab4",
+  "src/ad_sym.c": "366ecd98d9273a79ce3476705bc8c92f30ebc02dc26ce7177816fedf870a9618",
+  "src/ad_sym.h": "112b80d92eef92335d0c43c42f0d2b6c6ed3c17319155b6f8b89b12e9a6f4b39",
+  "src/ad_trace.c": "162626abd88731c31fd05dbbaa480ee1fc8a5bbcde1a5a432755981c1428ac6f",
+  "src/ad_trace.h": "78cd199fccff5147e1f7b2c389632ef07f7990cb0df5ea674e1431b779b5d590",
+  "src/ad_tree.c": "6c98f3add9f663b07df3e999d2ddcccf22edde22e424717047dac3c891a8ce6e",
+  "src/ad_tree.h": "3260e6b5a9050d5114fad0ba33ffced8880ea14c166e6cb3ed0ee152d8854f8e",
+  "src/ad_tree_dot.c": "e9274405ca9e78ff467e2ef3a4e5071be56ca15a0d856d47aa379fd49368c36f",
+  "src/ad_tree_dot.h": "8e47ac2be8b1a49f2765c32a67487ef353a1046c98cd4b0878889dcab54f3828",
+  "src/ad_tree_json.c": "3e0f0215679e38479bdb859a56018b726319daef67ee066a3876952cd4967d2f",
+  "src/ad_tree_json.h": "aaae87b710db50cb91ee1c34167e27e141a51b20e7cf94f5e5e1ce6671d491c0",
+  "src/cli_commands.c": "9735ca9b6c4f7ffd7f7a13c1fec01985328634c01e65e1225b6e014f1cbb4ffe",
+  "src/cli_commands.h": "58f73022a7d2a5c3141e6fc7124430b099df37734b5518695326d915559e50be",
+  "src/cli_version.c": "c706b73780c576729d94691a92635a9719a9b0a8a86b6a24c23f7c87f8473107",
+  "src/cli_version.h": "b70832e52d47298b213712c87e85d9ac1266297f26c934cb7ab822f1ea97ed49",
+  "src/dot_utils.c": "e0c53746177719f07c4e26faaa8db16503934250d456fdf193798ebde896e7d0",
+  "src/dot_utils.h": "12a4f785706ce314e1aaa2edb22712e2a7c7dea7561ddef1382b6f9258ae8132",
+  "src/genstree.c": "ed9b53925a1f363f9db053492b5cc7f6723f1d13f2b6ef6565523b971289e98f",
+  "src/genstree_command.c": "1eb094063c89e29652db7283b467dbcc1b5707a126368f1d4f11ecf61829f093",
+  "src/host_order_data.h": "05c5b88d0b28194ed80c376e81cfc490c61e1bf1062ac620e0fd74b7cd35cd93",
+  "src/json_input.c": "e7a370e83d69d7bb9020cccd588d536519783aa0c922cd67e3aad407ac333f02",
+  "src/json_input.h": "9085b74360a6004e66bbf2bbb17bdb969bebdfbf52d817524f46b9dc723da199",
+  "src/json_utils.c": "fed42fecd7f8eeef9a9e6b0b7d148469737be19960aea169811f9b56a6f04cdb",
+  "src/json_utils.h": "23eb2f04793a04328dac2e7c31f16ba860b18b807bc36f8b089b3d8f193b108a",
+  "src/lift_simd.c": "34976fc7729de8bc1f79a8c66c3080e20b3795cacabe6590ca67dbdf3e23cf07",
+  "src/lift_simd.h": "667cdb579cd63fe0d91895027c8e738750e7856481c4c9cbbb32fbecb0e136d2",
+  "src/lift_simd_neon.c": "2b3f03951e116bd14b00a2b4e86e6c0406b1d1c44ce31a9f871b2c55a6380025",
+  "src/lift_simd_x86.c": "e8c3b33d95df78eaf0ca88a5d64da4e892c1a657e1a41493aafc4a6c2ef6f400",
+  "src/ordered_tree.c": "be2b67dfcca6f273fabafb8fc0b738e1066fbb7935215b211432d7abdd6d0068",
+  "src/ordered_tree.h": "3104abc52e2e21fbd12812e54c55c507de349c85da248e5de64682a59afd2d51",
+  "src/parameter_queue.h": "e8d84cd8206407854f6fc76cf1f0188d844c13b059926c7a868d5c32b9d72ba7",
+  "src/pg2adot.c": "07f66936cb937a3871a68d2a2c6f895b2e04b9b94307492a0f12c819b0d2c480",
+  "src/pg2adot_command.c": "abc9ecff9e16f1f8d70ef22b4c7c6fdc989f27725f491056928ccfb14f8d2065",
+  "src/pg2pmdot.c": "fed75ab26d37b4c5de515178ae38e49011cb176c4780b74f2ee772e9935835f0",
+  "src/pg2pmdot_command.c": "cdd3c65f76392435d31fe711225594213b493cc9dc745faaccedc39b56ede47d",
+  "src/pg_attractor.c": "7fbc751c5ca5f814cecca214332da37a6ef78372ce37a645d30d9c9aaa474d1f",
+  "src/pg_attractor.h": "f392c9ee931e6dea1098ca5c7d07398b04bc8bfd544951b79e19c2870974ba61",
+  "src/pg_dot.c": "997a1f4e80e00abbd573560b5405f9246ed17eb89e667197bfe2c4a4bf08e55f",
+  "src/pg_dot.h": "b4412b09b414e3f7505e065eb606dbdca3e0e25734884c7de297282c6d2d955f",
+  "src/pg_game.c": "a677c51147b264b6389993c5eceae3fa35691324b1f960b50286975a8accf027",
+  "src/pg_game.h": "1e5c18510a20a450c8f9c7d1e768ce83208d6c5bb6df2d6134ca8f6a772416d5",
+  "src/pg_game_internal.h": "d8429a4bae38a0b27771fd95c478e0964886f08c73db11bbe45b5cc7962c22e5",
+  "src/pg_preprocess.c": "00b5b60d77e2228df13f908aa80d1f1946a958a5eee89af455e8c36e6b1eb109",
+  "src/pg_preprocess.h": "accfeea612a0862514c09da1543e27b1c1f25b92d01aee466d076375080eb863",
+  "src/pg_set.c": "0f8302e0aa73d53c29d37e1379746df2826c7e7ddcdd271e560350ce5ca11ae3",
+  "src/pg_set.h": "98a288e0c0a2c0d6bea7764a33f2592b14869063bdc71f88b7aff25d717fccbe",
+  "src/pgfilt.c": "4a4fa8dcf098e2031539ec143a084ea2bceaf123c106baf74de819aa75a76472",
+  "src/pm_internal.h": "101afd8505f8a7e6e5c8280d34fd37a17dbc28f20c6962098a28a29563a8b575",
+  "src/pm_lift.c": "a841bff6a81fe75fff21c9db6fd37f28fd60425f20343d723e298fe828238474",
+  "src/pm_lift.h": "3fa212ba10b66af60dbe5d713e6d8a1a5e52e5dc3c342537eefa4827512fbffe",
+  "src/pm_solve.c": "0c6e86c882c584b062068c3122d6e965d6598bb5b6d1e538a1fa0cfcf298a665",
+  "src/pm_tree_dot.c": "68190300c599253e0a3a7a03a2e9f24975c7dff2ce04a6cd1d3ec4b613c42aa8",
+  "src/pm_tree_dot.h": "f5226d66a4365b236c2bf7e67cfefbe8b60e2acce931bb54a7a2a7e94c9af484",
+  "src/pms2dot.c": "38e4b7cb48f762864b7696f9f0cb87d8fa3a3710bd70e24f2621000ab414693c",
+  "src/pms2dot_command.c": "c159c30e2f07e19835b1e6066158e27a39f68e240d6aad8ae49d1f41ec633a36",
+  "src/sspm.c": "d07bd08a4820e2bd668dac3599469a378f902f5f68e01964e8f7e01138c5aee4",
+  "src/str-tree.cc": "b55f29857cda2c956e03aeb1f9fbe9fbf7f2e21709f1222691716e7f87a323dd",
+  "src/strahler.c": "dc9b7c695303c7b1db436b46ad9254c816760f318e4bb42990ad9bc02af4e83e",
+  "src/strahler.h": "e4b56259390c2d6e43cac86eafb5fc0aacefb9d8a35551ac01e9180ad301a34f",
+  "src/stree.c": "768d392600a3007657adaefa8da378e642e177fe60f947e3aaa895f3b2f23003",
+  "src/stree.h": "bc62c4e3c64aa62f04738e3ac76143819fa084506991b5c77aae919762b31109",
+  "src/strpm.c": "6423089cbd0eab41b56b5a417993c873397148fa07e813cf027240ef9649e486",
+  "src/strpm_simd.c": "29dcaeff4ebbebba1bacfa93954b5ae0f0f668446055703cd3c950573faa5750",
+  "src/strpm_simd.h": "3c9d15750fe09482a97d7bdb776168e8fc3b4c2956b95d76359c92096bcf11a1",
+  "src/utils.h": "9bf183d6e6c9e71c62cc72b9ca5617ce1837826e235f1788fe8f00bec68020c1",
+  "src/utrees.h": "936e816bb817f42111253232186ad2d933667ec0bced5748bef8ae012de29571",
+  "src/zielonka.c": "4405f852e5ba2214e92e2248502cea61d9963d85011d41a586fac5c77930cfbd",
+  "src/zielonka.h": "b896170bc45aa10a0c587077f7bbad24634fbeb97b483e8fc5935edb525a2c3f"
+ },
+ "compiler": "cc (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)",
+ "buildtype": "release",
+ "b_ndebug": true,
+ "note": "Native version string reflects the pre-commit build; binary and source snapshots are pinned separately.",
+ "complete": false,
+ "coverage": [
+  {
+   "n": 4,
+   "backend": "PM",
+   "measured": 34,
+   "confirmed_minima": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "unmeasured": []
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "measured": 34,
+   "confirmed_minima": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "unmeasured": []
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "measured": 37,
+   "confirmed_minima": [
+    [
+     4,
+     6
+    ]
+   ],
+   "unmeasured": [
+    [
+     5,
+     4
+    ],
+    [
+     6,
+     4
+    ],
+    [
+     6,
+     5
+    ]
+   ]
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "measured": 38,
+   "confirmed_minima": [
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     5
+    ]
+   ],
+   "unmeasured": [
+    [
+     6,
+     4
+    ]
+   ]
+  }
+ ],
+ "search": "observed Pareto minima; dominated successors skipped",
+ "validation_rows": [],
+ "rows": [
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 0,
+   "seconds": 0.133,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 1,
+   "seconds": 0.135,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 2,
+   "seconds": 0.134,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 3,
+   "seconds": 0.136,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 4,
+   "seconds": 0.131,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 5,
+   "seconds": 0.138,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 1,
+   "t": 6,
+   "seconds": 0.14,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 0,
+   "seconds": 0.133,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 1,
+   "seconds": 0.147,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 2,
+   "seconds": 0.153,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 3,
+   "seconds": 0.178,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 4,
+   "seconds": 0.238,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 5,
+   "seconds": 0.319,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 2,
+   "t": 6,
+   "seconds": 0.506,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 0,
+   "seconds": 0.132,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 1,
+   "seconds": 0.174,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 2,
+   "seconds": 0.301,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 3,
+   "seconds": 0.609,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 4,
+   "seconds": 1.383,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 5,
+   "seconds": 3.194,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 3,
+   "t": 6,
+   "seconds": 7.51,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 4,
+   "t": 0,
+   "seconds": 0.136,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 4,
+   "t": 1,
+   "seconds": 0.259,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 4,
+   "t": 2,
+   "seconds": 0.82,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 4,
+   "t": 3,
+   "seconds": 2.82,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 4,
+   "t": 4,
+   "seconds": 8.969,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    7868,
+    6185
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": [
+    "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+    "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+   ],
+   "peak_rss_mib": 35.45,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 5,
+   "t": 0,
+   "seconds": 0.139,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 5,
+   "t": 1,
+   "seconds": 0.394,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 5,
+   "t": 2,
+   "seconds": 2.015,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 5,
+   "t": 3,
+   "seconds": 9.353,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 6,
+   "t": 0,
+   "seconds": 0.142,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    5572
+   ],
+   "unresolved": 8480,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 6,
+   "t": 1,
+   "seconds": 0.496,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 6,
+   "t": 2,
+   "seconds": 3.365,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM",
+   "k": 6,
+   "t": 3,
+   "seconds": 18.626,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    7868,
+    6185
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": [
+    "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+    "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+   ],
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 0,
+   "seconds": 0.147,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 1,
+   "seconds": 0.144,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 2,
+   "seconds": 0.147,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 3,
+   "seconds": 0.145,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 4,
+   "seconds": 0.145,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 5,
+   "seconds": 0.149,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 6,
+   "seconds": 0.151,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 0,
+   "seconds": 0.143,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 1,
+   "seconds": 0.162,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 2,
+   "seconds": 0.179,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 3,
+   "seconds": 0.21,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 4,
+   "seconds": 0.269,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 5,
+   "seconds": 0.391,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 6,
+   "seconds": 0.621,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 0,
+   "seconds": 0.146,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 1,
+   "seconds": 0.192,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 2,
+   "seconds": 0.294,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 3,
+   "seconds": 0.562,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 4,
+   "seconds": 1.24,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 5,
+   "seconds": 2.647,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 6,
+   "seconds": 6.243,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 0,
+   "seconds": 0.144,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 1,
+   "seconds": 0.242,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 2,
+   "seconds": 0.612,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 3,
+   "seconds": 1.855,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 4,
+   "seconds": 3.76,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    7868,
+    6185
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": [
+    "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+    "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+   ],
+   "peak_rss_mib": 35.59,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 0,
+   "seconds": 0.142,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 1,
+   "seconds": 0.317,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 2,
+   "seconds": 1.221,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 3,
+   "seconds": 5.079,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 0,
+   "seconds": 0.147,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 1,
+   "seconds": 0.36,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    6185
+   ],
+   "unresolved": 7867,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 2,
+   "seconds": 1.884,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1352,
+    6185
+   ],
+   "unresolved": 6516,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 31.89,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 3,
+   "seconds": 8.728,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    7868,
+    6185
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    },
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 8
+    }
+   ],
+   "winner_sha256": [
+    "f0e06e5be26cdb26a238a0ee5c9fadf734b5cc7306ebe41223cd364250651f71",
+    "c5cd0e3094f8575129b48a48d2fd633ec9e3345591f1838c6322dae5729922b4"
+   ],
+   "peak_rss_mib": 34.82,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 0,
+   "seconds": 0.25,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 1,
+   "seconds": 0.254,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 2,
+   "seconds": 0.255,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 3,
+   "seconds": 0.261,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 4,
+   "seconds": 0.263,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 5,
+   "seconds": 0.271,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 1,
+   "t": 6,
+   "seconds": 0.261,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 0,
+   "seconds": 0.254,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 1,
+   "seconds": 0.338,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 2,
+   "seconds": 0.411,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 3,
+   "seconds": 0.532,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 4,
+   "seconds": 0.786,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 5,
+   "seconds": 1.339,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 2,
+   "t": 6,
+   "seconds": 2.466,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 0,
+   "seconds": 0.258,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 1,
+   "seconds": 0.541,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 2,
+   "seconds": 1.277,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 3,
+   "seconds": 3.262,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 4,
+   "seconds": 8.231,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 5,
+   "seconds": 25.746,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 3,
+   "t": 6,
+   "seconds": 49.189,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 0,
+   "seconds": 0.274,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 1,
+   "seconds": 1.138,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 2,
+   "seconds": 5.202,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 3,
+   "seconds": 18.959,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 4,
+   "seconds": 67.285,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 5,
+   "seconds": 202.728,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    4685,
+    35290
+   ],
+   "unresolved": 22732,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 50.16,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 4,
+   "t": 6,
+   "seconds": 543.054,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    27417,
+    35290
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": [
+    "971e4637c2e68ee2e1981ad9681d3a19211c760ad72638502b37b37ffc5e2acf",
+    "1767a24e288c2e180fdb81081215d95a6317c9b4c58d91d5bb7f57a24ee8a272"
+   ],
+   "peak_rss_mib": 70.87,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
+   "t": 0,
+   "seconds": 0.266,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
+   "t": 1,
+   "seconds": 2.404,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
+   "t": 2,
+   "seconds": 16.107,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
+   "t": 3,
+   "seconds": 77.304,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
+   "t": 5,
+   "seconds": 600.036,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "timeout"
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 0,
+   "seconds": 0.266,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    32242
+   ],
+   "unresolved": 30464,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 1,
+   "seconds": 3.96,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 2,
+   "seconds": 34.617,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 3,
+   "seconds": 201.869,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 0,
+   "seconds": 0.279,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 1,
+   "seconds": 0.279,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 2,
+   "seconds": 0.279,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 3,
+   "seconds": 0.287,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 4,
+   "seconds": 0.284,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 5,
+   "seconds": 0.291,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 1,
+   "t": 6,
+   "seconds": 0.299,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 1,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 4
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 0,
+   "seconds": 0.291,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 1,
+   "seconds": 0.396,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 2,
+   "seconds": 0.477,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 3,
+   "seconds": 0.659,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 4,
+   "seconds": 1.021,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 5,
+   "seconds": 2.053,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 2,
+   "t": 6,
+   "seconds": 4.193,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 2,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 0,
+   "seconds": 0.285,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 1,
+   "seconds": 0.598,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 2,
+   "seconds": 1.35,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 3,
+   "seconds": 3.46,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 4,
+   "seconds": 11.087,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 5,
+   "seconds": 20.693,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 3,
+   "t": 6,
+   "seconds": 49.122,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 3,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 0,
+   "seconds": 0.286,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 1,
+   "seconds": 1.045,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 2,
+   "seconds": 4.792,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 3,
+   "seconds": 15.277,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 4,
+   "seconds": 50.157,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 5,
+   "seconds": 143.741,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    4685,
+    35290
+   ],
+   "unresolved": 22732,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 53.11,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 4,
+   "t": 6,
+   "seconds": 255.183,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    27417,
+    35290
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 4,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 4,
+     "t": 6,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": [
+    "971e4637c2e68ee2e1981ad9681d3a19211c760ad72638502b37b37ffc5e2acf",
+    "1767a24e288c2e180fdb81081215d95a6317c9b4c58d91d5bb7f57a24ee8a272"
+   ],
+   "peak_rss_mib": 70.75,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 0,
+   "seconds": 0.289,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 1,
+   "seconds": 1.848,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 2,
+   "seconds": 11.465,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 3,
+   "seconds": 52.092,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 4,
+   "seconds": 223.374,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    4685,
+    35290
+   ],
+   "unresolved": 22732,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 52.41,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 5,
+   "t": 5,
+   "seconds": 576.014,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "won": [
+    27417,
+    35290
+   ],
+   "unresolved": 0,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 5,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": [
+    "971e4637c2e68ee2e1981ad9681d3a19211c760ad72638502b37b37ffc5e2acf",
+    "1767a24e288c2e180fdb81081215d95a6317c9b4c58d91d5bb7f57a24ee8a272"
+   ],
+   "peak_rss_mib": 71.07,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 0,
+   "seconds": 0.299,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 0,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 1,
+   "seconds": 2.824,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 1,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 2,
+   "seconds": 22.364,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 2,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 3,
+   "seconds": 127.045,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    1,
+    35290
+   ],
+   "unresolved": 27416,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 3,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 44.64,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
+  }
+ ]
+}
