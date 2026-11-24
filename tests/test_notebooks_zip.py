@@ -71,6 +71,7 @@ class NotebooksZip(unittest.TestCase):
                     'examples/README.md': '# Counterexamples\n',
                     'examples/ad-nonmonotone.pg': '0 0 0 0;\n',
                     'examples/strpm-nonmonotone.pg': '0 0 0 0;\n',
+                    'examples/strpm-nonstrict-tail.pg': '0 0 0 0;\n',
                     'experimental/host-order/sizes.csv': 'h,k,t,leaves\n1,1,0,1\n',
                     'experimental/host-order/summary.json': '{}'}
             for name, content in data.items():
