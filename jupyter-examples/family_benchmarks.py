@@ -455,6 +455,10 @@ def result_text(row):
         return f"{tuple(row['final_pair'])}, {row['seconds']:.2f} s"
     if row['outcome'] == 'not measured':
         return 'beyond measured frontier'
+    if row['outcome'] == 'memory':
+        return f"{row['memory_gib']} GiB limit"
+    if row['outcome'] == 'unsolved':
+        return f"partial, {row['seconds']:.2f} s"
     return f"{row['outcome']} ({row['timeout_seconds']:g} s cap)"
 
 
@@ -466,7 +470,9 @@ def fixed_maps(info, document):
         for backend in FIXED_BACKENDS:
             rows = [r for r in document['fixed_rows'] if (r['game'], r['backend']) == (game['id'], backend)]
             k_max = max(game['PM_k_max'] if backend.startswith('PM') else game['AD_k_max'])
-            grids.append(grid_svg(f"{game['label']}, {backend}", rows, k_max, game['fixed_t_max']))
+            grids.append('<figure style="margin:0"><figcaption>' +
+                         escape(game['label']) + '</figcaption>' +
+                         grid_svg(backend, rows, k_max, game['fixed_t_max']) + '</figure>')
             candidates, confirmed, _ = pareto(rows)
             summary.append([game['label'], backend, confirmed, candidates,
                             [(r['k'], r['t']) for r in rows if r['outcome'] in ('timeout', 'memory')]])
