@@ -281,9 +281,11 @@ def recorded_maps(path=RESULTS, pm_path=PM_RESULTS):
     sources = {path.name: {key: value for key, value in document.items()
                            if key not in ('rows', 'validation_rows')}}
     sources[path.name]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
-    if path.resolve() == RESULTS.resolve() and pm_path is not None and Path(pm_path).exists():
+    if path.resolve() == RESULTS.resolve() and pm_path is not None:
         pm_path = Path(pm_path)
         pm = json.loads(pm_path.read_text())
+        assert pm['complete'], 'PM recording is incomplete'
+        validate_pm_recording(pm)
         assert pm['fixtures'] == document['fixtures']
         sources[pm_path.name] = {key: value for key, value in pm.items()
                                  if key not in ('rows', 'validation_rows')}
@@ -441,6 +443,47 @@ def smallest_pairs(document):
     return summary
 
 
+def validate_pm_recording(document):
+    """Reject a truncated grid: every omitted cell needs a measured dominator."""
+    def require(condition, message):
+        if not condition:
+            raise ValueError(message)
+    require(set(document['games']) == set(MAPPED_GAMES), 'Incomplete game selection')
+    require(set(document['backends']) == set(PM_BACKENDS), 'Incomplete PM selection')
+    require(document['rectangle'] == dict(k_max=6, t_max=6), 'Unexpected rectangle')
+    require(document['fixtures'] == {g['file']: g['sha256'] for g in manifest()},
+            'Fixture hashes differ')
+    rows = document['rows']
+    keys = [(r['n'], r['backend'], r['k'], r['t']) for r in rows]
+    require(len(set(keys)) == len(keys), 'Duplicate measured pair')
+    expected = {(n, b) for n in MAPPED_GAMES for b in PM_BACKENDS}
+    require({key[:2] for key in keys} == expected, 'Missing PM map')
+    for row in rows:
+        k_max, t_max = caps(row['n'], row['backend'])
+        require(1 <= row['k'] <= min(6, k_max) and 0 <= row['t'] <= min(6, t_max),
+                'Pair outside the studied rectangle')
+        require(row['outcome'] in ('solved', 'unsolved', 'timeout', 'memory'),
+                'Unexpected solver outcome')
+        require(row['timeout_seconds'] == document['timeout_seconds'] and
+                row['memory_gib'] == document['memory_gib'], 'Mixed run limits')
+        if row['outcome'] in ('solved', 'unsolved'):
+            require(row.get('independent_winner_check') is True, 'Unchecked winner IDs')
+            require(sum(row['dispatch'].values()) > 0, 'Missing PM dispatch evidence')
+    coverage = []
+    for n, backend in sorted(expected):
+        cells = [r for r in rows if (r['n'], r['backend']) == (n, backend)]
+        k_max, t_max = caps(n, backend)
+        states = classify(cells, min(6, k_max), min(6, t_max))
+        missing = [pair for pair, state in states.items() if state[0] == 'unknown']
+        require(not missing, f'{n} {backend}: missing undominated cells {missing}')
+        candidates, confirmed, open_pairs = pareto(cells)
+        coverage.append(dict(n=n, backend=backend, measured=len(cells),
+                             dominated_not_run=sum(s[0] == 'dominated' for s in states.values()),
+                             observed_candidates=candidates, confirmed_minima=confirmed,
+                             open_predecessors={str(p): v for p, v in open_pairs.items() if v}))
+    return coverage
+
+
 def collect(checkpoint, validation=None, output=PM_RESULTS):
     """Publish the exact checkpoint provenance; keep the original AD recording."""
     checkpoint = Path(checkpoint)
@@ -451,7 +494,8 @@ def collect(checkpoint, validation=None, output=PM_RESULTS):
     document = dict(metadata, search='observed Pareto minima; dominated successors skipped',
                     validation_rows=validation_rows,
                     rows=sorted(rows, key=lambda r: (r['n'], r['backend'], r['k'], r['t'])))
-    assert all(row['outcome'] != 'error' for row in rows)
+    document['coverage'] = validate_pm_recording(document)
+    document['complete'] = True
     Path(output).write_text(json.dumps(document, indent=1)+'\n')
     return recorded_maps(output, pm_path=None)
 

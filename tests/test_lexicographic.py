@@ -140,6 +140,30 @@ def test_minima_walk_does_not_prune_after_a_timeout(monkeypatch):
     assert (2, 1) in visits and (2, 2) not in visits
 
 
+@pytest.mark.parametrize('damage', ['truncated', 'duplicate', 'mixed_limit', 'unchecked'])
+def test_pm_grid_publication_rejects_incomplete_or_mixed_evidence(damage):
+    import fixed_pair_maps as maps
+    document = json.loads(maps.PM_RESULTS.read_text())
+    assert len(maps.validate_pm_recording(document)) == 4
+    if damage == 'truncated':
+        document['rows'] = [r for r in document['rows'] if
+                            (r['n'], r['backend'], r['k'], r['t']) != (4, 'PM', 1, 0)]
+    elif damage == 'duplicate':
+        document['rows'].append(document['rows'][0])
+    elif damage == 'mixed_limit':
+        document['rows'][0]['timeout_seconds'] = 60
+    else:
+        document['rows'][0]['independent_winner_check'] = False
+    with pytest.raises(ValueError):
+        maps.validate_pm_recording(document)
+
+
+def test_fixed_maps_require_the_new_pm_recording(tmp_path):
+    import fixed_pair_maps as maps
+    with pytest.raises(FileNotFoundError):
+        maps.recorded_maps(pm_path=tmp_path / 'missing.json')
+
+
 @pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
 def test_tree_t_pins_the_host_and_clamps_to_the_universal_t(algorithm):
     with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:

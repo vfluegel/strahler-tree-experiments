@@ -119,87 +119,6 @@
  "buildtype": "release",
  "b_ndebug": true,
  "note": "Native version string reflects the pre-commit build; binary and source snapshots are pinned separately.",
- "complete": false,
- "coverage": [
-  {
-   "n": 4,
-   "backend": "PM",
-   "measured": 34,
-   "confirmed_minima": [
-    [
-     4,
-     4
-    ],
-    [
-     6,
-     3
-    ]
-   ],
-   "unmeasured": []
-  },
-  {
-   "n": 4,
-   "backend": "PM+iter",
-   "measured": 34,
-   "confirmed_minima": [
-    [
-     4,
-     4
-    ],
-    [
-     6,
-     3
-    ]
-   ],
-   "unmeasured": []
-  },
-  {
-   "n": 5,
-   "backend": "PM",
-   "measured": 37,
-   "confirmed_minima": [
-    [
-     4,
-     6
-    ]
-   ],
-   "unmeasured": [
-    [
-     5,
-     4
-    ],
-    [
-     6,
-     4
-    ],
-    [
-     6,
-     5
-    ]
-   ]
-  },
-  {
-   "n": 5,
-   "backend": "PM+iter",
-   "measured": 38,
-   "confirmed_minima": [
-    [
-     4,
-     6
-    ],
-    [
-     5,
-     5
-    ]
-   ],
-   "unmeasured": [
-    [
-     6,
-     4
-    ]
-   ]
-  }
- ],
  "search": "observed Pareto minima; dominated successors skipped",
  "validation_rows": [],
  "rows": [
@@ -3922,6 +3841,43 @@
    "n": 5,
    "backend": "PM",
    "k": 5,
+   "t": 4,
+   "seconds": 310.194,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "won": [
+    4685,
+    35290
+   ],
+   "unresolved": 22732,
+   "parameters": [
+    {
+     "k": 5,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 5,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 49.91,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 5,
    "t": 5,
    "seconds": 600.036,
    "timeout_seconds": 600.0,
@@ -4075,6 +4031,26 @@
     "simd": 2,
     "scalar": 0
    }
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 4,
+   "seconds": 600.087,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "timeout"
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "k": 6,
+   "t": 5,
+   "seconds": 600.107,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "timeout"
   },
   {
    "n": 5,
@@ -5487,6 +5463,146 @@
     "simd": 4,
     "scalar": 0
    }
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "k": 6,
+   "t": 4,
+   "seconds": 556.633,
+   "timeout_seconds": 600.0,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 2,
+   "won": [
+    4685,
+    35290
+   ],
+   "unresolved": 22732,
+   "parameters": [
+    {
+     "k": 6,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    },
+    {
+     "k": 6,
+     "t": 4,
+     "bits": 0,
+     "depth": 9
+    }
+   ],
+   "winner_sha256": null,
+   "peak_rss_mib": 53.16,
+   "independent_winner_check": true,
+   "dispatch": {
+    "simd": 4,
+    "scalar": 0
+   }
   }
- ]
+ ],
+ "coverage": [
+  {
+   "n": 4,
+   "backend": "PM",
+   "measured": 34,
+   "dominated_not_run": 8,
+   "observed_candidates": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "confirmed_minima": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "open_predecessors": {}
+  },
+  {
+   "n": 4,
+   "backend": "PM+iter",
+   "measured": 34,
+   "dominated_not_run": 8,
+   "observed_candidates": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "confirmed_minima": [
+    [
+     4,
+     4
+    ],
+    [
+     6,
+     3
+    ]
+   ],
+   "open_predecessors": {}
+  },
+  {
+   "n": 5,
+   "backend": "PM",
+   "measured": 40,
+   "dominated_not_run": 2,
+   "observed_candidates": [
+    [
+     4,
+     6
+    ]
+   ],
+   "confirmed_minima": [
+    [
+     4,
+     6
+    ]
+   ],
+   "open_predecessors": {}
+  },
+  {
+   "n": 5,
+   "backend": "PM+iter",
+   "measured": 39,
+   "dominated_not_run": 3,
+   "observed_candidates": [
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     5
+    ]
+   ],
+   "confirmed_minima": [
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     5
+    ]
+   ],
+   "open_predecessors": {}
+  }
+ ],
+ "complete": true
 }
