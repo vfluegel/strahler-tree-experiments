@@ -461,6 +461,11 @@ standard input. The default algorithm is attractor-decomposition lifting.
   while shaving makes progress. AD preflights both hosts and skips individually
   over-budget pairs so cheaper fallback hosts can still be tried. Start-pair
   overrides are rejected. [Counts and analysis](../HOST-ORDER.md).
+- `--search=monotone-tab` reads a nested prefix generated offline from that
+  size order and the [host embedding bound](host-monotonicity.md). Prefix
+  variants respect the parameter caps. After the prefix, the ordinary ratio
+  traversal tries every remaining positive-t pair, including pairs omitted
+  from the prefix. Productive shaving repeats its current pair.
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.

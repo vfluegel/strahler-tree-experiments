@@ -16,10 +16,10 @@ for Jupyter and the optional Python dependencies.
 | [05-compare-backends](05-compare-backends.ipynb) | +pre/+iter metrics, generated and progress-measure prefix trees |
 | [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
 | [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
-| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic and ratio AD/symmetric AD/PM search, host trees, linked AD tree/block views, Nester frontier and fixed-pair (k,t) maps |
-| [09-adaptive-cabp-swp](09-adaptive-cabp-swp.ipynb) | CABP data sizes 2/4, branching/strong bisimulation, three search orders and fixed SIMD STRPM/AD maps |
-| [10-adaptive-ladder](10-adaptive-ladder.ipynb) | Nine ordinary ladder sizes, three search orders, endpoint fixed maps and a small live STRPM check |
-| [11-adaptive-recursiveladder](11-adaptive-recursiveladder.ipynb) | Recursive ladders n=2…300, growing priority depth, three search orders and fixed AD/STRPM maps |
+| [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Nester search orders, host trees, linked AD tree/block views and fixed-pair (k,t) maps |
+| [09-adaptive-cabp-swp](09-adaptive-cabp-swp.ipynb) | CABP data sizes 2/4, branching/strong bisimulation, search orders and fixed SIMD STRPM/AD maps |
+| [10-adaptive-ladder](10-adaptive-ladder.ipynb) | Nine ordinary ladder sizes, search orders, endpoint fixed maps and a small live STRPM check |
+| [11-adaptive-recursiveladder](11-adaptive-recursiveladder.ipynb) | Recursive ladders n=2…300, growing priority depth, search orders and fixed AD/STRPM maps |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
@@ -31,26 +31,28 @@ columns print their definitions; `notebook_support.won_vertices(result, player)`
 combines all wins.
 Notebook 07 labels Strahler numbers as tree metrics; progress-measure rows
 describe occupied measure trees, and AD rows describe dominion decompositions.
-Notebook 08 uses `search='lexicographic'` for both solvers. It includes a recorded
-ten-minute/2-GiB comparison of AD, symmetric AD and PM, each with and without
-iterative shaving. Each method stops at its first unsuccessful run; larger
-instances are marked beyond that method's frontier. Execution reads the recorded
-results and draws Nester-1's trees; it needs no network and does not repeat the
-benchmarks.
-The current comparison remeasures all six methods after correcting `+iter`
-to repeat the same `(k,t)` while shaving removes vertices. Its fixed-pair section
-adds fresh full-kernel STRPM and PM+iter measurements alongside the archived AD
-data, distinguishing confirmed minima from candidates and resource limits.
+Notebook 08 retains the earlier ten-minute Nester sweeps. Notebooks 08–11
+also compare `table` and `monotone-tab` with the corrected STRPM kernel,
+**60 seconds and 2 GiB per case**, and fresh fixed-pair maps. The monotone
+prefix is generated offline; both orders use ordinary ratio fallback.
 
-Notebooks 09–11 use a fresh 60-second/2-GiB first pass with lexicographic,
-ratio and table orders. CABP keeps the two equivalence relations as separate
-parameter series. Ladder uses every published rung count from 100 to 50,000.
-Recursive ladders grow both the graph and its priority depth, through n=300.
-These notebooks read bundled recordings and winner references, draw small host and
-certificate views, and check input hashes without network access. Their times
-include input and reporting; they are not kernel-only timings. The compressed
-fixtures, conversion provenance and exact limits are described in
-[cabp/README.md](cabp/README.md), [ladder/README.md](ladder/README.md) and
+CABP keeps branching and strong bisimulation as separate series. Ordinary
+ladders cover every published rung count from 100 to 50,000; recursive ladders
+grow through n=300. The notebooks read bundled measurements and winner
+references. Running their cells does not repeat the benchmark sweeps.
+
+To collect a new comparison from the repository root:
+
+```sh
+python jupyter-examples/family_benchmarks.py run --family recursiveladder \
+  --build-dir build --orders table monotone-tab --seconds 60 --memory-gib 2 --jobs 2 \
+  --output jupyter-examples/recursiveladder/new-results-60s.json
+```
+
+The other family names are `nester`, `cabp` and `ladder`. Recordings preserve
+the executable hashes, limits and end-to-end times. Fixture origins and
+conversion details are in [cabp/README.md](cabp/README.md),
+[ladder/README.md](ladder/README.md) and
 [recursiveladder/README.md](recursiveladder/README.md).
 
 ## Release zip

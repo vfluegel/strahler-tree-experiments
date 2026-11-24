@@ -1,0 +1,7660 @@
+{
+ "family": "cabp",
+ "timeout_seconds": 60,
+ "memory_gib": 2,
+ "jobs": 2,
+ "reference_algorithm": "zielonka",
+ "reference_timeout_seconds": 60,
+ "memory_cap_enforced": true,
+ "report_size_cap_gib": 2,
+ "python_version": "3.14.8",
+ "source_commit": "f4acfb4c4ca095716c56b926bc2225a001202a82",
+ "worker_sha256": "2e6ac17b162b83106cb62c4465749c7f02127e45b3e4a3825df5287cafb00c2b",
+ "ijson_version": "3.6.0",
+ "machine": "Linux x86_64, 4 CPUs",
+ "fixture_sha256": {
+  "cabp-branching-bisim-data2": "77f4b3b3d768e533a4ebe675f0e085ca394365c8e2ff35aeac1f528e489a65d9",
+  "cabp-strong-bisim-data2": "e1e815d42b9eb4553883c8c85b819f2fb79e264a03cd49a80137fcc060b21340",
+  "cabp-branching-bisim-data4": "467fa80ad661a69497ecd81293e09769d4bb18cec73dd12d256928fd36a56c5e",
+  "cabp-strong-bisim-data4": "e0a390a7ca4f454fbaee854d4e2687038bdfa295fea7f0f8dd9a287f6f5a335e"
+ },
+ "binary_sha256": {
+  "pg2adot": "d33974baebd09340829642aadf87e13e009dfb5741062c1eabb7e15508004015",
+  "pg2pmdot": "762541ac9418b136798d94740cb4f9c859e82b6ef932ac99cf89a584a73fe637"
+ },
+ "version": "pg2adot 0.4.2.dev62+g639010d.dirty (git v0.4.1-62-g639010d-dirty)",
+ "pm_algorithm": "strahler",
+ "requested_pm_backend": "simd",
+ "lifting_backends": {
+  "STRAHLER_AD_BACKEND": "auto",
+  "STRAHLER_PM_BACKEND": "simd"
+ },
+ "timing": "End-to-end worker: decompress, parse, native solve/verification, JSON output/reduction and winner checks; reference measured separately.",
+ "orders": [
+  "table",
+  "monotone-tab"
+ ],
+ "backends": [
+  "AD",
+  "AD+iter",
+  "AD-sym",
+  "AD-sym+iter",
+  "PM",
+  "PM+iter"
+ ],
+ "fixed_backends": [
+  "AD-sym",
+  "AD-sym+iter",
+  "PM",
+  "PM+iter"
+ ],
+ "strpm_kernel": "canonical-prefix",
+ "recorded_utc": "2026-11-24T22:06:46+00:00",
+ "complete": true,
+ "references": [
+  {
+   "game": "cabp-branching-bisim-data2",
+   "seconds": 3.76,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    null,
+    {
+     "h": 3,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 1,
+       "H": 3456,
+       "T": 11664,
+       "S": 44352,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 12096,
+       "T": 36864,
+       "S": 14400,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 3840,
+       "T": 12096,
+       "S": 13248,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 2496,
+       "T": 8064,
+       "S": 18496,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 6656,
+       "T": 21440,
+       "S": 36224,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 10944,
+       "T": 35200,
+       "S": 56384,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 12896,
+       "T": 39520,
+       "S": 19776,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 3968,
+       "T": 12960,
+       "S": 29537,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 10176,
+       "T": 32480,
+       "S": 50144,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 15712,
+       "T": 49856,
+       "S": 66432,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 16352,
+       "T": 50240,
+       "S": 27840,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 5376,
+       "T": 16832,
+       "S": 18304,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 5296,
+       "T": 16464,
+       "S": 13568,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 3408,
+       "T": 10224,
+       "S": 0,
+       "children": []
+      }
+     ]
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 15,
+      "leaves": 14,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 14,
+      "max_arity": 14,
+      "mean_internal_arity": 14.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 1.899,
+   "report_bytes": 12033227,
+   "peak_rss_mib": 133.12,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/5711ca2a5d7e3db8a8e99dbf04c9455204fdb4de6e4b4b06a27f76729472c158.winners.gz",
+   "bitset_sha256": "5711ca2a5d7e3db8a8e99dbf04c9455204fdb4de6e4b4b06a27f76729472c158"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "seconds": 0.565,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    null,
+    {
+     "h": 3,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 1,
+       "H": 1,
+       "T": 2690,
+       "S": 122393,
+       "children": []
+      }
+     ]
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.137,
+   "report_bytes": 1529942,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/536e4ba0c7dae166eadf214b2e15627f98ca77cecc86f8682491ca297f18817d.winners.gz",
+   "bitset_sha256": "536e4ba0c7dae166eadf214b2e15627f98ca77cecc86f8682491ca297f18817d"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "seconds": 13.571,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    2512705
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ae3ab4490ec2aef53d6ee126bc95d66b6170e1047b4c40821f294909e335e830"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    null,
+    {
+     "h": 3,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 1,
+       "H": 18432,
+       "T": 58176,
+       "S": 117888,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 32448,
+       "T": 98880,
+       "S": 38272,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 10304,
+       "T": 32448,
+       "S": 35200,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 6656,
+       "T": 21504,
+       "S": 50048,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 18304,
+       "T": 59264,
+       "S": 107776,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 34432,
+       "T": 112768,
+       "S": 225536,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 51584,
+       "T": 158080,
+       "S": 79104,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 15872,
+       "T": 51264,
+       "S": 102337,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 37248,
+       "T": 116672,
+       "S": 128448,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 46912,
+       "T": 146176,
+       "S": 132864,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 32704,
+       "T": 100480,
+       "S": 55680,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 10752,
+       "T": 33664,
+       "S": 36608,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 10592,
+       "T": 32928,
+       "S": 27136,
+       "children": []
+      },
+      {
+       "h": 1,
+       "H": 6816,
+       "T": 20448,
+       "S": 0,
+       "children": []
+      }
+     ]
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 15,
+      "leaves": 14,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 14,
+      "max_arity": 14,
+      "mean_internal_arity": 14.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 5.643,
+   "report_bytes": 37982574,
+   "peak_rss_mib": 379.07,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/2477892b8dd7a1ce107014f460ef06bd70d7ffd37fc09f718d7143408cc131ff.winners.gz",
+   "bitset_sha256": "2477892b8dd7a1ce107014f460ef06bd70d7ffd37fc09f718d7143408cc131ff"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "seconds": 1.576,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    null,
+    {
+     "h": 3,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 1,
+       "H": 1,
+       "T": 6722,
+       "S": 332721,
+       "children": []
+      }
+     ]
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.391,
+   "report_bytes": 4530982,
+   "peak_rss_mib": 52.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/d18dbb253473f6dec18a0703e75ae2c247f5132fa03e8929ba0e384a8dfebead.winners.gz",
+   "bitset_sha256": "d18dbb253473f6dec18a0703e75ae2c247f5132fa03e8929ba0e384a8dfebead"
+  }
+ ],
+ "rows": [
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 54.738,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": [
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     }
+    ]
+   },
+   "native_cli_seconds": 52.234,
+   "report_bytes": 56863457,
+   "peak_rss_mib": 168.31,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD",
+   "order": "table",
+   "outcome": "not measured",
+   "frontier": "cabp-branching-bisim-data2",
+   "timeout_seconds": 60,
+   "memory_gib": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 60.064,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD-sym",
+   "order": "table",
+   "outcome": "not measured",
+   "frontier": "cabp-branching-bisim-data2",
+   "timeout_seconds": 60,
+   "memory_gib": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 36.303,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": [
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     }
+    ]
+   },
+   "native_cli_seconds": 33.902,
+   "report_bytes": 56863465,
+   "peak_rss_mib": 203.3,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 45.057,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 43.98,
+   "report_bytes": 6025663,
+   "peak_rss_mib": 259.13,
+   "dispatch": {
+    "simd": 24,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 1.216,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.752,
+   "report_bytes": 1530054,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 2.658,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 1.688,
+   "report_bytes": 4531094,
+   "peak_rss_mib": 66.55,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 1.002,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.583,
+   "report_bytes": 1530069,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 2.512,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 1.612,
+   "report_bytes": 4531109,
+   "peak_rss_mib": 66.47,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.649,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.237,
+   "report_bytes": 1530062,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 1.675,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.744,
+   "report_bytes": 4531102,
+   "peak_rss_mib": 79.79,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.706,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.282,
+   "report_bytes": 1530077,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 25.289,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 23,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 21.065,
+   "report_bytes": 99070895,
+   "peak_rss_mib": 241.66,
+   "dispatch": {
+    "simd": 32,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 1.705,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.785,
+   "report_bytes": 4531117,
+   "peak_rss_mib": 79.76,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 3.211,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.858,
+   "report_bytes": 773723,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 22,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 10.039,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 9.27,
+   "report_bytes": 2274243,
+   "peak_rss_mib": 97.18,
+   "dispatch": {
+    "simd": 22,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 1.554,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 10,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.951,
+   "report_bytes": 7647899,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 6,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 4.504,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 10,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 3.003,
+   "report_bytes": 22653099,
+   "peak_rss_mib": 92.27,
+   "dispatch": {
+    "simd": 6,
+    "scalar": 14
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 60.066,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 60.064,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "outcome": "not measured",
+   "frontier": "cabp-branching-bisim-data2",
+   "timeout_seconds": 60,
+   "memory_gib": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 41.091,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": [
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     }
+    ]
+   },
+   "native_cli_seconds": 38.677,
+   "report_bytes": 56863464,
+   "peak_rss_mib": 168.38,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 29.826,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    3
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 2,
+     "t": 3
+    },
+    {
+     "H": 2,
+     "K": 2,
+     "t": 3
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 15,
+      "leaves": 14,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 14,
+      "max_arity": 14,
+      "mean_internal_arity": 14.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 28.552,
+   "report_bytes": 12033354,
+   "peak_rss_mib": 207.92,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 60.068,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 20.883,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 19.942,
+   "report_bytes": 6025669,
+   "peak_rss_mib": 259.14,
+   "dispatch": {
+    "simd": 10,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 32.707,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": [
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     }
+    ]
+   },
+   "native_cli_seconds": 30.356,
+   "report_bytes": 56863472,
+   "peak_rss_mib": 203.3,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 60.065,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "timeout",
+   "stage": "native solve and JSON output"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 1.03,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.589,
+   "report_bytes": 1530061,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 2.664,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 1.692,
+   "report_bytes": 4531101,
+   "peak_rss_mib": 66.55,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.998,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.56,
+   "report_bytes": 1530076,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 2.755,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 1.8,
+   "report_bytes": 4531116,
+   "peak_rss_mib": 66.46,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.848,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.274,
+   "report_bytes": 1530069,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 1.859,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.871,
+   "report_bytes": 4531109,
+   "peak_rss_mib": 79.81,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.698,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.284,
+   "report_bytes": 1530084,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 1.763,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.831,
+   "report_bytes": 4531124,
+   "peak_rss_mib": 79.78,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 1.531,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.175,
+   "report_bytes": 772459,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 10,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 18.037,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 15,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 15.543,
+   "report_bytes": 50942214,
+   "peak_rss_mib": 249.29,
+   "dispatch": {
+    "simd": 28,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 4.27,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 3.506,
+   "report_bytes": 2272979,
+   "peak_rss_mib": 98.6,
+   "dispatch": {
+    "simd": 10,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.654,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 2,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.279,
+   "report_bytes": 1530257,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-strong-bisim-data4",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 1.648,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 2,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    339444
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "f12cc269b6c4cadecb8860e24f593a4da38f1317a8a24fbfcdace3e0c9a2ae2f"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.814,
+   "report_bytes": 4531297,
+   "peak_rss_mib": 95.41,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "cabp-branching-bisim-data4",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 49.248,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 15,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    2512705
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ae3ab4490ec2aef53d6ee126bc95d66b6170e1047b4c40821f294909e335e830"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 39.684,
+   "report_bytes": 153416753,
+   "peak_rss_mib": 679.01,
+   "dispatch": {
+    "simd": 28,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  }
+ ],
+ "fixed_rows": [
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 8.071,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 7.391,
+   "report_bytes": 6426723,
+   "peak_rss_mib": 202.91,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 8.11,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    1
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 1
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 1
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 7.426,
+   "report_bytes": 6426723,
+   "peak_rss_mib": 202.83,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 9.36,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 2,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 2,
+     "t": 0
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 8.632,
+   "report_bytes": 6426723,
+   "peak_rss_mib": 202.83,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 7.08,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    2
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 2
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 2
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 6.382,
+   "report_bytes": 6426723,
+   "peak_rss_mib": 202.83,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 5.915,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    3
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 3
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 3
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 5.273,
+   "report_bytes": 6426723,
+   "peak_rss_mib": 202.84,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 3
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": null,
+   "seconds": 39.776,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": [
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     },
+     {
+      "trees": [
+       {
+        "nodes": 0,
+        "leaves": 0,
+        "internal_nodes": 0,
+        "height": 0,
+        "width": 0,
+        "max_arity": 0,
+        "mean_internal_arity": 0.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 0,
+        "mean_leaf_depth": 0.0,
+        "strahler": 0
+       },
+       {
+        "nodes": 2,
+        "leaves": 1,
+        "internal_nodes": 1,
+        "height": 2,
+        "width": 1,
+        "max_arity": 1,
+        "mean_internal_arity": 1.0,
+        "branching_nodes": 0,
+        "min_leaf_depth": 2,
+        "mean_leaf_depth": 2.0,
+        "strahler": 1
+       }
+      ],
+      "shaves": []
+     }
+    ]
+   },
+   "native_cli_seconds": 37.496,
+   "report_bytes": 56863374,
+   "peak_rss_mib": 203.06,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.592,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.172,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 183.68,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.762,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.326,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 191.55,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.96,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.519,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 230.43,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.711,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.286,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 199.85,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 9.689,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    1
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 2,
+     "t": 1
+    },
+    {
+     "H": 2,
+     "K": 2,
+     "t": 1
+    }
+   ],
+   "unresolved": 723265,
+   "won": [
+    0,
+    152016
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 4,
+      "leaves": 3,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 3,
+      "max_arity": 3,
+      "mean_internal_arity": 3.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 9.02,
+   "report_bytes": 7061728,
+   "peak_rss_mib": 202.96,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.578,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.185,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 236.96,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 1.607,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.205,
+   "report_bytes": 6016473,
+   "peak_rss_mib": 208.19,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 3
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 2.436,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 838273,
+   "won": [
+    0,
+    37008
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.02,
+   "report_bytes": 6017168,
+   "peak_rss_mib": 235.31,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 2.904,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 816961,
+   "won": [
+    0,
+    58320
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.494,
+   "report_bytes": 6017699,
+   "peak_rss_mib": 237.13,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 2.454,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 858433,
+   "won": [
+    0,
+    16848
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.037,
+   "report_bytes": 6016909,
+   "peak_rss_mib": 241.05,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 12.303,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    2
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 2,
+     "t": 2
+    },
+    {
+     "H": 2,
+     "K": 2,
+     "t": 2
+    }
+   ],
+   "unresolved": 455169,
+   "won": [
+    0,
+    420112
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 8,
+      "leaves": 7,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 7,
+      "max_arity": 7,
+      "mean_internal_arity": 7.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 11.604,
+   "report_bytes": 8901296,
+   "peak_rss_mib": 202.95,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 3.153,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 815809,
+   "won": [
+    0,
+    59472
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.743,
+   "report_bytes": 6017839,
+   "peak_rss_mib": 239.02,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 3
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 2.949,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 766273,
+   "won": [
+    0,
+    109008
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 2.539,
+   "report_bytes": 6017711,
+   "peak_rss_mib": 245.76,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 4.709,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    3
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 2,
+     "t": 3
+    },
+    {
+     "H": 2,
+     "K": 2,
+     "t": 3
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 15,
+      "leaves": 14,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 14,
+      "max_arity": 14,
+      "mean_internal_arity": 14.0,
+      "branching_nodes": 1,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 2
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 3.488,
+   "report_bytes": 12033334,
+   "peak_rss_mib": 202.09,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 3
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.609,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.192,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 187.65,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 4.138,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 712129,
+   "won": [
+    0,
+    163152
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 3.716,
+   "report_bytes": 6019259,
+   "peak_rss_mib": 250.01,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 3
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.667,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.252,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 191.67,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 1
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 0.684,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.26,
+   "report_bytes": 1530049,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "AD-sym+iter",
+   "order": null,
+   "seconds": 0.673,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 0,
+      "leaves": 0,
+      "internal_nodes": 0,
+      "height": 0,
+      "width": 0,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 0,
+      "mean_leaf_depth": 0.0,
+      "strahler": 0
+     },
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.267,
+   "report_bytes": 1530064,
+   "peak_rss_mib": 48.37,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.425,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.14,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.607,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.202,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 234.51,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.426,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.149,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 1
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.442,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.163,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.461,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.157,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 2
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.441,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.155,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 0
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.625,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.215,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 199.98,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 2
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.462,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.159,
+   "report_bytes": 765093,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 3
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.607,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 112025,
+   "won": [
+    0,
+    13059
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.268,
+   "report_bytes": 765788,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 1
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.657,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 101729,
+   "won": [
+    0,
+    23355
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.312,
+   "report_bytes": 766319,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.91,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.515,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 238.52,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.449,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 119705,
+   "won": [
+    0,
+    5379
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.177,
+   "report_bytes": 765529,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 1
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.635,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 74345,
+   "won": [
+    0,
+    50739
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.351,
+   "report_bytes": 767386,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 3
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.526,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 101729,
+   "won": [
+    0,
+    23355
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.238,
+   "report_bytes": 766196,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 2
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 1.635,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 875281,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 1.243,
+   "report_bytes": 6016505,
+   "peak_rss_mib": 208.27,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 3
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.578,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 68441,
+   "won": [
+    0,
+    56643
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.296,
+   "report_bytes": 767541,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 3
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.452,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.15,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.49,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.171,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 1
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.608,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.222,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.535,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    2
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 2,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.182,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 2
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.572,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 0,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.214,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 0
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.599,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "unsolved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    3
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 3,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 125084,
+   "won": [
+    0,
+    0
+   ],
+   "winner_sha256": null,
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.219,
+   "report_bytes": 765125,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 3
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.728,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    2,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.295,
+   "report_bytes": 765819,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 1
+  },
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 16.54,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 14,
+   "final_pair": [
+    2,
+    1
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 2,
+     "t": 1,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 14.332,
+   "report_bytes": 44929503,
+   "peak_rss_mib": 243.77,
+   "dispatch": {
+    "simd": 28,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 2,
+   "t": 1
+  }
+ ],
+ "followup_rows": [
+  {
+   "game": "cabp-branching-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 7.637,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    875281
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "64797ea994612f1a37edad4b05dc0a0b77604b8adb907ffd5e4569bae46fb63e"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 6.801,
+   "report_bytes": 6025661,
+   "peak_rss_mib": 259.39,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 5
+  },
+  {
+   "game": "cabp-strong-bisim-data2",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.741,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    3,
+    5
+   ],
+   "parameters": [
+    {
+     "k": 2,
+     "t": 5,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 3,
+     "t": 5,
+     "bits": 0,
+     "depth": 2
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    0,
+    125084
+   ],
+   "winner_sha256": [
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fdf3eddb670e60e13a6432b20517ef61d6241fa682c11dd6fa31d5de6ad117ad"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.404,
+   "report_bytes": 772451,
+   "peak_rss_mib": 48.37,
+   "dispatch": {
+    "simd": 2,
+    "scalar": 0
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 3,
+   "t": 5
+  }
+ ],
+ "followup_policy": "Freshly repeat the fastest successful plain-PM adaptive pair for each mapped case without a fixed solve; these probes do not establish Pareto minimality."
+}

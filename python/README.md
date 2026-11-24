@@ -82,7 +82,8 @@ All lifting hosts are available: full/default, `tree_k` (optionally with
 `tree_t`), `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
 `iter_shave=True`. Symmetric lifting supports adaptive hosts through
-`search='lexicographic'`, `search='ratio'`, or `search='table'`; it rejects `adaptive_t`.
+`search='lexicographic'`, `search='ratio'`, `search='table'`, or
+`search='monotone-tab'`; it rejects `adaptive_t`.
 `search='lexicographic'` walks `(k,t)` with `k` as the outer loop and
 `t=0..floor(log2(n))` as the inner loop. It is available in
 `decompose(game, 'lifting', ...)`, `decompose(game, 'lifting-sym', ...)`
@@ -272,6 +273,9 @@ jobs. The Linux Python test checks RSS across 1,000 repeated call batches.
 larger initial player height, then falls back to ratio order. It preserves
 the individual height caps and repeats a productive pair during iterative
 shaving. [Data and height sensitivity](../HOST-ORDER.md).
+`search="monotone-tab"` reads a nested prefix generated offline using the
+host embedding bound, then uses ordinary ratio order for every untried
+positive-t pair. The inclusion guarantee applies to the prefix.
 
 For a fixed STRPM pair, `k=K, t=T, iter_shave=True, repeat_fixed=True` keeps
 the same hosts until shaving completes or stalls. Without `repeat_fixed`,

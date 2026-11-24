@@ -1,0 +1,8441 @@
+{
+ "family": "ladder",
+ "timeout_seconds": 60,
+ "memory_gib": 2,
+ "jobs": 2,
+ "reference_algorithm": "zielonka",
+ "reference_timeout_seconds": 60,
+ "memory_cap_enforced": true,
+ "report_size_cap_gib": 2,
+ "python_version": "3.14.8",
+ "source_commit": "f4acfb4c4ca095716c56b926bc2225a001202a82",
+ "worker_sha256": "2e6ac17b162b83106cb62c4465749c7f02127e45b3e4a3825df5287cafb00c2b",
+ "ijson_version": "3.6.0",
+ "machine": "Linux x86_64, 4 CPUs",
+ "fixture_sha256": {
+  "ladder-100": "ace39ecfb5fb143544581b37c0985485d5c180e2832f6dba5ce005b86409da8e",
+  "ladder-200": "f091e5e247d09c9093eb33f22de257a08f0e31cf17f517395a85033283036634",
+  "ladder-500": "cb8ff0afabd28805ce6ab52bb6b497c2d8569ccadecdcfe4f44845407b5216c8",
+  "ladder-1000": "ffe50add3eeed40858dbee7ebd017c214ec435c43f3b4a2d5ab47de71f667a33",
+  "ladder-2000": "d2a06f8c4dcf0c886ec3891238584ea6539b1125015585fd469fed073d5dcce2",
+  "ladder-5000": "2a1d73a6e2bacde5625fff04d35a6279b346c227602bba647c3f47f1702d01ae",
+  "ladder-10000": "691ebf4da9152f86314f9993312581cceba5fd924699f379ee95e93c7cfa5b8e",
+  "ladder-20000": "987acd2cefc92dcf9624821c7a9c049740e375b06f4c397ab29ffc379028b123",
+  "ladder-50000": "710b8d4806ce465a7cfdb2d7a0fc7b74d5f16db4b3a3f607fe80c5f28c7da250"
+ },
+ "binary_sha256": {
+  "pg2adot": "d33974baebd09340829642aadf87e13e009dfb5741062c1eabb7e15508004015",
+  "pg2pmdot": "762541ac9418b136798d94740cb4f9c859e82b6ef932ac99cf89a584a73fe637"
+ },
+ "version": "pg2adot 0.4.2.dev62+g639010d.dirty (git v0.4.1-62-g639010d-dirty)",
+ "pm_algorithm": "strahler",
+ "requested_pm_backend": "simd",
+ "lifting_backends": {
+  "STRAHLER_AD_BACKEND": "auto",
+  "STRAHLER_PM_BACKEND": "simd"
+ },
+ "timing": "End-to-end worker: decompress, parse, native solve/verification, JSON output/reduction and winner checks; reference measured separately.",
+ "orders": [
+  "table",
+  "monotone-tab"
+ ],
+ "backends": [
+  "AD",
+  "AD+iter",
+  "AD-sym",
+  "AD-sym+iter",
+  "PM",
+  "PM+iter"
+ ],
+ "fixed_backends": [
+  "AD-sym",
+  "AD-sym+iter",
+  "PM",
+  "PM+iter"
+ ],
+ "strpm_kernel": "canonical-prefix",
+ "recorded_utc": "2026-11-24T22:18:03+00:00",
+ "complete": true,
+ "references": [
+  {
+   "game": "ladder-100",
+   "seconds": 0.102,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 100,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 100,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2396,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/56ab9f4c37263174883f21ebc391fe3c027622dbd5fa272ce21b5fa197ec4ebb.winners.gz",
+   "bitset_sha256": "56ab9f4c37263174883f21ebc391fe3c027622dbd5fa272ce21b5fa197ec4ebb"
+  },
+  {
+   "game": "ladder-200",
+   "seconds": 0.102,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 200,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 200,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 3996,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/589206cbb3330d7bb2b7407bcce60bbccd6e6f7c671bb24d79c28783d6d4f8a4.winners.gz",
+   "bitset_sha256": "589206cbb3330d7bb2b7407bcce60bbccd6e6f7c671bb24d79c28783d6d4f8a4"
+  },
+  {
+   "game": "ladder-500",
+   "seconds": 0.104,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 500,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 500,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 8798,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/4847157b42f97eb69a1dedf62fb8322b7cd8a8297350371fbc4c9da3f3eaa642.winners.gz",
+   "bitset_sha256": "4847157b42f97eb69a1dedf62fb8322b7cd8a8297350371fbc4c9da3f3eaa642"
+  },
+  {
+   "game": "ladder-1000",
+   "seconds": 0.107,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 1000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 1000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.003,
+   "report_bytes": 18798,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/d9c4df2635e6a43df9867fcaf71194b6d895e99e8b9ac3f2baf092cdda346f27.winners.gz",
+   "bitset_sha256": "d9c4df2635e6a43df9867fcaf71194b6d895e99e8b9ac3f2baf092cdda346f27"
+  },
+  {
+   "game": "ladder-2000",
+   "seconds": 0.113,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 2000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 2000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 38798,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/7fb87eac5ed10750417a6b920f33293e42cc81b0ef2488c7e9e6224106435417.winners.gz",
+   "bitset_sha256": "7fb87eac5ed10750417a6b920f33293e42cc81b0ef2488c7e9e6224106435417"
+  },
+  {
+   "game": "ladder-5000",
+   "seconds": 0.131,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 5000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 5000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.009,
+   "report_bytes": 98800,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/c6efa5f33da423fa23dad0ea2d65cb4c2151cfb29ad4b030abccfa7a1b2955fe.winners.gz",
+   "bitset_sha256": "c6efa5f33da423fa23dad0ea2d65cb4c2151cfb29ad4b030abccfa7a1b2955fe"
+  },
+  {
+   "game": "ladder-10000",
+   "seconds": 0.159,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 10000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 10000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.017,
+   "report_bytes": 218800,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/bef7b9fc860d13fe378b7f2ebab1ab75db80d2cbd4c712e4f64f6cab6ad4cf51.winners.gz",
+   "bitset_sha256": "bef7b9fc860d13fe378b7f2ebab1ab75db80d2cbd4c712e4f64f6cab6ad4cf51"
+  },
+  {
+   "game": "ladder-20000",
+   "seconds": 0.217,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 20000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 20000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.034,
+   "report_bytes": 458800,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/dc6ad1a90deb1c6f3796701ea19d9c5f4d15186dc15506ab9fcc9a5b9b9673c9.winners.gz",
+   "bitset_sha256": "dc6ad1a90deb1c6f3796701ea19d9c5f4d15186dc15506ab9fcc9a5b9b9673c9"
+  },
+  {
+   "game": "ladder-50000",
+   "seconds": 0.381,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": null,
+   "parameters": [
+    {},
+    {}
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": false,
+   "reference_shape": [
+    {
+     "h": 2,
+     "H": 0,
+     "T": 0,
+     "S": 0,
+     "children": [
+      {
+       "h": 0,
+       "H": 50000,
+       "T": 0,
+       "S": 0,
+       "children": []
+      }
+     ]
+    },
+    {
+     "h": 1,
+     "H": 50000,
+     "T": 0,
+     "S": 0,
+     "children": []
+    }
+   ],
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.085,
+   "report_bytes": 1178802,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "bitset_file": "references/6cbe8caa988cfd1eeb5797bfce02819cc256f50f60cbc9c420c957315943f0e8.winners.gz",
+   "bitset_sha256": "6cbe8caa988cfd1eeb5797bfce02819cc256f50f60cbc9c420c957315943f0e8"
+  }
+ ],
+ "rows": [
+  {
+   "game": "ladder-100",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.112,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2508,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.112,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2523,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.112,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4123,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.113,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4108,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.003,
+   "report_bytes": 8925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 8910,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.125,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18910,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.126,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.128,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.006,
+   "report_bytes": 38910,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.128,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.007,
+   "report_bytes": 38925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.147,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.015,
+   "report_bytes": 98912,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.148,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.016,
+   "report_bytes": 98927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.181,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.029,
+   "report_bytes": 218912,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.18,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.031,
+   "report_bytes": 218927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.249,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.059,
+   "report_bytes": 458912,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.252,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.063,
+   "report_bytes": 458927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD",
+   "order": "table",
+   "seconds": 0.484,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.18,
+   "report_bytes": 1178914,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD+iter",
+   "order": "table",
+   "seconds": 0.482,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.184,
+   "report_bytes": 1178929,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.114,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 2531,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.115,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2516,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.114,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4116,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.115,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4131,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 8933,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.003,
+   "report_bytes": 8918,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18918,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.121,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18933,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.127,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.007,
+   "report_bytes": 38918,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.128,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.007,
+   "report_bytes": 38933,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.164,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.016,
+   "report_bytes": 98920,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.164,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.017,
+   "report_bytes": 98935,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.225,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.037,
+   "report_bytes": 218935,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.228,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.037,
+   "report_bytes": 218920,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.305,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.082,
+   "report_bytes": 458920,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.308,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.084,
+   "report_bytes": 458935,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym",
+   "order": "table",
+   "seconds": 0.48,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.17,
+   "report_bytes": 1178922,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym+iter",
+   "order": "table",
+   "seconds": 0.486,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.179,
+   "report_bytes": 1178937,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1506,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1521,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.117,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2306,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.113,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.002,
+   "report_bytes": 2321,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.115,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4708,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.114,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4723,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.003,
+   "report_bytes": 9708,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.118,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.003,
+   "report_bytes": 9723,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.124,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.006,
+   "report_bytes": 19708,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.125,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.005,
+   "report_bytes": 19723,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.138,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.012,
+   "report_bytes": 49710,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.139,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.012,
+   "report_bytes": 49725,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.166,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.023,
+   "report_bytes": 109710,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.167,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.023,
+   "report_bytes": 109725,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.218,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.046,
+   "report_bytes": 229725,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.22,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.047,
+   "report_bytes": 229710,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM",
+   "order": "table",
+   "seconds": 0.379,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.122,
+   "report_bytes": 589712,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM+iter",
+   "order": "table",
+   "seconds": 0.38,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.119,
+   "report_bytes": 589727,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.114,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2515,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.115,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2530,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.114,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4130,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.116,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4115,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.117,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 8932,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.117,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 8917,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.119,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18917,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.122,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18932,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.127,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.006,
+   "report_bytes": 38917,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.128,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.007,
+   "report_bytes": 38932,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.146,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.015,
+   "report_bytes": 98919,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.147,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.015,
+   "report_bytes": 98934,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.181,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.03,
+   "report_bytes": 218934,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.183,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.029,
+   "report_bytes": 218919,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.257,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.065,
+   "report_bytes": 458919,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.278,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.086,
+   "report_bytes": 458934,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD",
+   "order": "monotone-tab",
+   "seconds": 0.47,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.161,
+   "report_bytes": 1178921,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD+iter",
+   "order": "monotone-tab",
+   "seconds": 0.487,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.173,
+   "report_bytes": 1178936,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.123,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 2523,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.124,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2538,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.123,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4123,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4138,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.127,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.003,
+   "report_bytes": 8925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.126,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.003,
+   "report_bytes": 8940,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.134,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.004,
+   "report_bytes": 18925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.133,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.005,
+   "report_bytes": 18940,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.135,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.007,
+   "report_bytes": 38925,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.137,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.008,
+   "report_bytes": 38940,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.159,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.017,
+   "report_bytes": 98927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.157,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.019,
+   "report_bytes": 98942,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.195,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.033,
+   "report_bytes": 218927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.198,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.036,
+   "report_bytes": 218942,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.265,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.064,
+   "report_bytes": 458927,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.267,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.07,
+   "report_bytes": 458942,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym",
+   "order": "monotone-tab",
+   "seconds": 0.467,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.167,
+   "report_bytes": 1178929,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym+iter",
+   "order": "monotone-tab",
+   "seconds": 0.488,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.176,
+   "report_bytes": 1178944,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.124,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1513,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.121,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1528,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.116,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2313,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-200",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    200,
+    200
+   ],
+   "winner_sha256": [
+    "5eb5d4048ecf68e968cac76a66dd664a5c37c7fb18b183987506f9b3276dc1b4",
+    "dc07947d9f9fec18b2e0d8beace4ec01e6526433e7a7c742824c91805a066533"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2328,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.119,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4715,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-500",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.12,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    500,
+    500
+   ],
+   "winner_sha256": [
+    "8a17b4c280281e8ba3175d3241cff1848aa536edf3687bec258ebe4d8ed8b3d9",
+    "dfd927b91404fd4295d60e4faca53b7751d3b2f645ec148832649c8b689e4300"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.002,
+   "report_bytes": 4730,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.126,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.003,
+   "report_bytes": 9715,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-1000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.121,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    1000,
+    1000
+   ],
+   "winner_sha256": [
+    "1ea1988d0eae8a4fbb07d250ee2ceef20152fae5b0cca078550ee346b30bef84",
+    "3bee878ec8d89369716281fb29452834fb4b719901b30e5f5022236117db5f29"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.003,
+   "report_bytes": 9730,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.136,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.006,
+   "report_bytes": 19715,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-2000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.148,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    2000,
+    2000
+   ],
+   "winner_sha256": [
+    "a2ac348f8b649ab516312297c553ce01b0768fe5755f42beec8a197b38e49d36",
+    "ffa4b12dd99512fbf666957e211578724b50ff59260a599df67349d32e8f9ffd"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.005,
+   "report_bytes": 19730,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.151,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.012,
+   "report_bytes": 49717,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-5000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.144,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    5000,
+    5000
+   ],
+   "winner_sha256": [
+    "888be14865ff501b9ab741d909d319e3bf65b63f0016f8b424869352893c5d96",
+    "9166d9d3a367c66d62ad8208f25ae77933055114320f471f36b85f8d99a5ad16"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.012,
+   "report_bytes": 49732,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.172,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.024,
+   "report_bytes": 109717,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-10000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.169,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    10000,
+    10000
+   ],
+   "winner_sha256": [
+    "4d0ea8727be203b3a14a9705ac760e3a5e2aaf7ce425fe21895dfaf6a3a0718c",
+    "a822dfe3292a3c0f7f5e052561ecfbb8e5b3baa0751f23249df3d3f7b1ff3d27"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.024,
+   "report_bytes": 109732,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.229,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.048,
+   "report_bytes": 229717,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-20000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.231,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    20000,
+    20000
+   ],
+   "winner_sha256": [
+    "e078d473fa9d3483cb5124b2bd58c8e6b691283e0e66fb1a1caffa76a4ec2415",
+    "0f4cced327c195dc9d2669002aa148cd15a9bff2e7136a9dc81fe9823009f8a5"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.048,
+   "report_bytes": 229732,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM",
+   "order": "monotone-tab",
+   "seconds": 0.377,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.119,
+   "report_bytes": 589719,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM+iter",
+   "order": "monotone-tab",
+   "seconds": 0.37,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.117,
+   "report_bytes": 589734,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation"
+  }
+ ],
+ "fixed_rows": [
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 0.112,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2503,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-100",
+   "backend": "AD-sym+iter",
+   "order": null,
+   "seconds": 0.113,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.001,
+   "report_bytes": 2518,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.111,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1505,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-100",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.112,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    100,
+    100
+   ],
+   "winner_sha256": [
+    "19a57855619b49d4024c99c2ab69b1d3b502b7f3d7f1001389690698fef9bdaf",
+    "0f9466ceaf3b4c0ccd2a06d260a2d6d249181123cdb8e1ea921a7f6e6bae0fc1"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.001,
+   "report_bytes": 1537,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym",
+   "order": null,
+   "seconds": 0.467,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.158,
+   "report_bytes": 1178909,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "AD-sym+iter",
+   "order": null,
+   "seconds": 0.476,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "H": 2,
+     "K": 1,
+     "t": 0
+    },
+    {
+     "H": 1,
+     "K": 1,
+     "t": 0
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": {
+    "trees": [
+     {
+      "nodes": 2,
+      "leaves": 1,
+      "internal_nodes": 1,
+      "height": 2,
+      "width": 1,
+      "max_arity": 1,
+      "mean_internal_arity": 1.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 2,
+      "mean_leaf_depth": 2.0,
+      "strahler": 1
+     },
+     {
+      "nodes": 1,
+      "leaves": 1,
+      "internal_nodes": 0,
+      "height": 1,
+      "width": 1,
+      "max_arity": 0,
+      "mean_internal_arity": 0.0,
+      "branching_nodes": 0,
+      "min_leaf_depth": 1,
+      "mean_leaf_depth": 1.0,
+      "strahler": 1
+     }
+    ],
+    "shaves": []
+   },
+   "native_cli_seconds": 0.168,
+   "report_bytes": 1178924,
+   "peak_rss_mib": 122.88,
+   "dispatch": null,
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM",
+   "order": null,
+   "seconds": 0.371,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.121,
+   "report_bytes": 589711,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  },
+  {
+   "game": "ladder-50000",
+   "backend": "PM+iter",
+   "order": null,
+   "seconds": 0.366,
+   "timeout_seconds": 60,
+   "memory_gib": 2,
+   "outcome": "solved",
+   "rounds": 1,
+   "final_pair": [
+    1,
+    0
+   ],
+   "parameters": [
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    },
+    {
+     "k": 1,
+     "t": 0,
+     "bits": 0,
+     "depth": 1
+    }
+   ],
+   "unresolved": 0,
+   "won": [
+    50000,
+    50000
+   ],
+   "winner_sha256": [
+    "5f97a488f5f84f00d7e505bca027bd8bbda9cbfb08b4be2c29258a68a5ad72de",
+    "f9a3d1bf694a1c73928a6dafe06e07e83c0493a688545bc6863f7f9cb6df834b"
+   ],
+   "native_verification": true,
+   "independent_winner_check": true,
+   "reference_shape": null,
+   "metrics": null,
+   "native_cli_seconds": 0.114,
+   "report_bytes": 589743,
+   "peak_rss_mib": 122.88,
+   "dispatch": {
+    "simd": 0,
+    "scalar": 2
+   },
+   "stage": "JSON reduction and winner validation",
+   "k": 1,
+   "t": 0
+  }
+ ],
+ "followup_rows": [],
+ "followup_policy": "Freshly repeat the fastest successful plain-PM adaptive pair for each mapped case without a fixed solve; these probes do not establish Pareto minimality."
+}
