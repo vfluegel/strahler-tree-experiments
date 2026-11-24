@@ -93,6 +93,43 @@ def test_pinned_family_bounds_and_separate_relations():
     assert [g['parameter'] for g in ladders if g['fixed_map']] == [100, 50000]
 
 
+def test_recursive_ladder_generator_matches_the_archived_games():
+    import importlib.util
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    spec = importlib.util.spec_from_file_location('gen_notebook_families', ROOT / 'scripts/gen_notebook_families.py')
+    generator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(generator)
+    info = family.manifest('recursiveladder')
+    assert [g['parameter'] for g in info['games']] == [2, 4, 8, 16, 32, 64, 100, 200, 300]
+    assert [g['parameter'] for g in info['games'] if g['fixed_map']] == [32, 100]
+    assert info['reference_algorithm'] == 'zielonka-sym'
+
+    def graph(text):
+        return {int(fields[0]): (int(fields[1]), int(fields[2]),
+                                 frozenset(map(int, fields[3].split(','))))
+                for line in text.splitlines()
+                if (fields := line.split()) and fields[0].isdigit()}
+
+    for game in info['games']:
+        n = game['parameter']
+        expected = graph(bz2.decompress((family.HERE / 'recursiveladder' / game['file']).read_bytes()).decode())
+        generated = graph(generator.recursive_ladder(n))
+        assert generated == expected
+        assert len(expected) == 5 * n
+        assert sum(len(v[2]) for v in expected.values()) == 11 * n - 3
+        assert game['generated'] == (n not in (100, 200))
+    with pytest.raises(ValueError):
+        generator.recursive_ladder(0)
+
+
+def test_symmetric_reference_is_supported(case_request, tmp_path):
+    reference = tmp_path / 'symmetric-winners.gz'
+    result = family.measure(dict(case_request, backend='reference',
+                                 reference_algorithm='zielonka-sym', save_reference=str(reference)), 10)
+    assert result['outcome'] == 'solved' and result['won'] == [5, 0]
+    assert reference.is_file()
+
+
 @pytest.mark.parametrize('damage', ['pair', 'parameter', 'height', 'status', 'range'])
 def test_fixed_recordings_reject_inconsistent_requested_hosts(damage):
     info = family.manifest('cabp')
@@ -115,16 +152,32 @@ def test_fixed_recordings_reject_inconsistent_requested_hosts(damage):
 
 
 def test_published_family_evidence_includes_all_cases_and_fixed_followups():
-    for name in ('cabp', 'ladder'):
+    from fixed_pair_maps import embedding_source
+    for name in ('cabp', 'ladder', 'recursiveladder'):
         info, document = family.recorded(name)
-        assert all(r['outcome'] == 'solved' for r in document['references'])
+        if name == 'recursiveladder':
+            assert [r['game'] for r in document['references'] if r['outcome'] != 'solved'] == [
+                'recursiveladder-200', 'recursiveladder-300']
+        else:
+            assert all(r['outcome'] == 'solved' for r in document['references'])
         assert len(document['rows']) == len(info['games']) * len(family.BACKENDS) * len(family.ORDERS)
+        for game in info['games']:
+            for backend in family.FIXED_BACKENDS:
+                cells = [r for r in document['fixed_rows']
+                         if (r['game'], r['backend']) == (game['id'], backend)]
+                solved = {(r['k'], r['t']) for r in cells if r['outcome'] == 'solved'}
+                assert all(embedding_source(solved, r['k'], r['t']) is None
+                           for r in cells if r['outcome'] == 'unsolved')
         if name == 'cabp':
             assert {(r['k'], r['t']) for r in document['followup_rows']} == {(3, 5), (3, 7)}
             assert all(r['outcome'] == 'solved' for r in document['followup_rows'])
-        else:
+        elif name == 'ladder':
             assert all(r['outcome'] == 'solved' for r in document['rows'])
             assert all(r['final_pair'] == [1, 0] for r in document['fixed_rows'])
+        else:
+            largest = [r for r in document['rows'] if r['game'] == 'recursiveladder-300']
+            assert any(r['backend'] == 'PM' and r['order'] == 'table' and r['outcome'] == 'solved'
+                       for r in largest)
 
 
 def test_alternate_budget_cannot_delete_a_published_reference(case_request, tmp_path, monkeypatch):

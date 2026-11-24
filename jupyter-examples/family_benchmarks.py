@@ -1,4 +1,4 @@
-"""Bounded CLI experiments and offline displays for the CABP and ladder notebooks."""
+"""Bounded CLI experiments and offline displays for protocol and ladder families."""
 
 import argparse
 import bz2
@@ -203,7 +203,7 @@ def worker(request):
     pm = backend.startswith('PM')
     binary = Path(request['build_dir']) / ('pg2pmdot' if pm else 'pg2adot')
     command = [str(binary), '--format=json', '--stats']
-    command += ['--algorithm=' + ('strahler' if pm else 'zielonka' if backend == 'reference'
+    command += ['--algorithm=' + ('strahler' if pm else request.get('reference_algorithm', 'zielonka') if backend == 'reference'
                                   else 'lifting-sym' if backend.startswith('AD-sym') else 'lifting')]
     if not pm and backend != 'reference':
         command += ['--max-host-leaves=' + str(2 * sys.maxsize + 1)]
@@ -314,6 +314,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
     cache.mkdir(parents=True, exist_ok=True)
     build_dir = Path(build_dir).resolve()
     metadata = dict(family=family, timeout_seconds=seconds, memory_gib=memory_gib, jobs=jobs,
+                    reference_algorithm=info.get('reference_algorithm', 'zielonka'),
                     reference_timeout_seconds=seconds, memory_cap_enforced=sys.platform.startswith('linux'),
                     report_size_cap_gib=2, python_version=platform.python_version(),
                     source_commit=subprocess.check_output(
@@ -361,6 +362,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
             pending = Path(temporary) / 'winners.gz'
             request = dict(game=game, path=str((directory / game['file']).resolve()),
                            backend='reference', build_dir=str(build_dir), memory_gib=memory_gib,
+                           reference_algorithm=metadata['reference_algorithm'],
                            cache=str(cache), save_reference=str(pending))
             result = dict(game=game['id'], **measure(request, seconds))
             if result['outcome'] == 'solved':
@@ -480,6 +482,7 @@ def recorded(family, path=None):
     directory = HERE / family
     document = json.loads((Path(path) if path else directory / 'results-60s.json').read_text())
     assert document['complete'] and document['pm_algorithm'] == 'strahler'
+    assert document.get('reference_algorithm', 'zielonka') == info.get('reference_algorithm', 'zielonka')
     assert document['fixture_sha256'] == {g['id']: g['sha256'] for g in info['games']}
     expected = {(g['id'], b, o) for g in info['games'] for b in BACKENDS for o in ORDERS}
     assert {(r['game'], r['backend'], r['order']) for r in document['rows']} == expected
@@ -587,7 +590,7 @@ def shape_html(shape):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('worker', 'run', 'check'))
-    parser.add_argument('--family', choices=('cabp', 'ladder'))
+    parser.add_argument('--family', choices=('cabp', 'ladder', 'recursiveladder'))
     parser.add_argument('--build-dir', type=Path, default=Path('build'))
     parser.add_argument('--output', type=Path)
     parser.add_argument('--seconds', type=float, default=60)

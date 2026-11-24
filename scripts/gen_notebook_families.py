@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check or rebuild the pinned CABP and ladder notebook fixtures."""
+"""Check or rebuild the pinned protocol and ladder notebook fixtures."""
 
 import argparse
 import bz2
@@ -20,6 +20,37 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'jupyter-examples'))
 from lexicographic_nester import bounds
 from family_benchmarks import sha256
+
+
+def recursive_ladder(n):
+    """PGSolver's recursive-ladder construction (5n vertices).
+
+    Port of src/lib/generators/recursiveladder.ml at PGSolver commit
+    d3cd624b61cd66739c45aff9554f6bbdcdd05401; see the fixture README.
+    Copyright (c) Oliver Friedmann and Martin Lange. BSD-3-Clause;
+    terms in jupyter-examples/recursiveladder/PGSOLVER-LICENSE.md.
+    """
+    if n < 1:
+        raise ValueError('Recursive ladder size must be positive')
+    vertices = {}
+    for i in range(n + 1):
+        start, priority, owner = 5 * i - 2, 3 * i + 5, i % 2
+
+        def add(j, p, relative_owner, edges):
+            vertices[start + j] = (p, (owner + relative_owner) % 2,
+                                    [start + edge for edge in edges])
+
+        if i > 0:
+            add(0, 1 - owner, 1, [-2, 1])
+            add(1, 1 - owner, 0, [0] if i == n else [0, 2])
+        if i < n:
+            add(2, priority, 1, [6, 3])
+            add(3, priority - 1, 0,
+                ([] if i == 0 else [-2]) + ([] if i == n - 1 else [8]) + [4])
+            add(4, priority - 2, 1, [3, 6])
+    return f'parity {5 * n - 1};\n' + ''.join(
+        f'{v} {p} {o} ' + ','.join(map(str, edges)) + f' "{v}";\n'
+        for v, (p, o, edges) in sorted(vertices.items()))
 
 
 def fetch(url, path, expected):
@@ -104,19 +135,23 @@ def check(path, game):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--family', choices=('cabp', 'ladder', 'both'), default='both')
+    parser.add_argument('--family', choices=('cabp', 'ladder', 'recursiveladder', 'both', 'all'), default='both')
     parser.add_argument('--check', action='store_true', help='Check bundled files without any network access')
     parser.add_argument('--knor', type=Path)
     parser.add_argument('--cache', type=Path, default=ROOT / '.cache/notebook-family-sources')
     args = parser.parse_args()
     args.cache.mkdir(parents=True, exist_ok=True)
-    for family in ('cabp', 'ladder') if args.family == 'both' else (args.family,):
+    families = ('cabp', 'ladder', 'recursiveladder') if args.family == 'all' else (
+        ('cabp', 'ladder') if args.family == 'both' else (args.family,))
+    for family in families:
         directory = ROOT / 'jupyter-examples' / family
         document = json.loads((directory / 'manifest.json').read_text())
         for game in document['games']:
             path = directory / game['file']
             if not path.exists() and not args.check:
-                if family == 'ladder':
+                if game.get('generated'):
+                    path.write_bytes(bz2.compress(recursive_ladder(game['parameter']).encode(), compresslevel=9))
+                elif family in ('ladder', 'recursiveladder'):
                     extract(document['original_figshare_file'], game['original_member'], path)
                 else:
                     cabp(game, document, path, args.cache, args.knor)

@@ -1,6 +1,6 @@
 # Offline Jupyter examples
 
-Ten notebooks for the public `strahler` Python API. Run each notebook from top
+Eleven notebooks for the public `strahler` Python API. Run each notebook from top
 to bottom. Its first cell checks the package and library versions and stops if
 they differ. Use this directory as the notebook working directory so its game
 and Python helpers are importable. Rendering uses inline ESM/CSS and SVG, with no
@@ -19,6 +19,7 @@ for Jupyter and the optional Python dependencies.
 | [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic and ratio AD/symmetric AD/PM search, host trees, linked AD tree/block views, Nester frontier and fixed-pair (k,t) maps |
 | [09-adaptive-cabp-swp](09-adaptive-cabp-swp.ipynb) | CABP data sizes 2/4, branching/strong bisimulation, three search orders and fixed SIMD STRPM/AD maps |
 | [10-adaptive-ladder](10-adaptive-ladder.ipynb) | Nine ordinary ladder sizes, three search orders, endpoint fixed maps and a small live STRPM check |
+| [11-adaptive-recursiveladder](11-adaptive-recursiveladder.ipynb) | Recursive ladders n=2…300, growing priority depth, three search orders and fixed AD/STRPM maps |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
@@ -41,14 +42,16 @@ to repeat the same `(k,t)` while shaving removes vertices. Its fixed-pair sectio
 adds fresh full-kernel STRPM and PM+iter measurements alongside the archived AD
 data, distinguishing confirmed minima from candidates and resource limits.
 
-Notebooks 09 and 10 use a fresh 60-second/2-GiB first pass with lexicographic,
+Notebooks 09–11 use a fresh 60-second/2-GiB first pass with lexicographic,
 ratio and table orders. CABP keeps the two equivalence relations as separate
 parameter series. Ladder uses every published rung count from 100 to 50,000.
-Both read bundled recordings and winner references, draw small host and
+Recursive ladders grow both the graph and its priority depth, through n=300.
+These notebooks read bundled recordings and winner references, draw small host and
 certificate views, and check input hashes without network access. Their times
 include input and reporting; they are not kernel-only timings. The compressed
 fixtures, conversion provenance and exact limits are described in
-[cabp/README.md](cabp/README.md) and [ladder/README.md](ladder/README.md).
+[cabp/README.md](cabp/README.md), [ladder/README.md](ladder/README.md) and
+[recursiveladder/README.md](recursiveladder/README.md).
 
 ## Release zip
 

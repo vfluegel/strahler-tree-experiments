@@ -116,8 +116,8 @@ def test_freeze_rejects_errors_and_volatile_output(executor):
             executor.freeze_outputs(notebook, {})
 
 
-def test_ten_notebooks_and_version_mismatch(monkeypatch, capsys):
-    assert len(NOTEBOOKS) == 10
+def test_eleven_notebooks_and_version_mismatch(monkeypatch, capsys):
+    assert len(NOTEBOOKS) == 11
     import importlib.metadata
     from types import SimpleNamespace
     monkeypatch.setitem(sys.modules, 'strahler', SimpleNamespace(version=lambda: '0.0.1'))
