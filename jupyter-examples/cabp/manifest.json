@@ -1,0 +1,207 @@
+{
+  "source": "https://doi.org/10.6084/m9.figshare.6004130.v1",
+  "license": "CC0",
+  "representation": "max-parity PGSolver, without optional preprocessing or same-parity compression",
+  "syntcomp_commit": "4105caf1f1e5fd3b76657879bfce8021d130cbde",
+  "original_figshare_file": 10811291,
+  "converter_url": "https://raw.githubusercontent.com/SYNTCOMP/benchmarks/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren/pg2hoa.py",
+  "converter_sha256": "5a5ffa4f67f17ba18f77a1ae4d3f554ec1c7f2a1d391c4dfea6471097d46708d",
+  "reference_knor_source": "https://github.com/gaperez64/strahler-knors/tree/9910afe5c31c4595381965ed3236762dd7653609",
+  "reference_knor_sha256": "bddd57aba2cf84f1ce06e4c5c73624605efeee0fac62ce881fae7f870e44c7c6",
+  "anchor_repository_file": "examples/cabp_swp.ehoa.pg",
+  "games": [
+    {
+      "id": "cabp-branching-bisim-data2",
+      "label": "branching-bisim, data=2",
+      "series": "branching-bisim",
+      "parameter": 2,
+      "data_size": 2,
+      "capacity": 1,
+      "window_size": 1,
+      "file": "cabp-data2-branching-bisim.pg",
+      "sha256": "77f4b3b3d768e533a4ebe675f0e085ca394365c8e2ff35aeac1f528e489a65d9",
+      "pg_sha256": "77f4b3b3d768e533a4ebe675f0e085ca394365c8e2ff35aeac1f528e489a65d9",
+      "vertices": 875281,
+      "edges": 1469041,
+      "raw_priorities": [
+        0,
+        3,
+        4
+      ],
+      "normalized_maximum": 2,
+      "dense_ids": true,
+      "official_syntcomp_2026": true,
+      "ehoa_file": "CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2.ehoa",
+      "ehoa_sha256": "e4c8725fed44ba83ea1a8010b186a38df8a7765d45cb54881b9a7caa65ab5b2b",
+      "ehoa_bytes": 38697409,
+      "ehoa_url": "https://raw.githubusercontent.com/SYNTCOMP/benchmarks/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren/CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2.ehoa",
+      "original_member": "equivchecking/games/CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2",
+      "original_sha256": null,
+      "fixed_map": true,
+      "fixed_t_max": 3,
+      "t_max": 19,
+      "AD_height": [
+        2,
+        2
+      ],
+      "PM_depth": [
+        1,
+        2
+      ],
+      "AD_k_max": [
+        2,
+        2
+      ],
+      "PM_k_max": [
+        2,
+        3
+      ],
+      "file_bytes": 28725936,
+      "repository_storage": "symlink to the existing examples/cabp_swp.ehoa.pg; the release zip stores its contents"
+    },
+    {
+      "id": "cabp-strong-bisim-data2",
+      "label": "strong-bisim, data=2",
+      "series": "strong-bisim",
+      "parameter": 2,
+      "data_size": 2,
+      "capacity": 1,
+      "window_size": 1,
+      "file": "cabp-data2-strong-bisim.pg.bz2",
+      "sha256": "e1e815d42b9eb4553883c8c85b819f2fb79e264a03cd49a80137fcc060b21340",
+      "pg_sha256": "f505bc3c78fec76e7d913debca29aefa15347597e03aa74bb3c8308cc97fcb34",
+      "vertices": 125084,
+      "edges": 202028,
+      "raw_priorities": [
+        0,
+        3,
+        4
+      ],
+      "normalized_maximum": 2,
+      "dense_ids": true,
+      "official_syntcomp_2026": true,
+      "ehoa_file": "CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
+      "ehoa_sha256": "d83a4b823da653d9b07a3b51817d20a8d3912beda21f4b2c94cdb585c4450458",
+      "ehoa_bytes": 4978324,
+      "ehoa_url": "https://raw.githubusercontent.com/SYNTCOMP/benchmarks/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren/CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
+      "original_member": "equivchecking/games/CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2",
+      "original_sha256": null,
+      "fixed_map": true,
+      "fixed_t_max": 3,
+      "t_max": 16,
+      "AD_height": [
+        2,
+        2
+      ],
+      "PM_depth": [
+        1,
+        2
+      ],
+      "AD_k_max": [
+        2,
+        2
+      ],
+      "PM_k_max": [
+        2,
+        3
+      ],
+      "file_bytes": 1067376
+    },
+    {
+      "id": "cabp-branching-bisim-data4",
+      "label": "branching-bisim, data=4",
+      "series": "branching-bisim",
+      "parameter": 4,
+      "data_size": 4,
+      "capacity": 1,
+      "window_size": 1,
+      "file": "cabp-data4-branching-bisim.pg.bz2",
+      "sha256": "467fa80ad661a69497ecd81293e09769d4bb18cec73dd12d256928fd36a56c5e",
+      "pg_sha256": "ca7005c7000c93a75a134796c260d325ce0605c5fc3273a280d2c5f0cbc70e9d",
+      "vertices": 2512705,
+      "edges": 4230209,
+      "raw_priorities": [
+        0,
+        3,
+        4
+      ],
+      "normalized_maximum": 2,
+      "dense_ids": true,
+      "official_syntcomp_2026": false,
+      "ehoa_file": "CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2.ehoa",
+      "ehoa_sha256": "00acaa8f241fabfdcb8f0e199bded2ea8c7b74b5e7fabb467105ac1b6f7d7865",
+      "ehoa_bytes": 129939812,
+      "ehoa_url": null,
+      "original_member": "equivchecking/games/CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2",
+      "original_sha256": "5761e18226220b3a8db43b0157fc2f38318c1f765f95d509157108119388e93f",
+      "fixed_map": false,
+      "fixed_t_max": 3,
+      "t_max": 21,
+      "AD_height": [
+        2,
+        2
+      ],
+      "PM_depth": [
+        1,
+        2
+      ],
+      "AD_k_max": [
+        2,
+        2
+      ],
+      "PM_k_max": [
+        2,
+        3
+      ],
+      "file_bytes": 22593232
+    },
+    {
+      "id": "cabp-strong-bisim-data4",
+      "label": "strong-bisim, data=4",
+      "series": "strong-bisim",
+      "parameter": 4,
+      "data_size": 4,
+      "capacity": 1,
+      "window_size": 1,
+      "file": "cabp-data4-strong-bisim.pg.bz2",
+      "sha256": "e0a390a7ca4f454fbaee854d4e2687038bdfa295fea7f0f8dd9a287f6f5a335e",
+      "pg_sha256": "6c4e01515fd013da4c4d733f2e55aafc706f3c16924b05a4954ede453fc6db8a",
+      "vertices": 339444,
+      "edges": 551252,
+      "raw_priorities": [
+        0,
+        3,
+        4
+      ],
+      "normalized_maximum": 2,
+      "dense_ids": true,
+      "official_syntcomp_2026": true,
+      "ehoa_file": "CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
+      "ehoa_sha256": "716b838a158916a05f87a9ede1e78cdfd31c283ee791d4fce070c1131d59c405",
+      "ehoa_bytes": 15864985,
+      "ehoa_url": "https://raw.githubusercontent.com/SYNTCOMP/benchmarks/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren/CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
+      "original_member": "equivchecking/games/CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2",
+      "original_sha256": null,
+      "fixed_map": false,
+      "fixed_t_max": 3,
+      "t_max": 18,
+      "AD_height": [
+        2,
+        2
+      ],
+      "PM_depth": [
+        1,
+        2
+      ],
+      "AD_k_max": [
+        2,
+        2
+      ],
+      "PM_k_max": [
+        2,
+        3
+      ],
+      "file_bytes": 2955991
+    }
+  ]
+}

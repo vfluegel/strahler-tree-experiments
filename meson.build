@@ -1659,7 +1659,7 @@ if python_option.enabled()
     env : python_test_env, suite : 'python', timeout : 480, depends : libstrahler)
   foreach slow : [false, true]
     test(slow ? 'test_python_slow' : 'test_python', python_module,
-      args : ['-m', 'pytest', files('tests/test_python.py'), files('tests/test_lexicographic.py'), '-q', '-rs',
+      args : ['-m', 'pytest', files('tests/test_python.py'), files('tests/test_lexicographic.py'), files('tests/test_family_benchmarks.py'), '-q', '-rs',
         '-m', slow ? 'slow' : 'not slow', '--durations=12'],
       env : python_test_env, suite : slow ? ['python', 'slow'] : ['python'],
       timeout : slow ? 7200 : 600,

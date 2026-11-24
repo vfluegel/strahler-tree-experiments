@@ -7,3 +7,5 @@ nbclient
 nbformat
 ipykernel
 playwright
+# Only needed to rerun the bounded large-family benchmark collector.
+ijson>=3.3,<4
