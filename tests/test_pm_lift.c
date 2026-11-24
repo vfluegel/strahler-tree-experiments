@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "parameter_queue.h"
 #include "pg_preprocess.h"
 #include "pm_internal.h"
 #include "zielonka.h"

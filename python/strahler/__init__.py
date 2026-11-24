@@ -137,6 +137,7 @@ def decompose(game, algorithm=None, *, args=None, **options):
     """Run pg2adot (default: lifting), returning certified complete/partial trees.
 
     search='lexicographic' accepts start_k/start_t; search='ratio' skips t=0.
+    'table' orders small hosts by size; 'monotone-tab' keeps provable embeddings.
     Algorithms: zielonka, zielonka-sym, lifting, lifting-sym. Host options and
     preprocessing use the CLI's spelling, e.g. adaptive_t='incremental',
     tree_k=2, tree_t=1, kary=2, tree_file=path, initial_shave='all', iter_shave=True.
@@ -343,6 +344,7 @@ def progress_measures(game, *, args=None, **options):
     """Return the strahler-pm/1 dict of pg2pmdot rounds and prefix trees.
 
     search='lexicographic' accepts start_k/start_t; search='ratio' skips t=0.
+    'table' orders small hosts by size; 'monotone-tab' keeps provable embeddings.
     algorithm='strahler' (default) or 'succinct'; k/t, bits, iter_shave and
     preprocessing options follow pg2pmdot. Each round keeps complete status.
     """

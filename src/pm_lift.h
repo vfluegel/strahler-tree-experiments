@@ -1,7 +1,7 @@
 #ifndef PM_LIFT_H
 #define PM_LIFT_H 1
 
-#include "parameter_queue.h"
+#include "parameter_pair.h"
 #include "pg_attractor.h"
 
 typedef enum { PM_STRAHLER, PM_SUCCINCT } PMAlgorithm;
@@ -43,6 +43,8 @@ typedef struct {
   bool lexicographic;
   bool ratio;
   bool table;
+  /* Table search restricted by the sufficient host embedding bound. */
+  bool monotone_table;
   /* Lexicographic start; zero k means the default 1. */
   size_t start_k;
   size_t start_t;

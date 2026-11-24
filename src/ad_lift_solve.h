@@ -50,6 +50,8 @@ typedef struct {
   bool ratio;
   /* ADAPTIVE: size-ordered small hosts, followed by the ratio fallback. */
   bool table;
+  /* TABLE: keep strictly growing hosts nested under the terminal host. */
+  bool monotone_table;
   /* Lexicographic start; zero starts at 1. t is the first t. */
   size_t start_k;
   /* KARY: the arity, at least one. */

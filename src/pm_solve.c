@@ -25,6 +25,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include "parameter_queue.h"
 #include "pm_internal.h"
 
 static size_t floor_log2(size_t value) {
@@ -40,6 +41,7 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
               PMVisit const visit, void *context, PMError *error) {
   if (game == nullptr || active == nullptr || options == nullptr ||
       visit == nullptr || active->bit_count != game->vertex_count ||
+      (options->monotone_table && !options->table) ||
       ((options->lexicographic || options->ratio || options->table) &&
        (options->fixed || options->algorithm != PM_STRAHLER)) ||
       ((unsigned)options->lexicographic + (unsigned)options->ratio +
@@ -81,8 +83,13 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
   bool succeeded = false;
   bool initialized = true;
   if (options->table) {
-    initialized = parameter_table_init(&queue, queue.k_max, queue.t_max,
-                                       (size_t)(game->max_priority / 2 + 2));
+    size_t const height = (size_t)(game->max_priority / 2 + 2);
+    initialized =
+        options->monotone_table
+            ? parameter_monotone_init(
+                  &queue, queue.k_max, queue.t_max, height,
+                  (size_t)((game->max_priority + 1) / 2 + 1), height)
+            : parameter_table_init(&queue, queue.k_max, queue.t_max, height);
   } else {
     queue.heap = calloc(slots, sizeof(queue.heap[0]));
     queue.seen = calloc(slots, sizeof(queue.seen[0]));
