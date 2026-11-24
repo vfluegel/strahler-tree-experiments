@@ -18,8 +18,8 @@ static_assert(sizeof(STRPMVector) == 56);
 void strpm_simd_unpack(STRPMVector const *from, PMMeasure *to);
 void strpm_simd_successor(STRPMVector *measure, int cutoff, int depth, int k,
                           int t);
-[[nodiscard]] int strpm_simd_compare(STRPMVector const *left,
-                                     STRPMVector const *right, int cutoff);
+[[nodiscard]] int strpm_simd_compare(STRPMVector const *a, STRPMVector const *b,
+                                     int cutoff);
 /* Successor and comparison stay in vector registers inside a vertex lift. */
 [[nodiscard]] bool strpm_simd_lift(PGGame const *game, PGSet const *active,
                                    PMResult *result, STRPMVector *measures,
