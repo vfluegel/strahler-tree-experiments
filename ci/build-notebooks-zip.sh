@@ -26,8 +26,10 @@ requirements = (notebooks / 'requirements.txt').read_text()
 output.mkdir(parents=True, exist_ok=True)
 name = f'strahler-notebooks-{version}'
 archive = output / f'{name}.zip'
-shared = ('HOST-ORDER.md', 'docs/incremental-t.md',
-          'experimental/host-order/sizes.csv', 'experimental/host-order/summary.json')
+shared = ('keiren/results.csv', 'KEIREN.md', 'HOST-ORDER.md', 'docs/incremental-t.md', 'docs/host-monotonicity.md',
+          'experimental/host-order/sizes.csv', 'experimental/host-order/summary.json',
+          'scripts/incremental_t.py', 'scripts/find_disagreements.py',
+          'examples/README.md', 'examples/ad-nonmonotone.pg', 'examples/strpm-nonmonotone.pg')
 with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
     for path in sorted(notebooks.rglob('*')):
         if path.is_file() and path != notebooks / 'requirements.txt':
@@ -41,7 +43,8 @@ with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
                     source = ''.join(cell['source'])
                     rewritten = source
                     for asset in shared:
-                        rewritten = rewritten.replace(f'](../{asset})', f']({asset})')
+                        rewritten = re.sub(r'\]\(\.\./' + re.escape(asset) + r'(?=[)#])',
+                                           '](' + asset, rewritten)
                     if rewritten != source:
                         cell['source'] = (rewritten.splitlines(keepends=True)
                                           if isinstance(cell['source'], list) else rewritten)
@@ -50,7 +53,7 @@ with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
                     bundle.writestr(destination, json.dumps(document, indent=1, ensure_ascii=False) + '\n')
                     continue
             bundle.write(path, destination)
-    for path in ('keiren/results.csv', 'KEIREN.md', *shared):
+    for path in shared:
         bundle.write(root / path, f'{name}/{path}')
     bundle.writestr(f'{name}/requirements.txt',
                     f'--find-links ./wheels\n--only-binary strahler\n'

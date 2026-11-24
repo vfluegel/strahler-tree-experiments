@@ -75,6 +75,9 @@ Meson builds the C unit tests and runs the command-line regression cases.
 - `run-regression.sh` regenerates or checks the complete golden suite.
 - `run-with-input.sh` supplies a file on standard input for smoke tests.
 - `games/` contains parser and solver fixtures.
+- The two `examples/*-nonmonotone.pg` games have fixed-host AD and STRPM
+  regressions at `(3,2)` and `(4,3)`, including scalar and SIMD PM. Research
+  tests also check the constructive cross-k host embedding bound.
 - `trees/` contains leaf-stream host trees for `pg2adot --tree-file`.
 - `golden/` contains expected command output.
 - `actual/` receives ignored output from the current test run.

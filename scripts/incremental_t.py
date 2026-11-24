@@ -38,6 +38,32 @@ def vtree(k, t, h):
     return vtree(k, t - 1, h) + (utree(k - 1, t, h - 1),) + vtree(k, t - 1, h)
 
 
+def embed_larger_k(leaf, target_k):
+    """Embed a canonical U leaf into U^(target_k) with t+k-1 budget.
+
+    Keep the first h-target_k empty components, then prefix every remaining
+    component by 0. Decisions use only the prefix, so this maps whole trees.
+    See docs/host-monotonicity.md for the proof and boundary cases.
+    """
+    h = len(leaf) + 1
+    k = 1 + sum(bool(bits) for bits in leaf)
+    if not k <= target_k <= h:
+        raise ValueError('Expected k <= target_k <= h')
+    if target_k == k:
+        return tuple(leaf)
+    if k == 1:
+        return ('0',) * (target_k - 1) + ('',) * (h - target_k)
+    keep_empty = h - target_k
+    result = []
+    for bits in leaf:
+        if keep_empty == 0:
+            result.append('0' + bits)
+        else:
+            result.append(bits)
+            keep_empty -= not bits
+    return tuple(result)
+
+
 class Host:
     def __init__(self, shape, player, bound):
         self.positions, self.nodes, self.player = [], [], player

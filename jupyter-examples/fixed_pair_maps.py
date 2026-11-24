@@ -316,17 +316,32 @@ def pareto(rows):
     return candidates, [pair for pair in candidates if not missing[pair]], missing
 
 
+def embedding_source(solved, k, t):
+    """A measured solve whose host embeds at this pair, at fixed height.
+
+    Zero-budget and k=1 hosts are chains. Otherwise use fixed-k inclusion or
+    the t+k-1 bound proved in docs/host-monotonicity.md.
+    """
+    return next(((a, b) for a, b in sorted(solved) if
+                 a == 1 or b == 0 or
+                 (k == a and t >= b) or (k > a and t >= b + a - 1)), None)
+
+
 def classify(rows, k_max, t_max):
-    """Only measured solves/partials are colored as answers; no across-k inference."""
+    """Keep measured outcomes and distinguish embedding-guaranteed solves."""
     measured = {(r['k'], r['t']): r for r in rows}
     solved = {at for at, r in measured.items() if r['outcome'] == 'solved'}
     candidates, confirmed, _ = pareto(rows)
     cells = {}
     for at in ((k, t) for k in range(1, k_max + 1) for t in range(t_max + 1)):
         row = measured.get(at)
+        witness = embedding_source(solved, *at)
         if row is None:
-            dominated = any(pair != at and pair[0] <= at[0] and pair[1] <= at[1] for pair in solved)
-            cells[at] = ('dominated', '', 'not run; cannot be a Pareto minimum') if dominated else ('unknown', '', 'not run; outcome unknown')
+            if witness is not None:
+                cells[at] = ('implied', '⇒', f'certificate guaranteed by host embedding from {witness}; not timed')
+            else:
+                dominated = any(pair != at and pair[0] <= at[0] and pair[1] <= at[1] for pair in solved)
+                cells[at] = ('dominated', '', 'not run; cannot be a Pareto minimum; outcome unknown') if dominated else ('unknown', '', 'not run; outcome unknown')
         elif row['outcome'] == 'solved':
             mark = '★' if at in confirmed else '◇' if at in candidates else '✓'
             cells[at] = ('solved', mark, f"solved in {row['seconds']:.1f} s, {row['rounds']} round(s)" +
@@ -334,7 +349,9 @@ def classify(rows, k_max, t_max):
         elif row['outcome'] == 'unsolved':
             cells[at] = ('failed', '✗', f"stabilized with {row['unresolved']} vertices unresolved")
         elif row['outcome'] in ('timeout', 'memory', 'output limit'):
-            cells[at] = ('limit', {'timeout': 'T', 'memory': 'M', 'output limit': 'O'}[row['outcome']], 'resource limit; host sufficiency unknown')
+            tip = ('resource limit; certificate guaranteed by embedding from ' + str(witness)
+                   if witness is not None else 'resource limit; host sufficiency unknown')
+            cells[at] = ('limit', {'timeout': 'T', 'memory': 'M', 'output limit': 'O'}[row['outcome']], tip)
         else:
             cells[at] = ('unknown', '!', row.get('detail', 'solver error'))
     return cells
@@ -352,6 +369,9 @@ def _glyph(x, y, glyph):
         return f'<polygon points="{x},{y-8} {x+7},{y} {x},{y+8} {x-7},{y}" {line}/>'
     if glyph == '✓':
         return f'<polyline points="{x - 5},{y} {x - 1.5},{y + 4} {x + 5.5},{y - 4.5}" {line}/>'
+    if glyph == '⇒':
+        return (f'<path d="M{x - 7} {y - 3}H{x + 3}M{x - 7} {y + 3}H{x + 3}'
+                f'M{x + 1} {y - 7}L{x + 8} {y}L{x + 1} {y + 7}" {line}/>')
     if glyph == '✗':
         return (f'<path d="M{x - 4.5} {y - 4.5}L{x + 4.5} {y + 4.5}'
                 f'M{x + 4.5} {y - 4.5}L{x - 4.5} {y + 4.5}" {line}/>')
@@ -362,7 +382,7 @@ def _glyph(x, y, glyph):
 
 
 def _square(x, y, state, glyph, tip=''):
-    fill, opacity = {'solved': (GREEN, 1), 'failed': (RED, 1),
+    fill, opacity = {'solved': (GREEN, 1), 'implied': (GREEN, .72), 'failed': (RED, 1),
                      'dominated': ('#94a3b8', .35), 'limit': ('#b45309', 1),
                      'unknown': ('none', 1)}[state]
     stroke = ' stroke="#94a3b8"' if state == 'unknown' else ''
@@ -402,8 +422,8 @@ def grid_svg(title, rows, k_max, t_max):
 
 def legend_svg():
     entries = [('solved', '★', 'confirmed Pareto minimum'), ('solved', '◇', 'observed nondominated solve'),
-               ('solved', '✓', 'measured solve'), ('failed', '✗', 'measured partial'),
-               ('limit', 'T', 'resource limit: unknown'),
+               ('solved', '✓', 'measured solve'), ('implied', '⇒', 'guaranteed by embedding, not timed'),
+               ('failed', '✗', 'measured partial'), ('limit', 'T', 'resource limit'),
                ('dominated', '', 'dominated, not run'), ('unknown', '', 'not run')]
     parts, x = [], 4
     for state, glyph, label in entries:
@@ -478,7 +498,7 @@ def validate_pm_recording(document):
         require(not missing, f'{n} {backend}: missing undominated cells {missing}')
         candidates, confirmed, open_pairs = pareto(cells)
         coverage.append(dict(n=n, backend=backend, measured=len(cells),
-                             dominated_not_run=sum(s[0] == 'dominated' for s in states.values()),
+                             dominated_not_run=sum(s[0] in ('dominated', 'implied') for s in states.values()),
                              observed_candidates=candidates, confirmed_minima=confirmed,
                              open_predecessors={str(p): v for p, v in open_pairs.items() if v}))
     return coverage

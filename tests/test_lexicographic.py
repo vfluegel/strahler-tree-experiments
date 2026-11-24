@@ -116,7 +116,8 @@ def test_fixed_pair_maps_distinguish_observations_from_open_predecessors():
             dict(k=2, t=1, outcome='solved', rounds=1, seconds=1),
             dict(k=1, t=2, outcome='timeout', timeout_seconds=600)]
     cells = maps.classify(rows, 3, 2)
-    assert cells[1, 0][0] == 'unknown' and cells[3, 2][0] == 'dominated'
+    assert cells[1, 0][0] == 'unknown' and cells[3, 1][0] == 'dominated'
+    assert cells[3, 2][:2] == ('implied', '⇒')
     assert cells[2, 1][1] == '◇' and cells[1, 2][0] == 'limit'
     rows += [dict(k=1, t=0, outcome='unsolved', unresolved=1, seconds=1),
              dict(k=2, t=0, outcome='unsolved', unresolved=1, seconds=1)]
@@ -125,6 +126,28 @@ def test_fixed_pair_maps_distinguish_observations_from_open_predecessors():
     assert not maps.monotonicity_violations([
         dict(n=1, backend='AD-sym', k=1, t=1, outcome='solved'),
         dict(n=1, backend='AD-sym', k=2, t=1, outcome='unsolved')])
+
+
+def test_map_inference_uses_the_bound_and_keeps_measured_limits():
+    import fixed_pair_maps as maps
+    rows = [dict(k=3, t=2, outcome='solved', seconds=1, rounds=1),
+            dict(k=4, t=4, outcome='timeout')]
+    cells = maps.classify(rows, 5, 6)
+    assert cells[3, 3][:2] == ('implied', '⇒')
+    assert cells[4, 3][0] == 'dominated'  # The counterexample transition.
+    assert cells[4, 4][0] == 'limit' and 'guaranteed' in cells[4, 4][2]
+    assert cells[5, 4][:2] == ('implied', '⇒')
+    assert cells[2, 6][0] == 'unknown'  # No inference to smaller k.
+    assert maps.embedding_source({(1, 5)}, 4, 0) == (1, 5)  # A chain.
+    assert maps.embedding_source({(3, 0)}, 1, 0) == (3, 0)
+    assert rows[0]['outcome'] == 'solved' and len(rows) == 2
+    assert 'guaranteed by embedding, not timed' in maps.legend_svg()
+    document = maps.recorded_maps()
+    for n, backend in {(r['n'], r['backend']) for r in document['rows']}:
+        cells = [r for r in document['rows'] if (r['n'], r['backend']) == (n, backend)]
+        solved = {(r['k'], r['t']) for r in cells if r['outcome'] == 'solved'}
+        assert all(maps.embedding_source(solved, r['k'], r['t']) is None
+                   for r in cells if r['outcome'] == 'unsolved')
 
 
 def test_minima_walk_does_not_prune_after_a_timeout(monkeypatch):

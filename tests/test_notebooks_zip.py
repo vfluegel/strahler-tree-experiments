@@ -21,16 +21,21 @@ class NotebooksZip(unittest.TestCase):
             (notebooks / 'nester').mkdir()
             (notebooks / 'cabp').mkdir()
             (notebooks / 'ladder').mkdir()
+            (notebooks / 'recursiveladder').mkdir()
             files = {'README.md': '# Notebooks\n', 'requirements.txt': 'jupyterlab\n',
                      'example.ipynb': '{}', '07-symmetric-lifting-kary-nester.ipynb': '{}',
                      '08-lexicographic-adaptive-nester.ipynb': '{}',
                      '09-adaptive-cabp-swp.ipynb': json.dumps({'cells': [
-                         {'cell_type': 'markdown', 'source': ['See [host sizes](../HOST-ORDER.md).']},
+                         {'cell_type': 'markdown', 'source': ['See [host sizes](../HOST-ORDER.md).\n',
+                             '[Proof](../docs/host-monotonicity.md#constructing-the-embedding).\n',
+                             '[Results](../keiren/results.csv).']},
                          {'cell_type': 'code', 'source': ['text = "[example](../HOST-ORDER.md)"']}]}),
                      '10-adaptive-ladder.ipynb': '{}',
+                     '11-adaptive-recursiveladder.ipynb': '{}',
                      'family_benchmarks.py': '# bounded streaming collector\n',
                      'cabp/manifest.json': '{}', 'cabp/results-60s.json': '{}',
                      'ladder/laddergame-100.gm.bz2': 'ladder fixture',
+                     'recursiveladder/recursiveladder-100.gm.bz2': 'recursive ladder fixture',
                      'symmetric_lifting.py': '# measurement helper\n',
                      'lexicographic_nester.py': '# lexicographic experiment helper\n',
                      'nester/Nestern=1.gm.bz2': 'compressed fixture',
@@ -60,6 +65,12 @@ class NotebooksZip(unittest.TestCase):
                     'KEIREN.md': '# Column definitions\n',
                     'HOST-ORDER.md': '# Host sizes\n\n[Counts](experimental/host-order/sizes.csv)\n',
                     'docs/incremental-t.md': '# Technical notes\n',
+                    'docs/host-monotonicity.md': '# Embedding bound\n',
+                    'scripts/incremental_t.py': '# Embedding witness\n',
+                    'scripts/find_disagreements.py': '# Research helper\n',
+                    'examples/README.md': '# Counterexamples\n',
+                    'examples/ad-nonmonotone.pg': '0 0 0 0;\n',
+                    'examples/strpm-nonmonotone.pg': '0 0 0 0;\n',
                     'experimental/host-order/sizes.csv': 'h,k,t,leaves\n1,1,0,1\n',
                     'experimental/host-order/summary.json': '{}'}
             for name, content in data.items():
@@ -83,7 +94,9 @@ class NotebooksZip(unittest.TestCase):
                     if name == '09-adaptive-cabp-swp.ipynb':
                         packaged = json.loads(bundle.read(prefix + name))
                         self.assertEqual(packaged['cells'][0]['source'],
-                                         ['See [host sizes](HOST-ORDER.md).'])
+                                         ['See [host sizes](HOST-ORDER.md).\n',
+                                          '[Proof](docs/host-monotonicity.md#constructing-the-embedding).\n',
+                                          '[Results](keiren/results.csv).'])
                         self.assertEqual(packaged['cells'][1]['source'],
                                          ['text = "[example](../HOST-ORDER.md)"'])
                     elif name != 'requirements.txt':
