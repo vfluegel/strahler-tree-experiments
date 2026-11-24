@@ -82,7 +82,7 @@ All lifting hosts are available: full/default, `tree_k` (optionally with
 `tree_t`), `kary`, `tree_file`,
 `adaptive_t=True`, and `adaptive_t='incremental'`; iterative shaving is
 `iter_shave=True`. Symmetric lifting supports adaptive hosts through
-`search='lexicographic'` or `search='ratio'`; it rejects `adaptive_t`.
+`search='lexicographic'`, `search='ratio'`, or `search='table'`; it rejects `adaptive_t`.
 `search='lexicographic'` walks `(k,t)` with `k` as the outer loop and
 `t=0..floor(log2(n))` as the inner loop. It is available in
 `decompose(game, 'lifting', ...)`, `decompose(game, 'lifting-sym', ...)`
@@ -267,3 +267,8 @@ with `meson test --setup=all ... test_python_slow`. Installed-wheel tests use
 `STRAHLER_BUILD_DIR` to find comparison CLIs and leave `STRAHLER_LIB` unset.
 C API ownership and failure injection also run in the sanitizer and Valgrind
 jobs. The Linux Python test checks RSS across 1,000 repeated call batches.
+
+`search="table"` orders the small `(k,t)` hosts by exact leaf count for the
+larger initial player height, then falls back to ratio order. It preserves
+the individual height caps and repeats a productive pair during iterative
+shaving. [Data and height sensitivity](../HOST-ORDER.md).

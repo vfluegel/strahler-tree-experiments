@@ -451,6 +451,15 @@ standard input. The default algorithm is attractor-decomposition lifting.
   For lexicographic AD or Strahler PM search, `--start-k=K --start-t=T` skips
   earlier pairs (default `(1,0)`, `K>=1` within the cap, `T` clamped to `t_max`);
   starting pairs are rejected with ratio search.
+- `--search=table` uses exact leaf counts for `k=1..6`, `t=0..6`, and
+  `h=1..1000`, ordered by `(leaves,k,t)`. Both players follow the order at their
+  larger initial height, with their individual k clamps. The remaining `t=0`
+  pairs precede the ordinary positive-t ratio fallback; tried table pairs are
+  skipped while their ratio neighbors are still expanded. Heights above 1000
+  go directly to the zero column and ratio order. The cursor stays at a pair
+  while shaving makes progress. AD preflights both hosts and skips individually
+  over-budget pairs so cheaper fallback hosts can still be tried. Start-pair
+  overrides are rejected. [Counts and analysis](../HOST-ORDER.md).
 - `--kary=A` lifts in the full `A`-ary tree with each player's full height
   `H`, which is not bounded by a Strahler number. The result may be partial;
   it is complete when `A` is at least the number of vertices.
@@ -823,7 +832,7 @@ Following the common header and `game`, the document contains, in order:
   as `--stats`: `H,K,t` for Strahler hosts, `H,arity` for k-ary hosts, and `H`
   for file hosts. Empty remaining games and recursive solvers have empty objects.
 - `round_pairs`: the final selected pair without shaving, or each shaving
-  round's pair; present with ratio search or an explicit lexicographic `start_k`.
+  round's pair; present with ratio/table search or an explicit lexicographic `start_k`.
 - `budget_exhausted`: true when an adaptive host exceeded the leaf limit;
   the returned parameters still describe the last hosts that actually ran.
 

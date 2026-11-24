@@ -182,6 +182,56 @@ unsigned stree_count_leaves(int const k, int const t, int const h) {
   return total;
 }
 
+bool stree_count_table(int const k_max, int const t_max, int const h_max,
+                       uint64_t **counts) {
+  if (counts == nullptr) {
+    return false;
+  }
+  *counts = nullptr;
+  if (!cache_fits(k_max, t_max, h_max, sizeof(uint64_t))) {
+    return false;
+  }
+  size_t const width = (size_t)t_max + 1;
+  size_t const plane = ((size_t)k_max + 1) * width;
+  size_t const cells = ((size_t)h_max + 1) * plane;
+  uint64_t *u = calloc(2 * cells, sizeof(*u));
+  if (u == nullptr) {
+    return false;
+  }
+  uint64_t *v = u + cells;
+  /* The same U/V recurrence as leaf generation, evaluated once for the
+   * whole grid instead of allocating a DFS cache for every requested tree. */
+  for (int h = 1; h <= h_max; h++) {
+    for (int k = 1; k <= k_max && k <= h; k++) {
+      for (int t = 0; t <= t_max; t++) {
+        size_t const at = (size_t)h * plane + (size_t)k * width + (size_t)t;
+        if (k == 1) {
+          u[at] = 1;
+        } else if (t == 0) {
+          u[at] = v[at] = u[at - plane - width];
+        } else {
+          uint64_t const lower_k = u[at - plane - width];
+          if (v[at - 1] > (UINT64_MAX - lower_k) / 2) {
+            goto overflow;
+          }
+          v[at] = 2 * v[at - 1] + lower_k;
+          uint64_t const lower_h = h == k ? 0 : u[at - plane];
+          if (h != k && v[at] > (UINT64_MAX - lower_h) / 2) {
+            goto overflow;
+          }
+          u[at] = h == k ? v[at] : 2 * v[at] + lower_h;
+        }
+      }
+    }
+  }
+  *counts = u;
+  return true;
+overflow:
+  free(u);
+  errno = ERANGE;
+  return false;
+}
+
 [[nodiscard]]
 static char *prepend(size_t const n, char const pref[restrict static n],
                      char const *restrict str) {

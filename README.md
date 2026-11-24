@@ -101,3 +101,7 @@ shared modules and tests, with the exception below.
 in `504081d`). Copyright 2017-2018 Tom van Dijk, Johannes Kepler University Linz.
 Ported to C23 and modified for tree output, these files remain Apache-2.0;
 see [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0).
+
+Adaptive AD lifting and Strahler PM also accept `--search=table`: small hosts
+are tried by their exact size, followed by ratio search. See the two-minute
+[host-order analysis](HOST-ORDER.md) and its reproducible CSV.

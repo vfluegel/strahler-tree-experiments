@@ -39,6 +39,7 @@ typedef struct {
    * repeat a pair while it removes vertices. */
   bool lexicographic;
   bool ratio;
+  bool table;
   /* Lexicographic start; zero k means the default 1. */
   size_t start_k;
   size_t start_t;

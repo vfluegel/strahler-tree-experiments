@@ -707,3 +707,65 @@ def test_new_pm_recordings_identify_strahler_simd(monkeypatch):
     metadata = experiment._run_metadata(manifest()[:1])
     assert metadata['pm_algorithm'] == 'strahler'
     assert metadata['lifting_backends']['STRAHLER_PM_BACKEND'] == 'simd'
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+@pytest.mark.parametrize('iterate', [False, True])
+def test_table_search_preserves_winners_and_repeat_on_progress(algorithm, iterate):
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/disagree_lifting_strahler.pg') as game:
+        expected = ad_wins(strahler.decompose(game, 'zielonka'))
+        run = strahler.trace(game, algorithm, search='table', iter_shave=iterate)
+        assert run.result.complete and ad_wins(run.result) == expected
+        check_document(run.result.data)
+        visits = visited_pairs(run)
+        assert visits[0] == (1, 0)
+        if iterate:
+            at = -1
+            for event in run.events:
+                if event.get('phase') == 't_raised':
+                    at += 1
+                if event.get('phase') == 'shave_applied' and at + 1 < len(visits):
+                    assert (visits[at + 1] == visits[at]) == any(event['result']['regions'])
+        pm = strahler.progress_measures(game, algorithm='strahler', search='table', iter_shave=iterate)
+        assert pm['rounds'][-1]['complete'] and pm_wins(pm) == expected
+        assert run.result.data['parameters'][0]['H'] != run.result.data['parameters'][1]['H']
+
+
+@pytest.mark.parametrize('algorithm', ['lifting', 'lifting-sym'])
+def test_table_budget_skips_keep_reaching_the_ratio_tail(algorithm):
+    # Sixteen disjoint copies keep the unary host partial, while priority loops
+    # give height seven and enough vertices to reach parameters outside 6x6.
+    text = []
+    source = '0 2 0 3;1 2 1 2;2 0 1 1,4;3 0 0 3;4 3 1 3;'
+    for copy in range(32):
+        for row in source.split(';'):
+            if not row:
+                continue
+            v, p, owner, edges = row.split()
+            offset = copy * 5
+            text.append(f"{int(v)+offset} {p} {owner} " + ','.join(str(int(e)+offset) for e in edges.split(',')) + ';')
+    for priority in range(13):
+        v = 160 + priority
+        text.append(f'{v} {priority} 0 {v};')
+    with strahler.Game.from_text('\n'.join(text)) as game:
+        run = strahler.trace(game, algorithm, search='table', max_host_leaves=1)
+        assert not run.result.complete and run.result.data['budget_exhausted']
+        assert (1, 7) in visited_pairs(run)
+        truth = ad_wins(strahler.decompose(game, 'zielonka'))
+        assert all(won <= true for won, true in zip(ad_wins(run.result), truth))
+
+
+@pytest.mark.parametrize('solver', ['AD', 'AD-sym', 'PM'])
+def test_table_search_handles_single_vertices_and_rejects_start_overrides(solver):
+    with strahler.Game.from_text('0 0 0 0;') as game:
+        solve = (lambda **kw: strahler.progress_measures(game, **kw)) if solver == 'PM' else (lambda **kw: strahler.decompose(game, 'lifting-sym' if solver == 'AD-sym' else 'lifting', **kw))
+        result = solve(search='table', iter_shave=True)
+        assert result['rounds'][-1]['complete'] if solver == 'PM' else result.complete
+        with pytest.raises(strahler.StrahlerError):
+            solve(search='table', start_k=2)
+
+
+def test_table_repeats_a_productive_unary_pair():
+    with strahler.Game.from_file(EXAMPLES.parent / 'tests/games/strahler_two.pg') as game:
+        run = strahler.trace(game, 'lifting', search='table', iter_shave=True)
+        assert visited_pairs(run)[:2] == [(1, 0), (1, 0)]

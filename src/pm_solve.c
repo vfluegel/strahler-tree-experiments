@@ -40,9 +40,11 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
               PMVisit const visit, void *context, PMError *error) {
   if (game == nullptr || active == nullptr || options == nullptr ||
       visit == nullptr || active->bit_count != game->vertex_count ||
-      ((options->lexicographic || options->ratio) &&
+      ((options->lexicographic || options->ratio || options->table) &&
        (options->fixed || options->algorithm != PM_STRAHLER)) ||
-      (options->lexicographic && options->ratio) ||
+      ((unsigned)options->lexicographic + (unsigned)options->ratio +
+           (unsigned)options->table >
+       1) ||
       ((options->start_k != 0 || options->start_t != 0) &&
        !options->lexicographic) ||
       game->max_priority >= INT_MAX || !pg_subgame_is_total(game, active)) {
@@ -60,7 +62,7 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
                           .k_max =
                               logarithm + 2 < height ? logarithm + 2 : height,
                           .t_max = logarithm};
-  if (options->lexicographic || options->ratio) {
+  if (options->lexicographic || options->ratio || options->table) {
     /* A measure tree has at most n occupied leaves and depth+1 levels.
      * Proposition 3 gives Str <= min(depth+1, floor(log2 n)+1), including
      * the root, with the same safe bound whether or not dominions are removed.
@@ -75,9 +77,15 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
   PGSet unresolved = {0};
   PGSet attracted = {0};
   bool succeeded = false;
-  queue.heap = calloc(slots, sizeof(queue.heap[0]));
-  queue.seen = calloc(slots, sizeof(queue.seen[0]));
-  if (queue.heap == nullptr || queue.seen == nullptr ||
+  bool initialized = true;
+  if (options->table) {
+    initialized = parameter_table_init(&queue, queue.k_max, queue.t_max,
+                                       (size_t)(game->max_priority / 2 + 2));
+  } else {
+    queue.heap = calloc(slots, sizeof(queue.heap[0]));
+    queue.seen = calloc(slots, sizeof(queue.seen[0]));
+  }
+  if (!initialized || queue.heap == nullptr || queue.seen == nullptr ||
       !pg_set_clone(&remaining, active)) {
     pm_error(error, "failed to allocate parameter search");
     goto cleanup;
@@ -95,15 +103,21 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       goto cleanup;
     }
   }
-  if (!options->fixed && !options->lexicographic &&
+  if (!options->fixed && !options->lexicographic && !options->table &&
       options->algorithm == PM_STRAHLER) {
     if (!options->ratio || queue.t_max >= 1) {
       parameter_queue_push(&queue, parameters);
     }
   }
   for (size_t round = 1;; round++) {
-    if (vertices != 0 && !options->fixed && !options->lexicographic &&
-        options->algorithm == PM_STRAHLER) {
+    if (options->table) {
+      if (!queue.ordered_valid) {
+        pm_error(error, "table search exhausted before covering the game");
+        goto cleanup;
+      }
+      parameters = queue.ordered;
+    } else if (vertices != 0 && !options->fixed && !options->lexicographic &&
+               options->algorithm == PM_STRAHLER) {
       if (queue.count == 0) {
         if (options->incremental && !options->ratio) {
           succeeded = true;
@@ -157,7 +171,11 @@ bool pm_solve(PGGame const *game, PGSet const *active, PMOptions const *options,
       succeeded = true;
       break;
     }
-    if (options->lexicographic) {
+    if (options->table) {
+      if (!options->incremental || before == pg_set_count(&remaining)) {
+        parameter_table_advance(&queue);
+      }
+    } else if (options->lexicographic) {
       /* A smaller remaining game may fit the same host. Advance the grid
        * only after this pair stops exposing new dominions. */
       if (options->incremental && pg_set_count(&remaining) < before) {

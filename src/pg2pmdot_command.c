@@ -51,7 +51,7 @@ static void usage(FILE *out, char *argv[]) {
         "budget; may be partial\n"
         "  --iter-shave                                Remove dominions "
         "between runs (default: off)\n"
-        "  --search=lexicographic|ratio                Select exhaustive "
+        "  --search=lexicographic|ratio|table          Select adaptive "
         "parameter order\n"
         "  --start-k=K --start-t=T                      First lexicographic "
         "pair (default: 1,0)\n"
@@ -328,12 +328,14 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
       break;
     case OPT_SEARCH:
       if (strcmp(parser.argument, "lexicographic") != 0 &&
-          strcmp(parser.argument, "ratio") != 0) {
+          strcmp(parser.argument, "ratio") != 0 &&
+          strcmp(parser.argument, "table") != 0) {
         return cli_error_to(io->err, argv[0], "Invalid --search value");
       }
       solve_options.lexicographic =
           strcmp(parser.argument, "lexicographic") == 0;
       solve_options.ratio = strcmp(parser.argument, "ratio") == 0;
+      solve_options.table = strcmp(parser.argument, "table") == 0;
       break;
     case OPT_STATS:
       output.stats = true;
@@ -351,7 +353,8 @@ int pg2pmdot_command(int argc, char *argv[], CLIIO *io) {
     goto invalid;
   }
   solve_options.fixed = k_given || bits_given;
-  if ((solve_options.lexicographic || solve_options.ratio) &&
+  if ((solve_options.lexicographic || solve_options.ratio ||
+       solve_options.table) &&
       (solve_options.fixed || solve_options.algorithm != PM_STRAHLER)) {
     return cli_error_to(io->err, argv[0],
                         "--search requires unfixed Strahler parameters");

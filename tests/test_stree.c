@@ -1,9 +1,31 @@
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "stree.h"
+
+static void test_exact_table(void) {
+  uint64_t *counts = nullptr;
+  assert(stree_count_table(6, 6, 1000, &counts));
+  for (int h = 1; h <= 10; h++) {
+    for (int k = 1; k <= 6 && k <= h; k++) {
+      for (int t = 0; t <= 6; t++) {
+        uint64_t const exact =
+            counts[((size_t)h * 7 + (size_t)k) * 7 + (size_t)t];
+        assert(stree_count_leaves(k, t, h) ==
+               (exact < UINT_MAX ? exact : UINT_MAX));
+      }
+    }
+  }
+  assert(counts[(1000 * 7 + 6) * 7 + 6] == UINT64_C(3557321882121489343));
+  free(counts);
+  errno = 0;
+  assert(!stree_count_table(6, 30, 1000, &counts));
+  assert(counts == nullptr && errno == ERANGE);
+  assert(!stree_count_table(0, 0, 1, &counts));
+}
 
 static void test_count_leaves(void) {
   assert(stree_count_leaves(2, 1, 2) == 3);
@@ -56,6 +78,7 @@ int main(void) {
   assert(stree_count_leaves(INT_MAX - 1, INT_MAX - 1, INT_MAX - 1) == 0);
 
   test_count_leaves();
+  test_exact_table();
   test_leaf_label();
   test_leaf_stream();
   return 0;

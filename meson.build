@@ -1672,6 +1672,10 @@ test('test_ad_reach', test_ad_reach_exe, timeout : 120)
 
 test_strpm_simd_exe = executable('test_strpm_simd', 'tests/test_strpm_simd.c', dependencies : [pm_lift_dep, lift_simd_dep], c_args : ['-UNDEBUG'])
 test('test_strpm_simd', test_strpm_simd_exe)
+
+test_parameter_order_exe = executable('test_parameter_order', 'tests/test_parameter_order.c', dependencies : stree_dep, c_args : ['-UNDEBUG'])
+test('test_parameter_order', test_parameter_order_exe)
+test('host_order_generated', python, args : [files('scripts/gen_host_order.py'), genstree, '--check'], workdir : meson.project_source_root(), depends : genstree)
 foreach backend : ['scalar', 'simd']
   test('test_pm_lift_' + backend, test_pm_lift_exe, env : ['STRAHLER_PM_BACKEND=' + backend], workdir : meson.project_source_root())
 endforeach
