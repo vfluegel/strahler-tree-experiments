@@ -211,7 +211,8 @@ class DecompTests(unittest.TestCase):
             regular.write_text("parity 0;\n0 0 0 0;\n")
             for name in decomp.FIXED_HOST_EXAMPLES:
                 (examples / name).write_text(regular.read_text())
-            self.assertEqual(len(decomp.discover_games([examples])), 3)
+            self.assertEqual(len(decomp.discover_games([examples])),
+                             1 + len(decomp.FIXED_HOST_EXAMPLES))
             self.assertEqual(decomp.gallery_games(root), [regular])
 
     def test_content_discovery_and_metadata(self):

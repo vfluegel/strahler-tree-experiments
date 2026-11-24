@@ -1403,7 +1403,9 @@ endforeach
 
 test_pm_lift_exe = executable('test_pm_lift', 'tests/test_pm_lift.c',
   dependencies : [pm_lift_dep, pg_preprocess_dep, zielonka_dep])
-test('test_pm_lift', test_pm_lift_exe, workdir : meson.project_source_root())
+test('test_pm_lift', test_pm_lift_exe, workdir : meson.project_source_root(), timeout : 120)
+test('test_bounded_strpm', python, args : [files('tests/test_bounded_strpm.py'), pg2pmdot],
+  depends : [pg2pmdot, genstree], timeout : 120)
 
 test('pg2pmdot_help', pg2pmdot, args : ['--help'])
 foreach bad : [
@@ -1677,7 +1679,7 @@ test_parameter_order_exe = executable('test_parameter_order', 'tests/test_parame
 test('test_parameter_order', test_parameter_order_exe)
 test('host_order_generated', python, args : [files('scripts/gen_host_order.py'), genstree, '--check'], workdir : meson.project_source_root(), depends : genstree)
 foreach backend : ['scalar', 'simd']
-  test('test_pm_lift_' + backend, test_pm_lift_exe, env : ['STRAHLER_PM_BACKEND=' + backend], workdir : meson.project_source_root())
+  test('test_pm_lift_' + backend, test_pm_lift_exe, env : ['STRAHLER_PM_BACKEND=' + backend], workdir : meson.project_source_root(), timeout : 120)
 endforeach
 
 test_ad_batch_exe = executable('test_ad_batch', 'tests/test_ad_batch.c', dependencies : ad_lift_dep, c_args : ['-UNDEBUG', '-D_POSIX_C_SOURCE=200809L'])

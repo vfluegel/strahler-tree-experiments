@@ -94,7 +94,8 @@ MAX_SET_ITEMS = 8
 GAME_LABELS = {}
 # These examples exercise fixed (k,t) runs, covered by native regression tests.
 # Universal-host renderings would not show their distinguishing behavior.
-FIXED_HOST_EXAMPLES = {"ad-nonmonotone.pg", "strpm-nonmonotone.pg"}
+FIXED_HOST_EXAMPLES = {"ad-nonmonotone.pg", "strpm-nonmonotone.pg",
+                       "strpm-nonstrict-tail.pg"}
 # Local release runs exceeded 60 s for each pair, with and without preprocessing.
 SKIP_RUNS = {
     ("cabp_swp.ehoa.pg", "lifting-adaptive"): 60,

@@ -29,7 +29,8 @@ archive = output / f'{name}.zip'
 shared = ('keiren/results.csv', 'KEIREN.md', 'HOST-ORDER.md', 'docs/incremental-t.md', 'docs/host-monotonicity.md',
           'experimental/host-order/sizes.csv', 'experimental/host-order/summary.json',
           'scripts/incremental_t.py', 'scripts/find_disagreements.py',
-          'examples/README.md', 'examples/ad-nonmonotone.pg', 'examples/strpm-nonmonotone.pg')
+          'examples/README.md', 'examples/ad-nonmonotone.pg', 'examples/strpm-nonmonotone.pg',
+          'examples/strpm-nonstrict-tail.pg')
 with ZipFile(archive, 'w', compression=ZIP_DEFLATED) as bundle:
     for path in sorted(notebooks.rglob('*')):
         if path.is_file() and path != notebooks / 'requirements.txt':

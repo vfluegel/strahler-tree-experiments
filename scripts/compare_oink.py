@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare print-pms Oink measures and winners (fixes in tests/README.md)."""
+"""Compare Oink winners and SSPM measures (differences in tests/README.md)."""
 
 import argparse
 from collections import Counter
@@ -138,55 +138,45 @@ def compare(args, game, algorithm, scratch):
             command += ["--no-single", "--no-loops", "--no-wcwc"]
         log = run(command + [str(path)], args.timeout)
         expected = solution(sol.read_text(), count)
-        if shave and len(expected) != count and algorithm == "strahler":
-            # Its outer bound can exhaust even after shaving; obtain the full
-            # winning partition independently with Oink's Zielonka solver.
-            partial = expected
-            sol.unlink()
-            log += "\nZielonka fallback for incomplete Strahler oracle:\n"
-            log += run([args.oink, "--zlk", "--output", str(sol), str(path)],
-                       args.timeout)
-            expected = solution(sol.read_text(), count)
-            if any(expected.get(v) != p for v, p in partial.items()):
-                failures.append("unsound partial Strahler solution")
         options = ["--initial-shave=all"] if shave else []
         mode = [] if shave else ["--iter-shave"]
         dot = run(ours + mode + options + ["--labels=sets",
                   f"--max-set-items={count}", str(path)], args.timeout)
         transcripts += [f"shave={shave}\n{log}\n{dot}"]
-        if dot_winners(dot, count) != expected:
+        actual_winners = dot_winners(dot, count)
+        if algorithm == "strahler":
+            # Upstream retains nonstrict tails; the corrected least lift can
+            # certify more vertices or stop at an earlier parameter pair.
+            # Check partial certificates against an independent full solve.
+            reference = expected
+            if len(expected) != count or len(actual_winners) != count:
+                sol.unlink()
+                log = run([args.oink, "--zlk", "--output", str(sol), str(path)],
+                          args.timeout)
+                transcripts.append("Zielonka reference:\n" + log)
+                reference = solution(sol.read_text(), count)
+            if len(reference) != count:
+                failures.append("incomplete Zielonka reference")
+            for name, partial in (("Oink", expected), ("native", actual_winners)):
+                if any(reference.get(v) != p for v, p in partial.items()):
+                    failures.append(f"unsound {name} Strahler solution")
+        elif actual_winners != expected:
             failures.append("shaved winners" if shave else "winners")
-        if shave and len(expected) != count:
-            failures.append("incomplete shaved solution")
-        if not shave:
+        if not shave and algorithm == "succinct":
             leaves = run(ours + ["--iter-shave", "--format=leaves",
                                  str(path)],
                          args.timeout)
             transcripts.append(leaves)
-            if len(expected) != count:
-                # Oink's outer Strahler bound can exhaust with no final print.
-                # Check partial regions above and full shaved winners below.
-                if (algorithm != "strahler" or "Solved with k =" in log
-                        or our_stream(leaves)):
-                    failures.append("unexpected incomplete solution")
-                continue
             actual = our_stream(leaves)
             oracle = oracle_stream(log)
             streams += 1
             if branches(actual) != branches(oracle):
                 failures.append(f"stream: Oink={oracle!r} ours={actual!r}")
-            if algorithm == "strahler":
-                selected = re.search(r"Solved with k = (\d+), t = (\d+)", log)
-                rounds = re.findall(r"# round \d+ k=(\d+) t=(\d+)", leaves)
-                if (selected is None or not rounds
-                        or selected.groups() != rounds[-1]):
-                    failures.append("final Strahler parameters")
-            else:
-                selected = re.search(r"max l (\d+)\.", log)
-                rounds = re.findall(r"# round \d+ bits=(\d+)", leaves)
-                if (selected is None or not rounds
-                        or selected[1] != rounds[-1]):
-                    failures.append("final succinct budget")
+            selected = re.search(r"max l (\d+)\.", log)
+            rounds = re.findall(r"# round \d+ bits=(\d+)", leaves)
+            if (selected is None or not rounds
+                    or selected[1] != rounds[-1]):
+                failures.append("final succinct budget")
     return failures, "\n".join(transcripts), streams
 
 
@@ -240,17 +230,13 @@ def main():
     with tempfile.TemporaryDirectory(prefix="compare-oink-") as directory:
         for algorithm in ("strahler", "succinct"):
             checked = mismatches = skipped = 0
-            streams = incomplete = 0
+            streams = 0
             for name, game, example in games:
                 compared = 0
                 try:
                     game = canonical_game(game)
                     failures, log, compared = compare(
                         args, game, algorithm, Path(directory))
-                    if not compared:
-                        incomplete += 1
-                        print(f"PARTIAL {algorithm} {name}: Oink's search "
-                              "exhausted without a stream", flush=True)
                 except subprocess.TimeoutExpired as error:
                     if example:
                         skipped += 1
@@ -274,7 +260,7 @@ def main():
                               + "; ".join(failures), flush=True)
             total += mismatches
             print(f"{algorithm}: {checked} games, {mismatches} mismatches, "
-                  f"{streams} streams compared, {incomplete} partial oracles, "
+                  f"{streams} exact streams compared, "
                   f"{skipped} slow examples skipped (seed={args.seed})",
                   flush=True)
     if total:

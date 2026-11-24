@@ -224,17 +224,12 @@ OINK_BIN="$TMPDIR/oink-build/oink" python3 scripts/compare_oink.py build/pg2pmdo
 ```
 
 Both solvers receive the same game with IDs assigned in priority/ID order.
-This avoids Oink's unspecified ordering of equal-priority vertices, which can
-change untruncated Strahler tails even when winning regions agree. Oink keeps
-its default parity-preserving priority renumbering. Stream runs disable
-single-parity, self-loop and winner-controlled-cycle preprocessing. Ours uses
-`--iter-shave --format=leaves`; succinct fixes `--bits=ceil(log2(n))` to match
-`--sspm`, bypassing our default bounded schedule. The comparison selects the
-last round's last-run player (Oink's counter player is our winner's opponent)
-and checks a multiset of the exact printed branches, retaining multiplicities.
-It also checks the final parameters and winning regions. With preprocessing
-enabled, Oink's solution file is compared with our full `--initial-shave=all` regions.
-Oink's `--sol` reads a solution; `--output` writes one.
+The test compares winners with and without preprocessing. Partial STRPM
+certificates are checked against Oink's independent Zielonka partition: our
+nonstrict lifts now compute the least canonical completion, so the old Oink
+kernel can leave more vertices unresolved or finish at a different `(k,t)`.
+Exact branch multisets and final budgets are still checked for SSPM, with
+`--bits=ceil(log2(n))` matching Oink's unbounded `--sspm`.
 
 The `oink-oracle` CI job builds `vfluegel/oink`, branch `print-pms`, pinned to
 `51c2640fe650fd18d9331cfe5133cf3605a98c31`, with CMake. Lace is fetched by
@@ -252,29 +247,20 @@ to correct two upstream printer defects, without changing active lifts:
   two-vertex [pm_cycle.pg](games/pm_cycle.pg) reaches this use-after-free;
   its native output can happen to look correct depending on the allocator.
 
-The upstream Strahler search can also exhaust its outer `k` bound without
-solving the game or printing a stream. The minimal
-[oink_search_limit.pg](games/oink_search_limit.pg) is a two-vertex cycle with
-priorities 0 and 1, both owned by Odd. Oink stops after `(k,t)=(1,1)` and writes
-`paritysol 0;`, although Odd wins both vertices. Our matching incremental mode
-has the same partial result; full-game mode solves it at `(2,1)`. The harness
-reports these missing streams separately, requires the partial regions to
-agree, and still compares full shaved winners. If shaved Oink Strahler also
-exhausts, Oink's `--zlk` supplies that full winning partition.
+The upstream Strahler search can exhaust its outer `k` bound. The two-vertex
+[oink_search_limit.pg](games/oink_search_limit.pg) stops after `(1,1)` and
+writes `paritysol 0;`, although Odd wins both vertices. The comparison checks
+partial certificates against Zielonka rather than requiring identical
+unresolved sets.
 
-Oink's `uintqueue` is LIFO, and its incoming edges are built in reverse
-priority order. The port initially used a FIFO queue and ID-ordered incoming
-edges, which changed the final untruncated Strahler measures. The live test
-exposed this mismatch, and the port now follows Oink's order.
-`test_lifo_order` retains a five-vertex reproducer that fails with FIFO.
-
-Seed 0 validation checked 506 games per algorithm: 500 generated, one quick
-example and five fixtures. With the printer patch, there were no stream
-or winning-region mismatches: 502 Strahler streams and 506 succinct streams
-were compared. Four Strahler cases had matching partial results with no Oink
-stream (three generated games plus the search-limit fixture). The large
-`cabp_swp.ehoa.pg` example exceeded the timeout for both algorithms. The regular
-Meson suite also passed, with the live test skipped when `OINK_BIN` was unset.
+The scalar and SIMD regressions for
+[strpm-nonstrict-tail.pg](../examples/strpm-nonstrict-tail.pg) check that both
+`(2,1)` and `(2,2)` solve all 32 vertices and compute the expected least labels.
+`test_bounded_strpm.py` independently enumerates `genstree` leaves and performs
+synchronous least lifting, comparing every vertex label with both kernels on
+small games. This also covers asymmetric player heights, unary hosts, zero
+budgets and the seven-vertex nonstrict-tail chain. `test_lifo_order` retains
+the old worklist-order reproducer, now expecting its least canonical tail.
 
 Tree JSON tests use `json_check.py` as a dependency-free schema checker and
 `test_json.py` to compare all DECOMP backends over examples and game fixtures
@@ -291,7 +277,7 @@ failure into metrics, measure-tree construction and prefix-tree parsing and
 checks cleanup and write-error propagation. No new Python dependencies are used.
 
 The full Strahler PM SIMD kernel is checked by `test_strpm_simd` against the
-native reference across 428,430 successors and over four million comparisons.
+native reference across successor, nonstrict completion and comparison probes.
 `STRAHLER_PM_BACKEND=scalar` selects the reference; `simd` and the default
 select the SSE2/NEON kernel inside its encoding bounds. Wider hosts use the
 native fallback. The previous partial packed backend has been removed.

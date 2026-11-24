@@ -29,6 +29,8 @@
 
 /* Working arrays have capacity k-1+t (Strahler) or bits (succinct). */
 void strpm_successor(PMMeasure *measure, int pindex, int depth, int k, int t);
+/* First canonical leaf with the same prefix through pindex; preserve TOP. */
+void strpm_truncate(PMMeasure *measure, int pindex, int k, int t);
 void sspm_successor(PMMeasure *measure, int pindex, int depth);
 void sspm_truncate(PMMeasure *measure, int pindex);
 void pm_error(PMError *error, char const *message);

@@ -6,7 +6,7 @@
 #include "strpm_simd.h"
 
 static unsigned rng = 7019;
-static size_t successors, comparisons;
+static size_t successors, comparisons, truncations;
 static unsigned random_value(void) {
   rng = rng * 1664525U + 1013904223U;
   return rng;
@@ -49,6 +49,21 @@ static void check_successors(void) {
           old.bits = old_bits;
           old.levels = old_levels;
           STRPMVector const previous = packed;
+          if (step % 50 == 0) {
+            int const p = (int)(random_value() % (unsigned)(depth + 1)) - 1;
+            PMMeasure canonical = native;
+            canonical.bits = old_bits;
+            canonical.levels = old_levels;
+            STRPMVector completion = previous;
+            strpm_truncate(&canonical, p, k, t);
+            strpm_simd_truncate(&completion, p, k, t);
+            equal(&canonical, &completion);
+            assert(pm_compare(&canonical, &native, p) == 0);
+            assert(pm_compare(&canonical, &native, depth) <= 0);
+            truncations++;
+            memcpy(old_bits, bits, sizeof(bits));
+            memcpy(old_levels, levels, sizeof(levels));
+          }
           strpm_successor(&native, cutoff, depth, k, t);
           strpm_simd_successor(&packed, cutoff, depth, k, t);
           successors++;
@@ -109,7 +124,6 @@ int main(void) {
   }
   check_strings();
   check_successors();
-  printf(
-      "Strahler PM SIMD: %zu successors, %zu comparisons agree with native\n",
-      successors, comparisons);
+  printf("Strahler PM SIMD: %zu successors, %zu truncations, %zu comparisons\n",
+         successors, truncations, comparisons);
 }

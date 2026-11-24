@@ -149,10 +149,17 @@ static bool lift_vertex(LiftWork *work, size_t const vertex,
   int const pindex =
       priority_index(result, work->game->vertices[vertex].priority);
   bool const maximum = work->game->vertices[vertex].owner != result->player;
+  bool const truncate =
+      result->algorithm == PM_STRAHLER &&
+      work->game->vertices[vertex].priority % 2 == result->player;
   if (maximum && target != SIZE_MAX) {
     progress(work, vertex, target, pindex);
     if (pm_compare(&work->tmp, current, pindex) <= 0) {
       return false;
+    }
+    if (truncate) {
+      strpm_truncate(&work->tmp, pindex, (int)result->parameters.k,
+                     (int)result->parameters.t);
     }
     copy_measure(current, &work->tmp);
   } else {
@@ -173,6 +180,10 @@ static bool lift_vertex(LiftWork *work, size_t const vertex,
     }
     if (first || pm_compare(current, &work->best, pindex) >= 0) {
       return false;
+    }
+    if (truncate) {
+      strpm_truncate(&work->best, pindex, (int)result->parameters.k,
+                     (int)result->parameters.t);
     }
     copy_measure(current, &work->best);
   }
@@ -309,7 +320,7 @@ bool pm_lift(PGGame const *game, PGSet const *active,
             work.packed == nullptr ? "scalar" : "simd");
   }
   size_t queued = 0;
-  /* Oink's uintqueue is a stack; order affects untruncated Strahler tails. */
+  /* Oink's uintqueue is a stack. */
   for (size_t step = 0; step < count || queued != 0;) {
     size_t vertex = 0;
     if (step < count) {
