@@ -1,7 +1,7 @@
 # Offline Jupyter examples
 
-Eight notebooks for the public `strahler` Python API. Run each notebook from top
-to bottom. Its first cell prints the package and library versions and stops if
+Ten notebooks for the public `strahler` Python API. Run each notebook from top
+to bottom. Its first cell checks the package and library versions and stops if
 they differ. Use this directory as the notebook working directory so its game
 and Python helpers are importable. Rendering uses inline ESM/CSS and SVG, with no
 CDN, Graphviz, or runtime network access. Installation may need internet access
@@ -17,6 +17,8 @@ for Jupyter and the optional Python dependencies.
 | [06-check-your-own-tree](06-check-your-own-tree.ipynb) | Handwritten trees, violation outlines, repair |
 | [07-symmetric-lifting-kary-nester](07-symmetric-lifting-kary-nester.ipynb) | Binary/ternary lifting event counts, bounded Nester runs and historical parameters |
 | [08-lexicographic-adaptive-nester](08-lexicographic-adaptive-nester.ipynb) | Lexicographic and ratio AD/symmetric AD/PM search, host trees, linked AD tree/block views, Nester frontier and fixed-pair (k,t) maps |
+| [09-adaptive-cabp-swp](09-adaptive-cabp-swp.ipynb) | CABP data sizes 2/4, branching/strong bisimulation, three search orders and fixed SIMD STRPM/AD maps |
+| [10-adaptive-ladder](10-adaptive-ladder.ipynb) | Nine ordinary ladder sizes, three search orders, endpoint fixed maps and a small live STRPM check |
 
 Metrics tables use `dominion` for the number of vertices covered by a player's
 attractor decomposition (its tree), as in OTJ22 and Jurdziński–Morvan.
@@ -35,7 +37,18 @@ instances are marked beyond that method's frontier. Execution reads the recorded
 results and draws Nester-1's trees; it needs no network and does not repeat the
 benchmarks.
 The current comparison remeasures all six methods after correcting `+iter`
-to repeat the same `(k,t)` while shaving removes vertices.
+to repeat the same `(k,t)` while shaving removes vertices. Its fixed-pair section
+adds fresh full-kernel STRPM and PM+iter measurements alongside the archived AD
+data, distinguishing confirmed minima from candidates and resource limits.
+
+Notebooks 09 and 10 use a fresh 60-second/2-GiB first pass with lexicographic,
+ratio and table orders. CABP keeps the two equivalence relations as separate
+parameter series. Ladder uses every published rung count from 100 to 50,000.
+Both read bundled recordings and winner references, draw small host and
+certificate views, and check input hashes without network access. Their times
+include input and reporting; they are not kernel-only timings. The compressed
+fixtures, conversion provenance and exact limits are described in
+[cabp/README.md](cabp/README.md) and [ladder/README.md](ladder/README.md).
 
 ## Release zip
 

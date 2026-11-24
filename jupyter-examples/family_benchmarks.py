@@ -2,7 +2,7 @@
 
 import argparse
 import bz2
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 import gzip
 import hashlib
@@ -76,7 +76,30 @@ def save_winners(path, won, game):
     header = dict(vertices=game['vertices'], fixture_sha256=game['sha256'],
                   layout='two byte arrays, Even then Odd, least significant bit first; IDs 0..N-1')
     raw = json.dumps(header, sort_keys=True).encode() + b'\n' + b''.join(won)
-    Path(path).write_bytes(gzip.compress(raw, mtime=0))
+    path = Path(path)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(prefix='.winners-', dir=path.parent, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(gzip.compress(raw, mtime=0))
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def publish_winners(temporary, directory):
+    """Immutable reference names let different-budget recordings share safely."""
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    digest = sha256(temporary)
+    destination = directory / (digest + '.winners.gz')
+    if destination.exists():
+        if sha256(destination) != digest:
+            raise ValueError('Existing content-addressed reference is corrupt')
+    else:
+        Path(temporary).replace(destination)
+    return destination, digest
 
 
 def load_winners(path, game):
@@ -211,10 +234,12 @@ def worker(request):
         native_seconds = perf_counter() - started
         detail = result.stderr.decode(errors='replace')
         if result.returncode:
+            output_limit = (result.returncode == -signal.SIGXFSZ or
+                            'file too large' in detail.lower())
             memory = 'allocat' in detail.lower() or 'out of memory' in detail.lower()
             if result.returncode < 0:
                 memory = False  # A crash is a defect, never a memory-frontier claim.
-            print(json.dumps(dict(outcome='memory' if memory else 'error',
+            print(json.dumps(dict(outcome='output limit' if output_limit else 'memory' if memory else 'error',
                                   returncode=result.returncode, detail=detail[-400:])))
             return
         stage_path.write_text('JSON reduction and winner validation')
@@ -244,7 +269,8 @@ def measure(request, seconds):
             if process.returncode == 0:
                 result = json.loads(output)
             else:
-                result = dict(outcome='memory' if 'MemoryError' in error else 'error',
+                output_limit = process.returncode == -signal.SIGXFSZ or 'File too large' in error
+                result = dict(outcome='output limit' if output_limit else 'memory' if 'MemoryError' in error else 'error',
                               returncode=process.returncode, detail=error[-400:])
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGKILL)
@@ -289,6 +315,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
     build_dir = Path(build_dir).resolve()
     metadata = dict(family=family, timeout_seconds=seconds, memory_gib=memory_gib, jobs=jobs,
                     reference_timeout_seconds=seconds, memory_cap_enforced=sys.platform.startswith('linux'),
+                    report_size_cap_gib=2, python_version=platform.python_version(),
                     source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
                     worker_sha256=sha256(__file__), ijson_version=ijson.__version__,
                     machine=f'{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs',
@@ -300,11 +327,12 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
                     orders=list(ORDERS), backends=list(BACKENDS), fixed_backends=list(FIXED_BACKENDS))
     if output.exists():
         document = json.loads(output.read_text())
-        for key in ('timeout_seconds', 'memory_gib', 'worker_sha256', 'fixture_sha256', 'binary_sha256'):
+        for key in ('timeout_seconds', 'memory_gib', 'jobs', 'reference_timeout_seconds',
+                    'worker_sha256', 'fixture_sha256', 'binary_sha256', 'ijson_version', 'python_version'):
             assert document[key] == metadata[key], f'Resume mismatch: {key}'
     else:
         document = dict(metadata, recorded_utc=datetime.now(timezone.utc).isoformat(timespec='seconds'),
-                        complete=False, references=[], rows=[], fixed_rows=[])
+                        complete=False, references=[], rows=[], fixed_rows=[], followup_rows=[])
 
     def checkpoint():
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -313,20 +341,29 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
         temporary.replace(output)
 
     references = {r['game']: r for r in document['references']}
+    stopped_work = threading.Event()
     reference_dir = directory / 'references'
     reference_dir.mkdir(exist_ok=True)
     for game in info['games']:
         if game['id'] in references:
+            reference = references[game['id']]
+            if reference['outcome'] == 'solved':
+                saved = directory / reference['bitset_file']
+                if sha256(saved) != reference['bitset_sha256']:
+                    raise ValueError('Checkpoint reference checksum mismatch')
+                load_winners(saved, game)
             continue
-        path = reference_dir / (game['id'] + '.winners.gz')
-        request = dict(game=game, path=str((directory / game['file']).resolve()),
-                       backend='reference', build_dir=str(build_dir), memory_gib=memory_gib,
-                       cache=str(cache), save_reference=str(path.resolve()))
-        result = dict(game=game['id'], **measure(request, seconds))
-        if result['outcome'] == 'solved':
-            result.update(bitset_file=str(path.relative_to(directory)), bitset_sha256=sha256(path))
-        else:
-            path.unlink(missing_ok=True)
+        # This attempt owns only its temporary path. A timeout cannot remove
+        # another recording's successful reference, even with a new --output.
+        with tempfile.TemporaryDirectory(prefix='reference-', dir=cache) as temporary:
+            pending = Path(temporary) / 'winners.gz'
+            request = dict(game=game, path=str((directory / game['file']).resolve()),
+                           backend='reference', build_dir=str(build_dir), memory_gib=memory_gib,
+                           cache=str(cache), save_reference=str(pending))
+            result = dict(game=game['id'], **measure(request, seconds))
+            if result['outcome'] == 'solved':
+                saved, digest = publish_winners(pending, reference_dir)
+                result.update(bitset_file=str(saved.relative_to(directory)), bitset_sha256=digest)
         references[game['id']] = result
         document['references'].append(result)
         checkpoint()
@@ -334,10 +371,13 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
 
     rows = {(r['game'], r['backend'], r['order']): r for r in document['rows']}
     fixed = {(r['game'], r['backend'], r['k'], r['t']): r for r in document['fixed_rows']}
+    followups = {(r['game'], r['backend'], r['k'], r['t']): r for r in document.get('followup_rows', [])}
 
-    def measured(game, backend, order=None, pair=None):
+    def measured(game, backend, order=None, pair=None, followup=False):
+        if stopped_work.is_set():
+            raise RuntimeError('Collection stopped after another worker failed')
         key = (game['id'], backend, order) if pair is None else (game['id'], backend, *pair)
-        target = rows if pair is None else fixed
+        target = followups if followup else rows if pair is None else fixed
         if key not in target:
             reference = references[game['id']]
             request = dict(game=game, path=str((directory / game['file']).resolve()), backend=backend,
@@ -349,7 +389,7 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
                 result.update(k=pair[0], t=pair[1])
             with _lock:
                 target[key] = result
-                document['rows' if pair is None else 'fixed_rows'].append(result)
+                document.setdefault('followup_rows' if followup else 'rows' if pair is None else 'fixed_rows', []).append(result)
                 checkpoint()
             print(f"{game['id']} {backend} {order or pair}: {result['outcome']}, {result['seconds']:.2f} s", flush=True)
         return target[key]
@@ -357,6 +397,8 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
     def frontier(series, backend, order):
         stopped = None
         for game in sorted((g for g in info['games'] if g['series'] == series), key=lambda g: g['parameter']):
+            if stopped_work.is_set():
+                return
             key = game['id'], backend, order
             if stopped is not None:
                 if key not in rows:
@@ -372,12 +414,21 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
             if row['outcome'] != 'solved':
                 stopped = game['id']
 
+    def finish(futures):
+        try:
+            for future in as_completed(futures):
+                future.result()
+        except BaseException:
+            stopped_work.set()
+            for future in futures:
+                future.cancel()
+            raise
+
     with ThreadPoolExecutor(jobs) as pool:
         futures = [pool.submit(frontier, series, backend, order)
                    for order in ORDERS for series in sorted({g['series'] for g in info['games']})
                    for backend in BACKENDS]
-        for future in futures:
-            future.result()
+        finish(futures)
         futures = []
         for game in info['games']:
             if not game.get('fixed_map'):
@@ -388,11 +439,38 @@ def run(family, build_dir, seconds=60, memory_gib=2, jobs=2, output=None):
                 futures.append(pool.submit(measured_grid,
                                            lambda k, t, g=game, b=backend: measured(g, b, pair=(k, t)),
                                            k_max, t_max))
-        for future in futures:
-            future.result()
+        finish(futures)
+        # A small declared box may contain no plain-PM solve. A separate
+        # targeted rerun supplies fixed-host evidence without claiming minima.
+        for game in info['games']:
+            if not game.get('fixed_map') or any(r['game'] == game['id'] and r['backend'] == 'PM' and
+                                               r['outcome'] == 'solved' for r in fixed.values()):
+                continue
+            candidates = [r for r in rows.values() if (r['game'], r['backend'], r['outcome']) ==
+                          (game['id'], 'PM', 'solved')]
+            if candidates:
+                candidate = min(candidates, key=lambda r: r['seconds'])
+                measured(game, 'PM', pair=tuple(candidate['final_pair']), followup=True)
+        document['followup_policy'] = 'Freshly repeat the fastest successful plain-PM adaptive pair for each mapped case without a fixed solve; these probes do not establish Pareto minimality.'
     document['complete'] = True
     checkpoint()
     return document
+
+
+def validate_fixed_row(row, game, rectangle=True):
+    assert game.get('fixed_map') and row['backend'] in FIXED_BACKENDS
+    pm = row['backend'].startswith('PM')
+    caps = game['PM_k_max'] if pm else game['AD_k_max']
+    k, t = row['k'], row['t']
+    assert 1 <= k <= max(caps) and 0 <= t <= game['t_max']
+    assert not rectangle or t <= game['fixed_t_max']
+    assert row['outcome'] in ('solved', 'unsolved', 'timeout', 'memory', 'output limit')
+    if row['outcome'] in ('solved', 'unsolved'):
+        assert row['final_pair'] == [k, t] and len(row['parameters']) == 2
+        for player, parameters in enumerate(row['parameters']):
+            assert parameters['t'] == t
+            assert parameters['k' if pm else 'K'] == min(k, caps[player])
+            assert parameters['depth' if pm else 'H'] == game['PM_depth' if pm else 'AD_height'][player]
 
 
 def recorded(family, path=None):
@@ -405,6 +483,12 @@ def recorded(family, path=None):
     assert {(r['game'], r['backend'], r['order']) for r in document['rows']} == expected
     assert len(document['rows']) == len(expected)
     assert len(document['references']) == len(info['games'])
+    games_by_id = {g['id']: g for g in info['games']}
+    for group, rectangle in ((document['fixed_rows'], True), (document.get('followup_rows', []), False)):
+        keys = [(r['game'], r['backend'], r['k'], r['t']) for r in group]
+        assert len(set(keys)) == len(keys)
+        for row in group:
+            validate_fixed_row(row, games_by_id[row['game']], rectangle)
     by_key = {(r['game'], r['backend'], r['order']): r for r in document['rows']}
     for order in ORDERS:
         for backend in BACKENDS:
@@ -415,7 +499,7 @@ def recorded(family, path=None):
                     if stopped is not None:
                         assert row['outcome'] == 'not measured' and row['frontier'] == stopped
                     else:
-                        assert row['outcome'] in ('solved', 'unsolved', 'timeout', 'memory')
+                        assert row['outcome'] in ('solved', 'unsolved', 'timeout', 'memory', 'output limit')
                         if row['outcome'] != 'solved':
                             stopped = game['id']
     for game in info['games']:
@@ -424,11 +508,15 @@ def recorded(family, path=None):
         reference = references[0]
         if reference['outcome'] == 'solved':
             assert sha256(directory / reference['bitset_file']) == reference['bitset_sha256']
-            load_winners(directory / reference['bitset_file'], game)
-        complete = [r for r in [*document['rows'], *document['fixed_rows'], reference]
+            won = load_winners(directory / reference['bitset_file'], game)
+            check_partition(won, bytes((game['vertices'] + 7) // 8), game['vertices'])
+            assert [sum(byte.bit_count() for byte in side) for side in won] == reference['won']
+            assert [winner_digest(bit_vertices(side)) for side in won] == reference['winner_sha256']
+        all_rows = [*document['rows'], *document['fixed_rows'], *document.get('followup_rows', []), reference]
+        complete = [r for r in all_rows
                     if r.get('game') == game['id'] and r['outcome'] == 'solved']
         assert len({tuple(r['winner_sha256']) for r in complete}) <= 1
-        for row in [r for r in [*document['rows'], *document['fixed_rows'], reference]
+        for row in [r for r in all_rows
                     if r['game'] == game['id']]:
             assert row['timeout_seconds'] == document['timeout_seconds']
             assert row['memory_gib'] == document['memory_gib']
@@ -457,6 +545,8 @@ def result_text(row):
         return 'beyond measured frontier'
     if row['outcome'] == 'memory':
         return f"{row['memory_gib']} GiB limit"
+    if row['outcome'] == 'output limit':
+        return '2 GiB report limit'
     if row['outcome'] == 'unsolved':
         return f"partial, {row['seconds']:.2f} s"
     return f"{row['outcome']} ({row['timeout_seconds']:g} s cap)"
@@ -475,7 +565,7 @@ def fixed_maps(info, document):
                          grid_svg(backend, rows, k_max, game['fixed_t_max']) + '</figure>')
             candidates, confirmed, _ = pareto(rows)
             summary.append([game['label'], backend, confirmed, candidates,
-                            [(r['k'], r['t']) for r in rows if r['outcome'] in ('timeout', 'memory')]])
+                            [(r['k'], r['t']) for r in rows if r['outcome'] in ('timeout', 'memory', 'output limit')]])
     return ('<div style="display:flex;flex-wrap:wrap;gap:12px">' + ''.join(grids) + '</div>' + legend_svg()), summary
 
 

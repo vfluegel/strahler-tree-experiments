@@ -1,6 +1,7 @@
 """Check bounded family reporting, fixture identity, and honest map coverage."""
 
 import bz2
+import json
 import os
 from pathlib import Path
 import sys
@@ -79,13 +80,90 @@ def test_grid_does_not_infer_a_solve_from_a_timeout():
 def test_pinned_family_bounds_and_separate_relations():
     cabp = family.manifest('cabp')
     assert len(cabp['games']) == 4
+    assert [g['id'] for g in cabp['games'] if g['in_v2026_selection']] == ['cabp-branching-bisim-data2']
     assert {g['parameter'] for g in cabp['games']} == {2, 4}
     assert {g['series'] for g in cabp['games']} == {'branching-bisim', 'strong-bisim'}
     assert all(g['AD_height'] == [2, 2] and g['PM_depth'] == [1, 2] for g in cabp['games'])
     anchor = cabp['games'][0]
     assert anchor['pg_sha256'] == family.sha256(ROOT / 'examples/cabp_swp.ehoa.pg')
-    assert not next(g for g in cabp['games'] if g['id'] == 'cabp-branching-bisim-data4')['official_syntcomp_2026']
+    assert not next(g for g in cabp['games'] if g['id'] == 'cabp-branching-bisim-data4')['source_in_v2026_repository']
     ladders = family.manifest('ladder')['games']
     assert len(ladders) == 9 and ladders[0]['parameter'] == 100 and ladders[-1]['parameter'] == 50000
     assert all(g['vertices'] == 2 * g['parameter'] and g['edges'] == 4 * g['parameter'] for g in ladders)
     assert [g['parameter'] for g in ladders if g['fixed_map']] == [100, 50000]
+
+
+@pytest.mark.parametrize('damage', ['pair', 'parameter', 'height', 'status', 'range'])
+def test_fixed_recordings_reject_inconsistent_requested_hosts(damage):
+    info = family.manifest('cabp')
+    document = json.loads((family.HERE / 'cabp/results-60s.json').read_text())
+    row = next(r for r in document['fixed_rows'] if r['backend'] == 'PM+iter' and r['outcome'] == 'solved')
+    game = next(g for g in info['games'] if g['id'] == row['game'])
+    family.validate_fixed_row(row, game)
+    if damage == 'pair':
+        row['final_pair'] = [1, 0]
+    elif damage == 'parameter':
+        row['parameters'][0]['k'] = 0
+    elif damage == 'height':
+        row['parameters'][0]['depth'] += 1
+    elif damage == 'status':
+        row['outcome'] = 'error'
+    else:
+        row['t'] = game['t_max'] + 1
+    with pytest.raises(AssertionError):
+        family.validate_fixed_row(row, game)
+
+
+def test_published_family_evidence_includes_all_cases_and_fixed_followups():
+    for name in ('cabp', 'ladder'):
+        info, document = family.recorded(name)
+        assert all(r['outcome'] == 'solved' for r in document['references'])
+        assert len(document['rows']) == len(info['games']) * len(family.BACKENDS) * len(family.ORDERS)
+        if name == 'cabp':
+            assert {(r['k'], r['t']) for r in document['followup_rows']} == {(3, 5), (3, 7)}
+            assert all(r['outcome'] == 'solved' for r in document['followup_rows'])
+        else:
+            assert all(r['outcome'] == 'solved' for r in document['rows'])
+            assert all(r['final_pair'] == [1, 0] for r in document['fixed_rows'])
+
+
+def test_alternate_budget_cannot_delete_a_published_reference(case_request, tmp_path, monkeypatch):
+    """A timed-out oracle in a new recording must leave old evidence intact."""
+    directory = tmp_path / 'cabp'
+    directory.mkdir()
+    fixture = directory / 'game.pg.bz2'
+    fixture.write_bytes(Path(case_request['path']).read_bytes())
+    game = dict(case_request['game'], id='toy', file=fixture.name, series='toy', parameter=1,
+                fixed_map=False)
+    monkeypatch.setattr(family, 'HERE', tmp_path)
+    monkeypatch.setattr(family, 'manifest', lambda _: dict(games=[game]))
+
+    def measured(request, seconds):
+        result = dict(outcome='timeout', seconds=seconds, timeout_seconds=seconds, memory_gib=2)
+        if request['backend'] == 'reference' and seconds == 60:
+            family.save_winners(request['save_reference'], [bytes([31]), bytes([0])], game)
+            result['outcome'] = 'solved'
+        return result
+
+    monkeypatch.setattr(family, 'measure', measured)
+    first = family.run('cabp', case_request['build_dir'], seconds=60)
+    saved = directory / first['references'][0]['bitset_file']
+    original = saved.read_bytes()
+    second = family.run('cabp', case_request['build_dir'], seconds=1, output=directory / 'short.json')
+    assert second['references'][0]['outcome'] == 'timeout'
+    assert saved.read_bytes() == original
+    assert not list(saved.parent.glob('.winners-*'))
+    with pytest.raises(AssertionError, match='jobs'):
+        family.run('cabp', case_request['build_dir'], seconds=60, jobs=1)
+    import ijson
+    with monkeypatch.context() as context:
+        context.setattr(ijson, '__version__', 'different-parser')
+        with pytest.raises(AssertionError, match='ijson_version'):
+            family.run('cabp', case_request['build_dir'], seconds=60)
+    saved.write_bytes(b'corrupt reference')
+    with pytest.raises(ValueError, match='checksum'):
+        family.run('cabp', case_request['build_dir'], seconds=60)
+    saved.write_bytes(original)
+    saved.unlink()
+    with pytest.raises(FileNotFoundError):
+        family.run('cabp', case_request['build_dir'], seconds=60)

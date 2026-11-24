@@ -30,7 +30,6 @@
       ],
       "normalized_maximum": 2,
       "dense_ids": true,
-      "official_syntcomp_2026": true,
       "ehoa_file": "CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2.ehoa",
       "ehoa_sha256": "e4c8725fed44ba83ea1a8010b186a38df8a7765d45cb54881b9a7caa65ab5b2b",
       "ehoa_bytes": 38697409,
@@ -57,7 +56,9 @@
         3
       ],
       "file_bytes": 28725936,
-      "repository_storage": "symlink to the existing examples/cabp_swp.ehoa.pg; the release zip stores its contents"
+      "repository_storage": "symlink to the existing examples/cabp_swp.ehoa.pg; the release zip stores its contents",
+      "source_in_v2026_repository": true,
+      "in_v2026_selection": true
     },
     {
       "id": "cabp-strong-bisim-data2",
@@ -79,7 +80,6 @@
       ],
       "normalized_maximum": 2,
       "dense_ids": true,
-      "official_syntcomp_2026": true,
       "ehoa_file": "CABP_SWP_(datasize=2_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
       "ehoa_sha256": "d83a4b823da653d9b07a3b51817d20a8d3912beda21f4b2c94cdb585c4450458",
       "ehoa_bytes": 4978324,
@@ -105,7 +105,9 @@
         2,
         3
       ],
-      "file_bytes": 1067376
+      "file_bytes": 1067376,
+      "source_in_v2026_repository": true,
+      "in_v2026_selection": false
     },
     {
       "id": "cabp-branching-bisim-data4",
@@ -127,7 +129,6 @@
       ],
       "normalized_maximum": 2,
       "dense_ids": true,
-      "official_syntcomp_2026": false,
       "ehoa_file": "CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=branching-bisim.gm.bz2.ehoa",
       "ehoa_sha256": "00acaa8f241fabfdcb8f0e199bded2ea8c7b74b5e7fabb467105ac1b6f7d7865",
       "ehoa_bytes": 129939812,
@@ -153,7 +154,9 @@
         2,
         3
       ],
-      "file_bytes": 22593232
+      "file_bytes": 22593232,
+      "source_in_v2026_repository": false,
+      "in_v2026_selection": false
     },
     {
       "id": "cabp-strong-bisim-data4",
@@ -175,7 +178,6 @@
       ],
       "normalized_maximum": 2,
       "dense_ids": true,
-      "official_syntcomp_2026": true,
       "ehoa_file": "CABP_SWP_(datasize=4_capacity=1_windowsize=1)eq=strong-bisim.gm.bz2.ehoa",
       "ehoa_sha256": "716b838a158916a05f87a9ede1e78cdfd31c283ee791d4fce070c1131d59c405",
       "ehoa_bytes": 15864985,
@@ -201,7 +203,11 @@
         2,
         3
       ],
-      "file_bytes": 2955991
+      "file_bytes": 2955991,
+      "source_in_v2026_repository": true,
+      "in_v2026_selection": false
     }
-  ]
+  ],
+  "selection_receipt_url": "https://github.com/SYNTCOMP/benchmarks/blob/f3374c9cab0d829498b4c055ed00ac2375e88e67/selection/releases/syntcomp26v2/parity-v2026.csv",
+  "selection_receipt_sha256": "98b9e0c0b61c5815338d0d4dfcfb31214428214e5d359a8d335111b623d0eb09"
 }

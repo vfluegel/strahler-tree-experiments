@@ -41,7 +41,7 @@ def cabp(game, document, destination, cache, knor):
     if knor is None:
         raise ValueError('Rebuilding CABP requires --knor PATH (see its manifest for the pinned source)')
     hoa = cache / game['ehoa_file']
-    if game['official_syntcomp_2026']:
+    if game['source_in_v2026_repository']:
         fetch(game['ehoa_url'], hoa, game['ehoa_sha256'])
     elif not hoa.exists():
         original = cache / Path(game['original_member']).name

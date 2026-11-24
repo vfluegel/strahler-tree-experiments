@@ -11,8 +11,11 @@ A symlink reuses it in a checkout; the notebooks release zip includes its
 contents. Converting the pinned SYNTCOMP eHOA file with `knor --print-game`
 reproduces it byte for byte.
 
-The [SYNTCOMP 2026 selection](https://github.com/SYNTCOMP/benchmarks/tree/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren)
-also supplies both strong-bisimulation inputs. Its
+The [SYNTCOMP v2026 repository corpus](https://github.com/SYNTCOMP/benchmarks/tree/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren)
+also supplies both strong-bisimulation inputs as related comparison cases.
+Only the branching data-size-2 anchor appears in the original 484-game release
+selection, as confirmed by the pinned
+[release receipt](https://github.com/SYNTCOMP/benchmarks/blob/f3374c9cab0d829498b4c055ed00ac2375e88e67/selection/releases/syntcomp26v2/parity-v2026.csv). Its
 [readme](https://github.com/SYNTCOMP/benchmarks/blob/4105caf1f1e5fd3b76657879bfce8021d130cbde/parity/keiren/readme.md)
 explains the 50 MB selection cutoff. The larger branching game was recovered
 from [Keiren's CC0 archive](https://doi.org/10.6084/m9.figshare.6004130.v1)
@@ -51,3 +54,15 @@ adaptive measurements of that method/order/relation; it makes no claim about
 the solvability of larger instances. Fixed maps cover the two data-size-2
 anchors, every admissible k, and t=0…3. Unmeasured dominated cells are skipped
 only because they cannot be new coordinatewise Pareto minima.
+
+Two separately labelled plain-PM follow-ups repeat the fastest successful
+adaptive pairs after the declared fixed grid: branching `(3,7)` and strong
+`(3,5)`. Both solve; unmeasured predecessors mean these are sufficient pairs,
+not confirmed minima. The collector reproduces this follow-up policy.
+
+The adaptive CABP pass overlapped the last Nester jobs on the shared four-CPU
+host. Fixed maps, follow-ups and the ladder pass followed afterwards. The
+recording preserves that workload note and the measured worker/executable hashes.
+New runs store references atomically by content hash, so a shorter-budget
+recording cannot overwrite or delete a published reference. A separate 2 GiB
+file-size cap applies to temporary reports; reaching it is an output limit.

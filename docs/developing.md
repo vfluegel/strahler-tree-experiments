@@ -1321,3 +1321,37 @@ Fixed Strahler PM accepts `--repeat-fixed` together with `--k`, `--t` and
 shrinks, then returns complete or a stable partial result. The existing fixed
 API still runs one round by default. Notebook 08 uses this opt-in for its
 PM+iter fixed-pair measurements and records scalar/SIMD dispatch.
+
+The CABP and ordinary-ladder experiments share
+`jupyter-examples/family_benchmarks.py`. Check their pinned input hashes, graph
+counts and host bounds with `python scripts/gen_notebook_families.py --check`.
+Missing fixtures can be recovered by omitting `--check`; CABP conversion also
+needs `--knor PATH`, using the source revision pinned in its manifest.
+
+After installing `jupyter-examples/requirements-dev.txt` and building the CLI
+tools, collect a resumable first pass with:
+
+```sh
+python jupyter-examples/family_benchmarks.py run \
+  --family cabp --build-dir build --seconds 60 --memory-gib 2 --jobs 2
+python jupyter-examples/family_benchmarks.py run \
+  --family ladder --build-dir build --seconds 60 --memory-gib 2 --jobs 2
+```
+
+The native command writes JSON to a temporary file. `ijson` reads selected
+subtrees while skipping the game object, and winner sets become compact bitsets
+bound to the fixture hash. Independent Zielonka references run under separate
+limits; an unavailable reference does not turn a verified solver result into a
+failure. Each worker and its native child inherit the same per-process
+address-space limit; the supervisor kills their entire process group on timeout. Input, solving,
+verification, serialization, reduction and winner checking all count toward
+the case deadline. Reference setup has its own deadline. The recorded native
+command time still includes JSON output. Worker, source, executable and input
+hashes make the timing scope and implementation identifiable.
+
+Frontiers are independent for every equivalence relation, method and search
+order. Fixed maps skip only measured-dominated cells for finding Pareto minima;
+they do not infer solver outcomes across k. A timeout leaves the corresponding
+host's sufficiency unknown. Unexpected solver or verification errors stop the
+collector. Notebooks 09 and 10 read the bundled recordings offline, so ordinary
+execution does not repeat these measurements.

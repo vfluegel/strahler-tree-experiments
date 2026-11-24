@@ -18,9 +18,16 @@ class NotebooksZip(unittest.TestCase):
             notebooks = root / 'jupyter-examples'
             (notebooks / 'data').mkdir(parents=True)
             (notebooks / 'nester').mkdir()
+            (notebooks / 'cabp').mkdir()
+            (notebooks / 'ladder').mkdir()
             files = {'README.md': '# Notebooks\n', 'requirements.txt': 'jupyterlab\n',
                      'example.ipynb': '{}', '07-symmetric-lifting-kary-nester.ipynb': '{}',
                      '08-lexicographic-adaptive-nester.ipynb': '{}',
+                     '09-adaptive-cabp-swp.ipynb': '{}',
+                     '10-adaptive-ladder.ipynb': '{}',
+                     'family_benchmarks.py': '# bounded streaming collector\n',
+                     'cabp/manifest.json': '{}', 'cabp/results-60s.json': '{}',
+                     'ladder/laddergame-100.gm.bz2': 'ladder fixture',
                      'symmetric_lifting.py': '# measurement helper\n',
                      'lexicographic_nester.py': '# lexicographic experiment helper\n',
                      'nester/Nestern=1.gm.bz2': 'compressed fixture',
@@ -41,6 +48,11 @@ class NotebooksZip(unittest.TestCase):
                      'data/requirements.txt': '# helper data\n'}
             for name, content in files.items():
                 (notebooks / name).write_text(content)
+            # The release must contain the data behind a checkout symlink.
+            anchor = root / 'cabp-anchor.pg'
+            anchor.write_text('0 0 0 0;\n')
+            (notebooks / 'cabp/anchor.pg').symlink_to('../../cabp-anchor.pg')
+            files['cabp/anchor.pg'] = anchor.read_text()
             data = {'keiren/results.csv': 'archive,game,backend\nmlsolver,Nestern=1.gm,lifting\n',
                     'KEIREN.md': '# Column definitions\n'}
             (root / 'keiren').mkdir()

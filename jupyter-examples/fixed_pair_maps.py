@@ -333,8 +333,8 @@ def classify(rows, k_max, t_max):
                          ('; all strict predecessors measured partial' if at in confirmed else '; smaller unmeasured pairs may solve'))
         elif row['outcome'] == 'unsolved':
             cells[at] = ('failed', '✗', f"stabilized with {row['unresolved']} vertices unresolved")
-        elif row['outcome'] in ('timeout', 'memory'):
-            cells[at] = ('limit', 'T' if row['outcome'] == 'timeout' else 'M', 'resource limit; host sufficiency unknown')
+        elif row['outcome'] in ('timeout', 'memory', 'output limit'):
+            cells[at] = ('limit', {'timeout': 'T', 'memory': 'M', 'output limit': 'O'}[row['outcome']], 'resource limit; host sufficiency unknown')
         else:
             cells[at] = ('unknown', '!', row.get('detail', 'solver error'))
     return cells
@@ -403,7 +403,7 @@ def grid_svg(title, rows, k_max, t_max):
 def legend_svg():
     entries = [('solved', '★', 'confirmed Pareto minimum'), ('solved', '◇', 'observed nondominated solve'),
                ('solved', '✓', 'measured solve'), ('failed', '✗', 'measured partial'),
-               ('limit', 'T', 'time/memory limit: unknown'),
+               ('limit', 'T', 'resource limit: unknown'),
                ('dominated', '', 'dominated, not run'), ('unknown', '', 'not run')]
     parts, x = [], 4
     for state, glyph, label in entries:
